@@ -1,6 +1,6 @@
 import { withAuth } from "next-auth/middleware";
 
-export const proxy = withAuth({
+export default withAuth({
   callbacks: {
     authorized: ({ token }) => !!token,
   },
