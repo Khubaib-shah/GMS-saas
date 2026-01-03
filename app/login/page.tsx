@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dumbbell } from "lucide-react";
@@ -15,35 +15,38 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+    const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
+        callbackUrl,
       });
 
       if (result?.error) {
-        toast.error("Invalid email or password");
+        toast.error('Invalid email or password');
       } else {
         // Fetch session to check role
-        const res = await fetch("/api/auth/session")
-        const session = await res.json()
-        
-        toast.success("Welcome back!");
-        
-        if (session?.user?.role === "super_admin") {
-          router.push("/admin");
+        const res = await fetch('/api/auth/session');
+        const session = await res.json();
+        toast.success('Welcome back!');
+        // If a callbackUrl was provided and is not the default dashboard, use it
+        if (callbackUrl && callbackUrl !== '/dashboard') {
+          router.push(callbackUrl);
+        } else if (session?.user?.role === 'super_admin') {
+          router.push('/admin');
         } else {
-          router.push("/dashboard");
+          router.push('/dashboard');
         }
       }
     } catch (error) {
-      toast.error("An error occurred during sign in");
+      toast.error('An error occurred during sign in');
     } finally {
       setLoading(false);
     }
