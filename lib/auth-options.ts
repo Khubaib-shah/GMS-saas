@@ -57,6 +57,10 @@ export const authOptions: NextAuthOptions = {
             }
             return session;
         },
+        async redirect({ url, baseUrl }) {
+            // If a callbackUrl is provided and is within the same site, use it; otherwise go to dashboard
+            return url.startsWith(baseUrl) ? url : `${baseUrl}/dashboard`;
+        },
     },
     session: {
         strategy: "jwt",
