@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Search, Plus, Trash2 } from "lucide-react";
+import { Search, Plus, Trash2, QrCode } from "lucide-react";
+import { MemberQrDialog } from "@/components/member-qr-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -27,12 +28,21 @@ export default function MembersPage() {
     "all" | "active" | "expired"
   >("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [qrMember, setQrMember] = useState<{ id: string; name: string } | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    store.loadMembers();
-    store.loadSubscriptions();
-    setLoading(false);
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([
+        store.loadMembers(),
+        store.loadSubscriptions()
+      ]);
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   const filtered = useMemo(() => {
@@ -212,6 +222,19 @@ export default function MembersPage() {
                     {formatDate(member.joinDate)}
                   </td>
                   <td className="py-4 px-4 space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setQrMember({
+                          id: member.id,
+                          name: `${member.firstName} ${member.lastName || ""}`,
+                        })
+                      }
+                      title="Show QR Code"
+                    >
+                      <QrCode className="w-4 h-4" />
+                    </Button>
                     <Link href={`/members/${member.id}`}>
                       <Button
                         variant="outline"
@@ -241,6 +264,16 @@ export default function MembersPage() {
           </div>
         )}
       </Card>
+
+      {/* QR Code Dialog */}
+      {qrMember && (
+        <MemberQrDialog
+          open={!!qrMember}
+          onOpenChange={(open) => !open && setQrMember(null)}
+          memberId={qrMember.id}
+          memberName={qrMember.name}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog

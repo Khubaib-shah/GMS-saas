@@ -27,11 +27,21 @@ export default function PaymentsPage() {
   const store = useAppStore()
   const [searchTerm, setSearchTerm] = useState("")
   const [filterPeriod, setFilterPeriod] = useState<"this-month" | "last-month" | "all">("this-month")
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    store.loadPayments()
-    store.loadMembers()
+    const loadData = async () => {
+      setLoading(true)
+      await Promise.all([
+        store.loadPayments(),
+        store.loadMembers()
+      ])
+      setLoading(false)
+    }
+    loadData()
   }, [])
+
+  // ... (filtered useMemo stays same)
 
   const filtered = useMemo(() => {
     let result = store.payments
@@ -72,6 +82,14 @@ export default function PaymentsPage() {
   const totalRevenue = filtered.reduce((sum, p) => sum + p.amount, 0)
   const paidCount = filtered.length
   const avgPayment = paidCount > 0 ? totalRevenue / paidCount : 0
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <p className="text-muted-foreground">Loading payments...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">

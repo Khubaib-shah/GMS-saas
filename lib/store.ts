@@ -11,6 +11,7 @@ import type { Member, Plan, Subscription, Payment } from "./types"
 export type AppState = {
   // Gym Profile
   gymProfile: {
+    _id?: string
     name: string
     owner: string
     phone: string
@@ -86,6 +87,7 @@ export const useAppStore = create<AppState>()(
             const data = await res.json();
             set({
               gymProfile: {
+                _id: data._id,
                 name: data.name || "GymFlow",
                 owner: data.owner || "Owner", // Fallback, usually from session
                 phone: data.phone || "",

@@ -1,0 +1,140 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useAppStore } from "@/lib/store";
+import { Check, X } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+
+export function ManualEntry() {
+  const store = useAppStore();
+  const [open, setOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [isCheckout, setIsCheckout] = useState(false);
+
+  // Filter only active members (basic check) if needed, or show all
+  const members = store.members || []; 
+
+  const handleAttendance = async () => {
+    if (!selectedMember) return;
+    setLoading(true);
+    try {
+      const endpoint = isCheckout
+        ? "/api/attendance/check-out"
+        : "/api/attendance/check-in";
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          memberId: selectedMember.id,
+          gymId: store.gymProfile._id, // Ensure gymProfile is loaded
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to mark attendance");
+      }
+
+      toast.success(
+        `Successfully ${isCheckout ? "Checked Out" : "Checked In"} ${
+          selectedMember.firstName
+        }`
+      );
+      setSelectedMember(null);
+      setOpen(false);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4 p-4 border rounded-lg bg-card">
+      <h3 className="text-lg font-semibold">Manual Entry</h3>
+      
+      <div className="flex items-center space-x-2 mb-4">
+        <Checkbox 
+            id="checkout-mode" 
+            checked={isCheckout} 
+            onCheckedChange={(checked) => setIsCheckout(checked as boolean)}
+        />
+        <Label htmlFor="checkout-mode">Mark as Check-out</Label>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between"
+            >
+              {selectedMember
+                ? `${selectedMember.firstName} ${selectedMember.lastName || ""}`
+                : "Select member..."}
+              {/* <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /> */}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[300px] p-0">
+            <Command>
+              <CommandInput placeholder="Search member name..." />
+              <CommandList>
+                <CommandEmpty>No member found.</CommandEmpty>
+                <CommandGroup>
+                  {members.map((member) => (
+                    <CommandItem
+                      key={member.id}
+                      value={`${member.firstName} ${member.lastName}`}
+                      onSelect={() => {
+                        setSelectedMember(member);
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={`mr-2 h-4 w-4 ${
+                          selectedMember?.id === member.id
+                            ? "opacity-100"
+                            : "opacity-0"
+                        }`}
+                      />
+                      {member.firstName} {member.lastName}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+
+        <Button 
+            onClick={handleAttendance} 
+            disabled={!selectedMember || loading}
+            className="w-full"
+        >
+          {loading ? "Processing..." : isCheckout ? "Check Out" : "Check In"}
+        </Button>
+      </div>
+    </div>
+  );
+}

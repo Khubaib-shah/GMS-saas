@@ -58,6 +58,22 @@ export default function SubscriptionsPage() {
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
 
   const [editFormData, setEditFormData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([
+        store.loadPlans(),
+        store.loadSubscriptions(),
+        store.loadMembers()
+      ]);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
   const [addFormData, setAddFormData] = useState<{
     id: string;
     name: string;
@@ -168,6 +184,14 @@ export default function SubscriptionsPage() {
         (sub.gym?.name || "").toLowerCase().includes(lower)
       );
     });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <p className="text-muted-foreground">Loading subscriptions...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-7xl">

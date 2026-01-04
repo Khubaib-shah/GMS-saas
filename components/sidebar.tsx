@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
-import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Dumbbell, ShieldCheck, Building2 } from "lucide-react"
+import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Dumbbell, ShieldCheck, Building2, UserCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface NavItem {
@@ -31,6 +31,7 @@ export function Sidebar() {
     : [
         { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
         { label: "Members", href: "/members", icon: <Users className="w-5 h-5" /> },
+        { label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> },
         { label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
         { label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> },
         { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },

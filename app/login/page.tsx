@@ -82,7 +82,7 @@ function LoginForm() {
             </label>
             <a
               href="#"
-              className="text-sm text-primary hover:text-accent transition-colors"
+              className="text-sm text-primary hover:text-primary/50 transition-colors"
             >
               Forgot password?
             </a>
@@ -100,7 +100,7 @@ function LoginForm() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary text-primary-foreground hover:bg-accent py-2 h-10"
+          className="w-full bg-primary text-primary-foreground hover:bg-accent hover:text-primary py-2 h-10"
         >
           {loading ? "Signing in..." : "Sign In"}
         </Button>
@@ -108,7 +108,10 @@ function LoginForm() {
 
       <div className="mt-8 pt-8 border-t border-border">
         <p className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account? Contact support.
+          Don&apos;t have an account?{" "}
+          <a href="https://wa.me/923149784156" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/50">
+            Contact support
+          </a>
         </p>
       </div>
     </div>
@@ -119,7 +122,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-card flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-accent to-secondary flex items-center justify-center p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-black flex items-center justify-center p-12">
         <div className="text-center text-primary-foreground">
           <div className="mb-8 flex justify-center">
             <div className="w-20 h-20 rounded-2xl bg-primary-foreground/20 flex items-center justify-center backdrop-blur-sm">

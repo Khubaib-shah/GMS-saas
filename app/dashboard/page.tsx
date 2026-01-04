@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Users, TrendingUp, AlertCircle, DollarSign } from "lucide-react";
 import { StatsCard } from "@/components/stats-card";
 import { RevenueChart, SubscriptionChart } from "@/components/dashboard-charts";
@@ -10,11 +10,19 @@ import { isSubscriptionActive, daysUntilExpiry, formatCurrency } from "@/lib/uti
 
 export default function DashboardPage() {
   const store = useAppStore();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    store.loadMembers();
-    store.loadSubscriptions();
-    store.loadPayments();
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([
+        store.loadMembers(),
+        store.loadSubscriptions(),
+        store.loadPayments()
+      ]);
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   const members = Array.isArray(store.members) ? store.members : [];
@@ -42,6 +50,16 @@ export default function DashboardPage() {
       );
     })
     .reduce((sum, p) => sum + p.amount, 0);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="flex flex-col items-center gap-2">
+            <p className="text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
