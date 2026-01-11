@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate } from "@/lib/utils/file-utils";
 
 export default function AttendancePage() {
     const store = useAppStore();
@@ -109,7 +108,7 @@ export default function AttendancePage() {
                                         </TableRow>
                                     ) : reports.length > 0 ? (
                                         reports.map((record: any) => (
-                                            <TableRow key={record.id}>
+                                            <TableRow key={record.id} className="capitalize">
                                                 <TableCell className="font-medium">
                                                     {record.memberId?.firstName} {record.memberId?.lastName}
                                                 </TableCell>

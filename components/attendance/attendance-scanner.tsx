@@ -53,8 +53,13 @@ export function AttendanceScanner() {
     }
   }, [useCamera]);
 
-  const processAttendance = async (memberId: string) => {
-    if (!memberId) return;
+  const processAttendance = async (member: string) => {
+    if (!member) return;
+
+    const memberId = member.split(" ")[0];
+    const memberName = member.split(" ")[1];
+
+    console.log(memberId);  
     setLoading(true);
     try {
       const endpoint = isCheckout
@@ -66,7 +71,7 @@ export function AttendanceScanner() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           memberId: memberId,
-          gymId: store.gymProfile?._id, // safe access
+          gymId: store.gymProfile?._id,
         }),
       });
 
@@ -77,7 +82,7 @@ export function AttendanceScanner() {
       }
 
       toast.success(
-        `[${memberId}] Successfully ${isCheckout ? "Checked Out" : "Checked In"}`
+        `[${memberName}] Successfully ${isCheckout ? "Checked Out" : "Checked In"}`
       );
     } catch (error: any) {
         // Prevent toast spam if it's just a duplicate scan quickly

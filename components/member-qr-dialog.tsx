@@ -93,7 +93,7 @@ export function MemberQrDialog({
           >
             {/* QRCode renders an SVG, ensuring sharp prints */}
             <QRCode
-              value={memberId + memberName}
+              value={`${memberId} ${memberName}`}
               size={200}
               level="H" // High error correction
             />
