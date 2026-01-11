@@ -4,9 +4,19 @@ import type { NextRequest } from "next/server";
 
 export async function proxy(req: NextRequest) {
   const cookies = req.cookies.getAll();
-  console.log("Cookies debug:", JSON.stringify(cookies.map(c => ({ name: c.name, value: c.name.includes('token') ? '[REDACTED]' : c.value }))));
+  const sessionCookie = cookies.find(c => c.name.includes('session-token'));
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!process.env.NEXTAUTH_SECRET) {
+    console.error("CRITICAL: NEXTAUTH_SECRET is not defined in environment variables!");
+  }
+
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+    // explicitly specify secureCookie based on protocol
+    secureCookie: req.nextUrl.protocol === "https:",
+  });
+
   const isAuth = !!token;
   const isLoginPage = req.nextUrl.pathname.startsWith("/login");
   const isAdmin = token?.role === "super_admin";
@@ -25,7 +35,13 @@ export async function proxy(req: NextRequest) {
 
   // 2. Protect other routes (if not login page, require auth)
   if (!isAuth) {
-    console.log(`Protected route access attempt: ${req.nextUrl.pathname}, no token found. Redirecting to login.`);
+    console.log(`Protected route access attempt: ${req.nextUrl.pathname}, token found: ${!!sessionCookie}. Redirecting to login.`);
+
+    // If we have a cookie but no token, it's likely a secret mismatch
+    if (sessionCookie && !token) {
+      console.error("Token decryption failed. Check NEXTAUTH_SECRET consistency.");
+    }
+
     let from = req.nextUrl.pathname;
     if (req.nextUrl.search) {
       from += req.nextUrl.search;
@@ -59,7 +75,8 @@ export const config = {
      * - _next/static
      * - _next/image
      * - favicon.ico
+     * - public assets (png, svg, jpg, etc.)
      */
-    "/((?!api/register|api/auth|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api/register|api/auth|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)",
   ],
 };
