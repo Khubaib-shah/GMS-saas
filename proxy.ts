@@ -11,16 +11,18 @@ export async function proxy(req: NextRequest) {
   // 1. Logged-in user visiting /login -> Redirect based on role
   if (isLoginPage) {
     if (isAuth) {
+      console.log(`Auth user on login page, redirecting to ${isAdmin ? '/admin' : '/dashboard'}`);
       if (isAdmin) {
         return NextResponse.redirect(new URL("/admin", req.url));
       }
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
-    return null;
+    return NextResponse.next();
   }
 
   // 2. Protect other routes (if not login page, require auth)
   if (!isAuth) {
+    console.log(`Protected route access attempt: ${req.nextUrl.pathname}, no token found. Redirecting to login.`);
     let from = req.nextUrl.pathname;
     if (req.nextUrl.search) {
       from += req.nextUrl.search;
@@ -32,11 +34,13 @@ export async function proxy(req: NextRequest) {
 
   // 3. Super admin visiting /dashboard -> Redirect to /admin
   if (req.nextUrl.pathname.startsWith("/dashboard") && isAdmin) {
+    console.log("Admin on dashboard, redirecting to admin panel");
     return NextResponse.redirect(new URL("/admin", req.url));
   }
 
   // 4. Regular user visiting /admin -> Redirect to /dashboard
   if (req.nextUrl.pathname.startsWith("/admin") && !isAdmin) {
+    console.log("Regular user on admin path, redirecting to dashboard");
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
