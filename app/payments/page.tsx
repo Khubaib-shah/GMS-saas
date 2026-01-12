@@ -83,14 +83,6 @@ export default function PaymentsPage() {
   const paidCount = filtered.length
   const avgPayment = paidCount > 0 ? totalRevenue / paidCount : 0
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <p className="text-muted-foreground">Loading payments...</p>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-8 animate-fade-in">
       <div>

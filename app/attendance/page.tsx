@@ -57,14 +57,6 @@ export default function AttendancePage() {
          }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <p className="text-muted-foreground">Loading attendance data...</p>
-            </div>
-        );
-    }
-
     return (
         <div className="container mx-auto p-6 space-y-8 animate-fade-in">
              <div>

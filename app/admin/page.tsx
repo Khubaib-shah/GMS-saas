@@ -115,10 +115,6 @@ export default function AdminDashboard() {
     }
   }
 
-  if (status === "loading" || isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>
-  }
-
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="flex items-center justify-between">

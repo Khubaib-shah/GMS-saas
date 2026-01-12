@@ -185,16 +185,8 @@ export default function SubscriptionsPage() {
       );
     });
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <p className="text-muted-foreground">Loading subscriptions...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto max-w-7xl">
+    <div className="container mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">

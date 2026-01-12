@@ -1,10 +1,5 @@
-import { Suspense } from "react";
 import SubscriptionsClient from "./SubscriptionsClient";
 
 export default function Page() {
-  return (
-    <Suspense fallback={<div className="p-6">Loading subscriptions...</div>}>
-      <SubscriptionsClient />
-    </Suspense>
-  );
+  return <SubscriptionsClient />;
 }

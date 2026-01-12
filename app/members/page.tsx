@@ -79,14 +79,6 @@ export default function MembersPage() {
     toast.success("Member deleted successfully");
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <p className="text-muted-foreground">Loading members...</p>
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="flex items-center justify-between mb-8">

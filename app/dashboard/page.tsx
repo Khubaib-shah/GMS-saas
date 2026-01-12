@@ -51,16 +51,6 @@ export default function DashboardPage() {
     })
     .reduce((sum, p) => sum + p.amount, 0);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="flex flex-col items-center gap-2">
-            <p className="text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8 animate-fade-in">
       <div>
