@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 
+import Gym from "@/models/Gym";
+
 export const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
@@ -30,12 +32,19 @@ export const authOptions: NextAuthOptions = {
                     throw new Error("Invalid credentials");
                 }
 
+                let isPremium = false;
+                if (user.gymId) {
+                    const gym = await Gym.findById(user.gymId);
+                    isPremium = !!gym?.isPremium;
+                }
+
                 return {
                     id: user._id.toString(),
                     name: user.fullName,
                     email: user.email,
                     role: user.role,
-                    gymId: user.gymId ? user.gymId.toString() : null
+                    gymId: user.gymId ? user.gymId.toString() : null,
+                    isPremium
                 };
             },
         }),
@@ -46,6 +55,7 @@ export const authOptions: NextAuthOptions = {
                 token.id = user.id;
                 token.role = (user as any).role;
                 token.gymId = (user as any).gymId;
+                token.isPremium = (user as any).isPremium;
             }
             return token;
         },
@@ -54,6 +64,7 @@ export const authOptions: NextAuthOptions = {
                 (session.user as any).id = token.id;
                 (session.user as any).role = token.role;
                 (session.user as any).gymId = token.gymId;
+                (session.user as any).isPremium = token.isPremium;
             }
             return session;
         },

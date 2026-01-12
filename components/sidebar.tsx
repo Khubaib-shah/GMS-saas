@@ -21,6 +21,7 @@ export function Sidebar() {
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
   const setSidebarCollapsed = useAppStore((state) => state.setSidebarCollapsed)
   const isAdmin = (session?.user as any)?.role === "super_admin"
+  const isPremium = (session?.user as any)?.isPremium
 
   const navItems: NavItem[] = isAdmin 
     ? [

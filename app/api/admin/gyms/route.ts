@@ -5,6 +5,7 @@ import Gym from "@/models/Gym";
 import User from "@/models/User";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { isValidObjectId } from "mongoose";
 
 export async function GET() {
     try {
@@ -70,6 +71,40 @@ export async function POST(req: Request) {
         );
     } catch (error) {
         console.error("Create Gym Error:", error);
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
+}
+
+export async function PATCH(req: Request) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || (session.user as any).role !== "super_admin") {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        const { id, isPremium } = await req.json();
+
+        if (!id || !isValidObjectId(id)) {
+            return NextResponse.json({ message: "Invalid Gym ID" }, { status: 400 });
+        }
+
+        await connectDB();
+        const updatedGym = await Gym.findByIdAndUpdate(
+            id,
+            { isPremium },
+            { new: true }
+        );
+
+        if (!updatedGym) {
+            return NextResponse.json({ message: "Gym not found" }, { status: 404 });
+        }
+
+        return NextResponse.json({
+            message: `Gym premium status updated to ${isPremium}`,
+            gym: updatedGym
+        });
+    } catch (error) {
+        console.error("Update Gym Error:", error);
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }

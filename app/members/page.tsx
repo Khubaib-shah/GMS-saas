@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Search, Plus, Trash2, QrCode } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Search, Plus, Trash2, QrCode, Sparkles } from "lucide-react";
 import { MemberQrDialog } from "@/components/member-qr-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,8 @@ import { isSubscriptionActive, formatDate } from "@/lib/utils/file-utils";
 import { toast } from "sonner";
 
 export default function MembersPage() {
+  const { data: session } = useSession();
+  const isPremium = (session?.user as any)?.isPremium;
   const store = useAppStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<
@@ -225,13 +228,24 @@ export default function MembersPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
+                      onClick={() => {
+                        if (!isPremium) {
+                          toast("Premium Feature", {
+                            description: "QR Code features are only available for Premium gyms.",
+                            action: {
+                              label: "Upgrade",
+                              onClick: () => console.log("Upgrade clicked"),
+                            },
+                          });
+                          return;
+                        }
                         setQrMember({
                           id: member.id,
                           name: `${member.firstName} ${member.lastName || ""}`,
-                        })
-                      }
-                      title="Show QR Code"
+                        });
+                      }}
+                      title={isPremium ? "Show QR Code" : "Premium Required"}
+                      className={cn(!isPremium && "text-slate-300")}
                     >
                       <QrCode className="w-4 h-4" />
                     </Button>

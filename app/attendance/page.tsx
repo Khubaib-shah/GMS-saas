@@ -6,7 +6,10 @@ import { ManualEntry } from "@/components/attendance/manual-entry";
 import { AttendanceScanner } from "@/components/attendance/attendance-scanner";
 import { AttendanceStats } from "@/components/attendance/attendance-stats";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Lock, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,6 +20,8 @@ import {
 } from "@/components/ui/table";
 
 export default function AttendancePage() {
+    const { data: session } = useSession();
+    const isPremium = (session?.user as any)?.isPremium;
     const store = useAppStore();
     const [reports, setReports] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -80,7 +85,25 @@ export default function AttendancePage() {
                 <TabsContent value="mark" className="space-y-6">
                     <div className="grid gap-6 md:grid-cols-2">
                         <ManualEntry />
-                        <AttendanceScanner />
+                        {isPremium ? (
+                            <AttendanceScanner />
+                        ) : (
+                            <div className="p-8 border-2 border-dashed rounded-xl bg-muted/30 flex flex-col items-center justify-center text-center space-y-4">
+                                <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
+                                    <Lock className="w-6 h-6 text-amber-600" />
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="font-semibold text-lg">Quick Scan Locked</h3>
+                                    <p className="text-sm text-muted-foreground max-w-[250px]">
+                                        QR Code scanning and automated check-ins are only available for Premium gyms.
+                                    </p>
+                                </div>
+                                <Button className="bg-amber-500 hover:bg-amber-600 gap-2">
+                                    <Sparkles className="w-4 h-4" />
+                                    Upgrade to Premium
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </TabsContent>
 

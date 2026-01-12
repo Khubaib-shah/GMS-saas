@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { Plus, Building2, Users, Phone, MapPin, Mail, Lock } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Plus, Building2, Users, Phone, MapPin, Mail, Lock, CheckCircle2, XCircle } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -94,6 +95,23 @@ export default function AdminDashboard() {
       toast.error(error.message)
     } finally {
       setIsSubmitLoading(false)
+    }
+  }
+
+  const handleTogglePremium = async (gymId: string, currentStatus: boolean) => {
+    try {
+      const res = await fetch("/api/admin/gyms", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: gymId, isPremium: !currentStatus }),
+      })
+
+      if (!res.ok) throw new Error("Failed to update premium status")
+
+      toast.success(`Premium status updated`)
+      fetchGyms()
+    } catch (error: any) {
+      toast.error(error.message)
     }
   }
 
@@ -215,6 +233,7 @@ export default function AdminDashboard() {
               <TableHead>Gym Name</TableHead>
               <TableHead>Contact</TableHead>
               <TableHead>Address</TableHead>
+              <TableHead>Plan</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Registered Date</TableHead>
             </TableRow>
@@ -244,6 +263,20 @@ export default function AdminDashboard() {
                       <MapPin className="w-3 h-3 flex-shrink-0" />
                       {gym.address || "N/A"}
                     </div>
+                  </TableCell>
+                   <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleTogglePremium(gym._id, gym.isPremium)}
+                      className={cn(
+                        "gap-2",
+                        gym.isPremium ? "text-amber-500 hover:text-amber-600" : "text-slate-400 hover:text-slate-500"
+                      )}
+                    >
+                      {gym.isPremium ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                      {gym.isPremium ? "Premium" : "Standard"}
+                    </Button>
                   </TableCell>
                   <TableCell>
                     <span className="px-2 py-1 rounded-full text-[10px] font-semibold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 uppercase tracking-wider">
