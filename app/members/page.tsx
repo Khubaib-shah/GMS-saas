@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Search, Plus, Trash2, QrCode, Sparkles } from "lucide-react";
+import { Search, Plus, Trash2, QrCode, Sparkles, Users } from "lucide-react";
 import { MemberQrDialog } from "@/components/member-qr-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,7 @@ export default function MembersPage() {
   const filtered = useMemo(() => {
     let result = store.members;
     const currentSearch = store.searchQuery || searchTerm;
-    
+
     if (currentSearch) {
       const lower = currentSearch.toLowerCase();
       result = result.filter(
@@ -80,199 +80,224 @@ export default function MembersPage() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-10 animate-fade-up">
+      {/* HUD HEADER */}
+      <div className="flex items-center justify-between mb-12 relative">
+        <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Members</h1>
-          <p className="text-muted-foreground">
-            Manage gym members and subscriptions
+          <div className="flex items-center gap-4 mb-2">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">DIRECTORY: MEMBER_DATABASE_v4</span>
+            <div className="h-px w-24 bg-white/5"></div>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
+            MEMBER <span className="text-primary neon-text">ROSTER</span>
+          </h1>
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+            Management and subscription surveillance active.
           </p>
         </div>
         <Link href="/members/add">
-          <Button className="bg-primary text-primary-foreground hover:bg-accent gap-2">
-            <Plus className="w-4 h-4" />
-            Add Member
+          <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+            INITIALIZE MEMBER
           </Button>
         </Link>
       </div>
 
-      {/* Search & Filter */}
-      <Card className="p-6 mb-6 bg-card">
-        <div className="flex gap-4 items-end flex-wrap">
+      {/* Search & Filter - Bento Style */}
+      <div className="bento-item p-8 mb-10 bg-slate-950/40 backdrop-blur-3xl border-white/5">
+        <div className="flex gap-8 items-end flex-wrap">
           <div className="flex-1 min-w-64">
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Search
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
+              SEARCH_QUERY
             </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
               <Input
-                placeholder="Search by name, email or phone..."
+                placeholder="BY NAME, EMAIL OR PHONE..."
                 value={searchTerm || store.searchQuery}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   store.setSearchQuery(e.target.value);
                 }}
-                className="pl-10"
+                className="pl-12 h-12 bg-white/5 border-transparent focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-xl"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Status
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
+              STATUS_FILTER
             </label>
             <select
               value={filterStatus}
               onChange={(e) =>
                 setFilterStatus(e.target.value as "all" | "active" | "expired")
               }
-              className="px-4 py-2 rounded-lg border border-border bg-card text-foreground"
+              className="h-12 px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
             >
-              <option value="all">All Members</option>
-              <option value="active">Active</option>
-              <option value="expired">Expired</option>
+              <option value="all">ALL_SUBJECTS</option>
+              <option value="active">ACTIVE_NODES</option>
+              <option value="expired">DECAYED_SIGNALS</option>
             </select>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Members Table */}
-      <Card className="p-6 bg-card overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border">
-              <th className="text-left py-4 px-4 font-semibold text-muted-foreground">
-                Name
-              </th>
-              <th className="text-left py-4 px-4 font-semibold text-muted-foreground">
-                Contact
-              </th>
-              <th className="text-left py-4 px-4 font-semibold text-muted-foreground">
-                Status
-              </th>
-              <th className="text-left py-4 px-4 font-semibold text-muted-foreground">
-                Joined
-              </th>
-              <th className="text-center py-4 px-4 font-semibold text-muted-foreground">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((member) => {
-              const subs = store.subscriptions.filter(
-                (s) => s.memberId === member.id
-              );
-              const activeSub = subs.find((s) =>
-                isSubscriptionActive(s.endDate, s.status)
-              );
-              const isActive = !!activeSub;
-              const isPaused = subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate));
+      <div className="bento-item p-0 overflow-hidden border-white/5 bg-slate-950/40 backdrop-blur-3xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[11px] font-bold tracking-widest uppercase">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/[0.02]">
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">
+                  SUBJECT_IDENTIFIER
+                </th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">
+                  CONTACT_PROTOCOLS
+                </th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">
+                  SIGNAL_STATUS
+                </th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">
+                  INITIATION_DATE
+                </th>
+                <th className="text-center py-6 px-6 font-black text-slate-500 italic">
+                  COMMAND_ACTIONS
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((member) => {
+                const subs = store.subscriptions.filter(
+                  (s) => s.memberId === member.id
+                );
+                const activeSub = subs.find((s) =>
+                  isSubscriptionActive(s.endDate, s.status)
+                );
+                const isActive = !!activeSub;
+                const isPaused = subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate));
 
-              return (
-                <tr
-                  key={member.id}
-                  className="border-b border-border hover:bg-muted/50 transition-colors"
-                >
-                  <td className="py-4 px-4">
-                    <div className="flex items-center gap-3">
-                      {member.photoBase64 ? (
-                        <img
-                          src={member.photoBase64 || "/placeholder.svg"}
-                          alt={member.firstName}
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-xs font-bold">
-                          {member.firstName.charAt(0)}
+                return (
+                  <tr
+                    key={member.id}
+                    className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group/row"
+                  >
+                    <td className="py-6 px-6">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          {member.photoBase64 ? (
+                            <img
+                              src={member.photoBase64 || "/placeholder.svg"}
+                              alt={member.firstName}
+                              className="w-10 h-10 rounded-xl object-cover grayscale group-hover/row:grayscale-0 transition-all border border-white/5"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center text-primary font-black text-xs">
+                              {member.firstName.charAt(0)}
+                            </div>
+                          )}
+                          <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-slate-950 border border-white/10 flex items-center justify-center">
+                            <div className={cn("w-1.5 h-1.5 rounded-full", isActive ? "bg-primary" : "bg-red-500")} />
+                          </div>
                         </div>
-                      )}
-                      <span className="text-foreground font-medium">
-                        {member.firstName} {member.lastName || ""}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <div className="text-sm">
-                      <div className="text-foreground">{member.phone}</div>
-                      <div className="text-muted-foreground text-xs">
-                        {member.email}
+                        <div>
+                          <span className="text-white font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
+                            {member.firstName} {member.lastName || ""}
+                          </span>
+                          <span className="text-[9px] text-slate-500 font-mono tracking-widest mt-0.5 block">ID_v4: {member.id.toUpperCase().slice(-8)}</span>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <span
-                      className={cn(
-                        "px-3 py-1 rounded-full text-xs font-medium",
+                    </td>
+                    <td className="py-6 px-6">
+                      <div className="space-y-1">
+                        <div className="text-white font-mono text-[10px]">{member.phone}</div>
+                        <div className="text-slate-500 text-[9px] font-mono lowercase">
+                          {member.email}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-6 px-6">
+                      <div className={cn(
+                        "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
                         isPaused
-                          ? "bg-amber-100 text-amber-700"
+                          ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
                           : isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      )}
-                    >
-                      {isPaused ? "Paused" : isActive ? "Active" : "Expired"}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4 text-muted-foreground">
-                    {formatDate(member.joinDate)}
-                  </td>
-                  <td className="py-4 px-4 flex gap-2 items-center justify-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        if (!isPremium) {
-                          toast("Premium Feature", {
-                            description: "QR Code features are only available for Premium gyms.",
-                            action: {
-                              label: "Upgrade",
-                              onClick: () => console.log("Upgrade clicked"),
-                            },
-                          });
-                          return;
-                        }
-                        setQrMember({
-                          id: member.id,
-                          name: `${member.firstName} ${member.lastName || ""}`,
-                        });
-                      }}
-                      title={isPremium ? "Show QR Code" : "Premium Required"}
-                      className={cn(!isPremium && "text-slate-300")}
-                    >
-                      <QrCode className="w-4 h-4" />
-                    </Button>
-                    <Link href={`/members/${member.id}`}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="inline-block bg-transparent"
-                      >
-                        View
-                      </Button>
-                    </Link>
+                            ? "bg-primary/10 border-primary/20 text-primary"
+                            : "bg-red-500/10 border-red-500/20 text-red-500"
+                      )}>
+                        <div className={cn("w-1 h-1 rounded-full", isPaused ? "bg-amber-500" : isActive ? "bg-primary" : "bg-red-500")} />
+                        {isPaused ? "PAUSED_SIG" : isActive ? "ACTIVE_NODE" : "SIGNAL_LOST"}
+                      </div>
+                    </td>
+                    <td className="py-6 px-6 text-slate-500 font-mono text-[10px]">
+                      {formatDate(member.joinDate).toUpperCase()}
+                    </td>
+                    <td className="py-6 px-6">
+                      <div className="flex gap-2 items-center justify-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (!isPremium) {
+                              toast("PREMIUM_RESTRICTION", {
+                                description: "QR CRYPTOGRAPHIC PROTOCOLS REQUIRE PREMIUM ACCESS.",
+                                action: {
+                                  label: "UPGRADE",
+                                  onClick: () => console.log("Upgrade clicked"),
+                                },
+                              });
+                              return;
+                            }
+                            setQrMember({
+                              id: member.id,
+                              name: `${member.firstName} ${member.lastName || ""}`,
+                            });
+                          }}
+                          className={cn(
+                            "h-9 w-9 rounded-xl border border-white/5 bg-white/5 transition-all text-slate-400 hover:text-primary hover:border-primary/50",
+                            !isPremium && "opacity-20 grayscale"
+                          )}
+                        >
+                          <QrCode className="w-4 h-4" />
+                        </Button>
+                        <Link href={`/members/${member.id}`}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all"
+                          >
+                            OPEN_PROFILE
+                          </Button>
+                        </Link>
 
-                    {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeleteId(member.id)}
-                        className="text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                        {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeleteId(member.id)}
+                            className="h-9 w-9 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
         {filtered.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No members found</p>
+          <div className="text-center py-24 bg-white/[0.01]">
+            <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
+              <Users className="w-8 h-8 text-slate-700" />
+            </div>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">NO_SUBJECTS_DETECTED</p>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* QR Code Dialog */}
       {qrMember && (

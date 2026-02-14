@@ -84,103 +84,133 @@ export default function PaymentsPage() {
   const avgPayment = paidCount > 0 ? totalRevenue / paidCount : 0
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">Payments</h1>
-        <p className="text-muted-foreground">Manage and track all gym payments</p>
+    <div className="space-y-10 animate-fade-up">
+      {/* HUD HEADER */}
+      <div className="relative">
+        <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
+        <div className="flex items-center gap-4 mb-2">
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">FINANCIAL_LEDGER: REVENUE_STREAM_v2</span>
+          <div className="h-px flex-1 bg-white/5"></div>
+        </div>
+        <h1 className="text-5xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
+          PAYMENT <span className="text-primary neon-text">LOGS</span>
+        </h1>
+        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+          Revenue tracking and transaction audit active.
+        </p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard
-          title="Total Revenue"
-          value={formatCurrency(totalRevenue)}
+          title="GROSS_REVENUE"
+          value={formatCurrency(totalRevenue).replace("PKR", "")}
           icon={<DollarSign className="w-5 h-5" />}
         />
         <StatsCard
-          title="Transactions"
+          title="TRANS_TOTAL"
           value={paidCount.toString()}
           icon={<AlertCircle className="w-5 h-5" />}
         />
         <StatsCard
-          title="Avg. Payment"
-          value={formatCurrency(avgPayment)}
+          title="AVG_THROUGHPUT"
+          value={formatCurrency(avgPayment).replace("PKR", "")}
           icon={<TrendingUp className="w-5 h-5" />}
         />
       </div>
 
-      {/* Filter */}
-      <Card className="p-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-end">
+      {/* Filter - Bento Style */}
+      <div className="bento-item p-8 bg-slate-950/40 backdrop-blur-3xl border-white/5">
+        <div className="flex flex-col sm:flex-row gap-8 items-end">
           <div className="flex-1 w-full sm:w-auto">
-            <label className="block text-sm font-medium text-foreground mb-2">Search by member name</label>
-            <Input
-              placeholder="Search..."
-              value={searchTerm || store.searchQuery}
-              onChange={(e) => {
-                setSearchTerm(e.target.value)
-                store.setSearchQuery(e.target.value)
-              }}
-              className="bg-background border-input"
-            />
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">SEARCH_SUBJECT_NAME</label>
+            <div className="relative group">
+              <Input
+                placeholder="PROBING DATA..."
+                value={searchTerm || store.searchQuery}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  store.setSearchQuery(e.target.value)
+                }}
+                className="h-12 bg-white/5 border-transparent focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-xl"
+              />
+            </div>
           </div>
           <div className="w-full sm:w-auto">
-            <label className="block text-sm font-medium text-foreground mb-2">Period</label>
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">TEMPORAL_PERIOD</label>
             <Select
               value={filterPeriod}
               onValueChange={(value) => setFilterPeriod(value as "this-month" | "last-month" | "all")}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="this-month">This Month</SelectItem>
-                <SelectItem value="last-month">Last Month</SelectItem>
-                <SelectItem value="all">All Time</SelectItem>
+              <SelectContent className="bg-slate-900 border-white/10">
+                <SelectItem value="this-month" className="text-[10px] font-bold uppercase tracking-widest">THIS_CYCLE</SelectItem>
+                <SelectItem value="last-month" className="text-[10px] font-bold uppercase tracking-widest">PREV_CYCLE</SelectItem>
+                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">FULL_HISTORY</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Payments Table */}
-      <Card className="overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Member</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead>Description</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.length > 0 ? (
-              filtered.map((payment) => {
-                const member = store.members.find((m) => m.id === payment.memberId)
-                return (
-                  <TableRow key={payment.id} className="hover:bg-muted/50">
-                    <TableCell className="font-medium text-foreground">
-                      {member?.firstName} {member?.lastName || ""}
-                    </TableCell>
-                    <TableCell className="font-semibold">{formatCurrency(payment.amount)}</TableCell>
-                    <TableCell className="text-muted-foreground">{formatDate(payment.date)}</TableCell>
-                    <TableCell className="capitalize text-muted-foreground">{payment.method}</TableCell>
-                    <TableCell className="text-muted-foreground">{payment.description}</TableCell>
-                  </TableRow>
-                )
-              })
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  No payments found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+      <div className="bento-item p-0 overflow-hidden border-white/5 bg-slate-950/40 backdrop-blur-3xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[11px] font-bold tracking-widest uppercase">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/[0.02]">
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">TRANSACTION_SUBJECT</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">CREDIT_AMOUNT</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">TIMELINE_STAMP</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">GATEWAY_METHOD</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">METADATA_DESC</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length > 0 ? (
+                filtered.map((payment) => {
+                  const member = store.members.find((m) => m.id === payment.memberId)
+                  return (
+                    <tr key={payment.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group/row">
+                      <td className="py-6 px-6">
+                        <span className="text-white font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
+                          {member?.firstName} {member?.lastName || ""}
+                        </span>
+                      </td>
+                      <td className="py-6 px-6 font-black text-primary text-base">
+                        {formatCurrency(payment.amount).replace("PKR", "")}<span className="text-[8px] ml-1 opacity-50 font-mono tracking-normal">PKR</span>
+                      </td>
+                      <td className="py-6 px-6 text-slate-500 font-mono text-[10px] whitespace-nowrap">
+                        {formatDate(payment.date).toUpperCase()}
+                      </td>
+                      <td className="py-6 px-6">
+                        <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg bg-white/5 border border-white/5 text-[9px] font-black tracking-widest italic group-hover/row:border-primary/20 transition-all">
+                          {payment.method.toUpperCase()}
+                        </div>
+                      </td>
+                      <td className="py-6 px-6 text-slate-500 font-mono text-[9px] lowercase max-w-xs truncate">
+                        {payment.description}
+                      </td>
+                    </tr>
+                  )
+                })
+              ) : (
+                <tr>
+                  <td colSpan={5} className="py-24 text-center">
+                    <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
+                      <DollarSign className="w-8 h-8 text-slate-700" />
+                    </div>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">NO_FINANCIAL_SIGNALS</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   )
 }

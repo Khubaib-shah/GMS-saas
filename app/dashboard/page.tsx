@@ -52,52 +52,75 @@ export default function DashboardPage() {
     .reduce((sum, p) => sum + p.amount, 0);
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back! Here's your gym overview.
+    <div className="space-y-10 animate-fade-up">
+      {/* HUD HEADER */}
+      <div className="relative">
+        <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
+        <div className="flex items-center gap-4 mb-2">
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">SYSTEM_OVERVIEW: DASHBOARD_v2</span>
+          <div className="h-px flex-1 bg-white/5"></div>
+        </div>
+        <h1 className="text-5xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
+          COMMAND <span className="text-primary neon-text">CENTER</span>
+        </h1>
+        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+          All systems operational. Tactical intake active.
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
-          title="Total Members"
+          title="TOTAL_BEASTS"
           value={totalMembers.toString()}
           icon={<Users className="w-5 h-5" />}
           trend={{ value: 5, isPositive: true }}
         />
         <StatsCard
-          title="Active Subscriptions"
+          title="ACTIVE_NODES"
           value={activeSubscriptions.toString()}
           icon={<TrendingUp className="w-5 h-5" />}
           trend={{ value: 2, isPositive: true }}
         />
         <StatsCard
-          title="Expiring Soon"
+          title="DECAYING_SLOTS"
           value={expiringSoon.toString()}
           icon={<AlertCircle className="w-5 h-5" />}
           trend={{ value: expiringSoon > 0 ? 8 : 0, isPositive: false }}
         />
         <StatsCard
-          title="Revenue This Month"
-          value={formatCurrency(monthlyRevenue)}
+          title="MONTHLY_THROUGHPUT"
+          value={formatCurrency(monthlyRevenue).replace("PKR", "")}
           icon={<DollarSign className="w-5 h-5" />}
           trend={{ value: 12, isPositive: true }}
         />
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <RevenueChart />
-        <SubscriptionChart />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 bento-item p-1 border-white/5 bg-transparent">
+          <RevenueChart />
+        </div>
+        <div className="bento-item p-1 border-white/5 bg-transparent">
+          <SubscriptionChart />
+        </div>
       </div>
 
       {/* Members Table */}
-      <div>
-         <h2 className="text-xl font-bold mb-4 tracking-tight">Recent Members</h2>
-         <MembersTable />
+      <div className="relative">
+        <div className="flex items-center gap-4 mb-8">
+          <h2 className="text-2xl font-black italic tracking-tighter text-white uppercase">RECENT_DEPLOYMENTS</h2>
+          <div className="h-px flex-1 bg-white/5"></div>
+          <div className="flex gap-1">
+            <div className="w-1 h-1 bg-primary"></div>
+            <div className="w-1 h-1 bg-primary/50"></div>
+            <div className="w-1 h-1 bg-primary/20"></div>
+          </div>
+        </div>
+        <div className="bento-item p-0 overflow-hidden border-white/5 bg-slate-950/40 backdrop-blur-3xl">
+          <MembersTable />
+        </div>
       </div>
     </div>
   );
