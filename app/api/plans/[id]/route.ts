@@ -4,17 +4,21 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import mongoose from "mongoose";
+import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 
 export async function PUT(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== "super_admin") {
-        return NextResponse.json({ message: "Forbidden: Super Admin access required" }, { status: 403 });
+    if (!session) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-
+    const role = (session.user as any).role;
+    if (!hasPermission(role, PERMISSIONS.PLANS_EDIT)) {
+        return NextResponse.json({ message: "Forbidden: Insufficient permissions" }, { status: 403 });
+    }
 
     const { id } = await params;
     const body = await req.json();
@@ -27,7 +31,8 @@ export async function PUT(
         const idQuery = isObjectId ? { _id: id } : { id: id };
 
         // If super_admin, we can update any plan. If not, only our gym's plans.
-        const query = (session.user as any).role === "super_admin" ? idQuery : { ...idQuery, gymId };
+        // Since super_admin is restricted, they won't reach here unless permissions change.
+        const query = role === "super_admin" ? idQuery : { ...idQuery, gymId };
         const plan = await Plan.findOneAndUpdate(query, body, { new: true });
 
         if (!plan) {
@@ -46,11 +51,14 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== "super_admin") {
-        return NextResponse.json({ message: "Forbidden: Super Admin access required" }, { status: 403 });
+    if (!session) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-
+    const role = (session.user as any).role;
+    if (!hasPermission(role, PERMISSIONS.PLANS_DELETE)) {
+        return NextResponse.json({ message: "Forbidden: Insufficient permissions" }, { status: 403 });
+    }
 
     const { id } = await params;
     const gymId = (session.user as any).gymId;
@@ -62,7 +70,7 @@ export async function DELETE(
         const idQuery = isObjectId ? { _id: id } : { id: id };
 
         // If super_admin, we can delete any plan. If not, only our gym's plans.
-        const query = (session.user as any).role === "super_admin" ? idQuery : { ...idQuery, gymId };
+        const query = role === "super_admin" ? idQuery : { ...idQuery, gymId };
         const plan = await Plan.findOneAndDelete(query);
         if (!plan) {
             return NextResponse.json({ message: "Plan not found" }, { status: 404 });

@@ -3,6 +3,7 @@ import Plan from "@/models/Plan";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
+import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 
 export async function GET() {
     const session = await getServerSession(authOptions);
@@ -30,19 +31,24 @@ export async function GET() {
 
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== "super_admin") {
-        return NextResponse.json({ message: "Forbidden: Super Admin access required" }, { status: 403 });
+    if (!session) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    const role = (session.user as any).role;
+    const canCreate = hasPermission(role, PERMISSIONS.PLANS_CREATE);
 
+    if (!canCreate) {
+        return NextResponse.json({ message: "Forbidden: Insufficient permissions" }, { status: 403 });
+    }
 
     try {
         const body = await req.json();
         await connectDB();
-        const role = (session.user as any).role;
         const sessionGymId = (session.user as any).gymId;
 
         // Use gymId from body if super_admin providing one, else use session gymId
+        // Since super_admin is restricted from creating plans, this will mostly use sessionGymId
         const targetGymId = (role === "super_admin" && body.gymId) ? body.gymId : sessionGymId;
 
         if (!targetGymId) {

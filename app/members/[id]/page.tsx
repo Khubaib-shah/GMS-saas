@@ -2,8 +2,9 @@
 
 import { use, useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useAppStore } from "@/lib/store";
-import type { Payment } from "@/lib/types";
+import type { Payment, Member } from "@/lib/types";
 import Link from "next/link";
 import { 
   ArrowLeft, 
@@ -57,6 +58,7 @@ export default function MemberDetailPage({
 }) {
   const { id: memberId } = use(params);
   const router = useRouter();
+  const { data: session } = useSession();
 
   const {
     members,
@@ -79,11 +81,12 @@ export default function MemberDetailPage({
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState("");
   const [renewDays, setRenewDays] = useState(30);
-  const [renewMethod, setRenewMethod] = useState<"cash" | "online">("cash");
+  const [renewMethod, setRenewMethod] = useState<"cash" | "online" | "bank_transfer" | "card" | "other">("cash");
   const [renewReceipt, setRenewReceipt] = useState<string | null>(null);
   const [previewReceiptUrl, setPreviewReceiptUrl] = useState<string | null>(null);
   const [isDeletingMember, setIsDeletingMember] = useState(false);
   const [deleteSubId, setDeleteSubId] = useState<string | null>(null);
+  const [fallbackMember, setFallbackMember] = useState<Member | null>(null);
   
   // Payment Edit/Delete State
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
@@ -91,7 +94,7 @@ export default function MemberDetailPage({
   const [deletePaymentId, setDeletePaymentId] = useState<string | null>(null);
   const [paymentEditData, setPaymentEditData] = useState<{
     amount: number;
-    method: "cash" | "online";
+    method: "cash" | "online" | "bank_transfer" | "card" | "other";
     date: string;
     description: string;
     receiptUrl?: string | null;
@@ -118,14 +121,30 @@ export default function MemberDetailPage({
         loadPayments(),
         loadPlans()
       ]);
+      
+      // Fallback: If member not found in store, try fetching individually
+      // (This handles cases where the global list might be incomplete or pagination is introduced)
+      const currentMembers = useAppStore.getState().members;
+      if (!currentMembers.find(m => m.id === memberId)) {
+        try {
+          const res = await fetch(`/api/members/${memberId}`);
+          if (res.ok) {
+            const data = await res.json();
+            setFallbackMember(data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch member fallback", error);
+        }
+      }
+
       setIsLoading(false);
     };
     loadData();
   }, []);
 
   const member = useMemo(() => 
-    members.find((m) => m.id === memberId),
-    [members, memberId]
+    members.find((m) => m.id === memberId) || fallbackMember,
+    [members, memberId, fallbackMember]
   );
   
   useEffect(() => {
@@ -291,10 +310,12 @@ export default function MemberDetailPage({
               Edit Profile
             </Link>
           </Button>
-          <Button variant="destructive" size="sm" onClick={() => setIsDeletingMember(true)} className="bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete
-          </Button>
+          {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
+             <Button variant="destructive" size="sm" onClick={() => setIsDeletingMember(true)} className="bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
+               <Trash2 className="w-4 h-4 mr-2" />
+               Delete
+             </Button>
+          )}
         </div>
       </div>
 
@@ -365,10 +386,37 @@ export default function MemberDetailPage({
                   </div>
                 </div>
               </div>
+
+              {/* Assigned Coach Section */}
+              {(member as any).trainerId && (
+                <div className="mt-6 pt-6 border-t border-border/40">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground leading-none mb-3">Assigned Coach</p>
+                  <Link href={`/trainers/${(member as any).trainerId._id || (member as any).trainerId.id}`} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors group">
+                    {(member as any).trainerId.photo ? (
+                       <img src={(member as any).trainerId.photo} className="w-10 h-10 rounded-full object-cover" alt="Trainer" />
+                    ) : (
+                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                          {(member as any).trainerId.firstName?.[0]}
+                       </div>
+                    )}
+                    <div className="flex-1">
+                       <p className="font-semibold text-sm group-hover:text-primary transition-colors">
+                          {(member as any).trainerId.firstName} {(member as any).trainerId.lastName}
+                       </p>
+                       <p className="text-xs text-muted-foreground">Personal Trainer</p>
+                    </div>
+                  </Link>
+                </div>
+              )}
             </div>
           </Card>
 
-          {/* Quick Stats / Action Card */}
+
+        </div>
+
+        {/* Right Column: Detailed History */}
+        <div className="lg:col-span-8 space-y-8">
+          {/* Quick Stats / Action Card - Moved to Right Column */}
           <Card className="p-6 border-none shadow-xl shadow-foreground/[0.03] space-y-6">
             <h3 className="font-bold flex items-center gap-2">
               <Clock className="w-4 h-4 text-primary" />
@@ -376,35 +424,38 @@ export default function MemberDetailPage({
             </h3>
             
             <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Target Plan</label>
-                <select
-                  className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                  value={selectedPlan}
-                  onChange={(e) => setSelectedPlan(e.target.value)}
-                >
-                  <option value="">Choose a plan...</option>
-                  {plans.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} — {formatCurrency(p.price)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Target Plan</label>
+                    <select
+                    className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                    value={selectedPlan}
+                    onChange={(e) => setSelectedPlan(e.target.value)}
+                    >
+                    <option value="">Choose a plan...</option>
+                    {plans.map((p) => (
+                        <option key={p.id} value={p.id}>
+                        {p.name} — {formatCurrency(p.price)}
+                        </option>
+                    ))}
+                    </select>
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Duration (Days)</label>
-                <div className="relative">
-                   <input
-                    type="number"
-                    className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
-                    value={renewDays}
-                    onChange={(e) => setRenewDays(Number(e.target.value))}
-                    placeholder="Days"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">DAYS</span>
+                <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Duration (Days)</label>
+                    <div className="relative">
+                    <input
+                        type="number"
+                        className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
+                        value={renewDays}
+                        onChange={(e) => setRenewDays(Number(e.target.value))}
+                        placeholder="Days"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">DAYS</span>
+                    </div>
                 </div>
               </div>
+
               <div className="space-y-2">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Payment Method</label>
                 <select
@@ -414,6 +465,9 @@ export default function MemberDetailPage({
                 >
                   <option value="cash">Cash</option>
                   <option value="online">Online</option>
+                  <option value="bank_transfer">Bank Transfer</option>
+                  <option value="card">Card</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
 
@@ -487,10 +541,6 @@ export default function MemberDetailPage({
               )}
             </div>
           </Card>
-        </div>
-
-        {/* Right Column: Detailed History */}
-        <div className="lg:col-span-8 space-y-8">
           {/* Active Status Banner */}
           <Card className={cn(
             "p-6 border-l-4 shadow-lg shadow-foreground/[0.02] flex items-center justify-between",
@@ -773,6 +823,9 @@ export default function MemberDetailPage({
                 >
                   <option value="cash">Cash</option>
                   <option value="online">Online</option>
+                  <option value="bank_transfer">Bank Transfer</option>
+                  <option value="card">Card</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
             </div>

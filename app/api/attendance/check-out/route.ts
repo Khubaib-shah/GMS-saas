@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
+import Member from "@/models/Member";
+import { logAudit, extractRequestInfo } from "@/lib/audit";
 
 export async function POST(req: Request) {
     try {
@@ -47,6 +49,27 @@ export async function POST(req: Request) {
 
         attendance.checkOutTime = new Date();
         await attendance.save();
+
+        // Fetch member details for audit log
+        const member = await Member.findById(memberId).lean();
+        const memberName = member ? `${member.firstName} ${member.lastName || ""}`.trim() : "Unknown Member";
+
+        // Log audit
+        await logAudit({
+            gymId,
+            userId: (session.user as any).id,
+            userName: session.user.name || "Unknown User",
+            action: "checkout",
+            resource: "attendance",
+            resourceId: attendance._id.toString(),
+            resourceName: memberName,
+            details: {
+                checkOutTime: attendance.checkOutTime,
+                durationMinutes: Math.floor((attendance.checkOutTime.getTime() - new Date(attendance.checkInTime).getTime()) / 60000)
+            },
+            branchId: attendance.branchId,
+            ...extractRequestInfo(req.headers),
+        });
 
         return NextResponse.json(attendance, { status: 200 });
 

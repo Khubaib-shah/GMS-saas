@@ -6,29 +6,143 @@ import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Lock, Building2, User, LogOut } from "lucide-react";
+import { Lock, Building2, User, LogOut, Users, Plus, Trash2, Save, UserCheck } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { data: session } = useSession();
-  const isAdmin = (session?.user as any)?.role === "super_admin";
-  const [activeTab, setActiveTab] = useState<"gym" | "account">(isAdmin ? "account" : "gym");
+  const userRole = (session?.user as any)?.role;
+  const isAdmin = userRole === "super_admin";
+  const isTrainer = userRole === "trainer";
+
+  // Default tab logic: Admin -> account, Trainer -> profile, Owner -> gym
+  const getDefaultTab = () => {
+    if (isAdmin) return "account";
+    if (isTrainer) return "profile";
+    return "gym"; // Owner/Manager default
+  };
+
+  const [activeTab, setActiveTab] = useState<"gym" | "account" | "staff" | "profile">(getDefaultTab());
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Staff State
+  const [staff, setStaff] = useState<any[]>([]);
+  const [isStaffLoading, setIsStaffLoading] = useState(false);
+  const [isParamsOpen, setIsParamsOpen] = useState(false);
+  const [staffFormData, setStaffFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    role: "receptionist",
+  });
   const [gymData, setGymData] = useState({
     name: "",
     address: "",
     phone: "",
   });
-  const [newPassword, setNewPassword] = useState("");
+
+  // Trainer Profile State
+  const [trainerData, setTrainerData] = useState({
+    bio: "",
+    specialties: "",
+    photo: "",
+  });
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (activeTab === "gym" && !isAdmin && !isTrainer) {
       fetchGymData();
+    } else if (activeTab === "staff") {
+      fetchStaff();
+    } else if (activeTab === "profile" && isTrainer) {
+      fetchTrainerProfile();
     } else {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  }, [isAdmin]);
+  }, [activeTab, isAdmin, isTrainer]);
+
+  // Initial load check
+  useEffect(() => {
+     setActiveTab(getDefaultTab());
+  }, [userRole]);
+
+
+  const fetchStaff = async () => {
+    setIsStaffLoading(true);
+    try {
+        const res = await fetch("/api/staff");
+        if (res.ok) {
+            const data = await res.json();
+            setStaff(data);
+        }
+    } catch {
+        toast.error("Failed to load staff");
+    } finally {
+        setIsStaffLoading(false);
+    }
+  };
+
+  const handleAddStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+        const res = await fetch("/api/staff", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(staffFormData),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        
+        toast.success("Staff member added successfully");
+        setIsParamsOpen(false);
+        setStaffFormData({ fullName: "", email: "", password: "", role: "receptionist" });
+        fetchStaff();
+    } catch (error: any) {
+        toast.error(error.message);
+    }
+  };
+
+  const handleDeleteStaff = async (id: string) => {
+     if (!confirm("Are you sure you want to remove this staff member?")) return;
+     try {
+        const res = await fetch(`/api/staff?id=${id}`, { method: "DELETE" });
+        if (res.ok) {
+            toast.success("Staff removed");
+            fetchStaff();
+        } else {
+            throw new Error("Failed to remove");
+        }
+     } catch (e) {
+        toast.error("Error removing staff");
+     }
+  };
 
   const fetchGymData = async () => {
     try {
@@ -65,6 +179,53 @@ export default function SettingsPage() {
     }
   };
 
+  const fetchTrainerProfile = async () => {
+      try {
+          // Use session ID
+          const id = (session?.user as any)?.id;
+          if (!id) return;
+          const res = await fetch(`/api/trainers/${id}`);
+          if (res.ok) {
+              const data = await res.json();
+              setTrainerData({
+                  bio: data.bio || "",
+                  specialties: data.specialties?.join(", ") || "",
+                  photo: data.photo || "",
+              });
+          }
+      } catch (error) {
+          toast.error("Failed to load profile");
+      } finally {
+          setIsLoading(false);
+      }
+  }
+
+  const handleUpdateProfile = async () => {
+      try {
+          const id = (session?.user as any)?.id;
+          const specialtiesArray = trainerData.specialties
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s);
+
+          const res = await fetch(`/api/trainers/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              bio: trainerData.bio,
+              specialties: specialtiesArray,
+              photo: trainerData.photo,
+            }),
+          });
+    
+          if (!res.ok) throw new Error("Failed to update profile");
+    
+          toast.success("Profile updated successfully");
+      } catch (error) {
+          toast.error("Failed to update profile");
+      }
+  }
+
   if (isLoading) return <div className="p-8">Loading settings...</div>
 
   return (
@@ -72,13 +233,13 @@ export default function SettingsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
-          Manage your gym account and preferences
+          Manage your account and preferences
         </p>
       </div>
 
       {/* Tab Navigation */}
       <div className="flex gap-4 mb-8 border-b border-border flex-wrap">
-        {!isAdmin && (
+        {!isAdmin && !isTrainer && (
           <button
             onClick={() => setActiveTab("gym")}
             className={`px-4 py-3 font-medium border-b-2 transition-colors ${
@@ -91,6 +252,21 @@ export default function SettingsPage() {
             Gym Profile
           </button>
         )}
+        
+        {isTrainer && (
+           <button
+             onClick={() => setActiveTab("profile")}
+             className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+               activeTab === "profile"
+                 ? "text-primary border-primary"
+                 : "text-muted-foreground border-transparent hover:text-foreground"
+             }`}
+           >
+             <UserCheck className="w-4 h-4 inline-block mr-2" />
+             My Profile
+           </button>
+        )}
+
         <button
           onClick={() => setActiveTab("account")}
           className={`px-4 py-3 font-medium border-b-2 transition-colors ${
@@ -102,6 +278,20 @@ export default function SettingsPage() {
           <User className="w-4 h-4 inline-block mr-2" />
           Account Details
         </button>
+
+        {!isAdmin && !isTrainer && (
+           <button
+             onClick={() => setActiveTab("staff")}
+             className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+               activeTab === "staff"
+                 ? "text-primary border-primary"
+                 : "text-muted-foreground border-transparent hover:text-foreground"
+             }`}
+           >
+             <Users className="w-4 h-4 inline-block mr-2" />
+             Staff Management
+           </button>
+        )}
       </div>
 
       {/* Gym Profile Tab */}
@@ -159,6 +349,168 @@ export default function SettingsPage() {
             </div>
           </form>
         </Card>
+      )}
+
+      {/* Trainer Profile Tab */}
+      {activeTab === "profile" && (
+          <Card className="p-8 bg-card max-w-2xl border-border/60 shadow-sm">
+              <h2 className="text-2xl font-semibold text-foreground mb-6">Edit Profile</h2>
+              <div className="space-y-6">
+                 {/* Photo Upload */}
+                 <div className="space-y-2">
+                  <Label>Profile Picture</Label>
+                  <div className="flex items-center gap-4">
+                    {trainerData.photo && (
+                      <Avatar className="w-16 h-16">
+                        <AvatarImage src={trainerData.photo} />
+                        <AvatarFallback>IMG</AvatarFallback>
+                      </Avatar>
+                    )}
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 4 * 1024 * 1024) { // 4MB limit
+                            toast.error("Image size too large (max 4MB)");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setTrainerData(prev => ({ ...prev, photo: reader.result as string }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Recommended: Square image, max 4MB.</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Bio</Label>
+                  <Textarea
+                    value={trainerData.bio}
+                    onChange={(e) => setTrainerData({ ...trainerData, bio: e.target.value })}
+                    rows={5}
+                    placeholder="Tell us about yourself..."
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Specialties (comma separated)</Label>
+                  <Input
+                    value={trainerData.specialties}
+                    onChange={(e) => setTrainerData({ ...trainerData, specialties: e.target.value })}
+                    placeholder="Yoga, HIIT, Nutrition"
+                  />
+                </div>
+
+                <div className="pt-6 border-t border-border">
+                  <Button onClick={handleUpdateProfile}>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Profile
+                  </Button>
+                </div>
+              </div>
+          </Card>
+      )}
+
+      {/* Staff Tab */}
+      {activeTab === "staff" && (
+        <div className="space-y-6 animate-fade-in">
+           <div className="flex items-center justify-between">
+              <div>
+                  <h2 className="text-2xl font-semibold text-foreground">Staff Members</h2>
+                  <p className="text-muted-foreground">Manage access for managers and receptionists.</p>
+              </div>
+              <Dialog open={isParamsOpen} onOpenChange={setIsParamsOpen}>
+                  <DialogTrigger asChild>
+                      <Button className="gap-2"><Plus className="w-4 h-4"/> Add Staff</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                      <form onSubmit={handleAddStaff}>
+                        <DialogHeader>
+                            <DialogTitle>Add Team Member</DialogTitle>
+                            <DialogDescription>Create a login for your staff member.</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label>Full Name</Label>
+                                <Input required value={staffFormData.fullName} onChange={e => setStaffFormData({...staffFormData, fullName: e.target.value})} placeholder="Jane Doe" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Email</Label>
+                                <Input required type="email" value={staffFormData.email} onChange={e => setStaffFormData({...staffFormData, email: e.target.value})} placeholder="jane@gymflow.com" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Password</Label>
+                                <Input required type="password" value={staffFormData.password} onChange={e => setStaffFormData({...staffFormData, password: e.target.value})} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Role</Label>
+                                <Select value={staffFormData.role} onValueChange={v => setStaffFormData({...staffFormData, role: v})}>
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {(isAdmin || (session?.user as any)?.role === 'owner') && (
+                                            <SelectItem value="manager">Manager</SelectItem>
+                                        )}
+                                        <SelectItem value="receptionist">Receptionist</SelectItem>
+                                        <SelectItem value="trainer">Trainer</SelectItem>
+                                        <SelectItem value="accountant">Accountant</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit">Create Account</Button>
+                        </DialogFooter>
+                      </form>
+                  </DialogContent>
+              </Dialog>
+           </div>
+
+           <Card className="overflow-hidden">
+               <Table>
+                   <TableHeader>
+                       <TableRow>
+                           <TableHead>Name</TableHead>
+                           <TableHead>Email</TableHead>
+                           <TableHead>Role</TableHead>
+                           <TableHead>Joined</TableHead>
+                           <TableHead className="text-right">Actions</TableHead>
+                       </TableRow>
+                   </TableHeader>
+                   <TableBody>
+                       {staff.length === 0 ? (
+                           <TableRow>
+                               <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">No staff members found.</TableCell>
+                           </TableRow>
+                       ) : (
+                           staff.map((s) => (
+                               <TableRow key={s.id || s._id}>
+                                   <TableCell className="font-medium">{s.fullName}</TableCell>
+                                   <TableCell>{s.email}</TableCell>
+                                   <TableCell>
+                                       <span className="capitalize bg-muted px-2 py-1 rounded text-xs font-semibold">{s.role}</span>
+                                   </TableCell>
+                                   <TableCell className="text-muted-foreground text-sm">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
+                                   <TableCell className="text-right">
+                                       <Button variant="ghost" size="icon" onClick={() => handleDeleteStaff(s._id || s.id)}>
+                                           <Trash2 className="w-4 h-4 text-destructive" />
+                                       </Button>
+                                   </TableCell>
+                               </TableRow>
+                           ))
+                       )}
+                   </TableBody>
+               </Table>
+           </Card>
+        </div>
       )}
 
       {/* Account Tab */}

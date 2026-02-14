@@ -16,7 +16,7 @@ export async function GET() {
 
         await connectDB();
         const gyms = await Gym.find().sort({ createdAt: -1 });
-        return NextResponse.json(gyms);
+        return NextResponse.json(gyms, { status: 200 });
     } catch (error) {
         return NextResponse.json({ message: "Error fetching gyms" }, { status: 500 });
     }

@@ -11,7 +11,10 @@ export async function GET() {
     }
 
     await connectDB();
-    const subs = await Subscription.find({ gymId: (session.user as any).gymId }).sort({ createdAt: -1 });
+    const subs = await Subscription.find({
+        gymId: (session.user as any).gymId,
+        deletedAt: null
+    }).sort({ createdAt: -1 });
     return NextResponse.json(subs);
 }
 

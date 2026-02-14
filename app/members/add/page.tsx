@@ -28,6 +28,7 @@ export default function AddMemberPage() {
     gender: "male" | "female" | "other";
     planId: string;
     notes: string;
+    trainerId: string;
   }>({
     firstName: "",
     lastName: "",
@@ -36,11 +37,27 @@ export default function AddMemberPage() {
     gender: "male",
     planId: "plan_basic",
     notes: "",
+    trainerId: "",
   });
+  const [trainers, setTrainers] = useState<any[]>([]);
 
   useEffect(() => {
     store.loadPlans();
+    fetchTrainers();
   }, [store.members]);
+
+  const fetchTrainers = async () => {
+    try {
+        const res = await fetch("/api/staff");
+        if (res.ok) {
+            const data = await res.json();
+            // Filter only trainers
+            setTrainers(data.filter((u: any) => u.role === 'trainer'));
+        }
+    } catch (error) {
+        console.error("Failed to fetch trainers");
+    }
+  };
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -232,6 +249,25 @@ export default function AddMemberPage() {
                 {store.plans.map((plan) => (
                   <option key={plan.id} value={plan.id}>
                     {plan.name} - {plan.price}/month
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Assign Trainer
+              </label>
+              <select
+                value={formData.trainerId}
+                onChange={(e) =>
+                  setFormData({ ...formData, trainerId: e.target.value })
+                }
+                className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground"
+              >
+                <option value="">No Trainer</option>
+                {trainers.map((trainer) => (
+                  <option key={trainer._id || trainer.id} value={trainer._id || trainer.id}>
+                    {trainer.fullName}
                   </option>
                 ))}
               </select>

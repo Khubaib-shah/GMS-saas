@@ -1,77 +1,167 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, extractRequestInfo } from "@/lib/audit";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
+import Gym from "@/models/Gym";
 import { isSubscriptionActive } from "@/lib/utils/file-utils";
 
 export async function POST(req: Request) {
+    const authResult = await requirePermission(PERMISSIONS.ATTENDANCE_CHECKIN);
+    if ("error" in authResult) return authResult.error;
+
+    const { session } = authResult;
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        const { memberId, branchId } = await req.json();
+
+        if (!memberId) {
+            return NextResponse.json({ error: "Member ID is required" }, { status: 400 });
         }
 
-        const { memberId, gymId } = await req.json();
-
-        if (!memberId || !gymId) {
-            return NextResponse.json(
-                { error: "Member ID and Gym ID are required" },
-                { status: 400 }
-            );
-        }
+        const gymId = session.user.gymId;
 
         await connectDB();
 
+        // Get gym settings for attendance rules
+        const gym = await Gym.findById(gymId).lean();
+        const attendanceRules = (gym as any)?.settings?.attendanceRules || {
+            preventDuplicateCheckin: true,
+            dailyLimit: 1,
+        };
+
         // 1. Check if member exists
-        const member = await Member.findById(memberId);
+        const member = await Member.findOne({
+            _id: memberId,
+            gymId,
+            deletedAt: null,
+        });
+
         if (!member) {
             return NextResponse.json({ error: "Member not found" }, { status: 404 });
         }
 
-        // 2. Check for active subscription
-        const subscriptions = await Subscription.find({ memberId: member.id, gymId });
-        const activeSub = subscriptions.find(sub => isSubscriptionActive(sub.endDate, sub.status));
+        // 2. Check for active subscription (not paused or expired)
+        const subscription = await Subscription.findOne({
+            memberId: member.id,
+            gymId,
+            deletedAt: null,
+        }).sort({ endDate: -1 });
 
-        if (!activeSub) {
-            return NextResponse.json({ error: "No active subscription found for this member" }, { status: 403 });
+        if (!subscription) {
+            return NextResponse.json({ error: "No subscription found for this member" }, { status: 403 });
         }
 
-        // 3. Check if already checked in today
+        // Block check-in for paused subscriptions
+        if (subscription.status === "paused") {
+            return NextResponse.json({
+                error: "Subscription is paused. Member cannot check in.",
+                isPaused: true,
+            }, { status: 403 });
+        }
+
+        // Check if subscription is expired
+        if (!isSubscriptionActive(subscription.endDate, subscription.status)) {
+            return NextResponse.json({
+                error: "Subscription has expired",
+                isExpired: true,
+            }, { status: 403 });
+        }
+
+        // 3. Check for duplicate check-in today (if rule enabled)
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
 
         const endOfDay = new Date();
         endOfDay.setHours(23, 59, 59, 999);
 
-        const existingAttendance = await Attendance.findOne({
-            memberId,
-            gymId,
-            date: {
-                $gte: startOfDay,
-                $lte: endOfDay
-            }
-        });
+        if (attendanceRules.preventDuplicateCheckin) {
+            const todayCheckIns = await Attendance.countDocuments({
+                memberId,
+                gymId,
+                date: { $gte: startOfDay, $lte: endOfDay },
+            });
 
-        if (existingAttendance) {
-            return NextResponse.json({ error: "Member already checked in today" }, { status: 400 });
+            if (todayCheckIns >= attendanceRules.dailyLimit) {
+                return NextResponse.json({
+                    error: `Daily check-in limit (${attendanceRules.dailyLimit}) reached`,
+                    dailyLimitReached: true,
+                }, { status: 400 });
+            }
         }
 
-        // 4. Create Attendance
+        // 4. Calculate attendance streak
+        let newStreak = 1;
+        const lastCheckIn = member.lastCheckIn;
+
+        if (lastCheckIn) {
+            const lastCheckInDate = new Date(lastCheckIn);
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            yesterday.setHours(0, 0, 0, 0);
+
+            const lastCheckInDay = new Date(lastCheckInDate);
+            lastCheckInDay.setHours(0, 0, 0, 0);
+
+            // If last check-in was yesterday, increment streak
+            if (lastCheckInDay.getTime() === yesterday.getTime()) {
+                newStreak = (member.attendanceStreak || 0) + 1;
+            }
+            // If last check-in was today, keep current streak
+            else if (lastCheckInDay.getTime() === startOfDay.getTime()) {
+                newStreak = member.attendanceStreak || 1;
+            }
+            // Otherwise, reset streak to 1
+        }
+
+        // 5. Create Attendance record
         const newAttendance = await Attendance.create({
             gymId,
             memberId,
             date: startOfDay,
             checkInTime: new Date(),
-            status: 'present'
+            status: "present",
+            branchId: branchId || session.user.branchId,
         });
 
-        return NextResponse.json(newAttendance, { status: 201 });
+        // 6. Update member stats
+        await Member.updateOne(
+            { _id: memberId },
+            {
+                $set: {
+                    lastCheckIn: new Date(),
+                    attendanceStreak: newStreak,
+                },
+                $inc: { totalCheckIns: 1 },
+            }
+        );
+
+        // 7. Audit log
+        await logAudit({
+            gymId,
+            userId: session.user.id,
+            userName: session.user.name,
+            action: "checkin",
+            resource: "attendance",
+            resourceId: newAttendance._id.toString(),
+            resourceName: `${member.firstName} ${member.lastName || ""}`.trim(),
+            details: { streak: newStreak },
+            branchId: branchId || session.user.branchId,
+            ...extractRequestInfo(req.headers),
+        });
+
+        return NextResponse.json({
+            ...newAttendance.toJSON(),
+            memberName: `${member.firstName} ${member.lastName || ""}`.trim(),
+            streak: newStreak,
+        }, { status: 201 });
 
     } catch (error: any) {
         console.error("Check-in error:", error);
         return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
     }
 }
+

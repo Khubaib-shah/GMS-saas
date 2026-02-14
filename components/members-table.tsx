@@ -83,7 +83,7 @@ export function MembersTable() {
               <th className="text-left py-3 px-4 font-semibold text-muted-foreground">
                 Status
               </th>
-              <th className="text-left py-3 px-4 font-semibold text-muted-foreground">
+              <th className="text-center py-3 px-4 font-semibold text-muted-foreground">
                 Action
               </th>
             </tr>

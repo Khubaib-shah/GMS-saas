@@ -38,9 +38,11 @@ export type AppState = {
   // Subscriptions
   subscriptions: Subscription[]
   loadSubscriptions: () => Promise<void>
-  renewSubscription: (memberId: string, planId: string, days: number, method?: "cash" | "online", receiptUrl?: string | null) => Promise<boolean>
+  renewSubscription: (memberId: string, planId: string, days: number, method?: "cash" | "online" | "bank_transfer" | "card" | "other", receiptUrl?: string | null) => Promise<boolean>
   updateSubscription: (id: string, data: Partial<Subscription>) => Promise<void>
   deleteSubscription: (id: string) => Promise<void>
+  pauseSubscription: (id: string, reason?: string) => Promise<void>
+  resumeSubscription: (id: string) => Promise<void>
 
   // Payments
   payments: Payment[]
@@ -87,7 +89,7 @@ export const useAppStore = create<AppState>()(
             const data = await res.json();
             set({
               gymProfile: {
-                _id: data._id,
+                _id: data._id || data.id,
                 name: data.name || "GymFlow",
                 owner: data.owner || "Owner", // Fallback, usually from session
                 phone: data.phone || "",
@@ -148,7 +150,8 @@ export const useAppStore = create<AppState>()(
       },
 
       deleteMember: async (id) => {
-        await fetch(`/api/members/${id}`, { method: "DELETE" });
+        const res = await fetch(`/api/members/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("Failed to delete member");
         set((state) => ({
           members: state.members.filter((m) => m.id !== id),
         }));
@@ -377,6 +380,58 @@ export const useAppStore = create<AppState>()(
           }));
         } catch (error) {
           console.error("Failed to delete subscription", error);
+        }
+      },
+
+      pauseSubscription: async (id, reason) => {
+        try {
+          const res = await fetch("/api/subscriptions/pause", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subscriptionId: id, reason }),
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Failed to pause subscription");
+          }
+
+          const { subscription } = await res.json();
+
+          set((state) => ({
+            subscriptions: state.subscriptions.map((s) =>
+              s.id === id ? subscription : s
+            ),
+          }));
+        } catch (error) {
+          console.error("Failed to pause subscription", error);
+          throw error;
+        }
+      },
+
+      resumeSubscription: async (id) => {
+        try {
+          const res = await fetch("/api/subscriptions/resume", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subscriptionId: id }),
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Failed to resume subscription");
+          }
+
+          const { subscription } = await res.json();
+
+          set((state) => ({
+            subscriptions: state.subscriptions.map((s) =>
+              s.id === id ? subscription : s
+            ),
+          }));
+        } catch (error) {
+          console.error("Failed to resume subscription", error);
+          throw error;
         }
       },
 

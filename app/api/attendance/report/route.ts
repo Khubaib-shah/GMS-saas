@@ -38,6 +38,14 @@ export async function GET(req: Request) {
             query.date = { $gte: startOfMonth, $lte: endOfMonth };
         }
 
+        // Restrict to trainer's assigned members
+        if ((session.user as any).role === 'trainer') {
+            const Member = require("@/models/Member").default; // Dynamic import to ensure registration
+            const trainerMembers = await Member.find({ trainerId: (session.user as any).id }).select('_id');
+            const memberIds = trainerMembers.map((m: any) => m._id);
+            query.memberId = { $in: memberIds };
+        }
+
         const attendanceKeys = await Attendance.find(query).sort({ date: -1 }).populate("memberId", "firstName lastName photoBase64");
 
         return NextResponse.json(attendanceKeys, { status: 200 });

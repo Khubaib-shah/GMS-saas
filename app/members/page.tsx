@@ -152,7 +152,7 @@ export default function MembersPage() {
               <th className="text-left py-4 px-4 font-semibold text-muted-foreground">
                 Joined
               </th>
-              <th className="text-left py-4 px-4 font-semibold text-muted-foreground">
+              <th className="text-center py-4 px-4 font-semibold text-muted-foreground">
                 Action
               </th>
             </tr>
@@ -216,7 +216,7 @@ export default function MembersPage() {
                   <td className="py-4 px-4 text-muted-foreground">
                     {formatDate(member.joinDate)}
                   </td>
-                  <td className="py-4 px-4 space-x-2">
+                  <td className="py-4 px-4 flex gap-2 items-center justify-center">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -250,14 +250,17 @@ export default function MembersPage() {
                         View
                       </Button>
                     </Link>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDeleteId(member.id)}
-                      className="text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+
+                    {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeleteId(member.id)}
+                        className="text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
                   </td>
                 </tr>
               );

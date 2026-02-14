@@ -11,7 +11,10 @@ export async function GET() {
     }
 
     await connectDB();
-    const payments = await Payment.find({ gymId: (session.user as any).gymId }).sort({ date: -1 });
+    const payments = await Payment.find({
+        gymId: (session.user as any).gymId,
+        deletedAt: null
+    }).sort({ date: -1 });
     return NextResponse.json(payments);
 }
 

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { Plus, Building2, Users, Phone, MapPin, Mail, Lock, CheckCircle2, XCircle } from "lucide-react"
+import { Plus, Building2, Users, Phone, MapPin, Mail, Lock, CheckCircle2, XCircle, Trash2 } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -27,6 +27,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession()
@@ -35,6 +45,8 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitLoading, setIsSubmitLoading] = useState(false)
   const [open, setOpen] = useState(false)
+  const [deleteGymId, setDeleteGymId] = useState<string | null>(null)
+  const [deleteGymName, setDeleteGymName] = useState<string>("")
 
   const [formData, setFormData] = useState({
     gymName: "",
@@ -112,6 +124,30 @@ export default function AdminDashboard() {
       fetchGyms()
     } catch (error: any) {
       toast.error(error.message)
+    }
+  }
+
+  const handleDeleteGym = async () => {
+    if (!deleteGymId) return
+
+    try {
+      toast.loading("Deleting gym and all associated data...", { id: "delete-gym" })
+      
+      const res = await fetch(`/api/admin/gyms?id=${deleteGymId}`, {
+        method: "DELETE",
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.message || "Failed to delete gym")
+      }
+
+      toast.success("Gym and all associated data deleted successfully", { id: "delete-gym" })
+      setDeleteGymId(null)
+      setDeleteGymName("")
+      fetchGyms()
+    } catch (error: any) {
+      toast.error(error.message, { id: "delete-gym" })
     }
   }
 
@@ -232,6 +268,7 @@ export default function AdminDashboard() {
               <TableHead>Plan</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Registered Date</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -283,14 +320,28 @@ export default function AdminDashboard() {
                     {new Date(gym.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                     <Button 
-                       variant="ghost" 
-                       size="sm" 
-                       className="text-primary hover:text-primary hover:bg-primary/10"
-                       onClick={() => router.push(`/subscriptions?gymId=${gym._id}`)}
-                     >
-                        Manage Plans
-                     </Button>
+                     <div className="flex items-center gap-2 justify-end">
+                       <Button 
+                         variant="ghost" 
+                         size="sm" 
+                         className="text-primary hover:text-primary hover:bg-primary/10"
+                         onClick={() => router.push(`/subscriptions?gymId=${gym._id}`)}
+                       >
+                          Manage Plans
+                       </Button>
+                       <Button
+                         variant="ghost"
+                         size="icon"
+                         className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                         onClick={() => {
+                           setDeleteGymId(gym._id)
+                           setDeleteGymName(gym.name)
+                         }}
+                         title="Delete Gym"
+                       >
+                         <Trash2 className="w-4 h-4" />
+                       </Button>
+                     </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -304,6 +355,45 @@ export default function AdminDashboard() {
           </TableBody>
         </Table>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteGymId !== null} onOpenChange={(open) => !open && setDeleteGymId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Gym: {deleteGymName}?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p className="font-semibold text-destructive">
+                ⚠️ This action cannot be undone!
+              </p>
+              <p>
+                This will permanently delete <strong>{deleteGymName}</strong> and <strong>ALL</strong> associated data including:
+              </p>
+              <ul className="list-disc list-inside text-sm space-y-1 ml-2">
+                <li>All members and their profiles</li>
+                <li>All subscriptions and payment records</li>
+                <li>All membership plans</li>
+                <li>All attendance records</li>
+                <li>All staff users</li>
+                <li>All audit logs</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setDeleteGymId(null)
+              setDeleteGymName("")
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteGym} 
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
-import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Dumbbell, ShieldCheck, Building2, UserCheck } from "lucide-react"
+import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Dumbbell, ShieldCheck, Building2, UserCheck, ClipboardList } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface NavItem {
@@ -29,12 +29,14 @@ export function Sidebar() {
         { label: "Plans", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
         { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
       ]
-    : [
-        { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
+      : [
+        ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : []),
         { label: "Members", href: "/members", icon: <Users className="w-5 h-5" /> },
         { label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> },
-        { label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
-        { label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> },
+        ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> }] : []),
+        ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> }] : []),
+        ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
+        ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [{ label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> }] : []),
         { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
       ]
 

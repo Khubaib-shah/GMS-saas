@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 import { Card } from "@/components/ui/card";
-import { Edit2, Plus, Trash2 } from "lucide-react";
+import { Edit2, Plus, Trash2, PauseCircle, PlayCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -49,6 +50,10 @@ export default function SubscriptionsPage() {
   const searchParams = useSearchParams();
   const queryGymId = searchParams.get("gymId");
   const isAdmin = (session?.user as any)?.role === "super_admin";
+  const userRole = (session?.user as any)?.role;
+  const canCreatePlans = hasPermission(userRole, PERMISSIONS.PLANS_CREATE);
+  const canEditPlans = hasPermission(userRole, PERMISSIONS.PLANS_EDIT);
+  const canDeletePlans = hasPermission(userRole, PERMISSIONS.PLANS_DELETE);
 
   const store = useAppStore();
   const [gyms, setGyms] = useState<any[]>([]);
@@ -56,6 +61,13 @@ export default function SubscriptionsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
+  
+  // Pause/Resume state
+  const [showPauseDialog, setShowPauseDialog] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
+  const [pauseReason, setPauseReason] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [editFormData, setEditFormData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -155,6 +167,38 @@ export default function SubscriptionsPage() {
     }
   };
 
+  const handlePauseSubscription = async () => {
+    if (!selectedSubscription) return;
+    setIsProcessing(true);
+    try {
+      await store.pauseSubscription(selectedSubscription.id, pauseReason);
+      toast.success("Subscription paused successfully");
+      setShowPauseDialog(false);
+      setPauseReason("");
+      setSelectedSubscription(null);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to pause subscription");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleResumeSubscription = async () => {
+    if (!selectedSubscription) return;
+    setIsProcessing(true);
+    try {
+      await store.resumeSubscription(selectedSubscription.id);
+      toast.success("Subscription resumed successfully");
+      setShowResumeDialog(false);
+      setSelectedSubscription(null);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to resume subscription");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+
   const filteredPlans = store.plans.filter((plan) => {
     if (!store.searchQuery) return true;
     const lower = store.searchQuery.toLowerCase();
@@ -173,6 +217,7 @@ export default function SubscriptionsPage() {
       const gym = gyms.find((g) => g._id === sub.gymId);
       return { ...sub, member, plan, gym };
     })
+    .filter((sub) => sub.member) // Filter out orphans (deleted members)
     .filter((sub) => {
       if (!store.searchQuery) return true;
       const lower = store.searchQuery.toLowerCase();
@@ -196,7 +241,7 @@ export default function SubscriptionsPage() {
             Manage subscription plans and member subscriptions
           </p>
         </div>
-        {(isAdmin || status === "loading") && (
+        {(canCreatePlans || status === "loading") && (
           <Button onClick={() => setShowAddModal(true)} className="gap-2" disabled={status === "loading"}>
             <Plus className="w-4 h-4" />
             {status === "loading" ? "Loading..." : "Add Plan"}
@@ -220,7 +265,7 @@ export default function SubscriptionsPage() {
                   <TableHead>Price</TableHead>
                   <TableHead>Duration</TableHead>
                   <TableHead className="text-center">Active Members</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  {(canEditPlans || canDeletePlans) && <TableHead className="text-right">Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -249,8 +294,10 @@ export default function SubscriptionsPage() {
                             {memberCount}
                           </span>
                         </TableCell>
+                        {(canEditPlans || canDeletePlans) && (
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                             {canEditPlans && (
                              <Button
                                variant="ghost"
                                size="sm"
@@ -265,6 +312,8 @@ export default function SubscriptionsPage() {
                              >
                                <Edit2 className="w-4 h-4" />
                              </Button>
+                             )}
+                             {canDeletePlans && (
                              <Button
                                variant="ghost"
                                size="sm"
@@ -273,14 +322,16 @@ export default function SubscriptionsPage() {
                              >
                                <Trash2 className="w-4 h-4" />
                              </Button>
+                             )}
                           </div>
                         </TableCell>
+                        )}
                       </TableRow>
                     );
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={(canEditPlans || canDeletePlans) ? 6 : 5} className="h-24 text-center text-muted-foreground">
                       No plans created yet.
                     </TableCell>
                   </TableRow>
@@ -332,8 +383,9 @@ export default function SubscriptionsPage() {
                     </div>
                   </div>
 
-                  {isAdmin && (
+                  {(canEditPlans || canDeletePlans) && (
                     <div className="flex gap-2 items-center justify-center mt-auto">
+                      {canEditPlans && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -350,7 +402,9 @@ export default function SubscriptionsPage() {
                         <Edit2 className="w-4 h-4 mr-2" />
                         Edit
                       </Button>
+                      )}
 
+                      {canDeletePlans && (
                       <Button
                         variant="destructive"
                         size="sm"
@@ -360,6 +414,7 @@ export default function SubscriptionsPage() {
                         <Trash2 className="w-4 h-4 mr-2" />
                         Delete
                       </Button>
+                      )}
                     </div>
                   )}
                 </Card>
@@ -383,6 +438,7 @@ export default function SubscriptionsPage() {
                 <TableHead>Start Date</TableHead>
                 <TableHead>Expiry Date</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -394,7 +450,14 @@ export default function SubscriptionsPage() {
                     </TableCell>
                     <TableCell>{sub.plan?.name}</TableCell>
                     <TableCell>{formatDate(sub.startDate)}</TableCell>
-                    <TableCell>{formatDate(sub.endDate)}</TableCell>
+                    <TableCell>{
+                      sub.status === "paused"
+                       ? <div>
+                           <span className="line-through text-muted-foreground text-xs block">{formatDate(sub.originalEndDate || sub.endDate)}</span>
+                           <span>{formatDate(sub.endDate)}</span>
+                         </div>
+                       : formatDate(sub.endDate)
+                    }</TableCell>
                     <TableCell>
                       <span
                         className={cn(
@@ -412,6 +475,40 @@ export default function SubscriptionsPage() {
                           ? "Active"
                           : "Expired"}
                       </span>
+                      {sub.totalPausedDays ? (
+                        <div className="text-[10px] text-muted-foreground mt-1">
+                          Paused: {sub.totalPausedDays}d
+                        </div>
+                      ) : null}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {sub.status === "paused" ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-100 dark:hover:bg-green-900/20"
+                          onClick={() => {
+                            setSelectedSubscription(sub);
+                            setShowResumeDialog(true);
+                          }}
+                          title="Resume Subscription"
+                        >
+                          <PlayCircle className="h-4 w-4" />
+                        </Button>
+                      ) : isSubscriptionActive(sub.endDate, sub.status) ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/20"
+                          onClick={() => {
+                            setSelectedSubscription(sub);
+                            setShowPauseDialog(true);
+                          }}
+                          title="Pause Subscription"
+                        >
+                          <PauseCircle className="h-4 w-4" />
+                        </Button>
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 ))
@@ -613,6 +710,55 @@ export default function SubscriptionsPage() {
               onClick={handleDeletePlan}
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Pause Subscription Dialog */}
+      <Dialog open={showPauseDialog} onOpenChange={setShowPauseDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Pause Subscription</DialogTitle>
+            <DialogDescription>
+              Pausing will stop the subscription timer. The end date will be extended by the number of days paused when resumed.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="pause-reason">Reason (Optional)</Label>
+              <Textarea
+                id="pause-reason"
+                value={pauseReason}
+                onChange={(e) => setPauseReason(e.target.value)}
+                placeholder="e.g. Member requested freeze for vacation"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPauseDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handlePauseSubscription} disabled={isProcessing}>
+              {isProcessing ? "Pausing..." : "Pause Subscription"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Resume Subscription Dialog */}
+      <AlertDialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Resume Subscription</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to resume this subscription? The end date will be extended based on how long it was paused.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleResumeSubscription} disabled={isProcessing}>
+              {isProcessing ? "Resuming..." : "Resume Subscription"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
