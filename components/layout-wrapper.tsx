@@ -15,12 +15,7 @@ import { SessionProvider } from "next-auth/react"
 interface LayoutWrapperProps {
   children: React.ReactNode
 }
-
-export function 
-
-
-
-LayoutWrapper({ children }: LayoutWrapperProps) {
+export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname()
   const loadMembers = useAppStore((state) => state.loadMembers)
   const loadPlans = useAppStore((state) => state.loadPlans)
@@ -49,13 +44,15 @@ LayoutWrapper({ children }: LayoutWrapperProps) {
     }
   }, [pathname, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments]) 
 
+  const isLandingPage = pathname === "/"
   const isLoginPage = pathname === "/login"
+  const isPublicPage = isLandingPage || isLoginPage
 
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
 
   return (
     <SessionProvider>
-      {isLoginPage ? (
+      {isPublicPage ? (
         children
       ) : (
         <div className="min-h-screen bg-background">

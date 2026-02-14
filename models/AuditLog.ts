@@ -31,7 +31,9 @@ const AuditLogSchema = new mongoose.Schema(
                 'checkin',
                 'checkout',
                 'role_change',
-                'export_data'
+                'export_data',
+                'enable_portal',
+                'disable_portal'
             ]
         },
         resource: {
@@ -46,7 +48,8 @@ const AuditLogSchema = new mongoose.Schema(
                 'user',
                 'branch',
                 'settings',
-                'gym'
+                'gym',
+                'trainer_profile'
             ]
         },
         resourceId: { type: String },

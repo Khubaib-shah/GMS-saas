@@ -118,8 +118,8 @@ export async function PUT(
 
         await logAudit({
             gymId,
-            userId: session.user.id,
-            userName: session.user.name,
+            userId,
+            userName: session.user?.name || undefined,
             action: "update",
             resource: "trainer_profile",
             resourceId: id,

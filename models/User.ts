@@ -90,6 +90,9 @@ const UserSchema = new mongoose.Schema(
 // Index for efficient queries
 UserSchema.index({ gymId: 1, email: 1 });
 UserSchema.index({ gymId: 1, branchId: 1 });
+UserSchema.index({ gymId: 1, role: 1 });
+UserSchema.index({ gymId: 1, deletedAt: 1 });
+UserSchema.index({ gymId: 1, isActive: 1 });
 
 // Virtual to check if user is deleted
 UserSchema.virtual("isDeleted").get(function () {

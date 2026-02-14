@@ -42,6 +42,9 @@ MemberSchema.index({ gymId: 1, email: 1 });
 MemberSchema.index({ gymId: 1, branchId: 1 });
 MemberSchema.index({ gymId: 1, qrCode: 1 });
 MemberSchema.index({ gymId: 1, trainerId: 1 });
+MemberSchema.index({ gymId: 1, phone: 1 });
+MemberSchema.index({ gymId: 1, deletedAt: 1 });
+MemberSchema.index({ gymId: 1, firstName: 1, lastName: 1 });
 
 // Add a transform to change _id to id
 MemberSchema.set("toJSON", {

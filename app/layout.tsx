@@ -9,24 +9,45 @@ import "./globals.css";
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#0f172a",
+};
+
 export const metadata: Metadata = {
-  title: "GymFlow - Gym Management SaaS",
-  description: "Modern gym management dashboard for owners and staff",
-  generator: "v0.app",
+  title: "GymFlow - Advanced Gym Management SaaS",
+  description: "Streamline your gym operations with GymFlow. Manage members, trainers, attendance, and subscriptions in one platform.",
+  keywords: ["gym management", "fitness software", "SaaS", "member tracking", "trainer scheduling"],
+  authors: [{ name: "Khubaib Shah" }],
+  openGraph: {
+    title: "GymFlow - Modern Gym Management",
+    description: "The complete toolkit for modern gym owners. Start managing your fitness business effectively today.",
+    url: "https://gms-saas.vercel.app", // Fallback URL
+    siteName: "GymFlow",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "GymFlow Dashboard Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GymFlow | Gym Management SaaS",
+    description: "Streamline your fitness business with our comprehensive management system.",
+    images: ["/og-image.png"],
+  },
   icons: {
     icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
+      { url: "/favicon.ico" },
+      { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
+      { url: "/icon-dark-32x32.png", media: "(prefers-color-scheme: dark)" },
     ],
     apple: "/apple-icon.png",
   },

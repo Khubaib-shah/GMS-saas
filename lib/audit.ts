@@ -25,7 +25,8 @@ export type AuditResource =
     | 'user'
     | 'branch'
     | 'settings'
-    | 'gym';
+    | 'gym'
+    | 'trainer_profile';
 
 export interface AuditLogEntry {
     gymId: string;
