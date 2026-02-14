@@ -5,7 +5,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dumbbell } from "lucide-react";
+import { Zap, Shield, ArrowRight, Trophy } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 
@@ -29,13 +29,11 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error("Invalid email or password");
+        toast.error("Invalid credentials. Try again.");
       } else {
-        // Fetch session to check role
         const res = await fetch("/api/auth/session");
         const session = await res.json();
-        toast.success("Welcome back!");
-        // If a callbackUrl was provided and is not the default dashboard, use it
+        toast.success("SYSTEM ACCESS GRANTED");
         if (callbackUrl && callbackUrl !== "/dashboard") {
           router.push(callbackUrl);
         } else if (session?.user?.role === "super_admin") {
@@ -45,46 +43,49 @@ function LoginForm() {
         }
       }
     } catch (error) {
-      toast.error("An error occurred during sign in");
+      toast.error("Critical authentication error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-sm">
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold text-foreground mb-2">
-          Welcome Back
+    <div className="w-full max-w-sm glass-card p-10 selection:bg-primary selection:text-black">
+      <div className="mb-10 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6 neon-glow">
+            <Zap className="w-10 h-10 text-black" />
+        </div>
+        <h2 className="text-3xl font-black italic text-white mb-2 uppercase tracking-tight">
+          System <span className="text-primary">Login</span>
         </h2>
-        <p className="text-muted-foreground">Sign in to your gym account</p>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Authorized Personnel Only</p>
       </div>
 
       <form onSubmit={handleLogin} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Email Address
+          <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+            Identity Email
           </label>
           <Input
             type="email"
-            placeholder="owner@gym.com"
+            placeholder="ACCESS@GYMFLOW.COM"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full"
+            className="w-full bg-white/5 border-white/10 text-white placeholder:text-slate-700 font-bold uppercase tracking-wider h-12 rounded-xl focus:bg-white/10"
             required
           />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-foreground">
-              Password
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              Security Key
             </label>
             <a
               href="#"
-              className="text-sm text-primary hover:text-primary/50 transition-colors"
+              className="text-[10px] font-black text-primary hover:text-white transition-colors uppercase tracking-widest"
             >
-              Forgot password?
+              Reset Key?
             </a>
           </div>
           <Input
@@ -92,7 +93,7 @@ function LoginForm() {
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full"
+            className="w-full bg-white/5 border-white/10 text-white placeholder:text-slate-700 font-bold h-12 rounded-xl focus:bg-white/10"
             required
           />
         </div>
@@ -100,17 +101,18 @@ function LoginForm() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary text-primary-foreground hover:bg-accent hover:text-primary py-2 h-10"
+          className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
         >
-          {loading ? "Signing in..." : "Sign In"}
+          {loading ? "INITIALIZING..." : "INITIATE ACCESS"}
+          {!loading && <ArrowRight className="ml-2 w-5 h-5" />}
         </Button>
       </form>
 
-      <div className="mt-8 pt-8 border-t border-border">
-        <p className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <a href="https://wa.me/923149784156" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/50">
-            Contact support
+      <div className="mt-10 pt-8 border-t border-white/5">
+        <p className="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">
+          No Access?{" "}
+          <a href="https://wa.me/923149784156" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-white transition-colors">
+            Contact High Command
           </a>
         </p>
       </div>
@@ -120,45 +122,62 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-card flex">
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-black flex items-center justify-center p-12">
-        <div className="text-center text-primary-foreground">
-          <div className="mb-8 flex justify-center">
-            <div className="w-20 h-20 rounded-2xl bg-primary-foreground/20 flex items-center justify-center backdrop-blur-sm">
-              <Dumbbell className="w-12 h-12" />
+    <div className="min-h-screen bg-slate-950 flex relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,rgba(76,255,0,0.1),transparent_70%)]"></div>
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -mr-40 -mb-40 animate-pulse"></div>
+
+      {/* Left Side - Branding (Hidden on mobile) */}
+      <div className="hidden lg:flex lg:w-3/5 relative items-center justify-center p-20 overflow-hidden">
+        <div className="absolute inset-0 grayscale contrast-150 opacity-40">
+           <img 
+            src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=2070&auto=format&fit=crop" 
+            alt="Gym Background" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
+        
+        <div className="relative z-10 text-left max-w-xl">
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center neon-glow">
+              <Zap className="w-8 h-8 text-black" />
             </div>
+            <span className="text-4xl font-black italic tracking-tighter text-white uppercase">
+                GYM<span className="text-primary neon-text">FLOW</span>
+            </span>
           </div>
-          <h1 className="text-4xl font-bold mb-4">GymFlow</h1>
-          <p className="text-lg opacity-90 mb-8">
-            Modern Gym Management Solution
+          
+          <h1 className="text-7xl font-black mb-6 italic text-white leading-[0.9] tracking-tighter uppercase">
+            Dominate <br />
+            The Every <br />
+            <span className="text-primary neon-text">Rep.</span>
+          </h1>
+          
+          <p className="text-xl text-slate-400 font-medium mb-12 max-w-md leading-relaxed">
+            The elite management suite for gyms that demand absolute precision and high-octane growth.
           </p>
-          <div className="space-y-4 text-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary-foreground/30 flex items-center justify-center">
-                ✓
+
+          <div className="grid grid-cols-1 gap-6">
+            {[
+              { icon: <Trophy className="w-5 h-5" />, text: "Ranked #1 for Scaling Systems" },
+              { icon: <Shield className="w-5 h-5" />, text: "Military-Grade Security" },
+              { icon: <Zap className="w-5 h-5" />, text: "Instantaneous Data Retrieval" }
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-white/70">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-primary">
+                  {item.icon}
+                </div>
+                {item.text}
               </div>
-              <span>Real-time member tracking</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary-foreground/30 flex items-center justify-center">
-                ✓
-              </div>
-              <span>Automated subscription management</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary-foreground/30 flex items-center justify-center">
-                ✓
-              </div>
-              <span>Comprehensive payment tracking</span>
-            </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Right Side - Login Form with Suspense */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <Suspense fallback={<div>Loading login form...</div>}>
+      {/* Right Side - Login Form area */}
+      <div className="w-full lg:w-2/5 flex items-center justify-center p-8 relative z-10">
+        <Suspense fallback={<div className="text-primary font-black italic animate-pulse tracking-widest uppercase text-xs">Synchronizing System...</div>}>
           <LoginForm />
         </Suspense>
       </div>
