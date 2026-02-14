@@ -206,6 +206,49 @@
   .animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
   .animate-float-particle { animation: float-particle 8s ease-in-out infinite; }
   
+  @keyframes light-sweep {
+    0% { transform: translateX(-100%) skewX(-30deg); opacity: 0; }
+    20% { opacity: 0.5; }
+    50% { opacity: 0.5; }
+    80% { opacity: 0.5; }
+    100% { transform: translateX(200%) skewX(-30deg); opacity: 0; }
+  }
+  @keyframes orbit-1 {
+    0% { transform: rotate(0deg) translateX(180px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
+  }
+  @keyframes orbit-2 {
+    0% { transform: rotate(120deg) translateX(220px) rotate(-120deg); }
+    100% { transform: rotate(480deg) translateX(220px) rotate(-480deg); }
+  }
+  @keyframes orbit-3 {
+    0% { transform: rotate(240deg) translateX(160px) rotate(-240deg); }
+    100% { transform: rotate(600deg) translateX(160px) rotate(-600deg); }
+  }
+  @keyframes scan-vertical {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  .animate-light-sweep { animation: light-sweep 4s ease-in-out infinite; }
+  .animate-orbit-1 { animation: orbit-1 15s linear infinite; }
+  .animate-orbit-2 { animation: orbit-2 20s linear infinite; }
+  .animate-orbit-3 { animation: orbit-3 18s linear infinite; }
+  .animate-scan { animation: scan-vertical 3s linear infinite; }
+  
+  @keyframes radar-sweep {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes data-flow {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+
+  .animate-radar { animation: radar-sweep 4s linear infinite; }
+  .animate-data-flow { animation: data-flow 20s linear infinite; }
+  
   .preserve-3d { transform-style: preserve-3d; }
+  .backface-hidden { backface-visibility: hidden; }
 }
 

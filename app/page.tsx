@@ -328,49 +328,183 @@ export default function LandingPage() {
         <section id="about" className="py-40 px-6 bg-slate-950 relative overflow-hidden border-t border-white/5">
           <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -ml-[400px]"></div>
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
-            <div>
-              <div className="text-primary font-black uppercase tracking-[0.4em] text-[10px] mb-8 italic">The Doctrine</div>
-              <h2 className="text-6xl md:text-8xl font-black mb-10 italic tracking-tighter uppercase leading-[0.8]">POWERED <br /> BY <span className="text-primary neon-text">ADRENALINE</span></h2>
-              <p className="text-xl text-slate-400 font-semibold mb-10 leading-relaxed italic">
+            <div className="relative">
+              {/* Technical Grid Overlay */}
+              <div className="absolute inset-x-0 -top-10 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+
+              <div className="text-primary font-black uppercase tracking-[0.4em] text-[10px] mb-8 italic flex items-center gap-4">
+                <span className="opacity-50">DOC_TYPE: STRATEGIC_INTEL</span>
+                <div className="h-px flex-1 bg-primary/20"></div>
+              </div>
+
+              <h2 className="text-6xl md:text-8xl font-black mb-10 italic tracking-tighter uppercase leading-[0.8] text-white">
+                POWERED <br /> BY <span className="text-primary neon-text">ADRENALINE</span>
+              </h2>
+
+              <p className="text-xl text-slate-400 font-semibold mb-12 leading-relaxed italic border-l-2 border-primary/20 pl-6">
                 We didn't build just another management tool. We engineered a high-performance engine
                 to fuel the elite of the fitness industry.
               </p>
-              <div className="space-y-8">
 
-                <div className="flex gap-6 p-8 glass-card border border-white/5 hover:border-primary/20 transition-all group">
-                  <div className="w-16 h-16 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center shrink-0 text-blue-500 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
-                    <Rocket className="w-8 h-8" />
-                  </div>
+              <div className="grid grid-cols-1 gap-6">
+                {[
+                  {
+                    icon: <Rocket className="w-6 h-6" />,
+                    title: "AGGRESSIVE INNOVATION",
+                    desc: "Constant tactical updates to stay ahead of the curve. Zero latency, zero compromise.",
+                    status: "VERIFIED",
+                    accent: "text-blue-500"
+                  },
+                  {
+                    icon: <Shield className="w-6 h-6" />,
+                    title: "UNBREAKABLE TRUST",
+                    desc: "Protecting your revenue and data like an iron fortress. End-to-end tactical encryption.",
+                    status: "ACTIVE_PROT",
+                    accent: "text-primary"
+                  }
+                ].map((item, i) => (
+                  <div key={i} className="group relative p-8 glass-card border border-white/5 hover:border-white/10 transition-all overflow-hidden flex gap-6">
+                    {/* Scanning Beam (Visible on Hover) */}
+                    <div className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="absolute top-0 left-0 w-full h-[1px] bg-primary/30 shadow-[0_0_10px_rgba(190,255,0,0.3)] animate-scan"></div>
+                    </div>
 
-                  <div>
-                    <h4 className="text-xl font-black italic uppercase mb-2 tracking-tighter">AGRESSIVE INNOVATION</h4>
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-500 leading-relaxed">Constant tactical updates to stay ahead of the curve. Zero latency, zero compromise.</p>
+                    <div className={cn("w-14 h-14 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center shrink-0 transition-all relative z-10", item.accent, "group-hover:neon-glow group-hover:scale-110")}>
+                      {item.icon}
+                    </div>
+
+                    <div className="relative z-10 flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-xl font-black italic uppercase tracking-tighter text-white">
+                          {item.title}
+                        </h4>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-1 h-1 rounded-full bg-primary animate-pulse"></div>
+                          <span className="text-[10px] font-black text-slate-500 font-mono tracking-widest">{item.status}</span>
+                        </div>
+                      </div>
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 leading-tight">
+                        {item.desc}
+                      </p>
+                    </div>
+
+                    {/* Corner Accent */}
+                    <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-white/5 group-hover:border-primary/30 transition-colors"></div>
                   </div>
-                </div>
-                <div className="flex gap-6 p-8 glass-card border border-white/5 hover:border-primary/20 transition-all group">
-                  <div className="w-16 h-16 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center shrink-0 text-blue-500 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">
-                    <Shield className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-black italic uppercase mb-2 tracking-tighter">UNBREAKABLE TRUST</h4>
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-500 leading-relaxed">Protecting your revenue and data like an iron fortress. End-to-end tactical encryption.</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
-            <div className="relative">
-              <div className="aspect-square glass-card p-6 rotate-2 overflow-hidden border border-white/10 group-hover:rotate-0 transition-transform duration-700">
-                <img
-                  src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=2075&auto=format&fit=crop"
-                  alt="Gym Interior"
-                  className="w-full h-full object-cover rounded-xl grayscale contrast-125"
-                />
-                <div className="absolute inset-0 bg-primary/10 mix-blend-color"></div>
+            <div className="relative flex flex-col gap-10">
+              {/* Module 01: Biometric Radar (Top) */}
+              <div className="glass-card p-6 border border-white/5 relative overflow-hidden group hover:border-primary/20 transition-all">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono">SYSTEM_RADAR: ACTIVE</span>
+                  </div>
+                  <Activity className="w-4 h-4 text-primary opacity-50" />
+                </div>
+                <div className="flex items-center gap-10">
+                  <div className="relative w-24 h-24 shrink-0">
+                    <div className="absolute inset-0 border border-primary/20 rounded-full"></div>
+                    <div className="absolute inset-2 border border-primary/10 rounded-full border-dashed animate-spin-slow"></div>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-full animate-radar origin-center"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_#BEFF00]"></div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-12 gap-y-4">
+                    <div>
+                      <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">INTEGRITY</div>
+                      <div className="text-xl font-black italic text-white tracking-tighter uppercase">MAX_CAP</div>
+                    </div>
+                    <div>
+                      <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">LATENCY</div>
+                      <div className="text-xl font-black italic text-primary tracking-tighter uppercase">0.02ms</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="absolute -bottom-10 -left-10 glass-card p-8 border-l-4 border-l-primary shadow-2xl animate-bounce-slow">
-                <Star className="text-primary w-8 h-8 mb-4 fill-primary" />
-                <div className="text-3xl font-black italic tracking-tighter text-white">4.9/5</div>
-                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">SQUAD RATING</div>
+
+              {/* Module 02: 3D Tactical ID (Center) */}
+              <div className="relative flex items-center justify-center py-6 perspective-2000 group">
+                {/* 3D Kinetic Card Container - Scaled to fit stack */}
+                <div className="relative w-full aspect-[1.8/1] preserve-3d transition-transform duration-700 ease-out hover:rotate-y-12 hover:rotate-x-[-10deg]">
+                  {/* Card Glow Base */}
+                  <div className="absolute inset-[-40px] bg-primary/20 rounded-[40px] blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+
+                  {/* The Glass Card Body */}
+                  <div className="absolute inset-0 glass-card bg-slate-950/60 border border-white/10 rounded-3xl overflow-hidden preserve-3d flex p-6 shadow-2xl backdrop-blur-3xl">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent w-1/2 -skew-x-12 animate-light-sweep pointer-events-none"></div>
+
+                    {/* Avatar */}
+                    <div className="w-[30%] flex flex-col gap-3 relative">
+                      <div className="w-full aspect-square rounded-xl border border-white/5 bg-slate-900 overflow-hidden relative group-hover:border-primary/50 transition-colors">
+                        <img
+                          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop"
+                          className="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-700"
+                          alt="Tactical Avatar"
+                        />
+                        <div className="absolute top-0 left-0 w-full h-[1px] bg-primary shadow-[0_0_10px_#BEFF00] animate-scan"></div>
+                      </div>
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full bg-primary w-[85%]"></div>
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 pl-6 flex flex-col justify-between py-1">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">MEMBER_001</span>
+                          <Zap className="w-3.5 h-3.5 text-primary" />
+                        </div>
+                        <h4 className="text-2xl font-black italic text-white tracking-tighter uppercase mb-2 drop-shadow-lg leading-none">ALPHA_INITIATE</h4>
+                        <div className="inline-block px-2 py-0.5 bg-primary/10 border border-primary/20 rounded text-[7px] font-black text-primary uppercase tracking-widest italic">SEC_LEVEL: ELITE_9</div>
+                      </div>
+                      <div className="flex items-end justify-between border-t border-white/5 pt-4">
+                        <div className="space-y-0.5">
+                          <div className="text-[7px] font-black text-slate-500 uppercase tracking-widest">EXPIRY_DATE</div>
+                          <div className="text-xs font-black text-white italic">24_JUL_2026</div>
+                        </div>
+                        <Shield className="w-5 h-5 text-white/20 group-hover:text-primary transition-colors" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rating Badge Overlay */}
+                <div className="absolute -bottom-4 -left-4 glass-card p-5 border-l-4 border-l-primary shadow-2xl z-20 group-hover:scale-110 transition-transform">
+                  <Star className="text-primary w-5 h-5 mb-2 fill-primary" />
+                  <div className="text-xl font-black italic tracking-tighter text-white">4.9/5</div>
+                  <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest">SQUAD RATING</div>
+                </div>
+              </div>
+
+              {/* Module 03: Performance Log (Bottom) */}
+              <div className="glass-card border border-white/5 h-40 overflow-hidden relative group hover:border-primary/20 transition-all">
+                <div className="absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-slate-950 to-transparent z-10 p-3 flex items-center justify-between">
+                  <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest font-mono">SYSTEM_RADAR: ACTIVE</span>
+                  <div className="flex gap-1">
+                    <div className="w-1 h-1 bg-primary rounded-full animate-pulse"></div>
+                    <div className="w-1 h-1 bg-primary/40 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="p-4 pt-10 space-y-3 animate-data-flow">
+                  {[...Array(10)].map((_, i) => (
+                    <div key={i} className="flex items-center justify-between border-b border-white/5 pb-2 opacity-40 hover:opacity-100 transition-opacity">
+                      <span className="text-[9px] font-mono text-slate-400">[{new Date().toLocaleTimeString()}] ADMISSION_GRANTED: UID_0{i}</span>
+                      <span className="text-[9px] font-mono text-primary">SECURED</span>
+                    </div>
+                  ))}
+                  {[...Array(10)].map((_, i) => (
+                    <div key={i + 10} className="flex items-center justify-between border-b border-white/5 pb-2 opacity-40">
+                      <span className="text-[9px] font-mono text-slate-400">[{new Date().toLocaleTimeString()}] SYSTEM_RESTORE: POINT_V{i}</span>
+                      <span className="text-[9px] font-mono text-blue-500">STABLE</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-slate-950 to-transparent pointer-events-none"></div>
               </div>
             </div>
           </div>
