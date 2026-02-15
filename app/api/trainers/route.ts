@@ -37,36 +37,6 @@ export async function GET(req: Request) {
             },
             {
                 $lookup: {
-                    from: "members", // Collection name (usually lowercase plural)
-                    let: { trainerId: { $toString: "$_id" } }, // Convert Object ID to string to match member store? 
-                    // Wait, member.trainerId is likely a string based on Member.ts definition "type: mongoose.Schema.Types.ObjectId" but in schema it might be stored as ObjectId
-                    // Let's check Member.ts again. It says "type: mongoose.Schema.Types.ObjectId, ref: 'User'".
-                    // So we should match ObjectId to ObjectId.
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        { $eq: ["$trainerId", "$$trainerId"] }, // This assumes localField is passed as variable? No, let's use standard lookup if types match
-                                        { $eq: ["$deletedAt", null] }
-                                    ]
-                                }
-                            }
-                        }
-                    ],
-                    as: "assignedMembers"
-                }
-            },
-            // Cleaner lookup attempt if types match:
-            // from: "members", localField: "_id", foreignField: "trainerId", as: "assignedMembers"
-            // But we need to filter members by deletedAt: null.
-            // So pipeline is better.
-
-            // Actually, let's verity if Member.trainerId is ObjectId. Yes.
-            // But User._id is ObjectId.
-            // So simplistic lookup:
-            {
-                $lookup: {
                     from: "members",
                     localField: "_id",
                     foreignField: "trainerId",
@@ -84,7 +54,7 @@ export async function GET(req: Request) {
             {
                 $project: {
                     password: 0,
-                    assignedMembers: 0, // Don't send the full list list in the summary view
+                    assignedMembers: 0,
                     __v: 0
                 }
             },

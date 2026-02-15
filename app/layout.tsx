@@ -17,6 +17,7 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://gymflow-management.vercel.app/"),
   title: "GymFlow - Advanced Gym Management SaaS",
   description: "Streamline your gym operations with GymFlow. Manage members, trainers, attendance, and subscriptions in one platform.",
   keywords: ["gym management", "fitness software", "SaaS", "member tracking", "trainer scheduling"],
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "GymFlow - Modern Gym Management",
     description: "The complete toolkit for modern gym owners. Start managing your fitness business effectively today.",
-    url: "https://gms-saas.vercel.app", // Fallback URL
+    url: "https://gymflow-management.vercel.app/", // Fallback URL
     siteName: "GymFlow",
     images: [
       {
@@ -53,6 +54,7 @@ export const metadata: Metadata = {
   },
 };
 
+import SmoothScroller from "@/components/smooth-scroller";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export default function RootLayout({
@@ -66,9 +68,10 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          forcedTheme="dark"
           disableTransitionOnChange
         >
+          <SmoothScroller />
           <LayoutWrapper>{children}</LayoutWrapper>
           <Toaster position="top-right" richColors />
           <Analytics />

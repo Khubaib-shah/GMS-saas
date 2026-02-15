@@ -87,9 +87,9 @@ export default function MembersPage() {
         <div>
           <div className="flex items-center gap-4 mb-2">
             <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">DIRECTORY: MEMBER_DATABASE_v4</span>
-            <div className="h-px w-24 bg-white/5"></div>
+            <div className="h-px w-24 bg-black/5 dark:bg-white/5"></div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
+          <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
             MEMBER <span className="text-primary neon-text">ROSTER</span>
           </h1>
           <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
@@ -106,7 +106,7 @@ export default function MembersPage() {
       </div>
 
       {/* Search & Filter - Bento Style */}
-      <div className="bento-item p-8 mb-10 bg-slate-950/40 backdrop-blur-3xl border-white/5">
+      <div className="glass-premium p-8 mb-8 border-border">
         <div className="flex gap-8 items-end flex-wrap">
           <div className="flex-1 min-w-64">
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
@@ -145,7 +145,7 @@ export default function MembersPage() {
       </div>
 
       {/* Members Table */}
-      <div className="bento-item p-0 overflow-hidden border-white/5 bg-slate-950/40 backdrop-blur-3xl">
+      <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
         <div className="overflow-x-auto">
           <table className="w-full text-[11px] font-bold tracking-widest uppercase">
             <thead>
@@ -181,7 +181,7 @@ export default function MembersPage() {
                 return (
                   <tr
                     key={member.id}
-                    className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group/row"
+                    className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row"
                   >
                     <td className="py-6 px-6">
                       <div className="flex items-center gap-4">
@@ -197,12 +197,12 @@ export default function MembersPage() {
                               {member.firstName.charAt(0)}
                             </div>
                           )}
-                          <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-slate-950 border border-white/10 flex items-center justify-center">
+                          <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-background border border-black/10 dark:border-white/10 flex items-center justify-center">
                             <div className={cn("w-1.5 h-1.5 rounded-full", isActive ? "bg-primary" : "bg-red-500")} />
                           </div>
                         </div>
                         <div>
-                          <span className="text-white font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
+                          <span className="text-foreground font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
                             {member.firstName} {member.lastName || ""}
                           </span>
                           <span className="text-[9px] text-slate-500 font-mono tracking-widest mt-0.5 block">ID_v4: {member.id.toUpperCase().slice(-8)}</span>
@@ -211,7 +211,7 @@ export default function MembersPage() {
                     </td>
                     <td className="py-6 px-6">
                       <div className="space-y-1">
-                        <div className="text-white font-mono text-[10px]">{member.phone}</div>
+                        <div className="text-foreground font-mono text-[10px]">{member.phone}</div>
                         <div className="text-slate-500 text-[9px] font-mono lowercase">
                           {member.email}
                         </div>

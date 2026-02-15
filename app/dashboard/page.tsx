@@ -60,7 +60,7 @@ export default function DashboardPage() {
           <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">SYSTEM_OVERVIEW: DASHBOARD_v2</span>
           <div className="h-px flex-1 bg-white/5"></div>
         </div>
-        <h1 className="text-5xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
+        <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
           COMMAND <span className="text-primary neon-text">CENTER</span>
         </h1>
         <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
@@ -70,7 +70,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div data-tour="dashboard-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="TOTAL_BEASTS"
           value={totalMembers.toString()}
@@ -98,27 +98,27 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bento-item p-1 border-white/5 bg-transparent">
+      <div data-tour="dashboard-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
           <RevenueChart />
         </div>
-        <div className="bento-item p-1 border-white/5 bg-transparent">
+        <div className="">
           <SubscriptionChart />
         </div>
       </div>
 
       {/* Members Table */}
-      <div className="relative">
+      <div data-tour="dashboard-members" className="relative">
         <div className="flex items-center gap-4 mb-8">
-          <h2 className="text-2xl font-black italic tracking-tighter text-white uppercase">RECENT_DEPLOYMENTS</h2>
-          <div className="h-px flex-1 bg-white/5"></div>
+          <h2 className="text-2xl font-black italic tracking-tighter text-foreground uppercase">RECENT_DEPLOYMENTS</h2>
+          <div className="h-px flex-1 bg-black/5 dark:bg-white/5"></div>
           <div className="flex gap-1">
             <div className="w-1 h-1 bg-primary"></div>
             <div className="w-1 h-1 bg-primary/50"></div>
             <div className="w-1 h-1 bg-primary/20"></div>
           </div>
         </div>
-        <div className="bento-item p-0 overflow-hidden border-white/5 bg-slate-950/40 backdrop-blur-3xl">
+        <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
           <MembersTable />
         </div>
       </div>

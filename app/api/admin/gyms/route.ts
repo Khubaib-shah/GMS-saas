@@ -108,3 +108,52 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || (session.user as any).role !== "super_admin") {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get("id");
+
+        if (!id || !isValidObjectId(id)) {
+            return NextResponse.json({ message: "Invalid Gym ID" }, { status: 400 });
+        }
+
+        await connectDB();
+
+        const gym = await Gym.findById(id);
+        if (!gym) {
+            return NextResponse.json({ message: "Gym not found" }, { status: 404 });
+        }
+
+        // Cascade delete all associated data
+        const mongoose = await import("mongoose");
+        const Member = (await import("@/models/Member")).default;
+        const Subscription = (await import("@/models/Subscription")).default;
+        const Payment = (await import("@/models/Payment")).default;
+        const Plan = (await import("@/models/Plan")).default;
+        const Attendance = (await import("@/models/Attendance")).default;
+        const AuditLog = (await import("@/models/AuditLog")).default;
+
+        await Promise.all([
+            Member.deleteMany({ gymId: id }),
+            Subscription.deleteMany({ gymId: id }),
+            Payment.deleteMany({ gymId: id }),
+            Plan.deleteMany({ gymId: id }),
+            User.deleteMany({ gymId: id }),
+            Attendance.deleteMany({ gymId: id }),
+            AuditLog.deleteMany({ gymId: id }),
+        ]);
+
+        await Gym.findByIdAndDelete(id);
+
+        return NextResponse.json({ message: "Gym and all associated data deleted successfully" });
+    } catch (error) {
+        console.error("Delete Gym Error:", error);
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
+}

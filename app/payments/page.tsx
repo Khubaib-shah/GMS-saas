@@ -92,7 +92,7 @@ export default function PaymentsPage() {
           <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">FINANCIAL_LEDGER: REVENUE_STREAM_v2</span>
           <div className="h-px flex-1 bg-white/5"></div>
         </div>
-        <h1 className="text-5xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
+        <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
           PAYMENT <span className="text-primary neon-text">LOGS</span>
         </h1>
         <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
@@ -121,7 +121,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* Filter - Bento Style */}
-      <div className="bento-item p-8 bg-slate-950/40 backdrop-blur-3xl border-white/5">
+      <div className="glass-premium p-8 border-border">
         <div className="flex flex-col sm:flex-row gap-8 items-end">
           <div className="flex-1 w-full sm:w-auto">
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">SEARCH_SUBJECT_NAME</label>
@@ -143,7 +143,7 @@ export default function PaymentsPage() {
               value={filterPeriod}
               onValueChange={(value) => setFilterPeriod(value as "this-month" | "last-month" | "all")}
             >
-              <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+              <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-white/10">
@@ -157,11 +157,11 @@ export default function PaymentsPage() {
       </div>
 
       {/* Payments Table */}
-      <div className="bento-item p-0 overflow-hidden border-white/5 bg-slate-950/40 backdrop-blur-3xl">
+      <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
         <div className="overflow-x-auto">
           <table className="w-full text-[11px] font-bold tracking-widest uppercase">
             <thead>
-              <tr className="border-b border-white/5 bg-white/[0.02]">
+              <tr className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]">
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">TRANSACTION_SUBJECT</th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">CREDIT_AMOUNT</th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">TIMELINE_STAMP</th>
@@ -174,9 +174,9 @@ export default function PaymentsPage() {
                 filtered.map((payment) => {
                   const member = store.members.find((m) => m.id === payment.memberId)
                   return (
-                    <tr key={payment.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group/row">
+                    <tr key={payment.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
                       <td className="py-6 px-6">
-                        <span className="text-white font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
+                        <span className="text-foreground font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
                           {member?.firstName} {member?.lastName || ""}
                         </span>
                       </td>
@@ -187,7 +187,7 @@ export default function PaymentsPage() {
                         {formatDate(payment.date).toUpperCase()}
                       </td>
                       <td className="py-6 px-6">
-                        <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg bg-white/5 border border-white/5 text-[9px] font-black tracking-widest italic group-hover/row:border-primary/20 transition-all">
+                        <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[9px] font-black tracking-widest italic group-hover/row:border-primary/20 transition-all">
                           {payment.method.toUpperCase()}
                         </div>
                       </td>

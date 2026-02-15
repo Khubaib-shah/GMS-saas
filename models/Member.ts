@@ -20,6 +20,9 @@ const MemberSchema = new mongoose.Schema(
         // Soft delete support
         deletedAt: { type: Date, default: null },
 
+        // Workout Plan
+        workoutPlanId: { type: mongoose.Schema.Types.ObjectId, ref: "WorkoutPlan" },
+
         // Member Portal Login Support
         portalPassword: { type: String, select: false }, // Hashed password for portal login
         portalPin: { type: String, select: false }, // 4-6 digit PIN alternative

@@ -6,6 +6,8 @@ import Subscription from "@/models/Subscription";
 import Payment from "@/models/Payment";
 import Attendance from "@/models/Attendance";
 import Plan from "@/models/Plan";
+import WorkoutPlan from "@/models/WorkoutPlan";
+import Exercise from "@/models/Exercise";
 
 const MEMBER_JWT_SECRET = process.env.NEXTAUTH_SECRET || "member-portal-secret";
 
@@ -94,6 +96,17 @@ export async function GET(req: Request) {
             .sort({ date: -1 })
             .lean();
 
+        // Get Workout Plan
+        let workoutPlan = null;
+        if (member.workoutPlanId) {
+            workoutPlan = await WorkoutPlan.findById(member.workoutPlanId)
+                .populate({
+                    path: "schedule.exercises.exerciseId",
+                    model: Exercise
+                })
+                .lean();
+        }
+
         // Calculate stats
         const daysUntilExpiry = subscription
             ? Math.ceil((new Date(subscription.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
@@ -152,6 +165,29 @@ export async function GET(req: Request) {
                 checkOutTime: a.checkOutTime,
                 status: a.status,
             })),
+            workoutPlan: workoutPlan ? {
+                id: workoutPlan._id.toString(),
+                name: workoutPlan.name,
+                description: workoutPlan.description,
+                schedule: workoutPlan.schedule.map((day: any) => ({
+                    _id: day._id?.toString(),
+                    day: day.day,
+                    title: day.title,
+                    exercises: day.exercises.map((ex: any) => ({
+                        exercise: ex.exerciseId ? {
+                            id: ex.exerciseId._id.toString(),
+                            name: ex.exerciseId.name,
+                            muscleGroup: ex.exerciseId.muscleGroup,
+                            gifUrl: ex.exerciseId.gifUrl,
+                            equipment: ex.exerciseId.equipment,
+                        } : null,
+                        sets: ex.sets,
+                        reps: ex.reps,
+                        restSeconds: ex.restSeconds,
+                        notes: ex.notes
+                    }))
+                }))
+            } : null,
         });
     } catch (error) {
         console.error("Member dashboard error:", error);

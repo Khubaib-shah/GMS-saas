@@ -11,6 +11,7 @@ import { useAppStore } from "@/lib/store"
 import { localDb } from "@/lib/localDb"
 
 import { SessionProvider } from "next-auth/react"
+import { GuidedTourProvider } from "./guided-tour"
 
 interface LayoutWrapperProps {
   children: React.ReactNode
@@ -42,7 +43,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       loadSubscriptions()
       loadPayments()
     }
-  }, [pathname, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments]) 
+  }, [pathname, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
 
   const isLandingPage = pathname === "/"
   const isLoginPage = pathname === "/login"
@@ -55,16 +56,18 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       {isPublicPage ? (
         children
       ) : (
-        <div className="min-h-screen bg-background">
-          <Sidebar />
-          <Navbar />
-          <main className={cn(
-            "mt-16 p-8 transition-all duration-300 ease-in-out",
-            sidebarCollapsed ? "ml-20" : "ml-64"
-          )}>
-            {children}
-          </main>
-        </div>
+        <GuidedTourProvider>
+          <div className="min-h-screen bg-background">
+            <Sidebar />
+            <Navbar />
+            <main className={cn(
+              "mt-16 p-8 transition-all duration-300 ease-in-out",
+              sidebarCollapsed ? "ml-20" : "ml-64"
+            )}>
+              {children}
+            </main>
+          </div>
+        </GuidedTourProvider>
       )}
     </SessionProvider>
   )

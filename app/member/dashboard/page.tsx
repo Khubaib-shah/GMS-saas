@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +11,6 @@ import {
     Calendar,
     CreditCard,
     TrendingUp,
-    Clock,
     LogOut,
     Flame,
     CalendarCheck,
@@ -21,6 +19,8 @@ import {
     History,
     Users,
     Activity,
+    Dumbbell,
+    RefreshCcw,
 } from "lucide-react";
 import QRCode from "react-qr-code";
 import { cn } from "@/lib/utils";
@@ -79,24 +79,45 @@ interface DashboardData {
         checkOutTime?: string;
         status: string;
     }>;
+    workoutPlan: {
+        id: string;
+        name: string;
+        description?: string;
+        schedule: Array<{
+            _id: string;
+            day: string;
+            title: string;
+            exercises: Array<{
+                exercise: {
+                    id: string;
+                    name: string;
+                    muscleGroup: string;
+                    gifUrl: string;
+                    equipment?: string;
+                } | null;
+                sets: number;
+                reps: string;
+                restSeconds: number;
+                notes?: string;
+            }>;
+        }>;
+    } | null;
 }
 
 export default function MemberDashboardPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState<DashboardData | null>(null);
+    const qrRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
+    const fetchDashboard = useCallback(async () => {
+        setIsLoading(true);
         const token = localStorage.getItem("memberToken");
         if (!token) {
             router.push("/member/login");
             return;
         }
 
-        fetchDashboard(token);
-    }, [router]);
-
-    const fetchDashboard = async (token: string) => {
         try {
             const res = await fetch("/api/member-portal/dashboard", {
                 headers: { Authorization: `Bearer ${token}` },
@@ -118,7 +139,11 @@ export default function MemberDashboardPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [router]);
+
+    useEffect(() => {
+        fetchDashboard();
+    }, [fetchDashboard]);
 
     const handleLogout = () => {
         localStorage.removeItem("memberToken");
@@ -128,7 +153,7 @@ export default function MemberDashboardPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+            <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Zap className="h-10 w-10 text-primary animate-pulse neon-glow" />
                     <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] italic">Synchronizing Data...</span>
@@ -139,8 +164,18 @@ export default function MemberDashboardPage() {
 
     if (!data) {
         return (
-            <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-                <p className="text-red-500 font-black uppercase italic tracking-widest">CRITICAL ERROR: DATA LINK SEVERED</p>
+            <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6">
+                <div className="flex flex-col items-center gap-2 text-center">
+                    <p className="text-red-500 font-black uppercase italic tracking-widest text-xl">CRITICAL ERROR: DATA LINK SEVERED</p>
+                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Unable to establish secure connection to command center</p>
+                </div>
+                <Button
+                    onClick={fetchDashboard}
+                    className="bg-white/10 hover:bg-white/20 text-white border border-white/10 font-black italic uppercase tracking-widest rounded-xl gap-2"
+                >
+                    <RefreshCcw className="w-4 h-4" />
+                    RE-INITIALIZE LINK
+                </Button>
             </div>
         );
     }
@@ -148,19 +183,19 @@ export default function MemberDashboardPage() {
     const { member, subscription, plan, payments, attendance } = data;
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white selection:bg-primary selection:text-black pb-20">
+        <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground pb-20">
             {/* Header */}
             <header className="glass border-b border-white/5 sticky top-0 z-50">
                 <div className="container mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary neon-glow">
-                            <Zap className="h-7 w-7 text-black" />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary neon-glow transition-transform hover:scale-105">
+                            <Zap className="h-7 w-7 text-primary-foreground" />
                         </div>
                         <div>
                             <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">
                                 WELCOME, <span className="text-primary">{member.firstName}</span>
                             </h1>
-                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1">Status: Active Beast</p>
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Status: Active Beast</p>
                         </div>
                     </div>
                     <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-400 hover:text-red-500 hover:bg-red-500/10 font-black uppercase italic text-[10px] tracking-widest rounded-xl">
@@ -173,7 +208,7 @@ export default function MemberDashboardPage() {
             <main className="container mx-auto px-6 py-10 space-y-10">
                 {/* Stats Cards */}
                 <div className="grid gap-6 md:grid-cols-4">
-                    <div className="glass-card p-6 border-l-4 border-l-primary">
+                    <div className="glass-premium p-6 border-l-4 border-l-primary">
                         <div className="flex items-center justify-between mb-4">
                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Subscription</p>
                             <Calendar className="h-4 w-4 text-primary" />
@@ -181,20 +216,20 @@ export default function MemberDashboardPage() {
                         {subscription ? (
                             <div className="space-y-3">
                                 <div className="flex items-end gap-2">
-                                    <span className="text-4xl font-black italic text-white line-height-1">
+                                    <span className="text-4xl font-black italic text-foreground line-height-1">
                                         {subscription.daysUntilExpiry}
                                     </span>
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest pb-1">Days Left</span>
+                                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pb-1">Days Left</span>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2">
                                     <Badge className={cn(
                                         "uppercase font-black text-[9px] tracking-widest px-2 py-0.5 rounded-md",
-                                        subscription.status === "active" ? "bg-primary text-black" : "bg-red-500 text-white"
+                                        subscription.status === "active" ? "bg-primary text-primary-foreground" : "bg-red-500 text-white"
                                     )}>
                                         {subscription.status}
                                     </Badge>
                                     {subscription.isPaused && (
-                                        <Badge variant="secondary" className="uppercase font-black text-[9px] tracking-widest px-2 py-0.5 bg-white/5 text-amber-500 border border-amber-500/30">
+                                        <Badge variant="secondary" className="uppercase font-black text-[9px] tracking-widest px-2 py-0.5 bg-black/5 dark:bg-white/5 text-amber-500 border border-amber-500/30">
                                             <Pause className="h-2 w-2 mr-1" />
                                             PAUSED
                                         </Badge>
@@ -202,30 +237,30 @@ export default function MemberDashboardPage() {
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-slate-500 font-bold italic text-sm">NO ACTIVE LINK</p>
+                            <p className="text-muted-foreground font-bold italic text-sm">NO ACTIVE LINK</p>
                         )}
                     </div>
 
-                    <div className="glass-card p-6 border-l-4 border-l-blue-500">
+                    <div className="glass-premium p-6 border-l-4 border-l-blue-500">
                         <div className="flex items-center justify-between mb-4">
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active Plan</p>
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Active Plan</p>
                             <Activity className="h-4 w-4 text-blue-500" />
                         </div>
                         {plan ? (
                             <div>
-                                <div className="text-2xl font-black italic uppercase text-white truncate mb-1">{plan.name}</div>
+                                <div className="text-2xl font-black italic uppercase text-foreground truncate mb-1">{plan.name}</div>
                                 <p className="text-[10px] font-black text-blue-500 tracking-widest uppercase italic">
                                     {plan.price} PKR / {plan.duration} DAYS
                                 </p>
                             </div>
                         ) : (
-                            <p className="text-slate-500 font-bold italic text-sm">NO PLAN DETECTED</p>
+                            <p className="text-muted-foreground font-bold italic text-sm">NO PLAN DETECTED</p>
                         )}
                     </div>
 
-                    <div className="glass-card p-6 border-l-4 border-l-orange-500">
+                    <div className="glass-premium p-6 border-l-4 border-l-orange-500">
                         <div className="flex items-center justify-between mb-4">
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Heat Streak</p>
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Heat Streak</p>
                             <Flame className="h-4 w-4 text-orange-500" />
                         </div>
                         <div className="flex items-end gap-2">
@@ -235,24 +270,24 @@ export default function MemberDashboardPage() {
                         <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-2 italic">Maintain the momentum 🔥</p>
                     </div>
 
-                    <div className="glass-card p-6 border-l-4 border-l-green-500">
+                    <div className="glass-premium p-6 border-l-4 border-l-green-500">
                         <div className="flex items-center justify-between mb-4">
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Check-Ins</p>
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Check-Ins</p>
                             <CalendarCheck className="h-4 w-4 text-green-500" />
                         </div>
-                        <div className="text-4xl font-black italic text-white mb-2">{member.totalCheckIns}</div>
-                        <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest italic">Since {new Date(member.joinDate).toLocaleDateString()}</p>
+                        <div className="text-4xl font-black italic text-foreground mb-2">{member.totalCheckIns}</div>
+                        <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest italic">Since {new Date(member.joinDate).toLocaleDateString()}</p>
                     </div>
                 </div>
 
                 <div className="grid gap-10 lg:grid-cols-3">
                     {/* QR Code Card */}
                     <div className="lg:col-span-1">
-                        <div className="glass-card p-8 h-full flex flex-col items-center justify-center text-center">
+                        <div className="glass-premium p-8 h-full flex flex-col items-center justify-center text-center">
                             <div className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-6">Digital ID</div>
-                            <h3 className="text-2xl font-black italic uppercase text-white mb-8 tracking-tighter">ACCESS SCAN</h3>
-                            
-                            <div className="bg-white p-6 rounded-2xl shadow-[0_0_50px_-10px_rgba(255,255,255,0.1)] mb-8 transition-transform hover:scale-105 duration-500">
+                            <h3 className="text-2xl font-black italic uppercase text-foreground mb-8 tracking-tighter">ACCESS SCAN</h3>
+
+                            <div ref={qrRef} className="bg-white p-6 rounded-2xl shadow-[0_0_50px_-10px_rgba(0,0,0,0.1)] mb-8 transition-transform hover:scale-105 duration-500">
                                 <QRCode
                                     value={member.qrCode || member.id}
                                     size={180}
@@ -260,13 +295,13 @@ export default function MemberDashboardPage() {
                                     fgColor="#000000"
                                 />
                             </div>
-                            
-                            <p className="text-[10px] font-mono font-bold text-slate-500 mb-8 uppercase tracking-widest bg-white/5 py-2 px-4 rounded-lg">
+
+                            <p className="text-[10px] font-mono font-bold text-muted-foreground mb-8 uppercase tracking-widest bg-black/5 dark:bg-white/5 py-2 px-4 rounded-lg">
                                 {member.qrCode || member.id}
                             </p>
-                            
+
                             <Button className="w-full bg-white text-black hover:bg-primary py-6 rounded-xl font-black italic transition-all gap-3" onClick={() => {
-                                const svg = document.querySelector(".bg-white svg");
+                                const svg = qrRef.current?.querySelector("svg");
                                 if (svg) {
                                     const svgData = new XMLSerializer().serializeToString(svg);
                                     const canvas = document.createElement("canvas");
@@ -296,11 +331,15 @@ export default function MemberDashboardPage() {
                     {/* Tabs for History */}
                     <div className="lg:col-span-2">
                         <div className="glass-card h-full flex flex-col">
-                           <Tabs defaultValue="attendance" className="flex-1 flex flex-col">
-                                <TabsList className="grid w-full grid-cols-3 bg-white/5 border-b border-white/10 rounded-t-2xl overflow-hidden p-0 h-16">
+                            <Tabs defaultValue="attendance" className="flex-1 flex flex-col">
+                                <TabsList className="grid w-full grid-cols-4 bg-white/5 border-b border-white/10 rounded-t-2xl overflow-hidden p-0 h-16">
                                     <TabsTrigger value="attendance" className="data-[state=active]:bg-primary data-[state=active]:text-black rounded-none font-black italic text-[11px] uppercase tracking-widest transition-all h-full">
                                         <History className="w-4 h-4 mr-2 hidden sm:block" />
                                         ATTENDANCE
+                                    </TabsTrigger>
+                                    <TabsTrigger value="workouts" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-none font-black italic text-[11px] uppercase tracking-widest transition-all h-full">
+                                        <Dumbbell className="w-4 h-4 mr-2 hidden sm:block" />
+                                        WORKOUTS
                                     </TabsTrigger>
                                     <TabsTrigger value="payments" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-none font-black italic text-[11px] uppercase tracking-widest transition-all h-full">
                                         <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
@@ -315,41 +354,104 @@ export default function MemberDashboardPage() {
                                 <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
                                     <TabsContent value="attendance" className="mt-0 space-y-3">
                                         {attendance.length === 0 ? (
-                                            <div className="py-20 text-center opacity-20 italic">No mission logs detected</div>
+                                            <div className="py-20 text-center opacity-20 italic text-foreground">No mission logs detected</div>
                                         ) : (
                                             attendance.map((record) => (
-                                                <div key={record.id} className="flex items-center justify-between p-5 rounded-2xl bg-white/5 border border-white/5 group hover:border-primary/30 transition-all">
+                                                <div key={record.id} className="flex items-center justify-between p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border group hover:border-primary/30 transition-all">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-green-500 border border-white/5">
+                                                        <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-green-500 border border-border">
                                                             <CalendarCheck className="h-6 w-6" />
                                                         </div>
                                                         <div>
-                                                            <p className="font-black italic uppercase text-sm">{new Date(record.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-                                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">
-                                                                {new Date(record.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
+                                                            <p className="font-black italic uppercase text-sm text-foreground">{new Date(record.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                                                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
+                                                                {new Date(record.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                                 {record.checkOutTime && ` → ${new Date(record.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <Badge variant="outline" className="font-black text-[9px] tracking-widest border-white/10 uppercase italic">{record.status}</Badge>
+                                                    <Badge variant="outline" className="font-black text-[9px] tracking-widest border-border text-foreground uppercase italic">{record.status}</Badge>
                                                 </div>
                                             ))
                                         )}
                                     </TabsContent>
 
+                                    <TabsContent value="workouts" className="mt-0 space-y-4">
+                                        {!data.workoutPlan ? (
+                                            <div className="py-20 text-center flex flex-col items-center">
+                                                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-slate-500">
+                                                    <Dumbbell className="w-8 h-8" />
+                                                </div>
+                                                <div className="opacity-40 font-black italic text-foreground uppercase tracking-widest">No Tactical Plan Assigned</div>
+                                                <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest">Contact your trainer to deploy a regimen.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-6">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <h3 className="text-xl font-black italic uppercase text-foreground">{data.workoutPlan.name}</h3>
+                                                        <p className="text-[10px] font-black text-purple-500 uppercase tracking-widest italic">{data.workoutPlan.schedule.length} Active Days</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-4">
+                                                    {data.workoutPlan.schedule.map((day) => (
+                                                        <div key={day._id} className="glass-card bg-black/5 dark:bg-white/5 border border-white/10 overflow-hidden">
+                                                            <div className="bg-purple-500/10 px-4 py-2 border-b border-purple-500/20 flex items-center justify-between">
+                                                                <span className="text-[10px] font-black text-purple-500 uppercase tracking-[0.2em]">{day.day}</span>
+                                                                <span className="text-[10px] font-black text-white uppercase tracking-wider italic">{day.title}</span>
+                                                            </div>
+                                                            <div className="divide-y divide-white/5">
+                                                                {day.exercises.map((ex, idx) => (
+                                                                    <div key={idx} className="p-4 hover:bg-white/5 transition-colors group">
+                                                                        <div className="flex items-start gap-4">
+                                                                            {ex.exercise?.gifUrl ? (
+                                                                                <div className="w-16 h-16 rounded-lg bg-black/20 overflow-hidden shrink-0 border border-white/10">
+                                                                                    <img src={ex.exercise.gifUrl} alt={ex.exercise.name} className="w-full h-full object-cover" />
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div className="w-16 h-16 rounded-lg bg-black/20 flex items-center justify-center shrink-0 border border-white/10 text-slate-600">
+                                                                                    <Dumbbell className="w-6 h-6" />
+                                                                                </div>
+                                                                            )}
+                                                                            <div className="flex-1 min-w-0">
+                                                                                <h4 className="font-black italic text-sm text-foreground uppercase truncate">{ex.exercise?.name || "Unknown Exercise"}</h4>
+                                                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                                                    <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 text-[9px] font-bold uppercase tracking-widest border-0">
+                                                                                        {ex.sets} SETS
+                                                                                    </Badge>
+                                                                                    <Badge variant="secondary" className="bg-white/10 text-slate-300 hover:bg-white/20 text-[9px] font-bold uppercase tracking-widest border-0">
+                                                                                        {ex.reps} REPS
+                                                                                    </Badge>
+                                                                                    {ex.notes && (
+                                                                                        <span className="text-[9px] text-slate-500 italic truncate max-w-full">NOTE: {ex.notes}</span>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </TabsContent>
+
                                     <TabsContent value="payments" className="mt-0 space-y-3">
                                         {payments.length === 0 ? (
-                                            <div className="py-20 text-center opacity-20 italic">No credit transactions detected</div>
+                                            <div className="py-20 text-center opacity-20 italic text-foreground">No credit transactions detected</div>
                                         ) : (
                                             payments.map((payment) => (
-                                                <div key={payment.id} className="flex items-center justify-between p-5 rounded-2xl bg-white/5 border border-white/5 group hover:border-blue-500/30 transition-all">
+                                                <div key={payment.id} className="flex items-center justify-between p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border group hover:border-blue-500/30 transition-all">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-blue-500 border border-white/5">
+                                                        <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-blue-500 border border-border">
                                                             <TrendingUp className="h-6 w-6" />
                                                         </div>
                                                         <div>
-                                                            <p className="font-black italic text-lg text-white">{payment.amount} PKR</p>
-                                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">
+                                                            <p className="font-black italic text-lg text-foreground">{payment.amount} PKR</p>
+                                                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
                                                                 {new Date(payment.date).toLocaleDateString()} • {payment.method}
                                                             </p>
                                                         </div>
@@ -361,21 +463,21 @@ export default function MemberDashboardPage() {
                                             ))
                                         )}
                                     </TabsContent>
-                                    
+
                                     <TabsContent value="pauses" className="mt-0 space-y-3">
                                         {(!subscription?.pauseHistory || subscription.pauseHistory.length === 0) ? (
-                                            <div className="py-20 text-center opacity-20 italic">No operational holds detected</div>
+                                            <div className="py-20 text-center opacity-20 italic text-foreground">No operational holds detected</div>
                                         ) : (
                                             subscription.pauseHistory.map((pause, index) => (
-                                                <div key={index} className="flex items-start gap-5 p-5 rounded-2xl bg-white/5 border border-white/5 group hover:border-amber-500/30 transition-all">
-                                                    <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-amber-500 border border-white/5 shrink-0">
+                                                <div key={index} className="flex items-start gap-5 p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border group hover:border-amber-500/30 transition-all">
+                                                    <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-amber-500 border border-border shrink-0">
                                                         <Pause className="h-6 w-6" />
                                                     </div>
                                                     <div className="flex-1">
                                                         <div className="flex justify-between items-start mb-2">
                                                             <div>
-                                                                <p className="font-black italic uppercase text-sm">System Freeze</p>
-                                                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">
+                                                                <p className="font-black italic uppercase text-sm text-foreground">System Freeze</p>
+                                                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
                                                                     {new Date(pause.startDate).toLocaleDateString()}
                                                                     {pause.endDate ? ` — ${new Date(pause.endDate).toLocaleDateString()}` : " (ONGOING)"}
                                                                 </p>
@@ -390,7 +492,7 @@ export default function MemberDashboardPage() {
                                                             )}
                                                         </div>
                                                         {pause.reason && (
-                                                            <p className="text-[11px] font-bold text-slate-400 bg-black/40 p-3 rounded-xl italic">
+                                                            <p className="text-[11px] font-bold text-muted-foreground bg-black/5 dark:bg-black/40 p-3 rounded-xl italic">
                                                                 "{pause.reason.toUpperCase()}"
                                                             </p>
                                                         )}
@@ -415,10 +517,10 @@ export default function MemberDashboardPage() {
                             </div>
                             <div>
                                 <h3 className="text-2xl font-black italic uppercase text-amber-500 mb-2 tracking-tighter">OPERATIONAL FREEZE DETECTED</h3>
-                                <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-relaxed">
+                                <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest leading-relaxed">
                                     Your tactical data link is currently suspended. Contact Command Center to initiate manual reactivation.
                                     {subscription.totalPausedDays > 0 && (
-                                        <span className="text-white block mt-1">TOTAL DURATION SUSPENDED: {subscription.totalPausedDays} CYCLES</span>
+                                        <span className="text-foreground block mt-1">TOTAL DURATION SUSPENDED: {subscription.totalPausedDays} CYCLES</span>
                                     )}
                                 </p>
                             </div>

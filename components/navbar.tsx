@@ -91,7 +91,7 @@ export function Navbar() {
 
   return (
     <header className={cn(
-      "fixed top-0 right-0 h-16 glass border-b border-white/5 flex items-center justify-between px-6 z-40 transition-all duration-300 ease-in-out",
+      "fixed top-0 right-0 h-16 glass-premium border-b border-border flex items-center justify-between px-6 z-40 transition-all duration-300 ease-in-out",
       sidebarCollapsed ? "left-20" : "left-64"
     )}>
       <div className="flex items-center gap-4">
@@ -112,12 +112,12 @@ export function Navbar() {
           </div>
         )}
         {/* Search Bar - Subtler */}
-        <div className="flex-1 max-w-sm hidden md:block">
+        <div data-tour="navbar-search" className="flex-1 max-w-sm hidden md:block">
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 group-hover:text-primary transition-colors" />
             <Input
               placeholder="SEARCH SYSTEM..."
-              className="pl-10 h-10 bg-white/5 border-transparent focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 w-[200px] lg:w-[300px] rounded-xl"
+              className="pl-10 h-10 bg-black/5 dark:bg-white/5 border-transparent focus:bg-black/10 dark:focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 w-[200px] lg:w-[300px] rounded-xl"
               value={store.searchQuery}
               onChange={(e) => store.setSearchQuery(e.target.value)}
             />
@@ -127,20 +127,10 @@ export function Navbar() {
 
       {/* Right Section */}
       <div className="flex items-center gap-2 ml-auto">
-        {/* Theme Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="h-10 w-10 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-xl transition-all"
-        >
-          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
+
 
         {/* Notifications */}
-        <div className="relative">
+        <div data-tour="navbar-notifications" className="relative">
           <Button
             variant="ghost"
             size="icon"
@@ -154,11 +144,11 @@ export function Navbar() {
           </Button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 top-14 w-80 glass border border-white/10 rounded-2xl shadow-2xl p-0 z-50 card-enter overflow-hidden">
-              <div className="px-5 py-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+            <div className="absolute right-0 top-14 w-80 glass-premium border border-border rounded-2xl shadow-2xl p-0 z-50 card-enter overflow-hidden">
+              <div className="px-5 py-4 border-b border-border bg-secondary flex items-center justify-between">
                 <div>
-                  <h3 className="font-black text-xs text-white tracking-widest uppercase">System Alerts</h3>
-                  <p className="text-[9px] text-slate-500 uppercase tracking-widest mt-0.5">Tactical Overlook</p>
+                  <h3 className="font-black text-xs text-foreground tracking-widest uppercase">System Alerts</h3>
+                  <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-0.5">Tactical Overlook</p>
                 </div>
                 {finalHasNotifications && (
                   <button
@@ -175,8 +165,8 @@ export function Navbar() {
                     <div
                       key={note.id}
                       className={cn(
-                        "group/note relative p-3 hover:bg-white/10 rounded-xl cursor-pointer transition-all border border-white/5",
-                        "bg-white/5"
+                        "group/note relative p-3 hover:bg-black/5 dark:hover:bg-white/10 rounded-xl cursor-pointer transition-all border border-black/5 dark:border-white/5",
+                        "bg-black/5 dark:bg-white/5"
                       )}
                       onClick={() => {
                         if (note.memberId) {
@@ -195,10 +185,10 @@ export function Navbar() {
                         <X className="w-3 h-3 text-slate-500 hover:text-white" />
                       </button>
                       <div className="flex items-center gap-2 mb-2 pr-6">
-                        <div className="p-1.5 rounded-lg bg-slate-900 border border-white/5 text-primary group-hover/note:neon-glow transition-all">
+                        <div className="p-1.5 rounded-lg bg-secondary border border-border text-primary group-hover/note:neon-glow transition-all">
                           {note.icon}
                         </div>
-                        <p className="text-xs font-black text-white leading-none tracking-tight uppercase italic">{note.title}</p>
+                        <p className="text-xs font-black text-foreground leading-none tracking-tight uppercase italic">{note.title}</p>
                       </div>
                       <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">{note.message}</p>
                     </div>
@@ -225,15 +215,15 @@ export function Navbar() {
         <div className="h-8 w-px bg-white/5 mx-3"></div>
 
         {/* User Profile */}
-        <div className="flex items-center gap-3 pl-2 cursor-pointer hover:bg-white/5 p-2 rounded-xl transition-all group">
+        <div data-tour="navbar-profile" className="flex items-center gap-3 pl-2 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-xl transition-all group">
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-black text-white uppercase tracking-wider italic leading-none">{userName}</p>
+            <p className="text-xs font-black text-foreground uppercase tracking-wider italic leading-none">{userName}</p>
             <p className="text-[9px] text-primary mt-1 uppercase font-black tracking-[0.15em]">{userRole.replace("_", " ")}</p>
           </div>
-          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-black font-black text-sm neon-glow group-hover:scale-105 transition-transform">
+          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-black text-sm neon-glow group-hover:scale-105 transition-transform">
             {initials}
           </div>
-          <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-primary transition-colors" />
+          <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
         </div>
       </div>
     </header>

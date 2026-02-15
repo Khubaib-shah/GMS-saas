@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Zap, Mail, Lock, Hash, ArrowRight } from "lucide-react";
+import { Zap, Mail, Lock, Hash, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 export default function MemberLoginPage() {
     const router = useRouter();
@@ -16,6 +16,8 @@ export default function MemberLoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [pin, setPin] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPin, setShowPin] = useState(false);
 
     const gymId = typeof window !== "undefined" ? localStorage.getItem("memberGymId") : null;
 
@@ -102,18 +104,18 @@ export default function MemberLoginPage() {
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic">Enter the arena</p>
                 </div>
 
-                <div className="glass-card p-1">
+                <div className="glass-premium p-1">
                     <Tabs defaultValue="password" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 bg-white/5 border-b border-white/10 rounded-t-xl overflow-hidden p-0 h-14">
-                            <TabsTrigger 
-                                value="password" 
-                                className="data-[state=active]:bg-primary data-[state=active]:text-black rounded-none font-black italic text-xs uppercase tracking-widest transition-all h-full"
+                        <TabsList className="grid w-full grid-cols-2 bg-white/5 border-b border-border rounded-t-xl overflow-hidden p-0 h-14">
+                            <TabsTrigger
+                                value="password"
+                                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none font-black italic text-xs uppercase tracking-widest transition-all h-full"
                             >
                                 PASSWORD
                             </TabsTrigger>
-                            <TabsTrigger 
-                                value="pin" 
-                                className="data-[state=active]:bg-primary data-[state=active]:text-black rounded-none font-black italic text-xs uppercase tracking-widest transition-all h-full"
+                            <TabsTrigger
+                                value="pin"
+                                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none font-black italic text-xs uppercase tracking-widest transition-all h-full"
                             >
                                 FAST PIN
                             </TabsTrigger>
@@ -132,7 +134,8 @@ export default function MemberLoginPage() {
                                                 placeholder="ACCESS@GYMFLOW.COM"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
-                                                className="pl-12 bg-white/5 border-white/10 text-white font-bold h-12 rounded-xl focus:bg-white/10 transition-all"
+                                                className="pl-12 bg-white/5 border-border text-white font-bold h-12 rounded-xl focus:bg-white/10 transition-all"
+                                                autoFocus
                                             />
                                         </div>
                                     </div>
@@ -142,17 +145,24 @@ export default function MemberLoginPage() {
                                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
                                             <Input
                                                 id="password"
-                                                type="password"
+                                                type={showPassword ? "text" : "password"}
                                                 placeholder="••••••••"
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
-                                                className="pl-12 bg-white/5 border-white/10 text-white font-bold h-12 rounded-xl focus:bg-white/10 transition-all"
+                                                className="pl-12 pr-12 bg-white/5 border-border text-white font-bold h-12 rounded-xl focus:bg-white/10 transition-all"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                                            >
+                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
                                         </div>
                                     </div>
-                                    <Button 
-                                        type="submit" 
-                                        className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all" 
+                                    <Button
+                                        type="submit"
+                                        className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
                                         disabled={isLoading}
                                     >
                                         {isLoading ? "SYNCING..." : "ENTER SYSTEM"}
@@ -183,18 +193,25 @@ export default function MemberLoginPage() {
                                             <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
                                             <Input
                                                 id="pin"
-                                                type="password"
+                                                type={showPin ? "text" : "password"}
                                                 placeholder="••••"
                                                 maxLength={6}
                                                 value={pin}
                                                 onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
-                                                className="pl-12 bg-white/5 border-white/10 text-white font-bold text-2xl tracking-[0.5em] h-14 rounded-xl focus:bg-white/10 text-center transition-all"
+                                                className="pl-12 pr-12 bg-white/5 border-white/10 text-white font-bold text-2xl tracking-[0.5em] h-14 rounded-xl focus:bg-white/10 text-center transition-all"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPin(!showPin)}
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                                            >
+                                                {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
                                         </div>
                                     </div>
-                                    <Button 
-                                        type="submit" 
-                                        className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all" 
+                                    <Button
+                                        type="submit"
+                                        className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
                                         disabled={isLoading}
                                     >
                                         {isLoading ? "VALIDATING..." : "PIN AUTHENTICATION"}
@@ -209,7 +226,7 @@ export default function MemberLoginPage() {
                 <div className="mt-8 text-center">
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
                         Issues with Access? <br />
-                        <a href="#" className="text-primary hover:text-white transition-colors">Contact Command Center</a>
+                        <a href="#" className="text-primary hover:text-foreground transition-colors">Contact Command Center</a>
                     </p>
                 </div>
             </div>

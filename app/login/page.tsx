@@ -53,7 +53,7 @@ function LoginForm() {
     <div className="w-full max-w-sm glass-card p-10 selection:bg-primary selection:text-black">
       <div className="mb-10 text-center">
         <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6 neon-glow">
-            <Zap className="w-10 h-10 text-black" />
+          <Zap className="w-10 h-10 text-black" />
         </div>
         <h2 className="text-3xl font-black italic text-white mb-2 uppercase tracking-tight">
           System <span className="text-primary">Login</span>
@@ -123,37 +123,37 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <div className="min-h-screen bg-slate-950 flex relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,rgba(76,255,0,0.1),transparent_70%)]"></div>
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -mr-40 -mb-40 animate-pulse"></div>
+      {/* Background Effects */}
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,rgba(76,255,0,0.1),transparent_70%)]"></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -mr-40 -mb-40 animate-pulse"></div>
 
       {/* Left Side - Branding (Hidden on mobile) */}
       <div className="hidden lg:flex lg:w-3/5 relative items-center justify-center p-20 overflow-hidden">
         <div className="absolute inset-0 grayscale contrast-150 opacity-40">
-           <img 
-            src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=2070&auto=format&fit=crop" 
-            alt="Gym Background" 
+          <img
+            src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=2070&auto=format&fit=crop"
+            alt="Gym Background"
             className="w-full h-full object-cover"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
-        
+
         <div className="relative z-10 text-left max-w-xl">
           <div className="flex items-center gap-3 mb-10">
             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center neon-glow">
               <Zap className="w-8 h-8 text-black" />
             </div>
             <span className="text-4xl font-black italic tracking-tighter text-white uppercase">
-                GYM<span className="text-primary neon-text">FLOW</span>
+              GYM<span className="text-primary neon-text">FLOW</span>
             </span>
           </div>
-          
+
           <h1 className="text-7xl font-black mb-6 italic text-white leading-[0.9] tracking-tighter uppercase">
             Dominate <br />
             The Every <br />
             <span className="text-primary neon-text">Rep.</span>
           </h1>
-          
+
           <p className="text-xl text-slate-400 font-medium mb-12 max-w-md leading-relaxed">
             The elite management suite for gyms that demand absolute precision and high-octane growth.
           </p>

@@ -132,7 +132,7 @@ export default function AdminDashboard() {
 
     try {
       toast.loading("Deleting gym and all associated data...", { id: "delete-gym" })
-      
+
       const res = await fetch(`/api/admin/gyms?id=${deleteGymId}`, {
         method: "DELETE",
       })
@@ -153,24 +153,24 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">Gym Registry</h1>
-          <p className="text-muted-foreground">Manage SaaS tenants and their owners</p>
+          <h1 className="text-4xl font-black italic tracking-tighter text-foreground uppercase mb-2">GYM_REGISTRY</h1>
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] italic">Manage SaaS tenants and their owners</p>
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />
-              Register New Gym
+            <Button className="gap-3 bg-primary text-primary-foreground hover:bg-foreground hover:text-background font-black italic uppercase tracking-wider h-12 px-6 rounded-xl transition-all neon-glow">
+              <Plus className="w-5 h-5" />
+              REGISTER_NEW_GYM
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <form onSubmit={handleRegisterGym}>
               <DialogHeader>
-                <DialogTitle>Register New Gym</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter text-foreground">REGISTER_GYM</DialogTitle>
+                <DialogDescription className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic">
                   Create a new gym tenant and its initial owner account.
                 </DialogDescription>
               </DialogHeader>
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
                     placeholder="123 Street Name, City"
                   />
                 </div>
-                
+
                 <div className="border-t pt-4 mt-2">
                   <h4 className="text-sm font-semibold mb-3">Owner Details</h4>
                   <div className="space-y-4">
@@ -258,17 +258,17 @@ export default function AdminDashboard() {
         </Dialog>
       </div>
 
-      <Card className="overflow-hidden">
+      <Card className="glass-premium overflow-hidden border-border bg-card dark:bg-slate-950/40">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Gym Name</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead>Plan</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Registered Date</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+          <TableHeader className="bg-muted/30">
+            <TableRow className="border-border">
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">GYM_NAME</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">CONTACT</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">ADDRESS</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">PLAN</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">STATUS</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">REGISTERED</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4 text-right">ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -297,7 +297,7 @@ export default function AdminDashboard() {
                       {gym.address || "N/A"}
                     </div>
                   </TableCell>
-                   <TableCell>
+                  <TableCell>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -320,34 +320,34 @@ export default function AdminDashboard() {
                     {new Date(gym.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                     <div className="flex items-center gap-2 justify-end">
-                       <Button 
-                         variant="ghost" 
-                         size="sm" 
-                         className="text-primary hover:text-primary hover:bg-primary/10"
-                         onClick={() => router.push(`/subscriptions?gymId=${gym._id}`)}
-                       >
-                          Manage Plans
-                       </Button>
-                       <Button
-                         variant="ghost"
-                         size="icon"
-                         className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                         onClick={() => {
-                           setDeleteGymId(gym._id)
-                           setDeleteGymName(gym.name)
-                         }}
-                         title="Delete Gym"
-                       >
-                         <Trash2 className="w-4 h-4" />
-                       </Button>
-                     </div>
+                    <div className="flex items-center gap-2 justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-[10px] font-black italic uppercase tracking-widest text-primary hover:text-primary hover:bg-primary/10 rounded-lg"
+                        onClick={() => router.push(`/subscriptions?gymId=${gym._id}`)}
+                      >
+                        MANAGE_PLANS
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                        onClick={() => {
+                          setDeleteGymId(gym._id)
+                          setDeleteGymName(gym.name)
+                        }}
+                        title="Delete Gym"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
                   No gyms registered yet.
                 </TableCell>
               </TableRow>
@@ -385,8 +385,8 @@ export default function AdminDashboard() {
             }}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDeleteGym} 
+            <AlertDialogAction
+              onClick={handleDeleteGym}
               className="bg-destructive hover:bg-destructive/90"
             >
               Delete Permanently

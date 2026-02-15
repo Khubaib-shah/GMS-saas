@@ -60,10 +60,15 @@ export async function DELETE(
 
         const objectId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : id;
 
-        const payment = await Payment.findOneAndDelete({
-            _id: objectId,
-            gymId: (session.user as any).gymId
-        });
+        const payment = await Payment.findOneAndUpdate(
+            {
+                _id: objectId,
+                gymId: (session.user as any).gymId,
+                deletedAt: null
+            },
+            { deletedAt: new Date() },
+            { new: true }
+        );
 
         if (!payment) {
             return NextResponse.json({ message: "Payment not found" }, { status: 404 });

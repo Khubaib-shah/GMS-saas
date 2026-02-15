@@ -23,37 +23,37 @@ export function Sidebar() {
   const isAdmin = (session?.user as any)?.role === "super_admin"
   const isPremium = (session?.user as any)?.isPremium
 
-  const navItems: NavItem[] = isAdmin 
+  const navItems: NavItem[] = isAdmin
     ? [
-        { label: "Gym Registry", href: "/admin", icon: <Building2 className="w-5 h-5" /> },
-        { label: "Plans", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
-        { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
-      ]
-      : [
-        ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : []),
-        { label: "Members", href: "/members", icon: <Users className="w-5 h-5" /> },
-        { label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> },
-        ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> }] : []),
-        ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> }] : []),
-        ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
-        ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [{ label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> }] : []),
-        { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
-      ]
+      { label: "Gym Registry", href: "/admin", icon: <Building2 className="w-5 h-5" /> },
+      { label: "Plans", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
+      { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
+    ]
+    : [
+      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : []),
+      { label: "Members", href: "/members", icon: <Users className="w-5 h-5" /> },
+      { label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> },
+      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> }] : []),
+      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> }] : []),
+      ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
+      ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [{ label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> }] : []),
+      { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
+    ]
 
   return (
     <aside className={cn(
-      "fixed left-0 top-0 h-screen bg-card/50 backdrop-blur-xl border-r border-white/5 flex flex-col z-50 transition-all duration-300 ease-in-out selection:bg-primary selection:text-black",
+      "fixed left-0 top-0 h-screen bg-sidebar backdrop-blur-xl border-r border-sidebar-border flex flex-col z-50 transition-all duration-300 ease-in-out selection:bg-primary selection:text-primary-foreground",
       sidebarCollapsed ? "w-20" : "w-64"
     )}>
       {/* Logo Section */}
-      <div className={cn("h-16 flex items-center border-b border-white/5", sidebarCollapsed ? "justify-center px-0" : "px-6")}>
+      <div data-tour="sidebar-logo" className={cn("h-16 flex items-center border-b border-sidebar-border", sidebarCollapsed ? "justify-center px-0" : "px-6")}>
         <div className="flex items-center gap-2 overflow-hidden">
           <Link href={isAdmin ? "/admin" : "/dashboard"} className="flex items-center gap-2 group cursor-pointer">
             <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary flex items-center justify-center neon-glow transition-all group-hover:scale-105">
               {isAdmin ? <ShieldCheck className="w-6 h-6 text-black" /> : <Zap className="w-6 h-6 text-black" />}
             </div>
             {!sidebarCollapsed && (
-              <span className="font-black text-xl tracking-tighter italic text-white animate-in fade-in slide-in-from-left-2 duration-300">
+              <span className="font-black text-xl tracking-tighter italic text-sidebar-foreground animate-in fade-in slide-in-from-left-2 duration-300">
                 GYM<span className="text-primary">FLOW</span>
               </span>
             )}
@@ -62,9 +62,9 @@ export function Sidebar() {
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 px-4 py-8 overflow-y-auto custom-scrollbar">
+      <nav data-tour="sidebar-nav" className="flex-1 px-4 py-8 overflow-y-auto custom-scrollbar">
         {!sidebarCollapsed && (
-          <p className="px-3 text-[10px] font-black text-slate-500 mb-6 uppercase tracking-[0.2em] animate-in fade-in duration-300">
+          <p className="px-3 text-[10px] font-black text-slate-500 dark:text-slate-400 mb-6 uppercase tracking-[0.2em] animate-in fade-in duration-300">
             {isAdmin ? "ADMIN CONTROL" : "COMMAND CENTER"}
           </p>
         )}
@@ -80,7 +80,7 @@ export function Sidebar() {
                     sidebarCollapsed && "justify-center px-0",
                     isActive
                       ? "text-primary bg-primary/10"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
                   )}
                 >
                   {isActive && (
@@ -103,13 +103,13 @@ export function Sidebar() {
       </nav>
 
       {/* Logout Section */}
-      <div className="p-4 border-t border-white/5">
+      <div data-tour="sidebar-logout" className="p-4 border-t border-sidebar-border">
         <button
           onClick={() => {
             signOut({ callbackUrl: "/login" })
           }}
           className={cn(
-            "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] text-slate-500 hover:bg-destructive/10 hover:text-destructive transition-all duration-300 cursor-pointer group",
+            "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] text-sidebar-foreground/50 hover:bg-destructive/10 hover:text-destructive transition-all duration-300 cursor-pointer group",
             sidebarCollapsed && "justify-center px-0"
           )}
         >
