@@ -180,13 +180,33 @@
     @apply ring-4 ring-primary/10 border-primary outline-none;
   }
 
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 10px;
+  /* Custom Scrollbar & Containment */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
+    overscroll-behavior: contain !important;
+    isolation: isolate;
   }
-  ::-webkit-scrollbar-track {
-    @apply bg-background;
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors;
+  }
+
+  .overscroll-contain {
+    overscroll-behavior: contain !important;
+  }
+
+  .scroll-lock-trap {
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+
   ::-webkit-scrollbar-thumb {
     @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors;
   }

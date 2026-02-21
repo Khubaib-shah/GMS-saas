@@ -84,7 +84,7 @@ export async function POST(req: Request) {
             });
 
             // Update Member reference (Optional, depends on how much you want to sync)
-            await Member.updateOne({ _id: memberId }, { workoutPlanId: assignment._id });
+            await Member.updateOne({ _id: memberId }, { workoutPlanId: templateId });
 
             assignmentsCreated.push(assignment);
 

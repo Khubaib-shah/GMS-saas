@@ -59,7 +59,7 @@ export function WorkoutTemplates() {
                         <div className="h-px w-20 bg-primary/20"></div>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none">
-                        WORKOUT <span className="text-primary/40">TEMPLATES</span>
+                        WORKOUT <span className="text-primary">TEMPLATES</span>
                     </h1>
                 </div>
                 <div className="flex items-center gap-3">

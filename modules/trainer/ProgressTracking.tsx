@@ -48,11 +48,11 @@ export function ProgressTracking() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic leading-none">ANALYTICS_CORE_ENGAGED</span>
+                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic leading-none">Analytics Overview</span>
                         <div className="h-px w-20 bg-primary/20"></div>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none">
-                        PERFORMANCE <span className="text-primary/40">ANALYTICS</span>
+                        MEMBER <span className="text-primary/40">PERFORMANCE</span>
                     </h1>
                 </div>
             </div>
@@ -60,10 +60,10 @@ export function ProgressTracking() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Member Sidebar */}
                 <Card className="lg:col-span-1 bg-slate-950/20 border-white/5 p-6 h-fit space-y-6">
-                    <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">ACTIVE_RECRUITS</h3>
+                    <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">Active Members</h3>
                     <div className="relative group">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                        <Input placeholder="SEARCH..." className="pl-10 h-10 bg-white/5 border-white/5 text-xs font-bold rounded-xl" />
+                        <Input placeholder="Search members..." className="pl-10 h-10 bg-white/5 border-white/5 text-xs font-bold rounded-xl" />
                     </div>
 
                     <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
@@ -81,8 +81,8 @@ export function ProgressTracking() {
                                         RC
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-xs font-black italic uppercase tracking-tight group-hover:text-primary transition-colors leading-none mb-1">RECRUIT_{i}</p>
-                                        <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest underline decoration-primary/20">STATUS: ACTIVE</p>
+                                        <p className="text-xs font-black italic uppercase tracking-tight group-hover:text-primary transition-colors leading-none mb-1">Member {i}</p>
+                                        <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest underline decoration-primary/20">Status: Active</p>
                                     </div>
                                 </div>
                                 <Activity className={cn("w-3.5 h-3.5", selectedMemberId === String(i) ? "text-primary" : "text-slate-800")} />
@@ -96,17 +96,17 @@ export function ProgressTracking() {
                     {!selectedMemberId ? (
                         <div className="flex flex-col items-center justify-center h-[500px] border border-dashed border-white/10 rounded-3xl bg-white/[0.01]">
                             <TrendingUp className="w-16 h-16 text-slate-800 mb-6" />
-                            <h3 className="text-lg font-black italic uppercase tracking-widest text-slate-500">AWAITING_RECRUIT_SELECTION</h3>
-                            <p className="text-[10px] text-slate-600 mt-2 font-medium italic">SELECT A MEMBER FROM THE SECURE_LIST TO FETCH OPERATIONAL LOGS.</p>
+                            <h3 className="text-lg font-black italic uppercase tracking-widest text-slate-500">Awaiting Member Selection</h3>
+                            <p className="text-[10px] text-slate-600 mt-2 font-medium italic uppercase">Select a member from the list to view their training logs.</p>
                         </div>
                     ) : (
                         <>
                             {/* KPI Summary */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 {[
-                                    { label: "COMPLIANCE_RATE", val: "92%", color: "primary", icon: CheckCircle2 },
-                                    { label: "TOTAL_VOLUME", val: "42,800 KG", color: "blue", icon: Activity },
-                                    { label: "CONSISTENCY", val: "4.5/WK", color: "green", icon: Clock }
+                                    { label: "Compliance Rate", val: "92%", color: "primary", icon: CheckCircle2 },
+                                    { label: "Total Volume", val: "42,800 KG", color: "blue", icon: Activity },
+                                    { label: "Training Consistency", val: "4.5/WK", color: "green", icon: Clock }
                                 ].map((kpi, idx) => (
                                     <Card key={idx} className="bg-slate-950/20 border-white/5 p-6 relative overflow-hidden group">
                                         <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 -skew-x-12 translate-x-10 -translate-y-10 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -124,7 +124,7 @@ export function ProgressTracking() {
                                 <div className="flex items-center justify-between mb-10">
                                     <h3 className="text-sm font-black italic uppercase tracking-widest flex items-center gap-3">
                                         <TrendingUp className="w-4 h-4 text-primary" />
-                                        STRENGTH_PROGRESSION_CURVE
+                                        Strength <span className="text-primary/40">Progression</span> Curve
                                     </h3>
                                     <div className="flex items-center gap-2">
                                         <Badge className="bg-primary/20 text-primary border-none text-[8px] font-black italic">COMPOUND_LIFTS</Badge>
@@ -148,14 +148,14 @@ export function ProgressTracking() {
 
                             {/* Recent Logs List */}
                             <div className="space-y-4">
-                                <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 pl-2">RAW_OPERATIONAL_LOGS</h3>
+                                <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 pl-2">Training Logs</h3>
                                 {[1, 2, 3].map(i => (
                                     <Card key={i} className="bg-slate-950/20 border-white/5 p-6 hover:bg-white/[0.02] transition-colors group cursor-pointer">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-6">
                                                 <div className="flex flex-col">
                                                     <span className="text-[9px] font-black italic text-primary uppercase tracking-widest">OCT_12_2023</span>
-                                                    <span className="text-base font-black italic uppercase tracking-tight group-hover:text-primary transition-colors">PUSH_PROTOCOL_A</span>
+                                                    <span className="text-base font-black italic uppercase tracking-tight group-hover:text-primary transition-colors">Push Day - Protocol A</span>
                                                 </div>
                                                 <div className="h-10 w-px bg-white/5" />
                                                 <div className="flex items-center gap-8">
@@ -176,7 +176,7 @@ export function ProgressTracking() {
                                     </Card>
                                 ))}
                                 <Button className="w-full h-12 bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] font-black italic uppercase tracking-[0.3em] text-slate-500 hover:text-white rounded-xl">
-                                    LOAD_ARCHIVED_SEQUENCES
+                                    Load Archive
                                 </Button>
                             </div>
                         </>

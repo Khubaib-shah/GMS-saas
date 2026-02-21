@@ -106,7 +106,7 @@ export function AssignWorkout() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">PLAN ASSIGNMENT ACTIVE</span>
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">Plan Assignment</span>
                         <div className="h-px w-20 bg-primary/20"></div>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none">
@@ -117,19 +117,19 @@ export function AssignWorkout() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* Step 1: Select Members */}
-                <Card className="bg-slate-950/20 border-white/5 p-8 space-y-6">
+                <Card className="bg-slate-950/20 border-white/5 p-8 space-y-6 ">
                     <div className="flex items-center justify-between border-b border-white/5 pb-6">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                                 <Users className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black italic uppercase tracking-widest leading-none mb-1">SELECT MEMBERS</h3>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest underline decoration-primary/30">STEP 01</p>
+                                <h3 className="text-sm font-black italic uppercase tracking-widest leading-none mb-1">Select Members</h3>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest underline decoration-primary/30">Step 01</p>
                             </div>
                         </div>
                         <Badge variant="outline" className="bg-white/5 border-white/10 text-[10px] font-black italic px-4 py-1">
-                            {selectedMembers.length} MEMBERS SELECTED
+                            {selectedMembers.length} Members Selected
                         </Badge>
                     </div>
 
@@ -143,7 +143,7 @@ export function AssignWorkout() {
                         />
                     </div>
 
-                    <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar overscroll-contain relative isolate">
                         {loading ? (
                             [1, 2, 3].map(i => <div key={i} className="h-14 rounded-xl bg-white/[0.02] animate-pulse" />)
                         ) : filteredMembers.length > 0 ? (
@@ -178,7 +178,7 @@ export function AssignWorkout() {
                                 </div>
                             ))
                         ) : (
-                            <div className="py-10 text-center text-[10px] font-black italic text-slate-500 uppercase">NO MATCHING MEMBERS</div>
+                            <div className="py-10 text-center text-[10px] font-black italic text-slate-500 uppercase">No members found</div>
                         )}
                     </div>
                 </Card>
@@ -191,12 +191,12 @@ export function AssignWorkout() {
                                 <Layout className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black italic uppercase tracking-widest leading-none mb-1">SELECT TEMPLATE</h3>
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest underline decoration-primary/30">STEP 02</p>
+                                <h3 className="text-sm font-black italic uppercase tracking-widest leading-none mb-1">Select Template</h3>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest underline decoration-primary/30">Step 02</p>
                             </div>
                         </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                             {loading ? (
                                 [1, 2].map(i => <div key={i} className="h-20 rounded-xl bg-white/[0.02] animate-pulse" />)
                             ) : workoutPlans.map((t: any) => (
@@ -216,7 +216,7 @@ export function AssignWorkout() {
                                             "text-[10px] font-bold uppercase tracking-[0.2em]",
                                             selectedTemplate === (t._id || t.id) ? "text-black/60" : "text-slate-500"
                                         )}>
-                                            {t.schedule?.length || 0} DAY TRAINING CYCLE
+                                            {t.schedule?.length || 0} Training Days
                                         </p>
                                     </div>
                                     <ChevronRight className={cn("w-5 h-5", selectedTemplate === (t._id || t.id) ? "text-black" : "text-slate-700")} />
@@ -232,9 +232,9 @@ export function AssignWorkout() {
                                 <Send className="w-6 h-6" />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-base font-black italic uppercase tracking-widest leading-none mb-1">COMPLETE ASSIGNMENT</h3>
+                                <h3 className="text-base font-black italic uppercase tracking-widest leading-none mb-1">Complete Assignment</h3>
                                 <p className="text-[11px] text-slate-400 font-medium italic leading-relaxed">
-                                    DEPLOY SELECTED PLAN TO CHOSEN MEMBERS.
+                                    Assign the selected plan to the chosen members.
                                 </p>
                             </div>
                         </div>
@@ -247,11 +247,11 @@ export function AssignWorkout() {
                             {submitting ? (
                                 <>
                                     <Loader2 className="mr-3 w-6 h-6 animate-spin" />
-                                    PROCESSING...
+                                    ASSIGNING...
                                 </>
                             ) : (
                                 <>
-                                    ASSIGN PLAN
+                                    CONFIRM ASSIGNMENT
                                     <Check className="ml-3 w-6 h-6" />
                                 </>
                             )}

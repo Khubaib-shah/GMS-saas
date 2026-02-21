@@ -34,10 +34,27 @@ export async function GET(
 
         const objectId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : id;
         const query = buildGymQuery(session, { _id: objectId, deletedAt: null });
-        const member = await Member.findOne(query).populate("trainerId", "firstName lastName photo");
+        const member = await Member.findOne(query).populate("trainerId", "firstName lastName photo").lean();
 
         if (!member) {
             return NextResponse.json({ message: "Member not found" }, { status: 404 });
+        }
+
+        // Inject active subscription status for UI (confidentiality bypass)
+        // This allows trainers to see the "Active" banner even if they can't fetch the full history
+        const activeSub = await Subscription.findOne({
+            memberId: id,
+            gymId: session.user.gymId,
+            status: { $in: ["active", "paused"] },
+            endDate: { $gt: new Date().toISOString() },
+            deletedAt: null
+        }).sort({ endDate: -1 }).lean();
+
+        if (activeSub) {
+            (member as any).activeSubscription = {
+                status: activeSub.status,
+                endDate: activeSub.endDate
+            };
         }
 
         // Store in Redis (30-minute TTL)

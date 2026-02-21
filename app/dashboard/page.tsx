@@ -8,6 +8,7 @@ import { MembersTable } from "@/components/members-table";
 import { useAppStore } from "@/lib/store";
 import { isSubscriptionActive, daysUntilExpiry, formatCurrency } from "@/lib/utils/file-utils";
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
   const store = useAppStore();
@@ -48,10 +49,7 @@ export default function DashboardPage() {
   const totalMembers = myMembers.length;
 
   const activeSubscriptions = isTrainer
-    ? subscriptions.filter(s =>
-      myMembers.some(m => m.id === s.memberId) &&
-      isSubscriptionActive(s.endDate, s.status)
-    ).length
+    ? myMembers.filter(m => (m as any).activeSubscription && isSubscriptionActive((m as any).activeSubscription.endDate, (m as any).activeSubscription.status)).length
     : subscriptions.filter(s => isSubscriptionActive(s.endDate, s.status)).length;
 
   const todayCheckins = attendance.length; // Already filtered by trainer in the API if role is trainer
@@ -68,12 +66,12 @@ export default function DashboardPage() {
     .reduce((sum, p) => sum + p.amount, 0);
 
   const expiringSoon = isTrainer
-    ? subscriptions.filter(s =>
-      myMembers.some(m => m.id === s.memberId) &&
-      s.status !== "paused" &&
-      daysUntilExpiry(s.endDate) > 0 &&
-      daysUntilExpiry(s.endDate) <= 7
-    ).length
+    ? myMembers.filter(m => {
+      const active = (m as any).activeSubscription;
+      if (!active || active.status === "paused") return false;
+      const daysLeft = daysUntilExpiry(active.endDate);
+      return daysLeft > 0 && daysLeft <= 7;
+    }).length
     : subscriptions.filter((s) => {
       if (s.status === "paused") return false;
       const daysLeft = daysUntilExpiry(s.endDate);
@@ -94,21 +92,51 @@ export default function DashboardPage() {
   return (
     <div className="space-y-10 animate-fade-up">
       {/* DASHBOARD HEADER */}
-      <div className="relative">
-        <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary shadow-lg"></div>
-        <div className="flex items-center gap-4 mb-2">
-          <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
-            {isTrainer ? 'Trainer Analytics' : 'System Overview'}
-          </span>
-          <div className="h-px flex-1 bg-white/5"></div>
+      <div className="relative flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-4">
+        <div className="relative">
+          <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary shadow-lg"></div>
+          <div className="flex items-center gap-4 mb-2">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+              {isTrainer ? 'Trainer Analytics' : 'System Overview'}
+            </span>
+            <div className="h-px flex-1 bg-white/5"></div>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
+            {isTrainer ? 'TRAINER' : 'ADMIN'} <span className="text-primary">{isTrainer ? 'DASHBOARD' : 'CONSOLE'}</span>
+          </h1>
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+            {isTrainer ? `Managing ${totalMembers} members.` : 'Dashboard is active and monitoring.'}
+          </p>
         </div>
-        <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
-          {isTrainer ? 'TRAINER' : 'ADMIN'} <span className="text-primary">{isTrainer ? 'DASHBOARD' : 'CONSOLE'}</span>
-        </h1>
-        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-          {isTrainer ? `Managing ${totalMembers} members.` : 'Dashboard is active and monitoring.'}
-        </p>
+
+        {isTrainer && (
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/trainer/exercises')}
+              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+            >
+              <Dumbbell className="mr-2 w-4 h-4" />
+              EXERCISES
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/trainer/templates')}
+              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+            >
+              <Plus className="mr-2 w-4 h-4" />
+              TEMPLATES
+            </Button>
+            <Button
+              onClick={() => router.push('/trainer/deploy')}
+              className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+            >
+              <Send className="mr-2 w-4 h-4" />
+              ASSIGN_PLAN
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Stats Grid */}
@@ -159,42 +187,6 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-
-      {/* Trainer Specific Section */}
-      {isTrainer && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40">
-            <h3 className="text-lg font-black italic uppercase tracking-tighter mb-4 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-primary" />
-              Quick Actions
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <button
-                className="flex items-center justify-center gap-2 p-4 rounded-xl border border-primary/20 hover:bg-primary/10 transition-all text-[11px] font-black uppercase tracking-widest text-primary italic"
-                onClick={() => router.push('/trainer/exercises')}
-              >
-                <Dumbbell className="w-4 h-4" />
-                Create Exercise
-              </button>
-              <button
-                className="flex items-center justify-center gap-2 p-4 rounded-xl border border-primary/20 hover:bg-primary/10 transition-all text-[11px] font-black uppercase tracking-widest text-primary italic"
-                onClick={() => router.push('/trainer/templates')}
-              >
-                <Plus className="w-4 h-4" />
-                Build Template
-              </button>
-              <button
-                className="flex items-center justify-center gap-2 p-4 rounded-xl border border-primary/20 hover:bg-primary/10 transition-all text-[11px] font-black uppercase tracking-widest text-primary italic"
-                onClick={() => router.push('/trainer/deploy')}
-              >
-                <Send className="w-4 h-4" />
-                Assign Workout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
 
       {/* Members Table */}
       <div data-tour="dashboard-members" className="relative">

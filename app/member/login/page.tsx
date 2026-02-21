@@ -47,7 +47,7 @@ export default function MemberLoginPage() {
             localStorage.setItem("memberToken", data.token);
             localStorage.setItem("memberData", JSON.stringify(data.member));
             localStorage.setItem("memberGymId", data.member.gymId); // Ensure future logins use correct gymId
-            toast.success("SYSTEM ACCESS GRANTED");
+            toast.success("Login Successful");
             router.push("/member/dashboard");
         } catch (error) {
             toast.error("Critical login failure");
@@ -81,7 +81,7 @@ export default function MemberLoginPage() {
             localStorage.setItem("memberToken", data.token);
             localStorage.setItem("memberData", JSON.stringify(data.member));
             localStorage.setItem("memberGymId", data.member.gymId);
-            toast.success("PIN ACCESS GRANTED");
+            toast.success("PIN Login Successful");
             router.push("/member/dashboard");
         } catch (error) {
             toast.error("PIN validation error");
@@ -104,7 +104,7 @@ export default function MemberLoginPage() {
                     <h2 className="text-4xl font-black italic text-white mb-2 uppercase tracking-tighter">
                         MEMBER <span className="text-primary">PORTAL</span>
                     </h2>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic">Enter the arena</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic">Access your member portal</p>
                 </div>
 
                 <div className="glass-premium p-1">
@@ -128,7 +128,7 @@ export default function MemberLoginPage() {
                             <TabsContent value="password" m-0>
                                 <form onSubmit={handleEmailPasswordLogin} className="space-y-6">
                                     <div className="space-y-2">
-                                        <Label htmlFor="email" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Identity Email</Label>
+                                        <Label htmlFor="email" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</Label>
                                         <div className="relative group">
                                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
                                             <Input
@@ -143,7 +143,7 @@ export default function MemberLoginPage() {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="password" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Security Key</Label>
+                                        <Label htmlFor="password" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</Label>
                                         <div className="relative group">
                                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
                                             <Input
@@ -168,7 +168,7 @@ export default function MemberLoginPage() {
                                         className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
                                         disabled={isLoading}
                                     >
-                                        {isLoading ? "SYNCING..." : "ENTER SYSTEM"}
+                                        {isLoading ? "Logging in..." : "Login"}
                                         {!isLoading && <ArrowRight className="ml-2 w-5 h-5" />}
                                     </Button>
                                 </form>
@@ -177,7 +177,7 @@ export default function MemberLoginPage() {
                             <TabsContent value="pin">
                                 <form onSubmit={handlePinLogin} className="space-y-6">
                                     <div className="space-y-2">
-                                        <Label htmlFor="pin-email" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Identity Email</Label>
+                                        <Label htmlFor="pin-email" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</Label>
                                         <div className="relative group">
                                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
                                             <Input
@@ -191,7 +191,7 @@ export default function MemberLoginPage() {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="pin" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tactical PIN</Label>
+                                        <Label htmlFor="pin" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Enter PIN</Label>
                                         <div className="relative group">
                                             <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
                                             <Input
@@ -217,7 +217,7 @@ export default function MemberLoginPage() {
                                         className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
                                         disabled={isLoading}
                                     >
-                                        {isLoading ? "VALIDATING..." : "PIN AUTHENTICATION"}
+                                        {isLoading ? "Verifying PIN..." : "Login with PIN"}
                                         {!isLoading && <ArrowRight className="ml-2 w-5 h-5" />}
                                     </Button>
                                 </form>
@@ -226,16 +226,16 @@ export default function MemberLoginPage() {
                     </Tabs>
                 </div>
 
-                <div className="mt-8 text-center space-y-4">
+                <div className="mt-4 text-center space-y-2">
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                        Are you Gym Staff? <br />
+                        Are you Gym Staff or Admin? {" "}
                         <Link href="/login" className="text-primary hover:text-white transition-colors">
                             Switch to Staff Login
                         </Link>
                     </p>
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                        Issues with Access? <br />
-                        <a href="https://wa.me/923149784156?text=Hello%2C%20I%20am%20having%20issues%20with%20accessing%20my%20account." target="_blank" rel="noopener noreferrer" className="text-primary hover:text-foreground transition-colors">Contact Command Center</a>
+                        Issues with Access? {" "}
+                        <a href="https://wa.me/923149784156?text=Hello%2C%20I%20am%20having%20issues%20with%20accessing%20my%20account." target="_blank" rel="noopener noreferrer" className="text-primary hover:text-foreground transition-colors">Contact Support</a>
                     </p>
                 </div>
             </div>

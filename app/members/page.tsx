@@ -71,9 +71,16 @@ export default function MembersPage() {
 
     if (filterStatus !== "all") {
       result = result.filter((m) => {
+        // 1. Check local subscriptions first (for managers/owners)
         const subs = store.subscriptions.filter((s) => s.memberId === m.id);
-        const active = subs.some((s) => isSubscriptionActive(s.endDate, s.status));
-        return filterStatus === "active" ? active : !active;
+        let isActive = subs.some((s) => isSubscriptionActive(s.endDate, s.status));
+
+        // 2. Fallback to injected status (for trainers)
+        if (!isActive && (m as any).activeSubscription) {
+          isActive = isSubscriptionActive((m as any).activeSubscription.endDate, (m as any).activeSubscription.status);
+        }
+
+        return filterStatus === "active" ? isActive : !isActive;
       });
     }
 
@@ -93,22 +100,22 @@ export default function MembersPage() {
         <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
         <div>
           <div className="flex items-center gap-4 mb-2">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">DIRECTORY: MEMBER_DATABASE_v4</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">DIRECTORY: MEMBER_LIST_v4</span>
             <div className="h-px w-24 bg-black/5 dark:bg-white/5"></div>
           </div>
           <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
-            MEMBER <span className="text-primary neon-text">ROSTER</span>
+            MEMBER <span className="text-primary neon-text">DIRECTORY</span>
           </h1>
           <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
-            Management and subscription surveillance active.
+            Member database and subscription management active.
           </p>
         </div>
         {((session?.user as any)?.role !== 'trainer') && (
           <Link href="/members/add">
             <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
               <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-              INITIALIZE MEMBER
+              ADD NEW MEMBER
             </Button>
           </Link>
         )}
@@ -119,7 +126,7 @@ export default function MembersPage() {
         <div className="flex gap-8 items-end flex-wrap">
           <div className="flex-1 min-w-64">
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-              SEARCH_QUERY
+              SEARCH_MEMBERS
             </label>
             <div className="relative group">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
@@ -145,9 +152,9 @@ export default function MembersPage() {
               }
               className="h-12 px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
             >
-              <option value="all">ALL_SUBJECTS</option>
-              <option value="active">ACTIVE_NODES</option>
-              <option value="expired">DECAYED_SIGNALS</option>
+              <option value="all">ALL_MEMBERS</option>
+              <option value="active">ACTIVE_MEMBERS</option>
+              <option value="expired">EXPIRED_MEMBERS</option>
             </select>
           </div>
         </div>
@@ -160,19 +167,19 @@ export default function MembersPage() {
             <thead>
               <tr className="border-b border-white/5 bg-white/[0.02]">
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  SUBJECT_IDENTIFIER
+                  MEMBER_IDENTIFIER
                 </th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  CONTACT_PROTOCOLS
+                  CONTACT_INFO
                 </th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  SIGNAL_STATUS
+                  SUBSCRIPTION_STATUS
                 </th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  INITIATION_DATE
+                  JOIN_DATE
                 </th>
                 <th className="text-center py-6 px-6 font-black text-slate-500 italic">
-                  COMMAND_ACTIONS
+                  ACTIONS
                 </th>
               </tr>
             </thead>
@@ -181,11 +188,17 @@ export default function MembersPage() {
                 const subs = store.subscriptions.filter(
                   (s) => s.memberId === member.id
                 );
-                const activeSub = subs.find((s) =>
+                // 1. Check local history if available
+                let activeSub = subs.find((s) =>
                   isSubscriptionActive(s.endDate, s.status)
                 );
+                // 2. Check injected status fallback
+                if (!activeSub && (member as any).activeSubscription) {
+                  activeSub = (member as any).activeSubscription;
+                }
+
                 const isActive = !!activeSub;
-                const isPaused = subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate));
+                const isPaused = activeSub?.status === "paused" || subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate));
 
                 return (
                   <tr
@@ -214,7 +227,7 @@ export default function MembersPage() {
                           <span className="text-foreground font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
                             {member.firstName} {member.lastName || ""}
                           </span>
-                          <span className="text-[9px] text-slate-500 font-mono tracking-widest mt-0.5 block">ID_v4: {member.id.toUpperCase().slice(-8)}</span>
+                          <span className="text-[9px] text-slate-500 font-mono tracking-widest mt-0.5 block">MEMBER_ID: {member.id.toUpperCase().slice(-8)}</span>
                         </div>
                       </div>
                     </td>
@@ -236,7 +249,7 @@ export default function MembersPage() {
                             : "bg-red-500/10 border-red-500/20 text-red-500"
                       )}>
                         <div className={cn("w-1 h-1 rounded-full", isPaused ? "bg-amber-500" : isActive ? "bg-primary" : "bg-red-500")} />
-                        {isPaused ? "PAUSED_SIG" : isActive ? "ACTIVE_NODE" : "SIGNAL_LOST"}
+                        {isPaused ? "PAUSED" : isActive ? "ACTIVE" : "EXPIRED"}
                       </div>
                     </td>
                     <td className="py-6 px-6 text-slate-500 font-mono text-[10px]">
@@ -276,7 +289,7 @@ export default function MembersPage() {
                             size="sm"
                             className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all"
                           >
-                            OPEN_PROFILE
+                            VIEW PROFILE
                           </Button>
                         </Link>
 
@@ -303,7 +316,7 @@ export default function MembersPage() {
             <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
               <Users className="w-8 h-8 text-slate-700" />
             </div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">NO_SUBJECTS_DETECTED</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">NO_MEMBERS_FOUND</p>
           </div>
         )}
       </div>

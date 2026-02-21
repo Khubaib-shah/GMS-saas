@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
+import AssignedWorkoutPlan from "@/models/AssignedWorkoutPlan";
 import Payment from "@/models/Payment";
 import Attendance from "@/models/Attendance";
 import Plan from "@/models/Plan";
@@ -106,10 +107,16 @@ export async function GET(req: Request) {
             .sort({ date: -1 })
             .lean();
 
-        // Get Workout Plan
+        // Get Active Workout Plan Assignment
+        const activeAssignment = await AssignedWorkoutPlan.findOne({
+            memberId: tokenData.memberId,
+            gymId: tokenData.gymId,
+            status: "active"
+        });
+
         let workoutPlan = null;
-        if (member.workoutPlanId) {
-            workoutPlan = await WorkoutPlan.findById(member.workoutPlanId)
+        if (activeAssignment) {
+            workoutPlan = await WorkoutPlan.findById(activeAssignment.templateId)
                 .populate({
                     path: "schedule.exercises.exerciseId",
                     model: Exercise

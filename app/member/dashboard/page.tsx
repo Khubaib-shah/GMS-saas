@@ -131,13 +131,13 @@ export default function MemberDashboardPage() {
                     router.push("/member/login");
                     return;
                 }
-                throw new Error("Failed to load level");
+                throw new Error("Failed to load dashboard");
             }
 
             const dashboardData = await res.json();
             setData(dashboardData);
         } catch (error) {
-            toast.error("Telemetry failed to load");
+            toast.error("Dashboard data failed to load");
         } finally {
             setIsLoading(false);
         }
@@ -158,7 +158,7 @@ export default function MemberDashboardPage() {
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Zap className="h-10 w-10 text-primary animate-pulse neon-glow" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] italic">Loading Dashboard...</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] italic">Loading your dashboard...</span>
                 </div>
             </div>
         );
@@ -168,7 +168,7 @@ export default function MemberDashboardPage() {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6">
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <p className="text-red-500 font-black uppercase italic tracking-widest text-xl">ERROR LOADING DASHBOARD</p>
+                    <p className="text-red-500 font-black uppercase italic tracking-widest text-xl">UNABLE TO LOAD DASHBOARD</p>
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Failed to load member data.</p>
                     <p className="text-[10px] text-slate-700 font-mono mt-2 uppercase tracking-tight">Please try logging in again.</p>
                 </div>
@@ -178,7 +178,7 @@ export default function MemberDashboardPage() {
                         className="bg-white/5 hover:bg-white/10 text-white border border-white/5 font-black italic uppercase tracking-widest rounded-xl gap-2"
                     >
                         <RefreshCcw className="w-4 h-4" />
-                        RETRY LOADING
+                        RETRY
                     </Button>
                     <Button
                         onClick={() => {
@@ -208,9 +208,9 @@ export default function MemberDashboardPage() {
                         </div>
                         <div>
                             <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">
-                                WELCOME, <span className="text-primary">{member.firstName}</span>
+                                Welcome, <span className="text-primary">{member.firstName}</span>
                             </h1>
-                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Status: Active Member</p>
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Membership Status: Active</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -241,7 +241,7 @@ export default function MemberDashboardPage() {
                 <div className="grid gap-6 md:grid-cols-4">
                     <div className="glass-premium p-6 border-l-4 border-l-primary">
                         <div className="flex items-center justify-between mb-4">
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Subscription</p>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Current Subscription</p>
                             <Calendar className="h-4 w-4 text-primary" />
                         </div>
                         {subscription ? (
@@ -268,7 +268,7 @@ export default function MemberDashboardPage() {
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-muted-foreground font-bold italic text-sm">NO ACTIVE LINK</p>
+                            <p className="text-muted-foreground font-bold italic text-sm">No Active Subscription</p>
                         )}
                     </div>
 
@@ -285,7 +285,7 @@ export default function MemberDashboardPage() {
                                 </p>
                             </div>
                         ) : (
-                            <p className="text-muted-foreground font-bold italic text-sm">NO PLAN DETECTED</p>
+                            <p className="text-muted-foreground font-bold italic text-sm">No active plan detected</p>
                         )}
                     </div>
 
@@ -314,9 +314,9 @@ export default function MemberDashboardPage() {
                 <div className="grid gap-10 lg:grid-cols-3">
                     {/* QR Code Card */}
                     <div className="lg:col-span-1">
-                        <div className="glass-premium p-8 h-full flex flex-col items-center justify-center text-center">
-                            <div className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-6">Digital ID</div>
-                            <h3 className="text-2xl font-black italic uppercase text-foreground mb-8 tracking-tighter">ACCESS QR CODE</h3>
+                        <div className="glass-premium p-8 flex flex-col items-center justify-center text-center">
+                            <div className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-6">Membership QR</div>
+                            <h3 className="text-2xl font-black italic uppercase text-foreground mb-8 tracking-tighter">Membership QR Code</h3>
 
                             <div ref={qrRef} className="bg-white p-6 rounded-2xl shadow-[0_0_50px_-10px_rgba(0,0,0,0.1)] mb-8 transition-transform hover:scale-105 duration-500">
                                 <QRCode
@@ -350,7 +350,7 @@ export default function MemberDashboardPage() {
                                     };
                                     img.src = "data:image/svg+xml;base64," + btoa(svgData);
                                 } else {
-                                    toast.error("Generation link offline");
+                                    toast.error("QR generation error");
                                 }
                             }}>
                                 <Download className="h-5 w-5" />
@@ -366,7 +366,7 @@ export default function MemberDashboardPage() {
                                 <TabsList className="grid w-full grid-cols-4 bg-white/5 border-b border-white/10 rounded-t-2xl overflow-hidden p-0 h-16">
                                     <TabsTrigger value="attendance" className="data-[state=active]:bg-primary data-[state=active]:text-black rounded-none font-black italic text-[11px] uppercase tracking-widest transition-all h-full">
                                         <History className="w-4 h-4 mr-2 hidden sm:block" />
-                                        ATTENDANCE
+                                        RECENT ATTENDANCE
                                     </TabsTrigger>
                                     <TabsTrigger value="workouts" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-none font-black italic text-[11px] uppercase tracking-widest transition-all h-full">
                                         <Dumbbell className="w-4 h-4 mr-2 hidden sm:block" />

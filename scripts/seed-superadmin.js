@@ -17,7 +17,7 @@ function loadEnv() {
   for (const file of envFiles) {
     const filePath = path.join(process.cwd(), file);
     if (fs.existsSync(filePath)) {
-      console.log(`ℹ️  Loading environment from ${file}`);
+      console.log(`Loading environment from ${file}`);
       const content = fs.readFileSync(filePath, 'utf8');
       const lines = content.split('\n');
       
@@ -43,8 +43,8 @@ loadEnv();
 const MONGODB_URL = process.env.MONGODB_URL;
 
 if (!MONGODB_URL) {
-    console.error('❌ MONGODB_URL not found in environment variables');
-    console.log('ℹ️  Make sure .env.local or .env file exists with MONGODB_URL');
+    console.error('MONGODB_URL not found in environment variables');
+    console.log('Make sure .env.local or .env file exists with MONGODB_URL');
     process.exit(1);
 }
 
@@ -80,15 +80,15 @@ async function seedSuperadmin() {
     console.log('🔌 Connecting to MongoDB...');
     // Use MONGODB_URL from env
     await mongoose.connect(MONGODB_URL);
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
 
     // Check if superadmin already exists
     const existingAdmin = await User.findOne({ email: SUPERADMIN_DATA.email });
     
     if (existingAdmin) {
-      console.log('⚠️  Superadmin already exists with email:', SUPERADMIN_DATA.email);
-      console.log('ℹ️  User ID:', existingAdmin._id);
-      console.log('ℹ️  Role:', existingAdmin.role);
+      console.log('Superadmin already exists with email:', SUPERADMIN_DATA.email);
+      console.log('User ID:', existingAdmin._id);
+      console.log('Role:', existingAdmin.role);
       
       // Update password if it exists but we want to reset it
       console.log('� Resetting password check...');
@@ -102,10 +102,10 @@ async function seedSuperadmin() {
         isActive: true
       });
       
-      console.log('✅ Superadmin updated successfully!');
+      console.log(' Superadmin updated successfully!');
     } else {
       // Hash the password
-      console.log('🔒 Hashing password...');
+      console.log('Hashing password...');
       const hashedPassword = await bcrypt.hash(SUPERADMIN_DATA.password, 10);
 
       // Create superadmin user
@@ -115,23 +115,23 @@ async function seedSuperadmin() {
         password: hashedPassword,
       });
 
-      console.log('\n✅ Superadmin created successfully!');
+      console.log('\n Superadmin created successfully!');
       console.log('─────────────────────────────────────');
-      console.log('📧 Email:', superadmin.email);
-      console.log('🆔 User ID:', superadmin._id);
+      console.log('Email:', superadmin.email);
+      console.log('User ID:', superadmin._id);
     }
     
     console.log('� Password:', SUPERADMIN_DATA.password);
     console.log('─────────────────────────────────────');
-    console.log('\n⚠️  IMPORTANT: Change the default password after first login!');
-    console.log('🌐 You can now login at: http://localhost:3000/login');
+    console.log('\n IMPORTANT: Change the default password after first login!');
+    console.log(' You can now login at: http://localhost:3000/login');
 
   } catch (error) {
-    console.error('❌ Error seeding superadmin:', error);
+    console.error('Error seeding superadmin:', error);
     process.exit(1);
   } finally {
     await mongoose.connection.close();
-    console.log('\n🔌 Disconnected from MongoDB');
+    console.log('\n Disconnected from MongoDB');
     process.exit(0);
   }
 }

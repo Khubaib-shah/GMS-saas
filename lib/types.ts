@@ -13,6 +13,8 @@ export type Member = {
   trainerId?: string
   branchId?: string // Multi-branch support
   workoutPlanId?: string
+  lastCheckIn?: string | null
+  createdAt?: string // ISO
   deletedAt?: string | null // Soft delete
 }
 

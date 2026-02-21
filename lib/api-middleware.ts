@@ -1,10 +1,12 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import { authOptions } from "@/lib/auth-options";
 import { Permission, hasPermission, getPermissionsForRole, hasAnyPermission } from "@/lib/permissions";
 import connectDB from "@/lib/db";
 import Role from "@/models/Role";
 import SubscriptionPlan from "@/models/SubscriptionPlan";
+import jwt from "jsonwebtoken";
 
 export interface AuthenticatedSession {
     user: {
@@ -75,32 +77,51 @@ export async function getAuthSession(): Promise<AuthenticatedSession | null> {
  * Returns either { session } or { error } — caller must check.
  */
 export async function attachTenantContext(): Promise<{ session: AuthenticatedSession } | { error: NextResponse }> {
+    // 1. Check for standard NextAuth session (Staff/Staff Members)
     const session = await getAuthSession();
 
-    if (!session) {
-        return {
-            error: NextResponse.json(
-                { message: "Unauthorized" },
-                { status: 401 }
-            )
-        };
+    if (session) {
+        if (session.user.role === 'super_admin' || session.user.gymId) {
+            return { session };
+        }
     }
 
-    // Super admins can operate without a gymId (platform-level routes)
-    if (session.user.role === 'super_admin') {
-        return { session };
+    // 2. Check for Member Portal JWT (Bearer Token)
+    try {
+        const headersList = await headers();
+        const authHeader = headersList.get("authorization");
+
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+            const token = authHeader.substring(7);
+            const secret = process.env.NEXTAUTH_SECRET || "member-portal-secret";
+            const decoded = jwt.verify(token, secret) as any;
+
+            if (decoded && decoded.type === "member") {
+                return {
+                    session: {
+                        user: {
+                            id: decoded.memberId,
+                            name: decoded.email,
+                            email: decoded.email,
+                            role: "member",
+                            gymId: decoded.gymId,
+                            isPremium: false, // Default or fetch if needed
+                            permissions: getPermissionsForRole("member"),
+                        }
+                    }
+                };
+            }
+        }
+    } catch (e) {
+        console.error("JWT Auth error in middleware:", e);
     }
 
-    if (!session.user.gymId) {
-        return {
-            error: NextResponse.json(
-                { message: "No gym context — access denied" },
-                { status: 403 }
-            )
-        };
-    }
-
-    return { session };
+    return {
+        error: NextResponse.json(
+            { message: "Unauthorized. Please log in." },
+            { status: 401 }
+        )
+    };
 }
 
 // ─────────────────────────────────────────────────
@@ -277,8 +298,13 @@ export function buildGymQuery(session: AuthenticatedSession, additionalFilters: 
     };
 
     // If user is branch-scoped, add branch filter
+    // We allow records with the specific branchId OR missing branchId (legacy)
     if (session.user.branchId) {
-        query.branchId = session.user.branchId;
+        query.$or = [
+            { branchId: session.user.branchId },
+            { branchId: { $exists: false } },
+            { branchId: null }
+        ];
     }
 
     return query;

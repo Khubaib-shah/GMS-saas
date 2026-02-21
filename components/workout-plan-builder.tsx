@@ -178,7 +178,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[80vw] w-[80vw] flex flex-col p-0 overflow-hidden bg-card border-none shadow-2xl">
+            <DialogContent className="sm:max-w-[80vw] w-[80vw] flex flex-col p-0 bg-card border-none shadow-2xl overflow-y-auto">
                 <DialogHeader className="p-8 pb-6 border-b border-white/5 bg-slate-950/20 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-full bg-primary/5 -skew-x-12 translate-x-12 opacity-50" />
                     <div className="relative">
@@ -192,7 +192,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                     </div>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
+                <div className="flex-1 flex flex-col md:flex-row min-h-0">
                     {/* Left Panel: Plan Meta & Exercise Browser */}
                     <div className="w-full md:w-[380px] shrink-0 border-r border-white/5 bg-slate-950/10 p-8 space-y-10 overflow-y-auto custom-scrollbar">
                         <div className="space-y-6">

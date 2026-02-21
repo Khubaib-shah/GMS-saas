@@ -172,7 +172,18 @@ export default function MemberDetailPage({
     [payments, memberId]
   );
 
-  const activeSub = memberSubs.find(s => isSubscriptionActive(s.endDate, s.status));
+  const activeSub = useMemo(() => {
+    // 1. Try to find in the loaded history (for managers/owners)
+    const found = memberSubs.find(s => isSubscriptionActive(s.endDate, s.status));
+    if (found) return found;
+
+    // 2. Fallback to injected data from API (for trainers who can't see history)
+    if ((member as any)?.activeSubscription) {
+      return (member as any).activeSubscription;
+    }
+
+    return null;
+  }, [memberSubs, member]);
 
   if (isLoading) {
     return (
@@ -550,7 +561,7 @@ export default function MemberDetailPage({
               </div>
             </Card>
           )}
-          {/* Active Status Banner */}
+          {/* Active Status Banner - Visible to all roles */}
           <Card className={cn(
             "p-6 border-l-4 shadow-lg shadow-foreground/[0.02] flex items-center justify-between",
             activeSub ? "border-l-emerald-500 bg-emerald-50/10" : "border-l-destructive bg-destructive/5"
@@ -580,224 +591,229 @@ export default function MemberDetailPage({
             )}
           </Card>
 
-          {/* Subscriptions History */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold flex items-center gap-2">
-              <History className="w-5 h-5 text-primary" />
-              Membership Timeline
-            </h3>
+          {((session?.user as any)?.role !== 'trainer') && (
+            <>
+              {/* Subscriptions History */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <History className="w-5 h-5 text-primary" />
+                  Membership Timeline
+                </h3>
 
-            <div className="space-y-3">
-              {memberSubs.length > 0 ? (
-                memberSubs.map((sub, idx) => {
-                  const isActive = isSubscriptionActive(sub.endDate, sub.status);
-                  const planName = plans.find(p => p.id === sub.planId)?.name || sub.planId;
-                  return (
-                    <div key={sub.id} className="group relative flex items-start gap-4 p-4 rounded-2xl border bg-background hover:shadow-md transition-all">
-                      <div className={cn(
-                        "mt-1 w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm transition-colors",
-                        isActive && sub.status !== "paused" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground",
-                        sub.status === "paused" && "bg-amber-100 text-amber-600"
-                      )}>
-                        {sub.status === "paused" ? <Pause className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h5 className="font-bold truncate">{planName}</h5>
-                          <div className="flex items-center gap-2">
-                            <span className={cn(
-                              "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
-                              sub.status === "paused" ? "bg-amber-100 text-amber-700" :
-                                isActive ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"
-                            )}>
-                              {sub.status === "paused" ? "Paused" : isActive ? 'Current' : 'Completed'}
-                            </span>
+                <div className="space-y-3">
+                  {memberSubs.length > 0 ? (
+                    memberSubs.map((sub, idx) => {
+                      const isActive = isSubscriptionActive(sub.endDate, sub.status);
+                      const planName = plans.find(p => p.id === sub.planId)?.name || sub.planId;
+                      return (
+                        <div key={sub.id} className="group relative flex items-start gap-4 p-4 rounded-2xl border bg-background hover:shadow-md transition-all">
+                          <div className={cn(
+                            "mt-1 w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm transition-colors",
+                            isActive && sub.status !== "paused" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground",
+                            sub.status === "paused" && "bg-amber-100 text-amber-600"
+                          )}>
+                            {sub.status === "paused" ? <Pause className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <h5 className="font-bold truncate">{planName}</h5>
+                              <div className="flex items-center gap-2">
+                                <span className={cn(
+                                  "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
+                                  sub.status === "paused" ? "bg-amber-100 text-amber-700" :
+                                    isActive ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"
+                                )}>
+                                  {sub.status === "paused" ? "Paused" : isActive ? 'Current' : 'Completed'}
+                                </span>
 
-                            {/* Management Actions */}
-                            {((session?.user as any)?.role !== 'trainer') && (
-                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                                {isActive && (
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7 rounded-md hover:bg-amber-100 hover:text-amber-600"
-                                    title={sub.status === "paused" ? "Resume Membership" : "Pause Membership"}
-                                    onClick={() => updateSubscription(sub.id, { status: sub.status === "paused" ? "active" : "paused" })}
-                                  >
-                                    {sub.status === "paused" ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
-                                  </Button>
+                                {/* Management Actions */}
+                                {((session?.user as any)?.role !== 'trainer') && (
+                                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                                    {isActive && (
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 rounded-md hover:bg-amber-100 hover:text-amber-600"
+                                        title={sub.status === "paused" ? "Resume Membership" : "Pause Membership"}
+                                        onClick={() => updateSubscription(sub.id, { status: sub.status === "paused" ? "active" : "paused" })}
+                                      >
+                                        {sub.status === "paused" ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                                      </Button>
+                                    )}
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive"
+                                      title="Delete Subscription"
+                                      onClick={() => setDeleteSubId(sub.id)}
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </div>
                                 )}
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive"
-                                  title="Delete Subscription"
-                                  onClick={() => setDeleteSubId(sub.id)}
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </Button>
                               </div>
-                            )}
+                            </div>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {formatDate(sub.startDate)} - {formatDate(sub.endDate)}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {Math.ceil((new Date(sub.endDate).getTime() - new Date(sub.startDate).getTime()) / 86400000)} Days
+                              </span>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {formatDate(sub.startDate)} - {formatDate(sub.endDate)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {Math.ceil((new Date(sub.endDate).getTime() - new Date(sub.startDate).getTime()) / 86400000)} Days
-                          </span>
-                        </div>
-                      </div>
+                      );
+                    })
+                  ) : (
+                    <div className="p-12 text-center rounded-3xl border border-dashed bg-muted/20">
+                      <p className="text-muted-foreground text-sm italic">No subscription history found.</p>
                     </div>
-                  );
-                })
-              ) : (
-                <div className="p-12 text-center rounded-3xl border border-dashed bg-muted/20">
-                  <p className="text-muted-foreground text-sm italic">No subscription history found.</p>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Payments History */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold flex items-center gap-2">
-              <div className="p-1 rounded-md bg-emerald-500/10 text-emerald-600">
-                <CreditCard className="w-5 h-5" />
               </div>
-              Payment Records
-            </h3>
 
-            <Card className="overflow-hidden border-none shadow-xl shadow-foreground/[0.02]">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead>
-                    <tr className="bg-muted/50 border-b">
-                      <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Transaction ID</th>
-                      <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Date</th>
-                      <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Method</th>
-                      <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground text-right relative min-w-[100px]">Amount</th>
-                      {((session?.user as any)?.role !== 'trainer') && (
-                        <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground text-right">Actions</th>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {memberPayments.length > 0 ? (
-                      memberPayments.map((pay) => (
-                        <tr key={pay.id} className="border-b transition-colors hover:bg-muted/5 group">
-                          <td className="px-6 py-4 font-medium text-muted-foreground flex items-center gap-2">
-                            {pay.id.slice(-8).toUpperCase()}
-                            {pay.receiptUrl && (
-                              <button
-                                onClick={() => setPreviewReceiptUrl(pay.receiptUrl || null)}
-                                className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors cursor-pointer"
-                                title="View Receipt"
-                              >
-                                <Eye className="w-3 h-3" />
-                              </button>
-                            )}
-                          </td>
-                          <td className="px-6 py-4 font-semibold">{formatDate(pay.date)}</td>
-                          <td className="px-6 py-4">
-                            <span className="px-2 py-0.5 rounded-full bg-secondary text-primary text-[10px] font-bold uppercase">
-                              {pay.method || "Cash"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-right font-bold text-foreground">
-                            {formatCurrency(pay.amount)}
-                          </td>
+              {/* Payments History */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <div className="p-1 rounded-md bg-emerald-500/10 text-emerald-600">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  Payment Records
+                </h3>
+
+                <Card className="overflow-hidden border-none shadow-xl shadow-foreground/[0.02]">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                      <thead>
+                        <tr className="bg-muted/50 border-b">
+                          <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Transaction ID</th>
+                          <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Date</th>
+                          <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Method</th>
+                          <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground text-right relative min-w-[100px]">Amount</th>
                           {((session?.user as any)?.role !== 'trainer') && (
-                            <td className="px-6 py-4 text-right">
-                              <div className="flex justify-end gap-1 opacity-100 transition-opacity">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 rounded-md hover:bg-primary/10 hover:text-primary"
-                                  onClick={() => handleOpenEditPayment(pay)}
-                                >
-                                  <Edit className="w-3.5 h-3.5" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive"
-                                  onClick={() => setDeletePaymentId(pay.id)}
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </Button>
-                              </div>
-                            </td>
+                            <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground text-right">Actions</th>
                           )}
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground italic bg-muted/10">
-                          No payment history recorded for this member.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody>
+                        {memberPayments.length > 0 ? (
+                          memberPayments.map((pay) => (
+                            <tr key={pay.id} className="border-b transition-colors hover:bg-muted/5 group">
+                              <td className="px-6 py-4 font-medium text-muted-foreground flex items-center gap-2">
+                                {pay.id.slice(-8).toUpperCase()}
+                                {pay.receiptUrl && (
+                                  <button
+                                    onClick={() => setPreviewReceiptUrl(pay.receiptUrl || null)}
+                                    className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+                                    title="View Receipt"
+                                  >
+                                    <Eye className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 font-semibold">{formatDate(pay.date)}</td>
+                              <td className="px-6 py-4">
+                                <span className="px-2 py-0.5 rounded-full bg-secondary text-primary text-[10px] font-bold uppercase">
+                                  {pay.method || "Cash"}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-right font-bold text-foreground">
+                                {formatCurrency(pay.amount)}
+                              </td>
+                              {((session?.user as any)?.role !== 'trainer') && (
+                                <td className="px-6 py-4 text-right">
+                                  <div className="flex justify-end gap-1 opacity-100 transition-opacity">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 rounded-md hover:bg-primary/10 hover:text-primary"
+                                      onClick={() => handleOpenEditPayment(pay)}
+                                    >
+                                      <Edit className="w-3.5 h-3.5" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive"
+                                      onClick={() => setDeletePaymentId(pay.id)}
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </div>
+                                </td>
+                              )}
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground italic bg-muted/10">
+                              No payment history recorded for this member.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               </div>
-            </Card>
-          </div>
+            </>
+          )}
 
           {/* Workout Assignment - Only for Assigned Trainer */}
-          {((session?.user as any)?.role === 'trainer' && (member as any).trainerId?._id === (session?.user as any)?.id) && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold flex items-center gap-2">
-                <div className="p-1 rounded-md bg-primary/10 text-primary">
-                  <Dumbbell className="w-5 h-5" />
-                </div>
-                Workout Plan
-              </h3>
-
-              <Card className="p-6 border-none shadow-xl shadow-foreground/[0.02] flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                    <Dumbbell className="w-6 h-6" />
+          {((session?.user as any)?.role === 'trainer' &&
+            ((member as any).trainerId?._id === (session?.user as any)?.id || (member as any).trainerId === (session?.user as any)?.id)) && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <div className="p-1 rounded-md bg-primary/10 text-primary">
+                    <Dumbbell className="w-5 h-5" />
                   </div>
-                  <div>
-                    <h4 className="font-bold text-foreground">
-                      {workoutPlans.find(wp => wp._id === member.workoutPlanId || wp.id === member.workoutPlanId)?.name || "No Plan Assigned"}
-                    </h4>
-                    <p className="text-sm text-muted-foreground leading-none mt-1">
-                      {member.workoutPlanId ? "Active Workout Plan" : "No plan assigned"}
-                    </p>
-                  </div>
-                </div>
+                  Workout Plan
+                </h3>
 
-                <div className="flex gap-2">
-                  <select
-                    className="h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-8"
-                    value={member.workoutPlanId || ""}
-                    onChange={(e) => {
-                      const planId = e.target.value;
-                      if (planId) {
-                        toast.promise(assignWorkoutToMember(memberId, planId), {
-                          loading: "Assigning plan...",
-                          success: "Plan assigned successfully",
-                          error: "Assignment failure"
-                        });
-                      }
-                    }}
-                  >
-                    <option value="">Select Plan...</option>
-                    {workoutPlans.map((wp) => (
-                      <option key={wp._id || wp.id} value={wp._id || wp.id}>
-                        {wp.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </Card>
-            </div>
-          )}
+                <Card className="p-6 border-none shadow-xl shadow-foreground/[0.02] flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                      <Dumbbell className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-foreground">
+                        {workoutPlans.find(wp => wp._id === member.workoutPlanId || wp.id === member.workoutPlanId)?.name || "No Plan Assigned"}
+                      </h4>
+                      <p className="text-sm text-muted-foreground leading-none mt-1">
+                        {member.workoutPlanId ? "Active Workout Plan" : "No plan assigned"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <select
+                      className="h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-8"
+                      value={member.workoutPlanId || ""}
+                      onChange={(e) => {
+                        const planId = e.target.value;
+                        if (planId) {
+                          toast.promise(assignWorkoutToMember(memberId, planId), {
+                            loading: "Assigning plan...",
+                            success: "Plan assigned successfully",
+                            error: (err) => err.message || "Assignment failure"
+                          });
+                        }
+                      }}
+                    >
+                      <option value="">Select Plan...</option>
+                      {workoutPlans.map((wp) => (
+                        <option key={wp._id || wp.id} value={wp._id || wp.id}>
+                          {wp.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </Card>
+              </div>
+            )}
         </div>
       </div>
 

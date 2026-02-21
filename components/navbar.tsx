@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Bell, Search, ChevronDown, CreditCard, UserPlus, AlertTriangle, Menu, X, Moon, Sun } from "lucide-react"
+import { Bell, Search, ChevronDown, CreditCard, UserPlus, AlertTriangle, Menu, X, Moon, Sun, Activity } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useSession, signOut } from "next-auth/react"
@@ -30,6 +30,7 @@ export function Navbar() {
   const isAdmin = (session?.user as any)?.role === "super_admin"
 
   const userName = session?.user?.name || "User"
+  const userId = (session?.user as any)?.id // Get current user ID
   const userRole = (session?.user as any)?.role || "Staff"
   const isTrainer = userRole === "trainer"
   const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
@@ -43,6 +44,9 @@ export function Navbar() {
       const daysLeft = daysUntilExpiry(sub.endDate)
       if (daysLeft > 0 && daysLeft <= 7) {
         const member = store.members?.find(m => m.id === sub.memberId)
+        // Trainer filter: only show for their members
+        if (isTrainer && member?.trainerId !== userId && (member?.trainerId as any)?._id !== userId) return
+
         notifications.push({
           id: `expiry-${sub.id}`,
           title: "Subscription Expiring",
@@ -60,10 +64,14 @@ export function Navbar() {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
     store.payments.forEach(pay => {
       if (new Date(pay.date) > oneDayAgo) {
+        const member = store.members?.find(m => m.id === pay.memberId)
+        // Trainer filter: only show for their members
+        if (isTrainer && member?.trainerId !== userId && (member?.trainerId as any)?._id !== userId) return
+
         notifications.push({
           id: `payment-${pay.id}`,
           title: "Payment Received",
-          message: `Received ${pay.amount} PKR.`,
+          message: `Received ${pay.amount} PKR from ${member?.firstName || 'Member'}.`,
           icon: <CreditCard className="w-3 h-3 text-emerald-500" />,
           color: "border-emerald-500",
           memberId: pay.memberId
@@ -78,12 +86,37 @@ export function Navbar() {
     store.members.forEach(m => {
       // @ts-ignore - createdAt comes from mongoose
       if (m.createdAt && new Date(m.createdAt) > oneDayAgo) {
+        // Trainer filter: only show if assigned to THEM
+        const isAssignedToTrainer = m.trainerId === userId || (m.trainerId as any)?._id === userId
+        if (isTrainer && !isAssignedToTrainer) return
+
         notifications.push({
           id: `member-${m.id}`,
-          title: "New Registration",
-          message: `${m.firstName} ${m.lastName} joined the gym.`,
+          title: isTrainer ? "Recently Assigned" : "New Registration",
+          message: `${m.firstName} ${m.lastName} ${isTrainer ? 'is now assigned to you.' : 'joined the gym.'}`,
           icon: <UserPlus className="w-3 h-3 text-blue-500" />,
           color: "border-blue-500",
+          memberId: m.id
+        })
+      }
+    })
+  }
+
+  // 4. Member Check-ins (last 4 hours)
+  if (Array.isArray(store.members)) {
+    const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000)
+    store.members.forEach(m => {
+      // @ts-ignore - lastCheckIn logic
+      if (m.lastCheckIn && new Date(m.lastCheckIn) > fourHoursAgo) {
+        // Trainer filter: only show for their members
+        if (isTrainer && m.trainerId !== userId && (m.trainerId as any)?._id !== userId) return
+
+        notifications.push({
+          id: `checkin-${m.id}-${m.lastCheckIn}`,
+          title: "Member Arrived",
+          message: `${m.firstName} has just checked in.`,
+          icon: <Activity className="w-3 h-3 text-primary" />,
+          color: "border-primary",
           memberId: m.id
         })
       }
@@ -154,8 +187,8 @@ export function Navbar() {
           </Button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 top-14 w-80 glass-premium border border-border rounded-2xl shadow-2xl p-0 z-50 card-enter overflow-hidden">
-              <div className="px-5 py-4 border-b border-border bg-secondary flex items-center justify-between">
+            <div className="absolute right-0 top-14 w-80 glass-premium bg-background/90 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-0 z-50 card-enter overflow-hidden">
+              <div className="px-5 py-4 border-b border-border bg-secondary/50 flex items-center justify-between">
                 <div>
                   <h3 className="font-black text-xs text-foreground tracking-widest uppercase">Notifications</h3>
                   <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-0.5">Operational Activity</p>

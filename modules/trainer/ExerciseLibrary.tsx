@@ -9,7 +9,9 @@ import {
     Dumbbell,
     Layers,
     ChevronRight,
-    Zap
+    Zap,
+    Trash2,
+    AlertTriangle
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,33 +24,75 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { ExerciseForm } from "@/components/exercise-form";
+import { ExerciseForm, Exercise } from "@/components/exercise-form";
+import { toast } from "sonner";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-interface Exercise {
-    id: string;
-    name: string;
-    muscleGroup: string;
-    equipment: string;
-    difficulty: string;
-    isPublicWithinGym: boolean;
-}
+// Interface moved to @/components/exercise-form.tsx
 
 export function ExerciseLibrary() {
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [formOpen, setFormOpen] = useState(false);
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+    const [mode, setMode] = useState<"add" | "edit" | "view">("add");
+    const [deleting, setDeleting] = useState(false);
 
     const fetchExercises = async () => {
         setLoading(true);
         try {
             const res = await fetch("/api/exercises");
             const data = await res.json();
-            setExercises(data);
+            // Map MongoDB _id to id if necessary
+            const mappedData = data.map((ex: any) => ({
+                ...ex,
+                id: ex._id || ex.id
+            }));
+            setExercises(mappedData);
         } catch (err) {
             console.error("Failed to load exercises", err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleAction = (exercise: Exercise, action: "edit" | "view" | "delete") => {
+        setSelectedExercise(exercise);
+        if (action === "delete") {
+            setDeleteConfirmOpen(true);
+        } else {
+            setMode(action);
+            setFormOpen(true);
+        }
+    };
+
+    const confirmDelete = async () => {
+        if (!selectedExercise?.id) return;
+        setDeleting(true);
+        try {
+            const res = await fetch(`/api/exercises/${selectedExercise.id}`, {
+                method: "DELETE"
+            });
+            if (!res.ok) throw new Error("Delete failed");
+            toast.success("Exercise deleted");
+            fetchExercises();
+        } catch (err) {
+            toast.error("Failed to delete exercise");
+        } finally {
+            setDeleting(false);
+            setDeleteConfirmOpen(false);
+            setSelectedExercise(null);
         }
     };
 
@@ -76,7 +120,11 @@ export function ExerciseLibrary() {
                 </div>
                 <div className="flex items-center gap-3">
                     <Button
-                        onClick={() => setFormOpen(true)}
+                        onClick={() => {
+                            setSelectedExercise(null);
+                            setMode("add");
+                            setFormOpen(true);
+                        }}
                         className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
                     >
                         <Plus className="mr-2 w-5 h-5" />
@@ -138,9 +186,19 @@ export function ExerciseLibrary() {
                                                 <MoreVertical className="w-4 h-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="bg-slate-900 border-white/10 text-slate-300">
-                                            <DropdownMenuItem className="text-[11px] font-black italic uppercase tracking-widest focus:bg-primary focus:text-black">Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-[11px] font-black italic uppercase tracking-widest focus:bg-red-500 focus:text-white">Delete</DropdownMenuItem>
+                                        <DropdownMenuContent align="end" className="bg-card border-white/10 text-slate-300 backdrop-blur-xl">
+                                            <DropdownMenuItem
+                                                onClick={() => handleAction(ex, "edit")}
+                                                className="text-[11px] font-black italic uppercase tracking-widest focus:bg-primary focus:text-black"
+                                            >
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => handleAction(ex, "delete")}
+                                                className="text-[11px] font-black italic uppercase tracking-widest focus:bg-destructive focus:text-destructive-foreground"
+                                            >
+                                                Delete
+                                            </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
@@ -151,9 +209,13 @@ export function ExerciseLibrary() {
                                     <Layers className="w-3 h-3" />
                                     Difficulty: {ex.difficulty.toUpperCase()}
                                 </span>
-                                <Button variant="ghost" size="sm" className="h-8 px-4 rounded-lg bg-white/5 hover:bg-primary hover:text-black text-[9px] group/btn">
-                                    View Details
-                                    <ChevronRight className="ml-2 w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+
+
+                                <Button
+
+                                    onClick={() => handleAction(ex, "view")}
+                                    size="icon" asChild className="h-8 w-8  rounded-full bg-white/5 border border-white/10 text-primary group-hover:bg-primary group-hover:text-black transition-all duration-300 shadow-xl shadow-black/20">
+                                    <ChevronRight className="w-4 h-4 hover:translate-x-1 transition-transform" />
                                 </Button>
                             </div>
                         </Card>
@@ -171,7 +233,33 @@ export function ExerciseLibrary() {
                 open={formOpen}
                 onOpenChange={setFormOpen}
                 onSuccess={fetchExercises}
+                exercise={selectedExercise}
+                mode={mode}
             />
+
+            <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+                <AlertDialogContent className="bg-background border-white/5 shadow-2xl">
+                    <AlertDialogHeader>
+                        <AlertTriangle className="w-12 h-12 text-destructive mb-4 mx-auto drop-shadow-[0_0_10px_rgba(255,0,0,0.3)]" />
+                        <AlertDialogTitle className="text-2xl font-black italic uppercase tracking-tighter text-white text-center">
+                            Delete <span className="text-destructive">Exercise?</span>
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-slate-400 text-center font-medium italic">
+                            This action cannot be undone. This exercise will be removed from your gym's library.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-6">
+                        <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDelete}
+                            disabled={deleting}
+                            className="bg-destructive text-white hover:bg-destructive/80 rounded-xl font-black italic uppercase tracking-widest"
+                        >
+                            {deleting ? "Deleting..." : "Confirm Delete"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

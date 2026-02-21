@@ -634,14 +634,21 @@ export const useAppStore = create<AppState>()(
       },
       assignWorkoutToMember: async (memberId, workoutPlanId) => {
         try {
-          const res = await fetch(`/api/members/${memberId}`, {
-            method: "PUT",
+          const res = await fetch("/api/workout-assign", {
+            method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ workoutPlanId }),
+            body: JSON.stringify({
+              templateId: workoutPlanId,
+              memberIds: [memberId]
+            }),
           });
 
-          if (!res.ok) throw new Error("Failed to assign workout plan");
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || "Failed to assign workout plan");
+          }
 
+          // Optimistic update of the member's workoutPlanId in the store
           set((state) => ({
             members: state.members.map((m) =>
               m.id === memberId ? { ...m, workoutPlanId } : m

@@ -46,12 +46,23 @@ export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean })
         const subs = store.subscriptions.filter(
           (s) => s.memberId === member.id
         );
-        const activeSub = subs.find((s) => isSubscriptionActive(s.endDate, s.status));
+
+        // 1. Try local history
+        let activeSub = subs.find((s) => isSubscriptionActive(s.endDate, s.status));
+
+        // 2. Fallback to injected status
+        if (!activeSub && (member as any).activeSubscription) {
+          activeSub = (member as any).activeSubscription;
+        }
+
         const daysLeft = activeSub ? daysUntilExpiry(activeSub.endDate) : -1;
 
-        const latestSub = [...subs].sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())[0];
-        if (latestSub?.status === "paused") {
-          return { member, subscription: null, daysLeft: -1, status: "active" as const };
+        // Check for paused in history
+        const latestSubInHistory = [...subs].sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())[0];
+        const isPaused = activeSub?.status === "paused" || latestSubInHistory?.status === "paused";
+
+        if (isPaused) {
+          return { member, subscription: activeSub, daysLeft: -1, status: "active" as const };
         }
 
         return {

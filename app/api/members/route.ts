@@ -2,6 +2,8 @@ import connectDB from "@/lib/db";
 import Member from "@/models/Member";
 import { NextResponse } from "next/server";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
+import Subscription from "@/models/Subscription";
+import { isSubscriptionActive } from "@/lib/utils/file-utils";
 import { PERMISSIONS } from "@/lib/permissions";
 import { logAudit, extractRequestInfo } from "@/lib/audit";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
@@ -34,16 +36,8 @@ export async function GET(req: Request) {
         console.log(`[Redis MISS] ${cacheKey} - Fetching from DB`);
         await connectDB();
 
-        // Build base query with gym scope and exclude deleted
-        const query: any = { gymId, deletedAt: null };
-
-        if (branchId && !search) {
-            query.branchId = branchId;
-        }
-
-        if (trainerId && !search) {
-            query.trainerId = trainerId;
-        }
+        // Build query using helper for legacy/branch support
+        const query = buildGymQuery(session);
 
         // Add search filter if present
         if (search) {
@@ -59,12 +53,33 @@ export async function GET(req: Request) {
             .populate("trainerId", "firstName lastName photo")
             .lean();
 
-        // lean() bypasses toJSON transform, so we must manually map _id to id
-        const mappedMembers = members.map((m: any) => ({
-            ...m,
-            id: m._id.toString(),
-            _id: undefined
-        }));
+        // Bulk fetch active subscriptions for status injection
+        const memberIds = members.map((m: any) => m._id.toString());
+        const activeSubs = await Subscription.find({
+            memberId: { $in: memberIds },
+            gymId,
+            status: { $in: ["active", "paused"] },
+            deletedAt: null
+        }).lean();
+
+        // Map members and inject status info
+        const mappedMembers = members.map((m: any) => {
+            const mId = m._id.toString();
+            const mySubs = activeSubs.filter(s => s.memberId === mId);
+
+            // Find current active one
+            const currentSub = mySubs.find(s => isSubscriptionActive(s.endDate, s.status));
+
+            return {
+                ...m,
+                id: mId,
+                _id: undefined,
+                activeSubscription: currentSub ? {
+                    status: currentSub.status,
+                    endDate: currentSub.endDate
+                } : null
+            };
+        });
 
         // Store in Redis with a 15-minute TTL (900 seconds)
         await setCache(cacheKey, mappedMembers, 900);

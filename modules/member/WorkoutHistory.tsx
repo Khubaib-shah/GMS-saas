@@ -28,7 +28,11 @@ export function WorkoutHistory() {
     const [search, setSearch] = useState("");
 
     useEffect(() => {
-        fetch("/api/workout-log")
+        const token = localStorage.getItem("memberToken");
+        const headers: any = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        fetch("/api/workout-log", { headers })
             .then(res => res.json())
             .then(data => setLogs(data))
             .catch(err => console.error(err))
@@ -41,9 +45,9 @@ export function WorkoutHistory() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <h2 className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-1">
-                        PERFORMANCE <span className="text-primary/40">ARCHIVE</span>
+                        WORKOUT <span className="text-primary/40">HISTORY</span>
                     </h2>
-                    <p className="text-[10px] text-slate-500 font-black italic uppercase tracking-widest">HISTORICAL_LOG_DATABASE</p>
+                    <p className="text-[10px] text-slate-500 font-black italic uppercase tracking-widest">Historical Workout Logs</p>
                 </div>
             </div>
 
@@ -51,7 +55,7 @@ export function WorkoutHistory() {
             <div className="relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <Input
-                    placeholder="SEARCH_LOG_HISTORY..."
+                    placeholder="Search workout history..."
                     className="pl-12 h-12 bg-white/5 border-white/5 rounded-2xl font-black italic uppercase tracking-widest text-[10px]"
                 />
             </div>
@@ -83,7 +87,7 @@ export function WorkoutHistory() {
                                             </span>
                                         </div>
                                         <h4 className="text-lg font-black italic uppercase tracking-tight group-hover:text-primary transition-colors leading-none">
-                                            SESSION_{log.exercises.length}_UNITS
+                                            {log.exercises.length} Exercises
                                         </h4>
                                     </div>
                                 </div>
@@ -105,7 +109,7 @@ export function WorkoutHistory() {
                 ) : (
                     <div className="py-20 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl space-y-4">
                         <Database className="w-12 h-12 text-slate-800" />
-                        <p className="text-[10px] font-black italic text-slate-500 uppercase tracking-widest">ARCHIVE_IS_EMPTY</p>
+                        <p className="text-[10px] font-black italic text-slate-500 uppercase tracking-widest">No workout history found</p>
                     </div>
                 )}
             </div>

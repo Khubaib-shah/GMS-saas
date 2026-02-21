@@ -174,9 +174,9 @@ export default function MemberSettingsPage() {
                         </Button>
                         <div>
                             <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">
-                                SYSTEM <span className="text-primary">SETTINGS</span>
+                                ACCOUNT <span className="text-primary">SETTINGS</span>
                             </h1>
-                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Configure Personal Matrix</p>
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Manage your profile and security settings</p>
                         </div>
                     </div>
                 </div>
@@ -314,8 +314,8 @@ export default function MemberSettingsPage() {
                                 <ShieldCheck className="w-6 h-6 text-primary" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black italic tracking-tight uppercase">Secure Data Protection</h3>
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mt-1">Your data is securely encrypted.</p>
+                                <h3 className="text-sm font-black italic tracking-tight uppercase">Security & Data Protection</h3>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mt-1">Your personal information is secure and encrypted.</p>
                             </div>
                         </div>
                     </TabsContent>
