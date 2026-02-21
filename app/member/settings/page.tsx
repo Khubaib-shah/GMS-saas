@@ -1,0 +1,326 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import {
+    Zap,
+    User,
+    Lock,
+    Phone,
+    ArrowLeft,
+    Save,
+    Eye,
+    EyeOff,
+    CheckCircle2,
+    ShieldCheck
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+export default function MemberSettingsPage() {
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    // Form States
+    const [profile, setProfile] = useState({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        email: ""
+    });
+
+    const [security, setSecurity] = useState({
+        password: "",
+        confirmPassword: "",
+        pin: ""
+    });
+
+    const fetchProfile = useCallback(async () => {
+        setIsLoading(true);
+        const token = localStorage.getItem("memberToken");
+        if (!token) {
+            router.push("/member/login");
+            return;
+        }
+
+        try {
+            const res = await fetch("/api/member-portal/profile", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    localStorage.removeItem("memberToken");
+                    router.push("/member/login");
+                    return;
+                }
+                throw new Error("Failed to load profile");
+            }
+
+            const data = await res.json();
+            setProfile({
+                firstName: data.firstName || "",
+                lastName: data.lastName || "",
+                phone: data.phone || "",
+                email: data.email || ""
+            });
+        } catch (error) {
+            toast.error("Failed to load profile");
+        } finally {
+            setIsLoading(false);
+        }
+    }, [router]);
+
+    useEffect(() => {
+        fetchProfile();
+    }, [fetchProfile]);
+
+    const handleProfileUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        const token = localStorage.getItem("memberToken");
+
+        try {
+            const res = await fetch("/api/member-portal/profile", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    firstName: profile.firstName,
+                    lastName: profile.lastName,
+                    phone: profile.phone,
+                }),
+            });
+
+            if (!res.ok) throw new Error("Update failed");
+
+            toast.success("Profile updated successfully");
+        } catch (error) {
+            toast.error("Failed to update profile");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleSecurityUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (security.password && security.password !== security.confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+
+        if (security.pin && (security.pin.length < 4 || security.pin.length > 6)) {
+            toast.error("PIN must be 4-6 digits");
+            return;
+        }
+
+        setIsSaving(true);
+        const token = localStorage.getItem("memberToken");
+
+        try {
+            const res = await fetch("/api/member-portal/profile", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    password: security.password || undefined,
+                    pin: security.pin || undefined,
+                }),
+            });
+
+            if (!res.ok) throw new Error("Security update failed");
+
+            toast.success("Security settings updated");
+            setSecurity({ password: "", confirmPassword: "", pin: "" });
+        } catch (error) {
+            toast.error("Failed to update security settings");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-background flex items-center justify-center">
+                <Zap className="h-10 w-10 text-primary animate-pulse neon-glow" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-background text-foreground pb-20 selection:bg-primary selection:text-primary-foreground">
+            {/* Header */}
+            <header className="glass border-b border-white/5 sticky top-0 z-50">
+                <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => router.back()}
+                            className="text-slate-400 hover:text-primary hover:bg-white/5 rounded-xl"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                        <div>
+                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">
+                                SYSTEM <span className="text-primary">SETTINGS</span>
+                            </h1>
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Configure Personal Matrix</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main className="container mx-auto px-6 pt-10 max-w-2xl">
+                <Tabs defaultValue="personal" className="space-y-8">
+                    <TabsList className="bg-white/5 border border-white/5 p-1 rounded-xl w-full grid grid-cols-2">
+                        <TabsTrigger value="personal" className="data-[state=active]:bg-primary data-[state=active]:text-black font-black uppercase italic text-xs py-2.5 rounded-lg transition-all tracking-widest leading-none">
+                            <User className="w-4 h-4 mr-2" />
+                            PERSONAL
+                        </TabsTrigger>
+                        <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-black font-black uppercase italic text-xs py-2.5 rounded-lg transition-all tracking-widest leading-none">
+                            <ShieldCheck className="w-4 h-4 mr-2" />
+                            SECURITY
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="personal" className="space-y-6 outline-none">
+                        <form onSubmit={handleProfileUpdate} className="glass border border-white/5 rounded-2xl p-8 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">First Name</Label>
+                                    <Input
+                                        value={profile.firstName}
+                                        onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
+                                        className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">Last Name</Label>
+                                    <Input
+                                        value={profile.lastName}
+                                        onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
+                                        className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none text-primary">Email Address</Label>
+                                <Input
+                                    value={profile.email}
+                                    disabled
+                                    className="bg-white/5 border-white/10 text-slate-500 rounded-xl h-12 font-bold cursor-not-allowed opacity-50"
+                                />
+                                <p className="text-[9px] font-bold text-slate-600 uppercase tracking-tight pl-1 italic">Note: Email cannot be changed.</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">Phone Number</Label>
+                                <Input
+                                    value={profile.phone}
+                                    onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                                    placeholder="03XX-XXXXXXX"
+                                    className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
+                                />
+                            </div>
+
+                            <Button
+                                type="submit"
+                                disabled={isSaving}
+                                className="w-full bg-primary text-black hover:bg-white font-black italic uppercase tracking-widest py-6 rounded-xl transition-all shadow-lg shadow-primary/20"
+                            >
+                                {isSaving ? "SAVING..." : "SAVE PROFILE"}
+                                <Save className="ml-2 w-5 h-5" />
+                            </Button>
+                        </form>
+                    </TabsContent>
+
+                    <TabsContent value="security" className="space-y-6 outline-none">
+                        <form onSubmit={handleSecurityUpdate} className="glass border border-white/5 rounded-2xl p-8 space-y-6">
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">New Password</Label>
+                                    <div className="relative">
+                                        <Input
+                                            type={showPassword ? "text" : "password"}
+                                            value={security.password}
+                                            onChange={(e) => setSecurity({ ...security, password: e.target.value })}
+                                            className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold pr-12 focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
+                                            placeholder="Enter new password"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors"
+                                        >
+                                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">Confirm New Password</Label>
+                                    <Input
+                                        type="password"
+                                        value={security.confirmPassword}
+                                        onChange={(e) => setSecurity({ ...security, confirmPassword: e.target.value })}
+                                        className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
+                                        placeholder="Repeat new password"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-white/5 my-8" />
+
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none text-primary">Login PIN</Label>
+                                <Input
+                                    type="text"
+                                    maxLength={6}
+                                    value={security.pin}
+                                    onChange={(e) => {
+                                        const value = e.target.value.replace(/\D/g, "");
+                                        setSecurity({ ...security, pin: value });
+                                    }}
+                                    className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
+                                    placeholder="4-6 digit numeric PIN"
+                                />
+                                <p className="text-[9px] font-bold text-slate-600 uppercase tracking-tight pl-1 italic">Set a PIN for quick login access.</p>
+                            </div>
+
+                            <Button
+                                type="submit"
+                                disabled={isSaving}
+                                className="w-full bg-primary text-black hover:bg-white font-black italic uppercase tracking-widest py-6 rounded-xl transition-all shadow-lg shadow-primary/20"
+                            >
+                                {isSaving ? "SAVING..." : "UPDATE SECURITY"}
+                                <Lock className="ml-2 w-5 h-5" />
+                            </Button>
+                        </form>
+
+                        <div className="glass border border-white/5 rounded-2xl p-6 flex items-start gap-4">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                                <ShieldCheck className="w-6 h-6 text-primary" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-black italic tracking-tight uppercase">Secure Data Protection</h3>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mt-1">Your data is securely encrypted.</p>
+                            </div>
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            </main>
+        </div>
+    );
+}

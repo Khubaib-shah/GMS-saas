@@ -155,7 +155,7 @@ export default function AdminDashboard() {
     <div className="space-y-8 animate-fade-in">
       <div className="flex items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-black italic tracking-tighter text-foreground uppercase mb-2">GYM_REGISTRY</h1>
+          <h1 className="text-4xl font-black italic tracking-tighter text-foreground uppercase mb-2">Gym Registry</h1>
           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] italic">Manage SaaS tenants and their owners</p>
         </div>
 
@@ -163,13 +163,13 @@ export default function AdminDashboard() {
           <DialogTrigger asChild>
             <Button className="gap-3 bg-primary text-primary-foreground hover:bg-foreground hover:text-background font-black italic uppercase tracking-wider h-12 px-6 rounded-xl transition-all neon-glow">
               <Plus className="w-5 h-5" />
-              REGISTER_NEW_GYM
+              Register New Gym
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <form onSubmit={handleRegisterGym}>
               <DialogHeader>
-                <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter text-foreground">REGISTER_GYM</DialogTitle>
+                <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter text-foreground">Register Gym</DialogTitle>
                 <DialogDescription className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic">
                   Create a new gym tenant and its initial owner account.
                 </DialogDescription>
@@ -262,13 +262,13 @@ export default function AdminDashboard() {
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="border-border">
-              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">GYM_NAME</TableHead>
-              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">CONTACT</TableHead>
-              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">ADDRESS</TableHead>
-              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">PLAN</TableHead>
-              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">STATUS</TableHead>
-              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">REGISTERED</TableHead>
-              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4 text-right">ACTIONS</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">Gym Name</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">Contact</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">Address</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">Plan</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">Status</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4">Registered</TableHead>
+              <TableHead className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic py-4 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -327,7 +327,7 @@ export default function AdminDashboard() {
                         className="text-[10px] font-black italic uppercase tracking-widest text-primary hover:text-primary hover:bg-primary/10 rounded-lg"
                         onClick={() => router.push(`/subscriptions?gymId=${gym._id}`)}
                       >
-                        MANAGE_PLANS
+                        Manage Plans
                       </Button>
                       <Button
                         variant="ghost"

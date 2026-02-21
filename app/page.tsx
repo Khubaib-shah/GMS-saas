@@ -18,21 +18,25 @@ export default function LandingPage() {
       {/* Navigation */}
       <header className="px-6 h-20 flex items-center justify-between glass sticky top-0 z-50 bg-slate-950/50 backdrop-blur-md border-b border-white/5">
         <div className="flex items-center gap-2 group cursor-pointer">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center neon-glow group-hover:scale-110 transition-transform">
-            <Zap className="w-6 h-6 text-black" />
+          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(190,255,0,0.2)] group-hover:scale-105 transition-transform">
+            <BarChart3 className="w-6 h-6 text-black" />
           </div>
-          <span className="font-bold text-2xl tracking-tighter text-white">GYM<span className="text-primary">FLOW</span></span>
+          <span className="font-bold text-2xl tracking-tighter text-white uppercase italic">Gym<span className="text-primary">Flow</span></span>
         </div>
-        <nav className="hidden md:flex items-center gap-10 text-sm font-bold uppercase tracking-widest text-slate-400">
-          <Link href="#features" className="hover:text-primary transition-colors">Features</Link>
+        <nav className="hidden md:flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+          <Link href="#features" className="hover:text-primary transition-colors">Solutions</Link>
           <Link href="#pricing" className="hover:text-primary transition-colors">Pricing</Link>
-          <Link href="#about" className="hover:text-primary transition-colors">About</Link>
+          <Link href="#about" className="hover:text-primary transition-colors">Enterprise</Link>
         </nav>
         <div className="flex items-center gap-4">
-          <Link href="/member/login" className="text-xs font-bold uppercase tracking-widest text-slate-300 hover:text-primary transition-colors hidden sm:block font-black italic">Member Portal</Link>
+          <Link href="/member/login">
+            <Button variant="ghost" size="sm" className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-white transition-colors italic border border-primary/20 rounded-xl px-6">
+              Member Login
+            </Button>
+          </Link>
           <Link href="/login">
-            <Button size="sm" className="bg-primary text-black hover:bg-white font-black italic rounded-full px-8 neon-glow transition-all">
-              LOGIN
+            <Button size="sm" className="bg-white text-black hover:bg-primary font-black italic rounded-xl px-8 transition-all hidden sm:flex text-[10px] uppercase tracking-widest">
+              Admin Login
             </Button>
           </Link>
         </div>
@@ -40,59 +44,55 @@ export default function LandingPage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative min-h-[95vh] flex items-center pt-20 pb-32 px-6 overflow-hidden">
+        <section className="relative min-h-[90vh] flex items-center pt-20 pb-32 px-6 overflow-hidden">
           {/* Background Elements */}
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] -mr-60 -mt-60 animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px] -ml-40 -mb-40"></div>
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] -mr-60 -mt-60 animate-pulse"></div>
 
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
             <div className="text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-10 neon-glow">
-                <Trophy className="w-3 h-3" />
-                OFFICIAL SYSTEM #1 GYM SUITE
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-10 italic">
+                <Shield className="w-3 h-3" />
+                ENTERPRISE GRADE GYM MANAGEMENT
               </div>
 
-              <div className="space-y-4 mb-10">
-                <h1 className="text-7xl md:text-9xl font-black leading-[0.8] tracking-tighter italic text-white">
-                  UNLEASH
-                </h1>
-                <h1 className="text-7xl md:text-9xl font-black leading-[0.8] tracking-tighter italic text-primary neon-text">
-                  PERFORMANCE
+              <div className="space-y-2 mb-10">
+                <h1 className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter italic text-white uppercase">
+                  COMPLETE <br />
+                  <span className="text-primary">Gym Management</span>
                 </h1>
               </div>
 
-              <p className="max-w-lg text-lg text-slate-400 mb-12 leading-relaxed font-semibold">
-                Stop managing, start dominating. The most aggressive, data-driven platform
-                engineered for the fitness beast of tomorrow.
+              <p className="max-w-lg text-lg text-slate-400 mb-12 leading-relaxed font-bold uppercase tracking-tight text-[13px]">
+                Streamline member management, automated billing, and operational logistics with
+                Pakistan's most advanced B2B fitness management ecosystem.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 <Link href="/login" className="w-full sm:w-auto">
-                  <Button size="lg" className="h-16 px-12 text-xl font-black italic rounded-xl bg-primary text-black hover:bg-white hover:text-black transition-all w-full neon-glow group">
-                    INITIATE ACCESS
+                  <Button size="lg" className="h-16 px-12 text-lg font-black italic rounded-xl bg-primary text-black hover:bg-white hover:shadow-[0_0_30px_rgba(190,255,0,0.3)] transition-all w-full group tracking-tighter">
+                    Get Started
                     <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-2 transition-transform" />
                   </Button>
                 </Link>
-                <Button variant="ghost" size="lg" className="h-16 px-10 text-lg font-black rounded-xl border border-white/10 hover:bg-white/5 text-white transition-all gap-3 italic">
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                    <Play className="w-4 h-4 fill-primary text-primary" />
-                  </div>
-                  VIEW SYSTEM
-                </Button>
+                <Link href="/request-demo" className="w-full sm:w-auto">
+                  <Button variant="ghost" size="lg" className="h-16 px-10 text-lg font-black rounded-xl border-2 border-white/10 hover:bg-white/5 text-white transition-all gap-3 italic w-full tracking-tighter">
+                    Request Demo
+                  </Button>
+                </Link>
               </div>
 
-              <div className="mt-20 grid grid-cols-3 gap-8 border-t border-white/10 pt-10">
+              <div className="mt-20 grid grid-cols-3 gap-8 border-t border-white/5 pt-10">
                 <div>
-                  <h4 className="text-5xl font-black italic tracking-tighter text-white">500+</h4>
-                  <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-2 italic">DEPLOYED NODES</p>
+                  <h4 className="text-4xl font-black italic tracking-tighter text-white">150+</h4>
+                  <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mt-2 italic">Gym Branches</p>
                 </div>
                 <div>
-                  <h4 className="text-5xl font-black italic tracking-tighter text-white">100K+</h4>
-                  <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-2 italic">ACTIVE BEASTS</p>
+                  <h4 className="text-4xl font-black italic tracking-tighter text-white">50K+</h4>
+                  <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mt-2 italic">Members Managed</p>
                 </div>
                 <div>
-                  <h4 className="text-5xl font-black text-primary italic tracking-tighter neon-text">99.9%</h4>
-                  <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-2 italic">CORE UPTIME</p>
+                  <h4 className="text-4xl font-black text-primary italic tracking-tighter">99.9%</h4>
+                  <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mt-2 italic">System Uptime</p>
                 </div>
               </div>
             </div>
@@ -149,22 +149,22 @@ export default function LandingPage() {
               </div>
 
               {/* Floating High-Performance HUD Nodes */}
-              <div className="absolute top-20 right-0 glass-card bg-slate-900/60 p-6 rotate-12 group-hover:rotate-0 transition-all duration-700 hover:shadow-[0_0_30px_rgba(190,255,0,0.2)] border-l-4 border-l-primary backdrop-blur-md border-white/10">
+              <div className="absolute top-20 right-0 bg-slate-900/60 p-6 rotate-12 group-hover:rotate-0 transition-all duration-700 border-l-4 border-l-primary backdrop-blur-md border border-white/5">
                 <div className="flex items-center gap-4">
-                  <Activity className="w-6 h-6 text-primary" />
+                  <BarChart3 className="w-6 h-6 text-primary" />
                   <div>
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">THROUGHPUT</div>
-                    <div className="text-2xl font-black italic tracking-tighter text-white">MAXED</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic leading-none">OPERATIONS</div>
+                    <div className="text-xl font-black italic tracking-tighter text-white uppercase mt-1">OPTIMIZED</div>
                   </div>
                 </div>
               </div>
 
-              <div className="absolute bottom-20 left-0 glass-card bg-slate-900/60 p-6 -rotate-12 group-hover:rotate-0 transition-all duration-700 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] border-l-4 border-l-blue-500 backdrop-blur-md border-white/10">
+              <div className="absolute bottom-20 left-0 bg-slate-900/60 p-6 -rotate-12 group-hover:rotate-0 transition-all duration-700 border-l-4 border-l-blue-500 backdrop-blur-md border border-white/5">
                 <div className="flex items-center gap-4">
                   <Shield className="w-6 h-6 text-blue-500" />
                   <div>
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">INTEGRITY</div>
-                    <div className="text-2xl font-black italic tracking-tighter text-white">STABLE</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic leading-none">SYSTEM</div>
+                    <div className="text-xl font-black italic tracking-tighter text-white uppercase mt-1">SECURED</div>
                   </div>
                 </div>
               </div>
@@ -176,70 +176,70 @@ export default function LandingPage() {
         <section id="features" className="py-40 px-6 relative border-t border-white/5 bg-slate-950">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-32">
-              <div className="text-primary font-black uppercase tracking-[0.4em] text-[10px] mb-6 italic">Tactical Capabilities</div>
-              <h2 className="text-6xl md:text-8xl font-black mb-10 italic tracking-tighter uppercase leading-none text-white">DOMINATE THE <span className="text-primary neon-text underline decoration-white/10 underline-offset-[12px]">SYSTEM</span></h2>
-              <div className="w-32 h-2 bg-primary mx-auto neon-glow"></div>
+              <div className="text-primary font-black uppercase tracking-[0.4em] text-[10px] mb-6 italic">MANAGEMENT SOLUTIONS</div>
+              <h2 className="text-5xl md:text-7xl font-black mb-10 italic tracking-tighter uppercase leading-none text-white">Platform <span className="text-primary">Features</span></h2>
+              <div className="w-32 h-2 bg-primary/20 mx-auto"></div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               {[
                 {
                   icon: <Users className="w-10 h-10" />,
-                  title: "ALPHA HUB",
-                  desc: "Control member lifecycle with iron-fisted precision and automated reporting.",
+                  title: "Member CRM",
+                  desc: "Comprehensive member database with automated onboarding and subscription tracking.",
                   color: "border-primary",
-                  baseBg: "bg-primary/30",
-                  hoverBg: "group-hover:bg-primary/30"
+                  baseBg: "bg-primary/5",
+                  hoverBg: "group-hover:bg-primary/10"
                 },
                 {
-                  icon: <Zap className="w-10 h-10" />,
-                  title: "NEON SCAN",
-                  desc: "0.1s latency QR check-ins that keep your gym floor moving like a machine.",
+                  icon: <CheckCircle className="w-10 h-10" />,
+                  title: "Access Control",
+                  desc: "Rapid QR-based attendance tracking for real-time member activity monitoring.",
                   color: "border-blue-500",
-                  baseBg: "bg-blue-500/30",
-                  hoverBg: "group-hover:bg-blue-500/30"
+                  baseBg: "bg-blue-500/5",
+                  hoverBg: "group-hover:bg-blue-500/10"
                 },
                 {
                   icon: <BarChart3 className="w-10 h-10" />,
-                  title: "RADAR ANALYTICS",
-                  desc: "Track every cent with deep-dive analytics and predictive revenue modeling.",
+                  title: "Financial Hub",
+                  desc: "Detailed revenue reporting and automated payment reconciliation in PKR.",
                   color: "border-purple-500",
-                  baseBg: "bg-purple-500/30",
-                  hoverBg: "group-hover:bg-purple-500/30"
+                  baseBg: "bg-purple-500/5",
+                  hoverBg: "group-hover:bg-purple-500/10"
                 },
                 {
                   icon: <Smartphone className="w-10 h-10" />,
-                  title: "COACH LINK",
-                  desc: "High-octane trainer profiles to manage schedules and member progress sessions.",
+                  title: "Staff & Trainers",
+                  desc: "Specialized interfaces for trainers and staff to manage schedules and assignments.",
                   color: "border-orange-500",
-                  baseBg: "bg-orange-500/30",
-                  hoverBg: "group-hover:bg-orange-500/30"
+                  baseBg: "bg-orange-500/5",
+                  hoverBg: "group-hover:bg-orange-500/10"
                 },
                 {
                   icon: <Shield className="w-10 h-10" />,
-                  title: "STEALTH BILLING",
-                  desc: "Seamless, secure payment processing that never misses a heartbeat.",
+                  title: "Enterprise Security",
+                  desc: "Bank-grade data protection and granular role-based access control.",
                   color: "border-red-500",
-                  baseBg: "bg-red-500/30",
-                  hoverBg: "group-hover:bg-red-500/30"
+                  baseBg: "bg-red-500/5",
+                  hoverBg: "group-hover:bg-red-500/10"
                 },
                 {
                   icon: <Globe className="w-10 h-10" />,
-                  title: "GLOBAL OPS",
-                  desc: "Scale across borders with multi-branch management and HQ master control.",
+                  title: "Multi-Location",
+                  desc: "Centralized management for gym chains with cross-location reporting.",
                   color: "border-teal-400",
-                  baseBg: "bg-teal-400/30",
-                  hoverBg: "group-hover:bg-teal-400/30"
+                  baseBg: "bg-teal-400/5",
+                  hoverBg: "group-hover:bg-teal-400/10"
                 }
               ].map((feature, i) => (
-                <div key={i} className={cn("glass-card bg-white/5 group p-12 relative overflow-hidden flex flex-col items-center text-center transition-all duration-500 border-b-4", feature.color)}>
+                <div key={i} className={cn("bg-white/5 border border-white/5 group p-12 relative overflow-hidden flex flex-col items-center text-center transition-all duration-500 border-b-4", feature.color)}>
                   <div className={cn("absolute top-0 right-0 w-32 h-32 rounded-full translate-x-10 -translate-y-10 group-hover:scale-[10] transition-transform duration-700 ease-in-out -z-0", feature.baseBg, feature.hoverBg)}></div>
                   <div className="relative z-10 flex flex-col items-center">
-                    <div className="mb-10 p-5 rounded-2xl bg-slate-950 border border-white/10 text-primary group-hover:neon-glow group-hover:scale-110 transition-all duration-500">
+                    <div className="mb-10 p-5 rounded-2xl bg-slate-900 border border-white/10 text-primary group-hover:scale-110 transition-all duration-500">
                       {feature.icon}
                     </div>
-                    <h3 className="text-3xl font-black italic mb-6 text-white group-hover:text-primary transition-colors tracking-tighter uppercase">{feature.title}</h3>
-                    <p className="text-slate-400 leading-relaxed font-bold uppercase text-[11px] tracking-widest">{feature.desc}</p>
+                    <h3 className="text-2xl font-black italic mb-6 text-white group-hover:text-primary transition-colors tracking-tighter uppercase">{feature.title}</h3>
+                    <p className="text-slate-400 leading-relaxed font-bold uppercase text-[10px] tracking-widest">{feature.desc}</p>
                   </div>
                 </div>
               ))}
@@ -249,80 +249,80 @@ export default function LandingPage() {
 
         {/* Pricing Section */}
         <section id="pricing" className="py-40 px-6 relative overflow-hidden border-t border-white/5 bg-slate-950">
-          <div className="absolute inset-0 bg-primary/5"></div>
+          <div className="absolute inset-0 bg-primary/2"></div>
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center mb-32">
-              <div className="text-primary font-black uppercase tracking-[0.4em] text-[10px] mb-6 italic">Pricing Deployment</div>
-              <h2 className="text-6xl md:text-8xl font-black mb-10 italic tracking-tighter uppercase leading-none text-white">STRATEGIC <span className="text-primary neon-text">INVESTMENT</span></h2>
-              <div className="w-32 h-2 bg-primary mx-auto neon-glow"></div>
+              <div className="text-primary font-black uppercase tracking-[0.4em] text-[10px] mb-6 italic">ENTERPRISE PRICING</div>
+              <h2 className="text-5xl md:text-7xl font-black mb-10 italic tracking-tighter uppercase leading-none text-white">Pricing <span className="text-primary">Plans</span></h2>
+              <div className="w-32 h-2 bg-primary/10 mx-auto"></div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               {[
                 {
-                  name: "SOLO OPS",
-                  price: "99",
-                  desc: "Perfect for single-unit combat gyms.",
-                  features: ["Up to 500 Members", "Basic Analytics", "QR Entry Pro", "Email Support"],
-                  tier: "LITE"
+                  name: "Basic",
+                  price: "15,000",
+                  desc: "Ideal for independent boutique fitness centers.",
+                  features: ["Up to 300 Global Members", "Standard Analytics", "QR Attendance Check-in", "Email Reporting"],
+                  tier: "Level 1"
                 },
                 {
-                  name: "ELITE FORCE",
-                  price: "199",
-                  desc: "Advanced arsenal for high-growth hubs.",
-                  features: ["Unlimited Members", "Deep Radar Analytics", "Priority Support", "Trainer Module", "Staff Accounts"],
+                  name: "Professional",
+                  price: "35,000",
+                  desc: "Advanced management for high-capacity gyms.",
+                  features: ["Unlimited Member Profiles", "Advanced Financial Radar", "Priority Staff Support", "Trainer Assignments", "Detailed Reporting"],
                   popular: true,
-                  tier: "STND"
+                  tier: "Level 2"
                 },
                 {
-                  name: "MASTER HQ",
-                  price: "499",
-                  desc: "Complete dominion for franchises.",
-                  features: ["Multiple Branches", "HQ Master Control", "Custom Deployment", "Dedicated Tactical Support", "API Access"],
-                  tier: "ENTR"
+                  name: "Enterprise",
+                  price: "75,000",
+                  desc: "Complete command for multi-branch gym chains.",
+                  features: ["Multi-Branch Management", "HQ Central Control", "Custom Deployments", "Dedicated Account Manager", "Full API Access"],
+                  tier: "Level 3"
                 }
               ].map((plan, i) => (
                 <div key={i} className={cn(
-                  "glass-card bg-white/5 p-12 flex flex-col relative overflow-hidden transition-all duration-500 hover:scale-105 group border-b-8 shadow-[0_4px_20px_rgba(0,0,0,0.3)]",
-                  plan.popular ? "border-primary" : "border-white/10"
+                  "bg-white/5 p-12 flex flex-col relative overflow-hidden transition-all duration-500 hover:border-primary/50 group border border-white/5 shadow-2xl",
+                  plan.popular ? "border-primary/30" : "border-white/5"
                 )}>
                   {/* Sliding Border Effect */}
                   <div className={cn(
-                    "absolute top-0 left-0 w-full h-2 transition-all duration-500 ease-in-out group-hover:h-full -z-0 opacity-20 group-hover:opacity-100",
+                    "absolute top-0 left-0 w-full h-1 transition-all duration-500 ease-in-out group-hover:h-full -z-0 opacity-10 group-hover:opacity-100",
                     plan.popular ? "bg-primary" : "bg-slate-700"
                   )}></div>
 
                   {plan.popular && (
-                    <div className="absolute top-10 -right-16 bg-primary text-black font-black italic py-2 px-16 rotate-45 text-[10px] tracking-widest shadow-xl z-20">
-                      COMMAND CHOICE
+                    <div className="absolute top-10 -right-16 bg-primary text-black font-black italic py-2 px-16 rotate-45 text-[9px] tracking-widest shadow-xl z-20">
+                      MOST POPULAR
                     </div>
                   )}
 
                   <div className="relative z-10 flex flex-col h-full">
                     <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 italic group-hover:text-white transition-colors">{plan.tier}</div>
-                    <h3 className="text-4xl font-black italic mb-2 tracking-tighter uppercase text-white group-hover:text-primary transition-colors">{plan.name}</h3>
-                    <p className="text-slate-400 text-xs font-bold uppercase italic mb-8 h-10 group-hover:text-white/80 transition-colors">{plan.desc}</p>
+                    <h3 className="text-3xl font-black italic mb-2 tracking-tighter uppercase text-white group-hover:text-primary transition-colors">{plan.name}</h3>
+                    <p className="text-slate-400 text-[10px] font-bold uppercase italic mb-8 h-10 group-hover:text-white/80 transition-colors leading-tight tracking-widest">{plan.desc}</p>
 
                     <div className="flex items-end gap-2 mb-10">
-                      <span className="text-[10px] font-black italic text-slate-500 pb-2 group-hover:text-white transition-colors">USD</span>
-                      <span className="text-6xl font-black italic tracking-tighter text-white group-hover:text-white transition-colors">${plan.price}</span>
-                      <span className="text-[10px] font-black italic text-slate-500 pb-2 group-hover:text-white transition-colors">/ MO</span>
+                      <span className="text-[10px] font-black italic text-slate-500 pb-2 group-hover:text-white transition-colors">PKR</span>
+                      <span className="text-5xl font-black italic tracking-tighter text-white group-hover:text-white transition-colors">₨ {plan.price}</span>
+                      <span className="text-[10px] font-black italic text-slate-500 pb-2 group-hover:text-white transition-colors">/ MON</span>
                     </div>
 
                     <div className="space-y-4 mb-12 flex-1">
                       {plan.features.map((f, j) => (
                         <div key={j} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-white/90 transition-colors">
-                          <CheckCircle className={cn("w-4 h-4 shrink-0", plan.popular ? "text-primary group-hover:text-white" : "text-primary")} />
+                          <CheckCircle className={cn("w-4 h-4 shrink-0", "text-primary")} />
                           {f}
                         </div>
                       ))}
                     </div>
 
                     <Button className={cn(
-                      "w-full py-8 h-auto font-black italic text-lg rounded-xl transition-all uppercase tracking-tighter z-20",
-                      plan.popular ? "bg-primary text-black hover:bg-white neon-glow" : "bg-white/5 hover:bg-white/10 border border-white/10 text-white"
+                      "w-full py-8 h-auto font-black italic text-sm rounded-xl transition-all uppercase tracking-widest z-20",
+                      plan.popular ? "bg-primary text-black hover:bg-white" : "bg-white/5 hover:bg-white/10 border border-white/10 text-white"
                     )}>
-                      COMMENCE OPERATION
+                      Select Plan
                     </Button>
                   </div>
                 </div>
@@ -402,14 +402,14 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="relative flex flex-col gap-10">
-              {/* Module 01: Biometric Radar (Top) */}
-              <div className="glass-card bg-white/5 p-6 border border-white/10 relative overflow-hidden group hover:border-primary/20 transition-all">
+              {/* Module 01: Operational Monitoring (Top) */}
+              <div className="bg-white/5 p-6 border border-white/5 relative overflow-hidden group hover:border-primary/20 transition-all">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono">SYSTEM_RADAR: ACTIVE</span>
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest font-mono">MONITOR_ACTIVE</span>
                   </div>
-                  <Activity className="w-4 h-4 text-primary opacity-50" />
+                  <BarChart3 className="w-4 h-4 text-primary opacity-50" />
                 </div>
                 <div className="flex items-center gap-10">
                   <div className="relative w-24 h-24 shrink-0">
@@ -422,40 +422,37 @@ export default function LandingPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-x-12 gap-y-4">
                     <div>
-                      <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">INTEGRITY</div>
-                      <div className="text-xl font-black italic tracking-tighter uppercase text-white">MAX_CAP</div>
+                      <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">DATA_INTEGRITY</div>
+                      <div className="text-xl font-black italic tracking-tighter uppercase text-white leading-none">NOMINAL</div>
                     </div>
                     <div>
                       <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">LATENCY</div>
-                      <div className="text-xl font-black italic text-primary tracking-tighter uppercase">0.02ms</div>
+                      <div className="text-xl font-black italic text-primary tracking-tighter uppercase leading-none">0.05ms</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Module 02: 3D Tactical ID (Center) */}
+              {/* Module 02: Digital Member ID (Center) */}
               <div className="relative flex items-center justify-center py-6 perspective-2000 group">
-                {/* 3D Kinetic Card Container - Scaled to fit stack */}
                 <div className="relative w-full aspect-[1.8/1] preserve-3d transition-transform duration-700 ease-out hover:rotate-y-12 hover:rotate-x-[-10deg]">
-                  {/* Card Glow Base */}
-                  <div className="absolute inset-[-40px] bg-primary/20 rounded-[40px] blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                  <div className="absolute inset-[-40px] bg-primary/10 rounded-[40px] blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
 
-                  {/* The Glass Card Body */}
-                  <div className="absolute inset-0 glass-card bg-slate-900/80 border border-white/10 rounded-3xl overflow-hidden preserve-3d flex p-6 shadow-2xl backdrop-blur-3xl">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-1/2 -skew-x-12 animate-light-sweep pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-slate-900 border border-white/5 rounded-3xl overflow-hidden preserve-3d flex p-6 shadow-2xl">
+                    <div className="absolute inset-0 bg-white/5 w-1/2 -skew-x-12 animate-light-sweep pointer-events-none"></div>
 
                     {/* Avatar */}
                     <div className="w-[30%] flex flex-col gap-3 relative">
-                      <div className="w-full aspect-square rounded-xl border border-white/10 bg-slate-900 overflow-hidden relative group-hover:border-primary/50 transition-colors">
+                      <div className="w-full aspect-square rounded-xl border border-white/5 bg-slate-800 overflow-hidden relative">
                         <img
-                          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop"
-                          className="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-700"
-                          alt="Tactical Avatar"
+                          src="https://images.unsplash.com/photo-1541534741688-6078c64b52d2?q=80&w=2070&auto=format&fit=crop"
+                          className="w-full h-full object-cover grayscale opacity-50 transition-all duration-700"
+                          alt="Member Avatar"
                         />
-                        <div className="absolute top-0 left-0 w-full h-[1px] bg-primary shadow-[0_0_10px_#BEFF00] animate-scan"></div>
+                        <div className="absolute top-0 left-0 w-full h-[1px] bg-primary animate-scan"></div>
                       </div>
-                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary w-[85%]"></div>
+                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full bg-primary w-[95%]"></div>
                       </div>
                     </div>
 
@@ -463,51 +460,43 @@ export default function LandingPage() {
                     <div className="flex-1 pl-6 flex flex-col justify-between py-1">
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">MEMBER_001</span>
-                          <Zap className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">REGISTERED_MEMBER</span>
+                          <CheckCircle className="w-3.5 h-3.5 text-primary" />
                         </div>
-                        <h4 className="text-2xl font-black italic tracking-tighter uppercase mb-2 drop-shadow-lg leading-none text-white">ALPHA_INITIATE</h4>
-                        <div className="inline-block px-2 py-0.5 bg-primary/10 border border-primary/20 rounded text-[7px] font-black text-primary uppercase tracking-widest italic">SEC_LEVEL: ELITE_9</div>
+                        <h4 className="text-2xl font-black italic tracking-tighter uppercase mb-2 leading-none text-white">HASAN_RAZA</h4>
+                        <div className="inline-block px-2 py-0.5 bg-primary/10 border border-primary/20 rounded text-[7px] font-black text-primary uppercase tracking-widest italic">TIER: PROFESSIONAL</div>
                       </div>
                       <div className="flex items-end justify-between border-t border-white/10 pt-4">
                         <div className="space-y-0.5">
                           <div className="text-[7px] font-black text-slate-500 uppercase tracking-widest">EXPIRY_DATE</div>
-                          <div className="text-xs font-black italic text-white">24_JUL_2026</div>
+                          <div className="text-xs font-black italic text-white uppercase">OCT_2026</div>
                         </div>
-                        <Shield className="w-5 h-5 text-slate-600 group-hover:text-primary transition-colors" />
+                        <Shield className="w-5 h-5 text-slate-700" />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Rating Badge Overlay */}
-                <div className="absolute -bottom-4 -left-4 glass-card bg-slate-900 p-5 border-l-4 border-l-primary shadow-2xl z-20 group-hover:scale-110 transition-transform">
+                <div className="absolute -bottom-4 -left-4 bg-slate-900 p-5 border-l-4 border-l-primary shadow-2xl z-20 group-hover:scale-110 transition-transform border border-white/5">
                   <Star className="text-primary w-5 h-5 mb-2 fill-primary" />
                   <div className="text-xl font-black italic tracking-tighter text-white">4.9/5</div>
-                  <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest">SQUAD RATING</div>
+                  <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest italic">CLIENT_RATING</div>
                 </div>
               </div>
 
-              {/* Module 03: Performance Log (Bottom) */}
-              <div className="glass-card bg-white/5 border border-white/10 h-40 overflow-hidden relative group hover:border-primary/20 transition-all">
-                <div className="absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-slate-950 to-transparent z-10 p-3 flex items-center justify-between">
-                  <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest font-mono">SYSTEM_RADAR: ACTIVE</span>
+              {/* Module 03: Activity Registry (Bottom) */}
+              <div className="bg-white/5 border border-white/5 h-40 overflow-hidden relative group hover:border-primary/20 transition-all">
+                <div className="absolute top-0 inset-x-0 h-8 bg-slate-950 z-10 p-3 flex items-center justify-between border-b border-white/5">
+                  <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest font-mono">REGISTRY_ACTIVE</span>
                   <div className="flex gap-1">
                     <div className="w-1 h-1 bg-primary rounded-full animate-pulse"></div>
-                    <div className="w-1 h-1 bg-primary/40 rounded-full animate-pulse"></div>
                   </div>
                 </div>
                 <div className="p-4 pt-10 space-y-3 animate-data-flow">
                   {[...Array(10)].map((_, i) => (
-                    <div key={i} className="flex items-center justify-between border-b border-white/5 pb-2 opacity-40 hover:opacity-100 transition-opacity">
-                      <span className="text-[9px] font-mono text-slate-500">[{new Date().toLocaleTimeString()}] ADMISSION_GRANTED: UID_0{i}</span>
-                      <span className="text-[9px] font-mono text-primary">SECURED</span>
-                    </div>
-                  ))}
-                  {[...Array(10)].map((_, i) => (
-                    <div key={i + 10} className="flex items-center justify-between border-b border-white/5 pb-2 opacity-40">
-                      <span className="text-[9px] font-mono text-slate-500">[{new Date().toLocaleTimeString()}] SYSTEM_RESTORE: POINT_V{i}</span>
-                      <span className="text-[9px] font-mono text-blue-500">STABLE</span>
+                    <div key={i} className="flex items-center justify-between border-b border-white/5 pb-2 opacity-50">
+                      <span className="text-[9px] font-mono text-slate-500 uppercase italic">[{new Date().toLocaleTimeString()}] CHECK_IN: UID_88{i}</span>
+                      <span className="text-[9px] font-mono text-primary font-black">GRANTED</span>
                     </div>
                   ))}
                 </div>
@@ -519,19 +508,19 @@ export default function LandingPage() {
 
         {/* Final CTA Section */}
         <section className="py-40 px-6 relative overflow-hidden border-t border-white/5 bg-slate-950">
-          <div className="absolute inset-0 bg-primary/10"></div>
+          <div className="absolute inset-0 bg-primary/5"></div>
           <div className="max-w-5xl mx-auto text-center relative z-10">
-            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.3em] mb-12 italic text-slate-400">
-              FINAL OVERRIDE DETECTED
+            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-xl bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-[0.3em] mb-12 italic text-slate-500">
+              OPTIMIZED_FOR_SCALE
             </div>
-            <h2 className="text-7xl md:text-9xl font-black mb-12 italic tracking-tighter uppercase leading-[0.8] text-white">READY TO <br /> <span className="text-primary neon-text">EVOLVE?</span></h2>
-            <p className="text-2xl text-slate-400 mb-16 max-w-2xl mx-auto font-black italic leading-tight uppercase tracking-widest">
-              Stop managing, start dominating. <br /> Join the elite league today.
+            <h2 className="text-6xl md:text-8xl font-black mb-12 italic tracking-tighter uppercase leading-[0.9] text-white">READY TO <br /> <span className="text-primary">RESTRUCTURE?</span></h2>
+            <p className="text-lg text-slate-400 mb-16 max-w-2xl mx-auto font-black italic leading-tight uppercase tracking-widest">
+              Join professional gym owners in Pakistan <br /> using the ecosystem to drive revenue.
             </p>
             <Link href="/login">
-              <Button size="lg" className="h-24 px-20 text-3xl font-black italic rounded-xl bg-primary text-black hover:bg-white neon-glow group transition-all tracking-tighter">
-                COMMENCE JOINING
-                <ArrowRight className="ml-4 w-10 h-10 group-hover:translate-x-4 transition-transform" />
+              <Button size="lg" className="h-24 px-20 text-2xl font-black italic rounded-xl bg-primary text-black hover:bg-white transition-all tracking-tighter uppercase group shadow-2xl">
+                Start Now
+                <ArrowRight className="ml-4 w-8 h-8 group-hover:translate-x-4 transition-transform" />
               </Button>
             </Link>
           </div>
@@ -539,46 +528,45 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-24 px-6 border-t border-white/10 glass bg-slate-950 text-slate-400 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-1/2 h-1 bg-gradient-to-r from-primary to-transparent"></div>
+      <footer className="py-24 px-6 border-t border-white/5 bg-slate-950 text-slate-500 relative overflow-hidden">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-24 items-start relative z-10">
           <div>
             <div className="flex items-center gap-3 mb-10">
-              <div className="p-2 rounded-xl bg-primary neon-glow">
-                <Zap className="w-8 h-8 text-black" />
+              <div className="p-2 rounded-xl bg-primary shadow-lg">
+                <BarChart3 className="w-8 h-8 text-black" />
               </div>
-              <span className="font-black text-3xl text-white italic tracking-tighter">GYMFLOW</span>
+              <span className="font-black text-3xl text-white italic tracking-tighter uppercase">GYMFLOW</span>
             </div>
-            <p className="text-sm font-bold uppercase tracking-widest leading-relaxed max-w-xs italic text-slate-500">
-              Next-generation tactical management for fitness elite.
-              Engineering excellence since 2026.
+            <p className="text-xs font-bold uppercase tracking-widest leading-relaxed max-w-xs italic opacity-50">
+              Professional gym management software for high-efficiency fitness centers.
+              Built for the Pakistan market.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-16">
             <div>
-              <h5 className="text-white font-black uppercase text-xs tracking-[0.3em] mb-8 italic">CORE NAVIGATION</h5>
-              <div className="flex flex-col gap-5 text-[11px] font-black tracking-widest">
-                <Link href="#features" className="hover:text-primary transition-colors uppercase italic">Tactical Features</Link>
-                <Link href="#pricing" className="hover:text-primary transition-colors uppercase italic">Pricing Plans</Link>
-                <Link href="#about" className="hover:text-primary transition-colors uppercase italic">Mission Intel</Link>
+              <h5 className="text-white font-black uppercase text-[10px] tracking-[0.3em] mb-8 italic">SOLUTIONS</h5>
+              <div className="flex flex-col gap-5 text-[10px] font-black tracking-widest uppercase italic leading-none">
+                <Link href="#features" className="hover:text-primary transition-colors">Core Features</Link>
+                <Link href="#pricing" className="hover:text-primary transition-colors">Pricing Plans</Link>
+                <Link href="#about" className="hover:text-primary transition-colors">Enterprise Intel</Link>
               </div>
             </div>
             <div>
-              <h5 className="text-white font-black uppercase text-xs tracking-[0.3em] mb-8 italic">LEGAL PROTOCOL</h5>
-              <div className="flex flex-col gap-5 text-[11px] font-black tracking-widest">
-                <Link href="#" className="hover:text-primary transition-colors uppercase italic">Privacy Vault</Link>
-                <Link href="#" className="hover:text-primary transition-colors uppercase italic">Service Terms</Link>
-                <Link href="#" className="hover:text-primary transition-colors uppercase italic">Refund Policy</Link>
+              <h5 className="text-white font-black uppercase text-[10px] tracking-[0.3em] mb-8 italic">SUPPORT</h5>
+              <div className="flex flex-col gap-5 text-[10px] font-black tracking-widest uppercase italic leading-none">
+                <Link href="#" className="hover:text-primary transition-colors">Terms of Use</Link>
+                <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
+                <Link href="#" className="hover:text-primary transition-colors">Contact Expert</Link>
               </div>
             </div>
           </div>
           <div className="text-right flex flex-col items-center md:items-end">
-            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-600 mb-4 italic">© 2026 GYMFLOW SAAS COMMAND</div>
-            <div className="text-xs font-black uppercase tracking-[0.2em] text-primary italic neon-text">ENGINEERING THE FUTURE OF FORCE</div>
+            <div className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-700 mb-4 italic">© 2026 GYMFLOW MANAGEMENT SYSTEMS</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-primary italic">EFFICIENCY_DRIVEN_LOGISTICS</div>
             <div className="mt-10 flex gap-4">
               {[1, 2, 3, 4].map(i => (
-                <div key={i} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all cursor-pointer group">
-                  <Activity className="w-4 h-4 group-hover:text-primary transition-colors" />
+                <div key={i} className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white/10 transition-all cursor-pointer group">
+                  <BarChart3 className="w-4 h-4 text-slate-700 group-hover:text-primary transition-colors" />
                 </div>
               ))}
             </div>

@@ -108,7 +108,7 @@ export default function AddMemberPage() {
         <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
         <div>
           <div className="flex items-center gap-4 mb-2">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">PROCESS: SUBJECT_INITIALIZATION_v1.0</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">MEMBER REGISTRATION</span>
             <div className="h-px w-24 bg-black/5 dark:bg-white/5"></div>
           </div>
           <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
@@ -116,7 +116,7 @@ export default function AddMemberPage() {
           </h1>
           <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
-            Biometric and credential intake in progress.
+            Please fill out the form below to add a new member.
           </p>
         </div>
         <Link
@@ -124,7 +124,7 @@ export default function AddMemberPage() {
           className="h-12 px-6 rounded-xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 flex items-center gap-3 text-[10px] font-black text-slate-400 hover:text-foreground hover:bg-black/10 dark:hover:bg-white/10 uppercase tracking-widest transition-all italic"
         >
           <ChevronLeft className="w-4 h-4" />
-          ABORT_COMMAND
+          Cancel
         </Link>
       </div>
 
@@ -132,7 +132,7 @@ export default function AddMemberPage() {
         {/* LEFT: INITIALIZATION FORM */}
         <div className="glass-premium p-8 border-border dark:bg-slate-950/40 space-y-8">
           <div className="flex items-center gap-4 mb-2">
-            <h2 className="text-xl font-black italic tracking-tighter text-foreground uppercase">INITIALIZATION_FORM</h2>
+            <h2 className="text-xl font-black italic tracking-tighter text-foreground uppercase">Member Details</h2>
             <div className="h-px flex-1 bg-white/5"></div>
           </div>
 
@@ -140,7 +140,7 @@ export default function AddMemberPage() {
             {/* Photo Upload - High Tech Dropzone */}
             <div>
               <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                BIOMETRIC_VISUAL_DATA
+                Profile Photo
               </label>
               <input
                 ref={fileInputRef}
@@ -164,7 +164,7 @@ export default function AddMemberPage() {
                       <div className="absolute inset-0 border-2 border-primary/20 rounded-2xl pointer-events-none group-hover:border-primary/50 transition-all"></div>
                     </div>
                     <p className="text-[10px] font-black text-primary uppercase tracking-widest italic animate-pulse">
-                      UPDATE_VISUAL_RECORD
+                      Change Photo
                     </p>
                   </div>
                 ) : (
@@ -173,7 +173,7 @@ export default function AddMemberPage() {
                       <Upload className="w-6 h-6 text-slate-500 group-hover:text-primary transition-colors" />
                     </div>
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic group-hover:text-slate-300 transition-colors">
-                      DRAG_OR_SELECT_IMAGE_FILE
+                      Click or drag photo here
                     </p>
                   </div>
                 )}
@@ -186,7 +186,7 @@ export default function AddMemberPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  IDENTIFIER: FIRST_NAME *
+                  First Name *
                 </label>
                 <Input
                   placeholder="EX: JOHN"
@@ -200,7 +200,7 @@ export default function AddMemberPage() {
               </div>
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  IDENTIFIER: LAST_NAME
+                  Last Name
                 </label>
                 <Input
                   placeholder="EX: DOE"
@@ -217,11 +217,11 @@ export default function AddMemberPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  COMMS_ADDR: EMAIL
+                  Email Address
                 </label>
                 <Input
                   type="email"
-                  placeholder="USER@SYSTEM.COM"
+                  placeholder="user@example.com"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -231,7 +231,7 @@ export default function AddMemberPage() {
               </div>
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  COMMS_ADDR: PHONE
+                  Phone Number
                 </label>
                 <Input
                   type="tel"
@@ -249,7 +249,7 @@ export default function AddMemberPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  BIOMETRIC: GENDER
+                  Gender
                 </label>
                 <select
                   value={formData.gender}
@@ -261,14 +261,14 @@ export default function AddMemberPage() {
                   }
                   className="h-12 w-full px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                 >
-                  <option value="male" className="bg-slate-900">MALE_COORD</option>
-                  <option value="female" className="bg-slate-900">FEMALE_COORD</option>
-                  <option value="other" className="bg-slate-900">OTHER_COORD</option>
+                  <option value="male" className="bg-slate-900">Male</option>
+                  <option value="female" className="bg-slate-900">Female</option>
+                  <option value="other" className="bg-slate-900">Other</option>
                 </select>
               </div>
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  DEPLOYMENT: PLAN *
+                  Membership Plan *
                 </label>
                 <select
                   value={formData.planId}
@@ -279,7 +279,7 @@ export default function AddMemberPage() {
                 >
                   {store.plans.map((plan) => (
                     <option key={plan.id} value={plan.id} className="bg-slate-900">
-                      {plan.name.toUpperCase()} - {plan.price}_PKR
+                      {plan.name.toUpperCase()} - ₨ {plan.price}
                     </option>
                   ))}
                 </select>
@@ -289,7 +289,7 @@ export default function AddMemberPage() {
             <div className="grid grid-cols-1 gap-8">
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  ASSIGNED_SUPERVISOR: TRAINER
+                  Assign Trainer
                 </label>
                 <select
                   value={formData.trainerId}
@@ -298,7 +298,7 @@ export default function AddMemberPage() {
                   }
                   className="h-12 w-full px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                 >
-                  <option value="" className="bg-slate-900">UNASSIGNED</option>
+                  <option value="" className="bg-slate-900">No Trainer Assigned</option>
                   {trainers.map((trainer) => (
                     <option key={trainer._id || trainer.id} value={trainer._id || trainer.id} className="bg-slate-900">
                       {trainer.fullName.toUpperCase()}
@@ -311,10 +311,10 @@ export default function AddMemberPage() {
             {/* Notes */}
             <div>
               <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                METADATA_OBSERVATIONS
+                Additional Notes
               </label>
               <textarea
-                placeholder="INPUT ADDITIONAL SUBJECT DATA..."
+                placeholder="Any special requirements or notes..."
                 value={formData.notes}
                 onChange={(e) =>
                   setFormData({ ...formData, notes: e.target.value })
@@ -330,7 +330,7 @@ export default function AddMemberPage() {
                 disabled={loading || !formData.firstName}
                 className="flex-1 h-14 bg-primary text-black hover:bg-white font-black italic tracking-tighter text-lg rounded-xl transition-all uppercase neon-glow z-20 group"
               >
-                {loading ? "INITIALIZING..." : "COMMENCE_SUB_REGISTRY"}
+                {loading ? "Saving..." : "Add Member"}
               </Button>
             </div>
           </form>
@@ -346,16 +346,16 @@ export default function AddMemberPage() {
             <div className="relative p-8 space-y-8 glass-premium border-border dark:bg-slate-950/80 rounded-[calc(1.5rem-4px)]">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic mb-1 block">SUBJECT_IDENT</span>
+                  <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic mb-1 block">New Member</span>
                   <h3 className="text-3xl font-black italic tracking-tighter text-foreground uppercase break-all">
                     {formData.firstName || "---"}_<span className="text-primary">{formData.lastName || "---"}</span>
                   </h3>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-1 block">REG_STATUS</span>
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-1 block">Status</span>
                   <div className="flex items-center gap-2 justify-end">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                    <span className="text-xs font-black text-foreground italic tracking-widest uppercase">PENDING_INIT</span>
+                    <span className="text-xs font-black text-foreground italic tracking-widest uppercase">Pending</span>
                   </div>
                 </div>
               </div>
@@ -382,13 +382,13 @@ export default function AddMemberPage() {
               {/* Data Grid */}
               <div className="grid grid-cols-2 gap-8 border-t border-black/10 dark:border-white/5 pt-8">
                 <div>
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic mb-2 block">SECURE_COMMS</span>
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic mb-2 block">Contact</span>
                   <p className="text-xs font-bold text-foreground tracking-widest truncate">{formData.email || "---"}</p>
                   <p className="text-xs font-bold text-slate-400 tracking-widest mt-1">{formData.phone || "---"}</p>
                 </div>
                 <div>
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic mb-2 block">BIOMETRIC_DATA</span>
-                  <p className="text-xs font-bold text-foreground tracking-widest uppercase">{formData.gender || "---"}_ADDR</p>
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic mb-2 block">Details</span>
+                  <p className="text-xs font-bold text-foreground tracking-widest uppercase">{formData.gender || "---"}</p>
                   <p className="text-xs font-bold text-slate-400 tracking-widest mt-1 uppercase">PLAN: {store.plans.find(p => p.id === formData.planId)?.name || "---"}</p>
                 </div>
               </div>
@@ -411,9 +411,9 @@ export default function AddMemberPage() {
             <div className="flex gap-4 items-start">
               <AlertCircle className="w-5 h-5 text-primary mt-1" />
               <div>
-                <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">OPERATIONAL_NOTICE</h4>
+                <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">Important Privacy Notice</h4>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed mt-1">
-                  Ensure all subject identifiers are accurately recorded. Misidentification may result in system-level access denial. Commencing operation will finalize biometric registration.
+                  Please ensure all member details are accurate before proceeding. Member information is stored securely according to privacy standards.
                 </p>
               </div>
             </div>

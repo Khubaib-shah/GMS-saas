@@ -83,6 +83,16 @@ const UserSchema = new mongoose.Schema(
             type: Date,
             default: null,
         },
+        // Reference to database-backed Role (new system)
+        roleId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Role",
+        },
+        // User preferences
+        preferences: {
+            theme: { type: String, default: "dark" },
+            notificationMode: { type: String, default: "email" },
+        },
     },
     { timestamps: true }
 );

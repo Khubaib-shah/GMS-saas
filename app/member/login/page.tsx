@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,7 @@ export default function MemberLoginPage() {
 
             localStorage.setItem("memberToken", data.token);
             localStorage.setItem("memberData", JSON.stringify(data.member));
+            localStorage.setItem("memberGymId", data.member.gymId); // Ensure future logins use correct gymId
             toast.success("SYSTEM ACCESS GRANTED");
             router.push("/member/dashboard");
         } catch (error) {
@@ -78,6 +80,7 @@ export default function MemberLoginPage() {
 
             localStorage.setItem("memberToken", data.token);
             localStorage.setItem("memberData", JSON.stringify(data.member));
+            localStorage.setItem("memberGymId", data.member.gymId);
             toast.success("PIN ACCESS GRANTED");
             router.push("/member/dashboard");
         } catch (error) {
@@ -223,10 +226,16 @@ export default function MemberLoginPage() {
                     </Tabs>
                 </div>
 
-                <div className="mt-8 text-center">
+                <div className="mt-8 text-center space-y-4">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                        Are you Gym Staff? <br />
+                        <Link href="/login" className="text-primary hover:text-white transition-colors">
+                            Switch to Staff Login
+                        </Link>
+                    </p>
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
                         Issues with Access? <br />
-                        <a href="#" className="text-primary hover:text-foreground transition-colors">Contact Command Center</a>
+                        <a href="https://wa.me/923149784156?text=Hello%2C%20I%20am%20having%20issues%20with%20accessing%20my%20account." target="_blank" rel="noopener noreferrer" className="text-primary hover:text-foreground transition-colors">Contact Command Center</a>
                     </p>
                 </div>
             </div>

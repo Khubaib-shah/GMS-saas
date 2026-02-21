@@ -5,11 +5,20 @@ import { useRouter } from "next/navigation"
 import { Bell, Search, ChevronDown, CreditCard, UserPlus, AlertTriangle, Menu, X, Moon, Sun } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { useAppStore } from "@/lib/store"
 import { daysUntilExpiry } from "@/lib/utils/file-utils"
 import { cn } from "@/lib/utils"
 import { useTheme } from "next-themes"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { LogOut, User, Settings as SettingsIcon, ShieldCheck } from "lucide-react"
 
 export function Navbar() {
   const { theme, setTheme } = useTheme()
@@ -22,6 +31,7 @@ export function Navbar() {
 
   const userName = session?.user?.name || "User"
   const userRole = (session?.user as any)?.role || "Staff"
+  const isTrainer = userRole === "trainer"
   const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
 
   // Derive notifications
@@ -116,7 +126,7 @@ export function Navbar() {
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 group-hover:text-primary transition-colors" />
             <Input
-              placeholder="SEARCH SYSTEM..."
+              placeholder="SEARCH DASHBOARD..."
               className="pl-10 h-10 bg-black/5 dark:bg-white/5 border-transparent focus:bg-black/10 dark:focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 w-[200px] lg:w-[300px] rounded-xl"
               value={store.searchQuery}
               onChange={(e) => store.setSearchQuery(e.target.value)}
@@ -147,8 +157,8 @@ export function Navbar() {
             <div className="absolute right-0 top-14 w-80 glass-premium border border-border rounded-2xl shadow-2xl p-0 z-50 card-enter overflow-hidden">
               <div className="px-5 py-4 border-b border-border bg-secondary flex items-center justify-between">
                 <div>
-                  <h3 className="font-black text-xs text-foreground tracking-widest uppercase">System Alerts</h3>
-                  <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-0.5">Tactical Overlook</p>
+                  <h3 className="font-black text-xs text-foreground tracking-widest uppercase">Notifications</h3>
+                  <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-0.5">Operational Activity</p>
                 </div>
                 {finalHasNotifications && (
                   <button
@@ -159,7 +169,10 @@ export function Navbar() {
                   </button>
                 )}
               </div>
-              <div className="max-h-[400px] overflow-y-auto p-3 space-y-2 custom-scrollbar">
+              <div
+                className="max-h-[400px] overflow-y-auto p-3 space-y-2 custom-scrollbar overscroll-contain"
+                data-lenis-prevent
+              >
                 {activeNotifications.length > 0 ? (
                   activeNotifications.map(note => (
                     <div
@@ -215,16 +228,57 @@ export function Navbar() {
         <div className="h-8 w-px bg-white/5 mx-3"></div>
 
         {/* User Profile */}
-        <div data-tour="navbar-profile" className="flex items-center gap-3 pl-2 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-xl transition-all group">
-          <div className="text-right hidden sm:block">
-            <p className="text-xs font-black text-foreground uppercase tracking-wider italic leading-none">{userName}</p>
-            <p className="text-[9px] text-primary mt-1 uppercase font-black tracking-[0.15em]">{userRole.replace("_", " ")}</p>
-          </div>
-          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-black text-sm neon-glow group-hover:scale-105 transition-transform">
-            {initials}
-          </div>
-          <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div data-tour="navbar-profile" className="flex items-center gap-3 pl-2 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-xl transition-all group">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-black text-foreground uppercase tracking-wider italic leading-none">{userName}</p>
+                <p className="text-[9px] text-primary mt-1 uppercase font-black tracking-[0.15em]">{userRole.replace("_", " ")}</p>
+              </div>
+              <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-black text-sm neon-glow group-hover:scale-105 transition-transform">
+                {initials}
+              </div>
+              <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 glass-premium border-border p-2">
+            <DropdownMenuLabel className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 py-1.5 italic">
+              User Account
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuItem
+              onClick={() => router.push(isAdmin ? "/admin/settings" : "/settings")}
+              className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
+            >
+              <User className="w-4 h-4" />
+              My Profile
+            </DropdownMenuItem>
+            {!isTrainer && (
+              <DropdownMenuItem
+                onClick={() => router.push("/gym/settings")}
+                className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
+              >
+                <SettingsIcon className="w-4 h-4" />
+                Gym Configuration
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem
+              onClick={() => router.push("/security")}
+              className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              Security Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuItem
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-red-500 focus:text-white"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   )

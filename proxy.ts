@@ -2,7 +2,7 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export async function proxy(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
     const cookies = req.cookies.getAll();
     const sessionCookie = cookies.find(c => c.name.includes('session-token'));
 
@@ -18,10 +18,16 @@ export async function proxy(req: NextRequest) {
 
     const isAuth = !!token;
     const isLoginPage = req.nextUrl.pathname.startsWith("/login");
+    const isMemberPortal = req.nextUrl.pathname.match(/^\/member($|\/)/) || req.nextUrl.pathname.match(/^\/api\/member-portal($|\/)/);
     const isLandingPage = req.nextUrl.pathname === "/";
     const isAdmin = token?.role === "super_admin";
 
-    // 1. Logged-in user visiting /login -> Redirect based on role
+    // 1. Allow landing page and member portal regardless of NextAuth session
+    if (isLandingPage || isMemberPortal) {
+        return NextResponse.next();
+    }
+
+    // 2. Logged-in user visiting /login -> Redirect based on role
     if (isLoginPage) {
         if (isAuth) {
             if (isAdmin) {
@@ -32,12 +38,7 @@ export async function proxy(req: NextRequest) {
         return NextResponse.next();
     }
 
-    // 2. Allow landing page regardless of auth
-    if (isLandingPage) {
-        return NextResponse.next();
-    }
-
-    // 3. Protect other routes (if not login page or landing page, require auth)
+    // 3. Protect other routes (staff dashboard, admin pages, etc.)
     if (!isAuth) {
         let from = req.nextUrl.pathname;
         if (req.nextUrl.search) {

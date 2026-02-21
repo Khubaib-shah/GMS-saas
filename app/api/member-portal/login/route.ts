@@ -17,7 +17,8 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { email, password, pin, qrCode, gymId } = body;
 
-        if (!gymId) {
+        // gymId is optional for email login, but required for others
+        if (!gymId && !email) {
             return NextResponse.json({ message: "Gym ID is required" }, { status: 400 });
         }
 
@@ -36,11 +37,17 @@ export async function POST(req: Request) {
         }
         // Email + Password/PIN login
         else if (email) {
+            // Find member by email
+            // Note: email is globally unique in our schema
+            if (gymId && gymId !== "null" && gymId !== "undefined") {
+                // We keep the query but we don't strictly enforce it if not found, 
+                // but actually since email is unique, we should just find by email.
+            }
+
             member = await Member.findOne({
                 email,
-                gymId,
                 deletedAt: null,
-                portalEnabled: true,
+                portalEnabled: true
             }).select("+portalPassword +portalPin");
 
             if (!member) {
@@ -76,6 +83,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "Member not found" }, { status: 404 });
         }
 
+        // Derive gymId from member if not provided or to ensure truth from DB
+        const effectiveGymId = member.gymId.toString();
+
         // Update last portal login
         await Member.updateOne(
             { _id: member._id },
@@ -85,7 +95,7 @@ export async function POST(req: Request) {
         // Get active subscription
         const subscription = await Subscription.findOne({
             memberId: member._id.toString(),
-            gymId,
+            gymId: effectiveGymId,
             status: { $in: ["active", "paused"] },
             deletedAt: null,
         }).sort({ endDate: -1 });
@@ -94,7 +104,7 @@ export async function POST(req: Request) {
         const token = jwt.sign(
             {
                 memberId: member._id.toString(),
-                gymId: gymId,
+                gymId: effectiveGymId,
                 email: member.email,
                 type: "member",
             },
@@ -113,6 +123,7 @@ export async function POST(req: Request) {
                 qrCode: member.qrCode,
                 attendanceStreak: member.attendanceStreak,
                 totalCheckIns: member.totalCheckIns,
+                gymId: effectiveGymId,
             },
             subscription: subscription ? {
                 id: subscription._id.toString(),

@@ -102,7 +102,9 @@ async function seed() {
 
         // Pre-hash password once to speed up
         const defaultPassword = "password123";
+        const defaultPin = "1234";
         const hashedPassword = await hashPassword(defaultPassword);
+        const hashedPin = await hashPassword(defaultPin);
 
         for (let i = 0; i < 10; i++) {
             const gymName = gymNames[i];
@@ -291,6 +293,7 @@ async function seed() {
                     trainerId: trainer._id,
                     planId: plan.id, // Using String ID as per schema
                     portalPassword: hashedPassword,
+                    portalPin: hashedPin,
                     portalEnabled: true,
                     status: "active"
                 });
@@ -313,6 +316,7 @@ async function seed() {
                     name: `${member.firstName} ${member.lastName}`,
                     email: member.email,
                     password: defaultPassword,
+                    pin: defaultPin,
                     plan: plan?.name,
                     trainer: trainer?.fullName
                 });

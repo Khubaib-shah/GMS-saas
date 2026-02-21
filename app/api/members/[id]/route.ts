@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import { logAudit, extractRequestInfo, createUpdateDiff } from "@/lib/audit";
+import { getCache, setCache, deleteCache, invalidatePattern } from "@/lib/redis";
 
 export async function GET(
     req: Request,
@@ -18,7 +19,17 @@ export async function GET(
     const { session } = authResult;
     const { id } = await params;
 
+    const cacheKey = `member:profile:${id}`;
+
     try {
+        // Cache-First
+        const cachedMember = await getCache<any>(cacheKey);
+        if (cachedMember) {
+            console.log(`[Redis HIT] ${cacheKey}`);
+            return NextResponse.json(cachedMember);
+        }
+
+        console.log(`[Redis MISS] ${cacheKey} - Fetching from DB`);
         await connectDB();
 
         const objectId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : id;
@@ -28,6 +39,9 @@ export async function GET(
         if (!member) {
             return NextResponse.json({ message: "Member not found" }, { status: 404 });
         }
+
+        // Store in Redis (30-minute TTL)
+        await setCache(cacheKey, member, 1800);
 
         return NextResponse.json(member);
     } catch (error) {
@@ -81,6 +95,10 @@ export async function PUT(
                 ...extractRequestInfo(req.headers),
             });
         }
+
+        // Invalidate profile cache and all list caches for this gym
+        await deleteCache(`member:profile:${id}`);
+        await invalidatePattern(`members:list:gym:${session.user.gymId}:*`);
 
         return NextResponse.json(member);
     } catch (error: any) {
@@ -144,6 +162,10 @@ export async function DELETE(
             { memberId: id, gymId: session.user.gymId },
             { deletedAt: new Date() }
         );
+
+        // Invalidate profile cache and all list caches for this gym
+        await deleteCache(`member:profile:${id}`);
+        await invalidatePattern(`members:list:gym:${session.user.gymId}:*`);
 
         return NextResponse.json({ message: "Member and associated data deleted" });
     } catch (error) {

@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import mongoose from "mongoose";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
+import { invalidatePattern } from "@/lib/redis";
 
 export async function PUT(
     req: Request,
@@ -38,6 +39,9 @@ export async function PUT(
         if (!plan) {
             return NextResponse.json({ message: "Plan not found" }, { status: 404 });
         }
+
+        // Invalidate list cache
+        await invalidatePattern(`plans:list:gym:${gymId}`);
 
         return NextResponse.json(plan);
     } catch (error) {
@@ -75,6 +79,10 @@ export async function DELETE(
         if (!plan) {
             return NextResponse.json({ message: "Plan not found" }, { status: 404 });
         }
+
+        // Invalidate list cache
+        await invalidatePattern(`plans:list:gym:${gymId}`);
+
         return NextResponse.json({ message: "Plan deleted" });
     } catch (error) {
         console.error("Delete plan error:", error);

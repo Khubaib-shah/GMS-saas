@@ -51,6 +51,13 @@ export default function MembersPage() {
   const filtered = useMemo(() => {
     let result = store.members;
     const currentSearch = store.searchQuery || searchTerm;
+    const userRole = (session?.user as any)?.role;
+    const userId = (session?.user as any)?.id;
+
+    // Trainer Filter
+    if (userRole === 'trainer' && userId) {
+      result = result.filter(m => (m as any).trainerId === userId || (m as any).trainerId?._id === userId);
+    }
 
     if (currentSearch) {
       const lower = currentSearch.toLowerCase();
@@ -71,7 +78,7 @@ export default function MembersPage() {
     }
 
     return result;
-  }, [store.members, store.subscriptions, store.searchQuery, searchTerm, filterStatus]);
+  }, [store.members, store.subscriptions, store.searchQuery, searchTerm, filterStatus, session]);
 
   const handleDelete = async (id: string) => {
     await store.deleteMember(id);
@@ -97,12 +104,14 @@ export default function MembersPage() {
             Management and subscription surveillance active.
           </p>
         </div>
-        <Link href="/members/add">
-          <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
-            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-            INITIALIZE MEMBER
-          </Button>
-        </Link>
+        {((session?.user as any)?.role !== 'trainer') && (
+          <Link href="/members/add">
+            <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
+              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+              INITIALIZE MEMBER
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Search & Filter - Bento Style */}

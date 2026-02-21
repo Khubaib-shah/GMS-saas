@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
+import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 
 export async function GET() {
     const session = await getServerSession(authOptions);
@@ -18,15 +19,28 @@ export async function GET() {
         return NextResponse.json({ message: "Unauthorized: No gym associated" }, { status: 401 });
     }
 
-    await connectDB();
+    const cacheKey = `plans:list:gym:${gymId || 'all'}`;
 
-    // If super_admin, they can see all plans (or we could filter later)
-    // For now, if they have a gymId, they see that gym's plans. 
-    // If not, they see all plans.
-    const query = (role === "super_admin" && !gymId) ? {} : { gymId };
+    try {
+        const cachedPlans = await getCache<any[]>(cacheKey);
+        if (cachedPlans) {
+            console.log(`[Redis HIT] ${cacheKey}`);
+            return NextResponse.json(cachedPlans);
+        }
 
-    const plans = await Plan.find(query).sort({ price: 1 });
-    return NextResponse.json(plans);
+        console.log(`[Redis MISS] ${cacheKey} - Fetching from DB`);
+        await connectDB();
+
+        const query = (role === "super_admin" && !gymId) ? {} : { gymId };
+        const plans = await Plan.find(query).sort({ price: 1 });
+
+        await setCache(cacheKey, plans, 3600); // 1 hour TTL
+
+        return NextResponse.json(plans);
+    } catch (error) {
+        console.error("Get plans error:", error);
+        return NextResponse.json({ message: "Error fetching plans" }, { status: 500 });
+    }
 }
 
 export async function POST(req: Request) {
@@ -67,6 +81,10 @@ export async function POST(req: Request) {
             ...body,
             gymId: targetGymId
         });
+
+        // Invalidate list cache
+        await invalidatePattern(`plans:list:gym:${targetGymId}`);
+
         return NextResponse.json(plan, { status: 201 });
     } catch (error: any) {
         console.error("Create plan error:", error);

@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useState, Suspense } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -110,6 +111,12 @@ function LoginForm() {
 
       <div className="mt-10 pt-8 border-t border-white/5">
         <p className="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">
+          Are you a Member?{" "}
+          <Link href="/member/login" className="text-primary hover:text-white transition-colors">
+            Go to Member Portal
+          </Link>
+        </p>
+        <p className="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest mt-4">
           No Access?{" "}
           <a href="https://wa.me/923149784156" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-white transition-colors">
             Contact High Command

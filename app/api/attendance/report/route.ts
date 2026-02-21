@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
+import { getCache, setCache } from "@/lib/redis";
 
 export async function GET(req: Request) {
     try {
@@ -20,6 +21,18 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Gym ID is required" }, { status: 400 });
         }
 
+        const role = (session.user as any).role;
+        const trainerId = role === 'trainer' ? (session.user as any).id : 'all';
+        const cacheKey = `attendance:report:gym:${gymId}:date:${date || 'none'}:month:${month || 'none'}:trainer:${trainerId}`;
+
+        // Cache-First
+        const cachedReport = await getCache<any[]>(cacheKey);
+        if (cachedReport) {
+            console.log(`[Redis HIT] ${cacheKey}`);
+            return NextResponse.json(cachedReport, { status: 200 });
+        }
+
+        console.log(`[Redis MISS] ${cacheKey} - Fetching from DB`);
         await connectDB();
 
         let query: any = { gymId };
@@ -47,6 +60,9 @@ export async function GET(req: Request) {
         }
 
         const attendanceKeys = await Attendance.find(query).sort({ date: -1 }).populate("memberId", "firstName lastName photoBase64");
+
+        // Store in Redis with a 5-minute TTL (Short TTL for operational data)
+        await setCache(cacheKey, attendanceKeys, 300);
 
         return NextResponse.json(attendanceKeys, { status: 200 });
 

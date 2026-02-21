@@ -16,6 +16,7 @@ const WorkoutPlanSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String },
     gymId: { type: mongoose.Schema.Types.ObjectId, ref: "Gym", required: true },
+    trainerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     schedule: [WorkoutDaySchema], // Array of days covered
     active: { type: Boolean, default: true }
 }, { timestamps: true });

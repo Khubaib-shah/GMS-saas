@@ -11,17 +11,28 @@ import {
   daysUntilExpiry,
 } from "@/lib/utils/file-utils";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
-export function MembersTable() {
+export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean }) {
   const store = useAppStore();
+  const { data: session } = useSession();
+  const userId = (session?.user as any)?.id;
 
   useEffect(() => {
     store.loadMembers();
     store.loadSubscriptions();
   }, []);
 
+  const relevantMembers = useMemo(() => {
+    let list = store.members;
+    if (trainerOnly && userId) {
+      list = list.filter(m => (m as any).trainerId === userId || (m as any).trainerId?._id === userId);
+    }
+    return list;
+  }, [store.members, trainerOnly, userId]);
+
   const expiringMembers = useMemo(() => {
-    return store.members
+    return relevantMembers
       .filter((member) => {
         if (!store.searchQuery) return true;
         const lower = store.searchQuery.toLowerCase();
@@ -37,9 +48,8 @@ export function MembersTable() {
         );
         const activeSub = subs.find((s) => isSubscriptionActive(s.endDate, s.status));
         const daysLeft = activeSub ? daysUntilExpiry(activeSub.endDate) : -1;
-        
-        // If latest subscription is paused, don't show in Attention Needed
-        const latestSub = [...subs].sort((a,b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())[0];
+
+        const latestSub = [...subs].sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())[0];
         if (latestSub?.status === "paused") {
           return { member, subscription: null, daysLeft: -1, status: "active" as const };
         }
@@ -52,14 +62,20 @@ export function MembersTable() {
             daysLeft > 0 && daysLeft <= 7
               ? ("expiring" as const)
               : daysLeft > 7
-              ? ("active" as const)
-              : ("expired" as const),
+                ? ("active" as const)
+                : ("expired" as const),
         };
       })
-      .filter((m) => m.status !== "active")
-      .sort((a, b) => (a.daysLeft > 0 ? a.daysLeft - b.daysLeft : 1))
-      .slice(0, 5);
-  }, [store.members, store.subscriptions, store.searchQuery]);
+      .sort((a, b) => {
+        // Priority: Expiring soon > Expired > Active
+        if (a.status === "expiring" && b.status !== "expiring") return -1;
+        if (a.status !== "expiring" && b.status === "expiring") return 1;
+        if (a.status === "expired" && b.status === "active") return -1;
+        if (a.status === "active" && b.status === "expired") return 1;
+        return 0;
+      })
+      .slice(0, 10);
+  }, [relevantMembers, store.subscriptions, store.searchQuery]);
 
   return (
     <Card className="p-6 bg-card">
@@ -118,14 +134,14 @@ export function MembersTable() {
                       {item.status === "active"
                         ? "Active"
                         : item.status === "expiring"
-                        ? "ExpSoon"
-                        : "Expired"}
+                          ? "ExpSoon"
+                          : "Expired"}
                     </span>
                   </td>
                   <td className="py-3 px-4">
                     <Link href={`/members/${item.member.id}`}>
                       <Button variant="outline" size="sm">
-                        Renew
+                        {trainerOnly ? "View" : "Renew"}
                       </Button>
                     </Link>
                   </td>

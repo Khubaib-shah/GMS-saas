@@ -14,7 +14,10 @@ export type AuditAction =
     | 'role_change'
     | 'export_data'
     | 'enable_portal'
-    | 'disable_portal';
+    | 'disable_portal'
+    | 'settings_update'
+    | 'permission_change'
+    | 'feature_flag_change';
 
 export type AuditResource =
     | 'member'
@@ -26,7 +29,11 @@ export type AuditResource =
     | 'branch'
     | 'settings'
     | 'gym'
-    | 'trainer_profile';
+    | 'trainer_profile'
+    | 'role'
+    | 'platform_settings'
+    | 'gym_settings'
+    | 'subscription_plan';
 
 export interface AuditLogEntry {
     gymId: string;

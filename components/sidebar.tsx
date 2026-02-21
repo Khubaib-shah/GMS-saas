@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
-import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Dumbbell, ShieldCheck, Building2, UserCheck, ClipboardList, Zap } from "lucide-react"
+import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Dumbbell, ShieldCheck, Building2, UserCheck, ClipboardList, Zap, Send, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface NavItem {
@@ -30,11 +30,17 @@ export function Sidebar() {
       { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
     ]
     : [
-      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : []),
+      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : [{ label: "My Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }]),
       { label: "Members", href: "/members", icon: <Users className="w-5 h-5" /> },
-      { label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> },
+      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> }] : []),
       ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> }] : []),
       ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> }] : []),
+      ...((session?.user as any)?.role === 'trainer' ? [
+        { label: "Exercises", href: "/trainer/exercises", icon: <Dumbbell className="w-5 h-5" /> },
+        { label: "Templates", href: "/trainer/templates", icon: <ClipboardList className="w-5 h-5" /> },
+        { label: "Plan Assignment", href: "/trainer/deploy", icon: <ClipboardList className="w-5 h-5" /> },
+        { label: "Reports", href: "/trainer/analytics", icon: <TrendingUp className="w-5 h-5" /> },
+      ] : []),
       ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
       ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [{ label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> }] : []),
       { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
@@ -49,8 +55,8 @@ export function Sidebar() {
       <div data-tour="sidebar-logo" className={cn("h-16 flex items-center border-b border-sidebar-border", sidebarCollapsed ? "justify-center px-0" : "px-6")}>
         <div className="flex items-center gap-2 overflow-hidden">
           <Link href={isAdmin ? "/admin" : "/dashboard"} className="flex items-center gap-2 group cursor-pointer">
-            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary flex items-center justify-center neon-glow transition-all group-hover:scale-105">
-              {isAdmin ? <ShieldCheck className="w-6 h-6 text-black" /> : <Zap className="w-6 h-6 text-black" />}
+            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg transition-all group-hover:scale-105">
+              {isAdmin ? <ShieldCheck className="w-6 h-6 text-black" /> : <Building2 className="w-6 h-6 text-black" />}
             </div>
             {!sidebarCollapsed && (
               <span className="font-black text-xl tracking-tighter italic text-sidebar-foreground animate-in fade-in slide-in-from-left-2 duration-300">
@@ -65,7 +71,7 @@ export function Sidebar() {
       <nav data-tour="sidebar-nav" className="flex-1 px-4 py-8 overflow-y-auto custom-scrollbar">
         {!sidebarCollapsed && (
           <p className="px-3 text-[10px] font-black text-slate-500 dark:text-slate-400 mb-6 uppercase tracking-[0.2em] animate-in fade-in duration-300">
-            {isAdmin ? "ADMIN CONTROL" : "COMMAND CENTER"}
+            {isAdmin ? "ADMIN CONTROL" : "MANAGEMENT CORE"}
           </p>
         )}
         <ul className="space-y-1.5">
@@ -114,7 +120,7 @@ export function Sidebar() {
           )}
         >
           <LogOut className="w-5 h-5 flex-shrink-0 group-hover:rotate-12 transition-transform" />
-          {!sidebarCollapsed && <span className="animate-in fade-in duration-300">SYSTEM LOGOUT</span>}
+          {!sidebarCollapsed && <span className="animate-in fade-in duration-300">LOGOUT</span>}
         </button>
       </div>
     </aside>

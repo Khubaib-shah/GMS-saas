@@ -8,6 +8,7 @@ import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
 import Gym from "@/models/Gym";
 import { isSubscriptionActive } from "@/lib/utils/file-utils";
+import { invalidatePattern } from "@/lib/redis";
 
 export async function POST(req: Request) {
     const authResult = await requirePermission(PERMISSIONS.ATTENDANCE_CHECKIN);
@@ -152,6 +153,9 @@ export async function POST(req: Request) {
             branchId: branchId || session.user.branchId,
             ...extractRequestInfo(req.headers),
         });
+
+        // Invalidate attendance report cache for this gym
+        await invalidatePattern(`attendance:report:gym:${gymId}:*`);
 
         return NextResponse.json({
             ...newAttendance.toJSON(),

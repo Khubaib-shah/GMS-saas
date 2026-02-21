@@ -12,6 +12,7 @@ import { localDb } from "@/lib/localDb"
 
 import { SessionProvider } from "next-auth/react"
 import { GuidedTourProvider } from "./guided-tour"
+import { GymProvider } from "@/hooks/use-gym-settings"
 
 interface LayoutWrapperProps {
   children: React.ReactNode
@@ -35,8 +36,8 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   }, [gymName, pathname])
 
   useEffect(() => {
-    // We only load if not in login page
-    if (pathname !== "/login") {
+    // We only load if not in login page or member portal
+    if (pathname !== "/login" && !pathname?.startsWith("/member")) {
       loadGymProfile()
       loadMembers()
       loadPlans()
@@ -47,28 +48,32 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   const isLandingPage = pathname === "/"
   const isLoginPage = pathname === "/login"
-  const isPublicPage = isLandingPage || isLoginPage
+  const isMemberPortal = pathname?.match(/^\/member($|\/)/)
+  const isPublicPage = isLandingPage || isLoginPage || isMemberPortal
 
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
 
   return (
     <SessionProvider>
-      {isPublicPage ? (
-        children
-      ) : (
-        <GuidedTourProvider>
-          <div className="min-h-screen bg-background">
-            <Sidebar />
-            <Navbar />
-            <main className={cn(
-              "mt-16 p-8 transition-all duration-300 ease-in-out",
-              sidebarCollapsed ? "ml-20" : "ml-64"
-            )}>
-              {children}
-            </main>
-          </div>
-        </GuidedTourProvider>
-      )}
+      <GymProvider>
+        {isPublicPage ? (
+          children
+        ) : (
+          <GuidedTourProvider>
+            <div className="min-h-screen bg-background">
+              <Sidebar />
+              <Navbar />
+              <main className={cn(
+                "mt-16 p-8 transition-all duration-300 ease-in-out",
+                sidebarCollapsed ? "ml-20" : "ml-64"
+              )}>
+                {children}
+              </main>
+            </div>
+          </GuidedTourProvider>
+        )}
+      </GymProvider>
     </SessionProvider>
   )
 }
+

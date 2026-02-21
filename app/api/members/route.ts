@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import { logAudit, extractRequestInfo } from "@/lib/audit";
+import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 
 export async function GET(req: Request) {
     const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW);
@@ -15,20 +16,33 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const search = searchParams.get("search");
 
+        const gymId = session.user.gymId;
+        const branchId = session.user.branchId;
+        const role = (session.user as any).role;
+        const trainerId = role === 'trainer' ? (session.user as any).id : null;
+
+        // Generate a deterministic cache key based on query parameters and user scope
+        const cacheKey = `members:list:gym:${gymId}:branch:${branchId || 'all'}:trainer:${trainerId || 'all'}:search:${search || 'none'}`;
+
+        // Attempt to fetch from Redis first (Cache-First)
+        const cachedData = await getCache<any[]>(cacheKey);
+        if (cachedData) {
+            console.log(`[Redis HIT] ${cacheKey}`);
+            return NextResponse.json(cachedData);
+        }
+
+        console.log(`[Redis MISS] ${cacheKey} - Fetching from DB`);
         await connectDB();
 
         // Build base query with gym scope and exclude deleted
-        const query: any = { gymId: session.user.gymId, deletedAt: null };
+        const query: any = { gymId, deletedAt: null };
 
-        // If user is branch-scoped AND NOT searching, apply branch filter.
-        // During search, we allow finding members across branches.
-        if (session.user.branchId && !search) {
-            query.branchId = session.user.branchId;
+        if (branchId && !search) {
+            query.branchId = branchId;
         }
 
-        // If user is a trainer AND NOT searching, restrict to their assigned members only.
-        if ((session.user as any).role === 'trainer' && !search) {
-            query.trainerId = (session.user as any).id;
+        if (trainerId && !search) {
+            query.trainerId = trainerId;
         }
 
         // Add search filter if present
@@ -49,8 +63,11 @@ export async function GET(req: Request) {
         const mappedMembers = members.map((m: any) => ({
             ...m,
             id: m._id.toString(),
-            _id: undefined // Optional: match toJSON behavior
+            _id: undefined
         }));
+
+        // Store in Redis with a 15-minute TTL (900 seconds)
+        await setCache(cacheKey, mappedMembers, 900);
 
         return NextResponse.json(mappedMembers);
     } catch (error) {
@@ -91,6 +108,9 @@ export async function POST(req: Request) {
             branchId: session.user.branchId,
             ...extractRequestInfo(req.headers),
         });
+
+        // Invalidate all member list caches for this gym on addition of new member
+        await invalidatePattern(`members:list:gym:${session.user.gymId}:*`);
 
         return NextResponse.json(createdMember, { status: 201 });
     } catch (error: any) {

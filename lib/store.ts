@@ -1,7 +1,8 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import { toast } from "sonner"
 // import { localDb } from "./localDb"
-import type { Member, Plan, Subscription, Payment } from "./types"
+import type { Member, Plan, Subscription, Payment, Branch } from "./types"
 
 // ... (imports)
 
@@ -49,6 +50,23 @@ export type AppState = {
   addPayment: (data: Omit<Payment, "id">) => void
   updatePayment: (id: string, data: Partial<Payment>) => Promise<void>
   deletePayment: (id: string) => Promise<void>
+
+  // Workout Plans
+  workoutPlans: any[]
+  loadWorkoutPlans: () => Promise<void>
+  addWorkoutPlan: (plan: any) => Promise<void>
+  updateWorkoutPlan: (id: string, data: any) => Promise<void>
+  deleteWorkoutPlan: (id: string) => Promise<void>
+  duplicateWorkoutPlan: (id: string) => Promise<void>
+  assignWorkoutToMember: (memberId: string, workoutPlanId: string) => Promise<void>
+
+  // Attendance
+  attendance: any[]
+  loadAttendance: (params?: { date?: string, month?: string }) => Promise<void>
+
+  // Exercises
+  exercises: any[]
+  loadExercises: () => Promise<void>
 
   // Search
   searchQuery: string
@@ -507,6 +525,179 @@ export const useAppStore = create<AppState>()(
         } catch (error) {
           console.error("Failed to delete payment", error);
           throw error;
+        }
+      },
+
+      // -------------------------
+      // WORKOUT PLANS
+      // -------------------------
+      workoutPlans: [],
+
+      loadWorkoutPlans: async () => {
+        try {
+          const res = await fetch("/api/workout-plans");
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            set({ workoutPlans: data });
+          } else {
+            set({ workoutPlans: [] });
+          }
+        } catch (error) {
+          console.error("Failed to load workout plans", error);
+          set({ workoutPlans: [] });
+        }
+      },
+
+      addWorkoutPlan: async (plan) => {
+        try {
+          const res = await fetch("/api/workout-plans", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(plan),
+          });
+          const newPlan = await res.json();
+          if (res.ok) {
+            set((state) => ({ workoutPlans: [newPlan, ...state.workoutPlans] }));
+            toast.success("Workout plan created successfully");
+          } else {
+            toast.error(newPlan.message || "Failed to create workout plan");
+          }
+        } catch (error) {
+          console.error("Failed to add workout plan", error);
+          toast.error("An error occurred while creating the plan");
+        }
+      },
+      updateWorkoutPlan: async (id, data) => {
+        try {
+          const res = await fetch(`/api/workout-plans/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          if (!res.ok) throw new Error("Failed to update workout plan");
+          const updatedPlan = await res.json();
+          set((state) => ({
+            workoutPlans: state.workoutPlans.map(p => (p._id === id || p.id === id ? updatedPlan : p))
+          }));
+          toast.success("Workout plan updated");
+        } catch (error) {
+          console.error("Failed to update workout plan", error);
+          toast.error("Failed to update workout plan");
+        }
+      },
+      deleteWorkoutPlan: async (id) => {
+        try {
+          const res = await fetch(`/api/workout-plans/${id}`, {
+            method: "DELETE",
+          });
+          if (!res.ok) throw new Error("Failed to delete workout plan");
+          set((state) => ({
+            workoutPlans: state.workoutPlans.filter((p) => (p._id !== id && p.id !== id)),
+          }));
+          toast.success("Plan deleted successfully");
+        } catch (error) {
+          console.error("Failed to delete workout plan", error);
+          toast.error("Failed to delete workout plan");
+        }
+      },
+      duplicateWorkoutPlan: async (id) => {
+        try {
+          const state = get();
+          const planToDuplicate = state.workoutPlans.find(p => p._id === id || p.id === id);
+          if (!planToDuplicate) {
+            toast.error("Plan not found");
+            return;
+          }
+
+          const newPlanData = {
+            name: `${planToDuplicate.name} (Copy)`,
+            description: planToDuplicate.description,
+            schedule: planToDuplicate.schedule
+          };
+
+          const res = await fetch("/api/workout-plans", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newPlanData),
+          });
+
+          if (!res.ok) {
+            throw new Error("Failed to duplicate workout plan");
+          }
+          const newPlan = await res.json();
+          set((state) => ({ workoutPlans: [newPlan, ...state.workoutPlans] }));
+          toast.success("Workout plan duplicated");
+        } catch (error) {
+          console.error("Failed to duplicate plan", error);
+          toast.error("An error occurred while duplicating the plan");
+        }
+      },
+      assignWorkoutToMember: async (memberId, workoutPlanId) => {
+        try {
+          const res = await fetch(`/api/members/${memberId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ workoutPlanId }),
+          });
+
+          if (!res.ok) throw new Error("Failed to assign workout plan");
+
+          set((state) => ({
+            members: state.members.map((m) =>
+              m.id === memberId ? { ...m, workoutPlanId } : m
+            ),
+          }));
+        } catch (error) {
+          console.error("Failed to assign workout plan", error);
+          throw error;
+        }
+      },
+
+      // -------------------------
+      // ATTENDANCE
+      // -------------------------
+      attendance: [],
+
+      loadAttendance: async (params = {}) => {
+        const state = get();
+        const gymId = state.gymProfile._id;
+        if (!gymId) return;
+
+        try {
+          let url = `/api/attendance/report?gymId=${gymId}`;
+          if (params.date) url += `&date=${params.date}`;
+          if (params.month) url += `&month=${params.month}`;
+
+          const res = await fetch(url);
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            set({ attendance: data });
+          } else {
+            set({ attendance: [] });
+          }
+        } catch (error) {
+          console.error("Failed to load attendance", error);
+          set({ attendance: [] });
+        }
+      },
+
+      // -------------------------
+      // EXERCISES
+      // -------------------------
+      exercises: [],
+
+      loadExercises: async () => {
+        try {
+          const res = await fetch("/api/exercises");
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            set({ exercises: data });
+          } else {
+            set({ exercises: [] });
+          }
+        } catch (error) {
+          console.error("Failed to load exercises", error);
+          set({ exercises: [] });
         }
       },
 

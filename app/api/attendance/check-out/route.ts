@@ -5,6 +5,7 @@ import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import Member from "@/models/Member";
 import { logAudit, extractRequestInfo } from "@/lib/audit";
+import { invalidatePattern } from "@/lib/redis";
 
 export async function POST(req: Request) {
     try {
@@ -70,6 +71,9 @@ export async function POST(req: Request) {
             branchId: attendance.branchId,
             ...extractRequestInfo(req.headers),
         });
+
+        // Invalidate attendance report cache for this gym
+        await invalidatePattern(`attendance:report:gym:${gymId}:*`);
 
         return NextResponse.json(attendance, { status: 200 });
 

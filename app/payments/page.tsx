@@ -105,7 +105,7 @@ export default function PaymentsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard
           title="GROSS_REVENUE"
-          value={formatCurrency(totalRevenue).replace("PKR", "")}
+          value={`₨ ${formatCurrency(totalRevenue).replace("PKR", "")}`}
           icon={<DollarSign className="w-5 h-5" />}
         />
         <StatsCard
@@ -115,7 +115,7 @@ export default function PaymentsPage() {
         />
         <StatsCard
           title="AVG_THROUGHPUT"
-          value={formatCurrency(avgPayment).replace("PKR", "")}
+          value={`₨ ${formatCurrency(avgPayment).replace("PKR", "")}`}
           icon={<TrendingUp className="w-5 h-5" />}
         />
       </div>
@@ -181,7 +181,7 @@ export default function PaymentsPage() {
                         </span>
                       </td>
                       <td className="py-6 px-6 font-black text-primary text-base">
-                        {formatCurrency(payment.amount).replace("PKR", "")}<span className="text-[8px] ml-1 opacity-50 font-mono tracking-normal">PKR</span>
+                        ₨ {formatCurrency(payment.amount).replace("PKR", "")}
                       </td>
                       <td className="py-6 px-6 text-slate-500 font-mono text-[10px] whitespace-nowrap">
                         {formatDate(payment.date).toUpperCase()}

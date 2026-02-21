@@ -1,6 +1,12 @@
 /**
  * Permission System for GMS SaaS
  * This file defines all available permissions and role-permission mappings.
+ * 
+ * ARCHITECTURE NOTE:
+ * - In-code ROLE_PERMISSIONS serves as the DEFAULT template.
+ * - At runtime the DB-backed Role model takes precedence if a user has roleId set.
+ * - The `hasPermission` and related helpers accept a permissions array directly
+ *   so they work with both approaches (legacy role string or DB-backed permissions).
  */
 
 // All available permissions in the system
@@ -50,9 +56,32 @@ export const PERMISSIONS = {
     // Trainer Profiles
     TRAINERS_VIEW: 'trainers:view',
     TRAINERS_MANAGE: 'trainers:manage',
+
+    // Roles & Permissions management
+    ROLES_VIEW: 'roles:view',
+    ROLES_CREATE: 'roles:create',
+    ROLES_EDIT: 'roles:edit',
+    ROLES_DELETE: 'roles:delete',
+
+    // Platform (super admin only)
+    PLATFORM_SETTINGS_VIEW: 'platform:settings:view',
+    PLATFORM_SETTINGS_EDIT: 'platform:settings:edit',
+
+    // Trainer Workout Management (Structured)
+    TRAINER_DASHBOARD_VIEW: 'trainer.dashboard.view',
+    EXERCISE_CREATE: 'exercise.create',
+    EXERCISE_UPDATE: 'exercise.update',
+    WORKOUT_TEMPLATE_CREATE: 'workout.template.create',
+    WORKOUT_TEMPLATE_UPDATE: 'workout.template.update',
+    WORKOUT_PLAN_ASSIGN: 'workout.plan.assign',
+    WORKOUT_PLAN_MODIFY: 'workout.plan.modify',
+    WORKOUT_LOG_VIEW: 'workout.log.view',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
+
+// All permission keys as an array (useful f    ding owner role)
+export const ALL_PERMISSIONS: Permission[] = Object.values(PERMISSIONS);
 
 // Role types
 export const ROLES = {
@@ -72,15 +101,17 @@ export const LEGACY_ROLE_MAP: Record<string, Role> = {
     'staff': 'receptionist',
 };
 
-// Default permissions per role
+// Default permissions per role (used as template when seeding DB-backed Role objects)
 export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
-    super_admin: Object.values(PERMISSIONS).filter(p =>
-        p !== PERMISSIONS.PLANS_CREATE &&
-        p !== PERMISSIONS.PLANS_EDIT &&
-        p !== PERMISSIONS.PLANS_DELETE
-    ),
+    super_admin: [
+        ...Object.values(PERMISSIONS).filter(p =>
+            p !== PERMISSIONS.PLANS_CREATE &&
+            p !== PERMISSIONS.PLANS_EDIT &&
+            p !== PERMISSIONS.PLANS_DELETE
+        ),
+    ],
 
-    owner: Object.values(PERMISSIONS), // Owner has all permissions
+    owner: ALL_PERMISSIONS, // Owner always has all permissions
 
     manager: [
         PERMISSIONS.MEMBERS_VIEW,
@@ -107,17 +138,27 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
         PERMISSIONS.SETTINGS_VIEW,
         PERMISSIONS.STAFF_MANAGE,
         PERMISSIONS.BRANCHES_MANAGE,
-        PERMISSIONS.TRAINERS_MANAGE, // Manager can manage trainers
+        PERMISSIONS.TRAINERS_MANAGE,
         PERMISSIONS.TRAINERS_VIEW,
+        PERMISSIONS.ROLES_VIEW,
     ],
 
     trainer: [
         PERMISSIONS.MEMBERS_VIEW,
         PERMISSIONS.ATTENDANCE_VIEW,
-        PERMISSIONS.ATTENDANCE_CHECKIN,
-        PERMISSIONS.ATTENDANCE_CHECKOUT,
         PERMISSIONS.PLANS_VIEW,
+        PERMISSIONS.PLANS_CREATE,
+        PERMISSIONS.PLANS_EDIT,
+        PERMISSIONS.PLANS_DELETE,
         PERMISSIONS.TRAINERS_VIEW,
+        PERMISSIONS.TRAINER_DASHBOARD_VIEW,
+        PERMISSIONS.EXERCISE_CREATE,
+        PERMISSIONS.EXERCISE_UPDATE,
+        PERMISSIONS.WORKOUT_TEMPLATE_CREATE,
+        PERMISSIONS.WORKOUT_TEMPLATE_UPDATE,
+        PERMISSIONS.WORKOUT_PLAN_ASSIGN,
+        PERMISSIONS.WORKOUT_PLAN_MODIFY,
+        PERMISSIONS.WORKOUT_LOG_VIEW,
     ],
 
     receptionist: [
@@ -149,10 +190,15 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
 };
 
 /**
- * Check if a role has a specific permission
+ * Check if a role has a specific permission.
+ * Works with both legacy role-string approach and DB-backed permission arrays.
  */
-export function hasPermission(role: Role | string, permission: Permission): boolean {
-    // Handle legacy roles
+export function hasPermission(role: Role | string, permission: Permission, customPermissions?: string[]): boolean {
+    // If custom permissions are provided (from DB Role), use those
+    if (customPermissions && customPermissions.length > 0) {
+        return customPermissions.includes(permission);
+    }
+    // Fallback to hardcoded role defaults
     const normalizedRole = LEGACY_ROLE_MAP[role] || role as Role;
     const permissions = ROLE_PERMISSIONS[normalizedRole];
     if (!permissions) return false;
@@ -170,13 +216,13 @@ export function getPermissionsForRole(role: Role | string): Permission[] {
 /**
  * Check if user has any of the given permissions
  */
-export function hasAnyPermission(role: Role | string, permissions: Permission[]): boolean {
-    return permissions.some(p => hasPermission(role, p));
+export function hasAnyPermission(role: Role | string, permissions: Permission[], customPermissions?: string[]): boolean {
+    return permissions.some(p => hasPermission(role, p, customPermissions));
 }
 
 /**
  * Check if user has all of the given permissions
  */
-export function hasAllPermissions(role: Role | string, permissions: Permission[]): boolean {
-    return permissions.every(p => hasPermission(role, p));
+export function hasAllPermissions(role: Role | string, permissions: Permission[], customPermissions?: string[]): boolean {
+    return permissions.every(p => hasPermission(role, p, customPermissions));
 }

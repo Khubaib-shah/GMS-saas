@@ -6,15 +6,15 @@ import { useSession } from "next-auth/react";
 import { useAppStore } from "@/lib/store";
 import type { Payment, Member } from "@/lib/types";
 import Link from "next/link";
-import { 
-  ArrowLeft, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  User, 
-  CreditCard, 
-  History, 
-  Trash2, 
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  Calendar,
+  User,
+  CreditCard,
+  History,
+  Trash2,
   Edit,
   Clock,
   ShieldCheck,
@@ -23,7 +23,8 @@ import {
   Play,
   Camera,
   Upload,
-  Eye
+  Eye,
+  Dumbbell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -76,6 +77,9 @@ export default function MemberDetailPage({
     deleteSubscription,
     updatePayment,
     deletePayment,
+    workoutPlans,
+    loadWorkoutPlans,
+    assignWorkoutToMember
   } = useAppStore();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -87,7 +91,7 @@ export default function MemberDetailPage({
   const [isDeletingMember, setIsDeletingMember] = useState(false);
   const [deleteSubId, setDeleteSubId] = useState<string | null>(null);
   const [fallbackMember, setFallbackMember] = useState<Member | null>(null);
-  
+
   // Payment Edit/Delete State
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
   const [isEditPaymentModalOpen, setIsEditPaymentModalOpen] = useState(false);
@@ -119,9 +123,10 @@ export default function MemberDetailPage({
         loadMembers(),
         loadSubscriptions(),
         loadPayments(),
-        loadPlans()
+        loadPlans(),
+        loadWorkoutPlans()
       ]);
-      
+
       // Fallback: If member not found in store, try fetching individually
       // (This handles cases where the global list might be incomplete or pagination is introduced)
       const currentMembers = useAppStore.getState().members;
@@ -142,25 +147,25 @@ export default function MemberDetailPage({
     loadData();
   }, []);
 
-  const member = useMemo(() => 
+  const member = useMemo(() =>
     members.find((m) => m.id === memberId) || fallbackMember,
     [members, memberId, fallbackMember]
   );
-  
+
   useEffect(() => {
     if (member?.planId && !selectedPlan) {
       setSelectedPlan(member.planId);
     }
   }, [member]);
 
-  const memberSubs = useMemo(() => 
+  const memberSubs = useMemo(() =>
     [...subscriptions]
       .filter((s) => s.memberId === memberId)
       .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()),
     [subscriptions, memberId]
   );
 
-  const memberPayments = useMemo(() => 
+  const memberPayments = useMemo(() =>
     [...payments]
       .filter((p) => p.memberId === memberId)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
@@ -304,17 +309,19 @@ export default function MemberDetailPage({
           </Link>
         </Button>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/members/${memberId}/edit`}>
-              <Edit className="w-4 h-4 mr-2" />
-              Edit Profile
-            </Link>
-          </Button>
+          {((session?.user as any)?.role !== 'trainer') && (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/members/${memberId}/edit`}>
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Profile
+              </Link>
+            </Button>
+          )}
           {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
-             <Button variant="destructive" size="sm" onClick={() => setIsDeletingMember(true)} className="bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
-               <Trash2 className="w-4 h-4 mr-2" />
-               Delete
-             </Button>
+            <Button variant="destructive" size="sm" onClick={() => setIsDeletingMember(true)} className="bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete
+            </Button>
           )}
         </div>
       </div>
@@ -324,8 +331,8 @@ export default function MemberDetailPage({
         <div className="lg:col-span-4 space-y-6">
           <Card className="overflow-hidden border-none shadow-xl shadow-foreground/[0.03]">
             <div className="relative h-32 bg-gradient-to-br from-primary/80 to-primary">
-               {/* Pattern Overlay */}
-               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '16px 16px' }} />
+              {/* Pattern Overlay */}
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '16px 16px' }} />
             </div>
             <div className="px-6 pb-8">
               <div className="relative flex justify-center -mt-16 mb-4">
@@ -393,17 +400,17 @@ export default function MemberDetailPage({
                   <p className="text-[10px] uppercase font-bold text-muted-foreground leading-none mb-3">Assigned Coach</p>
                   <Link href={`/trainers/${(member as any).trainerId._id || (member as any).trainerId.id}`} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors group">
                     {(member as any).trainerId.photo ? (
-                       <img src={(member as any).trainerId.photo} className="w-10 h-10 rounded-full object-cover" alt="Trainer" />
+                      <img src={(member as any).trainerId.photo} className="w-10 h-10 rounded-full object-cover" alt="Trainer" />
                     ) : (
-                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                          {(member as any).trainerId.firstName?.[0]}
-                       </div>
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        {(member as any).trainerId.firstName?.[0]}
+                      </div>
                     )}
                     <div className="flex-1">
-                       <p className="font-semibold text-sm group-hover:text-primary transition-colors">
-                          {(member as any).trainerId.firstName} {(member as any).trainerId.lastName}
-                       </p>
-                       <p className="text-xs text-muted-foreground">Personal Trainer</p>
+                      <p className="font-semibold text-sm group-hover:text-primary transition-colors">
+                        {(member as any).trainerId.firstName} {(member as any).trainerId.lastName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Personal Trainer</p>
                     </div>
                   </Link>
                 </div>
@@ -417,130 +424,132 @@ export default function MemberDetailPage({
         {/* Right Column: Detailed History */}
         <div className="lg:col-span-8 space-y-8">
           {/* Quick Stats / Action Card - Moved to Right Column */}
-          <Card className="p-6 border-none shadow-xl shadow-foreground/[0.03] space-y-6">
-            <h3 className="font-bold flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
-              Manage Subscription
-            </h3>
-            
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+          {((session?.user as any)?.role !== 'trainer') && (
+            <Card className="p-6 border-none shadow-xl shadow-foreground/[0.03] space-y-6">
+              <h3 className="font-bold flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                Manage Subscription
+              </h3>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Target Plan</label>
                     <select
-                    className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                    value={selectedPlan}
-                    onChange={(e) => setSelectedPlan(e.target.value)}
+                      className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                      value={selectedPlan}
+                      onChange={(e) => setSelectedPlan(e.target.value)}
                     >
-                    <option value="">Choose a plan...</option>
-                    {plans.map((p) => (
+                      <option value="">Choose a plan...</option>
+                      {plans.map((p) => (
                         <option key={p.id} value={p.id}>
-                        {p.name} — {formatCurrency(p.price)}
+                          {p.name} — {formatCurrency(p.price)}
                         </option>
-                    ))}
+                      ))}
                     </select>
-                </div>
+                  </div>
 
-                <div className="space-y-2">
+                  <div className="space-y-2">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Duration (Days)</label>
                     <div className="relative">
-                    <input
+                      <input
                         type="number"
                         className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
                         value={renewDays}
                         onChange={(e) => setRenewDays(Number(e.target.value))}
                         placeholder="Days"
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">DAYS</span>
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">DAYS</span>
                     </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Payment Method</label>
-                <select
-                  className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                  value={renewMethod}
-                  onChange={(e) => setRenewMethod(e.target.value as any)}
-                >
-                  <option value="cash">Cash</option>
-                  <option value="online">Online</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                  <option value="card">Card</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              {renewMethod === "online" && (
-                <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1 flex items-center gap-1">
-                    Receipt Required <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                  </label>
-                  <div className="space-y-3">
-                    {renewReceipt ? (
-                      <div className="relative group rounded-xl overflow-hidden border bg-muted/20">
-                        <img src={renewReceipt} alt="Receipt" className="w-full h-32 object-cover" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <Button 
-                            variant="destructive" 
-                            size="sm" 
-                            className="h-8 rounded-full"
-                            onClick={() => setRenewReceipt(null)}
-                          >
-                            <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button 
-                          variant="outline" 
-                          type="button"
-                          className="h-20 flex-col gap-2 rounded-xl border-dashed hover:bg-primary/5 hover:border-primary/50 transition-all"
-                          onClick={() => {
-                            const input = document.createElement('input');
-                            input.type = 'file';
-                            input.accept = 'image/*';
-                            input.capture = 'environment';
-                            input.onchange = (e) => handleFileChange(e as any, setRenewReceipt);
-                            input.click();
-                          }}
-                        >
-                          <Camera className="w-5 h-5 text-muted-foreground" />
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-center">Take Photo</span>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          type="button"
-                          className="h-20 flex-col gap-2 rounded-xl border-dashed hover:bg-primary/5 hover:border-primary/50 transition-all"
-                          onClick={() => {
-                            const input = document.createElement('input');
-                            input.type = 'file';
-                            input.accept = 'image/*';
-                            input.onchange = (e) => handleFileChange(e as any, setRenewReceipt);
-                            input.click();
-                          }}
-                        >
-                          <Upload className="w-5 h-5 text-muted-foreground" />
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-center">Upload File</span>
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 </div>
-              )}
-              <Button className="w-full shadow-lg shadow-primary/20" onClick={handleRenew}>
-                <Plus className="w-4 h-4 mr-2" />
-                Extend Membership
-              </Button>
-              
-              {activeSub && (
-                <p className="text-[11px] text-center text-muted-foreground italic">
-                  New sub will start on {formatDate(activeSub.endDate)}
-                </p>
-              )}
-            </div>
-          </Card>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Payment Method</label>
+                  <select
+                    className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                    value={renewMethod}
+                    onChange={(e) => setRenewMethod(e.target.value as any)}
+                  >
+                    <option value="cash">Cash</option>
+                    <option value="online">Online</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="card">Card</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                {renewMethod === "online" && (
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1 flex items-center gap-1">
+                      Receipt Required <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                    </label>
+                    <div className="space-y-3">
+                      {renewReceipt ? (
+                        <div className="relative group rounded-xl overflow-hidden border bg-muted/20">
+                          <img src={renewReceipt} alt="Receipt" className="w-full h-32 object-cover" />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="h-8 rounded-full"
+                              onClick={() => setRenewReceipt(null)}
+                            >
+                              <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            variant="outline"
+                            type="button"
+                            className="h-20 flex-col gap-2 rounded-xl border-dashed hover:bg-primary/5 hover:border-primary/50 transition-all"
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.capture = 'environment';
+                              input.onchange = (e) => handleFileChange(e as any, setRenewReceipt);
+                              input.click();
+                            }}
+                          >
+                            <Camera className="w-5 h-5 text-muted-foreground" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-center">Take Photo</span>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            type="button"
+                            className="h-20 flex-col gap-2 rounded-xl border-dashed hover:bg-primary/5 hover:border-primary/50 transition-all"
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.onchange = (e) => handleFileChange(e as any, setRenewReceipt);
+                              input.click();
+                            }}
+                          >
+                            <Upload className="w-5 h-5 text-muted-foreground" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-center">Upload File</span>
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                <Button className="w-full shadow-lg shadow-primary/20" onClick={handleRenew}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Extend Membership
+                </Button>
+
+                {activeSub && (
+                  <p className="text-[11px] text-center text-muted-foreground italic">
+                    New sub will start on {formatDate(activeSub.endDate)}
+                  </p>
+                )}
+              </div>
+            </Card>
+          )}
           {/* Active Status Banner */}
           <Card className={cn(
             "p-6 border-l-4 shadow-lg shadow-foreground/[0.02] flex items-center justify-between",
@@ -558,8 +567,8 @@ export default function MemberDetailPage({
                   {activeSub ? "Currently Active" : "Membership Expired"}
                 </h4>
                 <p className="text-sm text-muted-foreground leading-none mt-1">
-                  {activeSub 
-                    ? `Expiring on ${formatDate(activeSub.endDate)}` 
+                  {activeSub
+                    ? `Expiring on ${formatDate(activeSub.endDate)}`
                     : `Last active on ${memberSubs[0] ? formatDate(memberSubs[0].endDate) : 'never'}`}
                 </p>
               </div>
@@ -577,7 +586,7 @@ export default function MemberDetailPage({
               <History className="w-5 h-5 text-primary" />
               Membership Timeline
             </h3>
-            
+
             <div className="space-y-3">
               {memberSubs.length > 0 ? (
                 memberSubs.map((sub, idx) => {
@@ -599,44 +608,46 @@ export default function MemberDetailPage({
                             <span className={cn(
                               "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
                               sub.status === "paused" ? "bg-amber-100 text-amber-700" :
-                              isActive ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"
+                                isActive ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"
                             )}>
                               {sub.status === "paused" ? "Paused" : isActive ? 'Current' : 'Completed'}
                             </span>
-                            
+
                             {/* Management Actions */}
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                              {isActive && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  className="h-7 w-7 rounded-md hover:bg-amber-100 hover:text-amber-600"
-                                  title={sub.status === "paused" ? "Resume Membership" : "Pause Membership"}
-                                  onClick={() => updateSubscription(sub.id, { status: sub.status === "paused" ? "active" : "paused" })}
+                            {((session?.user as any)?.role !== 'trainer') && (
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                                {isActive && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 rounded-md hover:bg-amber-100 hover:text-amber-600"
+                                    title={sub.status === "paused" ? "Resume Membership" : "Pause Membership"}
+                                    onClick={() => updateSubscription(sub.id, { status: sub.status === "paused" ? "active" : "paused" })}
+                                  >
+                                    {sub.status === "paused" ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                                  </Button>
+                                )}
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive"
+                                  title="Delete Subscription"
+                                  onClick={() => setDeleteSubId(sub.id)}
                                 >
-                                  {sub.status === "paused" ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </Button>
-                              )}
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive"
-                                title="Delete Subscription"
-                                onClick={() => setDeleteSubId(sub.id)}
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
-                             <Calendar className="w-3 h-3" />
-                             {formatDate(sub.startDate)} - {formatDate(sub.endDate)}
+                            <Calendar className="w-3 h-3" />
+                            {formatDate(sub.startDate)} - {formatDate(sub.endDate)}
                           </span>
                           <span className="flex items-center gap-1">
-                             <Clock className="w-3 h-3" />
-                             {Math.ceil((new Date(sub.endDate).getTime() - new Date(sub.startDate).getTime()) / 86400000)} Days
+                            <Clock className="w-3 h-3" />
+                            {Math.ceil((new Date(sub.endDate).getTime() - new Date(sub.startDate).getTime()) / 86400000)} Days
                           </span>
                         </div>
                       </div>
@@ -645,7 +656,7 @@ export default function MemberDetailPage({
                 })
               ) : (
                 <div className="p-12 text-center rounded-3xl border border-dashed bg-muted/20">
-                   <p className="text-muted-foreground text-sm italic">No subscription history found.</p>
+                  <p className="text-muted-foreground text-sm italic">No subscription history found.</p>
                 </div>
               )}
             </div>
@@ -659,7 +670,7 @@ export default function MemberDetailPage({
               </div>
               Payment Records
             </h3>
-            
+
             <Card className="overflow-hidden border-none shadow-xl shadow-foreground/[0.02]">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
@@ -669,7 +680,9 @@ export default function MemberDetailPage({
                       <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Date</th>
                       <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Method</th>
                       <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground text-right relative min-w-[100px]">Amount</th>
-                      <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground text-right">Actions</th>
+                      {((session?.user as any)?.role !== 'trainer') && (
+                        <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground text-right">Actions</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -679,7 +692,7 @@ export default function MemberDetailPage({
                           <td className="px-6 py-4 font-medium text-muted-foreground flex items-center gap-2">
                             {pay.id.slice(-8).toUpperCase()}
                             {pay.receiptUrl && (
-                              <button 
+                              <button
                                 onClick={() => setPreviewReceiptUrl(pay.receiptUrl || null)}
                                 className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors cursor-pointer"
                                 title="View Receipt"
@@ -697,26 +710,28 @@ export default function MemberDetailPage({
                           <td className="px-6 py-4 text-right font-bold text-foreground">
                             {formatCurrency(pay.amount)}
                           </td>
-                          <td className="px-6 py-4 text-right">
-                            <div className="flex justify-end gap-1 opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 rounded-md hover:bg-primary/10 hover:text-primary"
-                                onClick={() => handleOpenEditPayment(pay)}
-                              >
-                                <Edit className="w-3.5 h-3.5" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive"
-                                onClick={() => setDeletePaymentId(pay.id)}
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            </div>
-                          </td>
+                          {((session?.user as any)?.role !== 'trainer') && (
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex justify-end gap-1 opacity-100 transition-opacity">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 rounded-md hover:bg-primary/10 hover:text-primary"
+                                  onClick={() => handleOpenEditPayment(pay)}
+                                >
+                                  <Edit className="w-3.5 h-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive"
+                                  onClick={() => setDeletePaymentId(pay.id)}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
+                            </td>
+                          )}
                         </tr>
                       ))
                     ) : (
@@ -731,6 +746,58 @@ export default function MemberDetailPage({
               </div>
             </Card>
           </div>
+
+          {/* Workout Assignment - Only for Assigned Trainer */}
+          {((session?.user as any)?.role === 'trainer' && (member as any).trainerId?._id === (session?.user as any)?.id) && (
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold flex items-center gap-2">
+                <div className="p-1 rounded-md bg-primary/10 text-primary">
+                  <Dumbbell className="w-5 h-5" />
+                </div>
+                Workout Plan
+              </h3>
+
+              <Card className="p-6 border-none shadow-xl shadow-foreground/[0.02] flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Dumbbell className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-foreground">
+                      {workoutPlans.find(wp => wp._id === member.workoutPlanId || wp.id === member.workoutPlanId)?.name || "No Plan Assigned"}
+                    </h4>
+                    <p className="text-sm text-muted-foreground leading-none mt-1">
+                      {member.workoutPlanId ? "Active Workout Plan" : "No plan assigned"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <select
+                    className="h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-8"
+                    value={member.workoutPlanId || ""}
+                    onChange={(e) => {
+                      const planId = e.target.value;
+                      if (planId) {
+                        toast.promise(assignWorkoutToMember(memberId, planId), {
+                          loading: "Assigning plan...",
+                          success: "Plan assigned successfully",
+                          error: "Assignment failure"
+                        });
+                      }
+                    }}
+                  >
+                    <option value="">Select Plan...</option>
+                    {workoutPlans.map((wp) => (
+                      <option key={wp._id || wp.id} value={wp._id || wp.id}>
+                        {wp.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
 
@@ -797,7 +864,7 @@ export default function MemberDetailPage({
               Correct transaction details for this record.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -858,8 +925,8 @@ export default function MemberDetailPage({
               <Label className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-muted-foreground uppercase">Receipt / Proof</span>
                 {paymentEditData.receiptUrl && (
-                  <Button 
-                    variant="link" 
+                  <Button
+                    variant="link"
                     className="h-auto p-0 text-[10px] text-primary hover:no-underline"
                     onClick={() => setPreviewReceiptUrl(paymentEditData.receiptUrl || null)}
                   >
@@ -872,9 +939,9 @@ export default function MemberDetailPage({
                   <div className="relative group rounded-xl overflow-hidden border bg-muted/20">
                     <img src={paymentEditData.receiptUrl} alt="Receipt" className="w-full h-32 object-cover" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
+                      <Button
+                        variant="destructive"
+                        size="sm"
                         className="h-8 rounded-full"
                         onClick={() => setPaymentEditData({ ...paymentEditData, receiptUrl: null })}
                       >
@@ -884,8 +951,8 @@ export default function MemberDetailPage({
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       type="button"
                       className="h-16 flex-col gap-1.5 rounded-xl border-dashed hover:bg-primary/5 transition-all"
                       onClick={() => {
@@ -900,8 +967,8 @@ export default function MemberDetailPage({
                       <Camera className="w-4 h-4 text-muted-foreground" />
                       <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Camera</span>
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       type="button"
                       className="h-16 flex-col gap-1.5 rounded-xl border-dashed hover:bg-primary/5 transition-all"
                       onClick={() => {
@@ -932,12 +999,12 @@ export default function MemberDetailPage({
       <Dialog open={previewReceiptUrl !== null} onOpenChange={(open) => !open && setPreviewReceiptUrl(null)}>
         <DialogContent className="max-w-3xl p-0 overflow-hidden border-none bg-transparent shadow-none">
           <div className="relative group flex items-center justify-center p-4">
-            <img 
-              src={previewReceiptUrl || ""} 
-              alt="Receipt Preview" 
-              className="w-full h-auto max-h-[90vh] object-contain rounded-2xl shadow-2xl border bg-background" 
+            <img
+              src={previewReceiptUrl || ""}
+              alt="Receipt Preview"
+              className="w-full h-auto max-h-[90vh] object-contain rounded-2xl shadow-2xl border bg-background"
             />
-          
+
           </div>
         </DialogContent>
       </Dialog>

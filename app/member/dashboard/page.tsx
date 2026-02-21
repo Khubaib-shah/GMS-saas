@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
     Zap,
+    User,
     Calendar,
     CreditCard,
     TrendingUp,
@@ -124,8 +125,9 @@ export default function MemberDashboardPage() {
             });
 
             if (!res.ok) {
-                if (res.status === 401) {
+                if (res.status === 401 || res.status === 404) {
                     localStorage.removeItem("memberToken");
+                    localStorage.removeItem("memberData");
                     router.push("/member/login");
                     return;
                 }
@@ -156,7 +158,7 @@ export default function MemberDashboardPage() {
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Zap className="h-10 w-10 text-primary animate-pulse neon-glow" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] italic">Synchronizing Data...</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] italic">Loading Dashboard...</span>
                 </div>
             </div>
         );
@@ -166,16 +168,29 @@ export default function MemberDashboardPage() {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6">
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <p className="text-red-500 font-black uppercase italic tracking-widest text-xl">CRITICAL ERROR: DATA LINK SEVERED</p>
-                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Unable to establish secure connection to command center</p>
+                    <p className="text-red-500 font-black uppercase italic tracking-widest text-xl">ERROR LOADING DASHBOARD</p>
+                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Failed to load member data.</p>
+                    <p className="text-[10px] text-slate-700 font-mono mt-2 uppercase tracking-tight">Please try logging in again.</p>
                 </div>
-                <Button
-                    onClick={fetchDashboard}
-                    className="bg-white/10 hover:bg-white/20 text-white border border-white/10 font-black italic uppercase tracking-widest rounded-xl gap-2"
-                >
-                    <RefreshCcw className="w-4 h-4" />
-                    RE-INITIALIZE LINK
-                </Button>
+                <div className="flex gap-4">
+                    <Button
+                        onClick={fetchDashboard}
+                        className="bg-white/5 hover:bg-white/10 text-white border border-white/5 font-black italic uppercase tracking-widest rounded-xl gap-2"
+                    >
+                        <RefreshCcw className="w-4 h-4" />
+                        RETRY LOADING
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            localStorage.removeItem("memberToken");
+                            localStorage.removeItem("memberData");
+                            router.push("/member/login");
+                        }}
+                        className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-widest rounded-xl"
+                    >
+                        RETURN TO LOGIN
+                    </Button>
+                </div>
             </div>
         );
     }
@@ -195,13 +210,29 @@ export default function MemberDashboardPage() {
                             <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">
                                 WELCOME, <span className="text-primary">{member.firstName}</span>
                             </h1>
-                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Status: Active Beast</p>
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Status: Active Member</p>
                         </div>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-400 hover:text-red-500 hover:bg-red-500/10 font-black uppercase italic text-[10px] tracking-widest rounded-xl">
-                        <LogOut className="h-4 w-4 mr-2" />
-                        TERMINATE SESSION
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => router.push("/member/settings")}
+                            className="text-slate-400 hover:text-primary hover:bg-white/5 font-black uppercase italic text-[10px] tracking-widest rounded-xl"
+                        >
+                            <User className="h-4 w-4 mr-2" />
+                            PROFILE
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleLogout}
+                            className="text-slate-400 hover:text-red-500 hover:bg-red-500/10 font-black uppercase italic text-[10px] tracking-widest rounded-xl"
+                        >
+                            <LogOut className="h-4 w-4 mr-2" />
+                            LOGOUT
+                        </Button>
+                    </div>
                 </div>
             </header>
 
@@ -260,14 +291,14 @@ export default function MemberDashboardPage() {
 
                     <div className="glass-premium p-6 border-l-4 border-l-orange-500">
                         <div className="flex items-center justify-between mb-4">
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Heat Streak</p>
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Attendance Streak</p>
                             <Flame className="h-4 w-4 text-orange-500" />
                         </div>
                         <div className="flex items-end gap-2">
                             <span className="text-4xl font-black italic text-orange-500">{member.attendanceStreak}</span>
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest pb-1">Days</span>
                         </div>
-                        <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-2 italic">Maintain the momentum 🔥</p>
+                        <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-2 italic">Consistent attendance</p>
                     </div>
 
                     <div className="glass-premium p-6 border-l-4 border-l-green-500">
@@ -285,7 +316,7 @@ export default function MemberDashboardPage() {
                     <div className="lg:col-span-1">
                         <div className="glass-premium p-8 h-full flex flex-col items-center justify-center text-center">
                             <div className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-6">Digital ID</div>
-                            <h3 className="text-2xl font-black italic uppercase text-foreground mb-8 tracking-tighter">ACCESS SCAN</h3>
+                            <h3 className="text-2xl font-black italic uppercase text-foreground mb-8 tracking-tighter">ACCESS QR CODE</h3>
 
                             <div ref={qrRef} className="bg-white p-6 rounded-2xl shadow-[0_0_50px_-10px_rgba(0,0,0,0.1)] mb-8 transition-transform hover:scale-105 duration-500">
                                 <QRCode
@@ -323,7 +354,7 @@ export default function MemberDashboardPage() {
                                 }
                             }}>
                                 <Download className="h-5 w-5" />
-                                DOWNLOAD ACCESS PASS
+                                DOWNLOAD QR CODE
                             </Button>
                         </div>
                     </div>
@@ -354,7 +385,7 @@ export default function MemberDashboardPage() {
                                 <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
                                     <TabsContent value="attendance" className="mt-0 space-y-3">
                                         {attendance.length === 0 ? (
-                                            <div className="py-20 text-center opacity-20 italic text-foreground">No mission logs detected</div>
+                                            <div className="py-20 text-center opacity-20 italic text-foreground">No attendance records found</div>
                                         ) : (
                                             attendance.map((record) => (
                                                 <div key={record.id} className="flex items-center justify-between p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border group hover:border-primary/30 transition-all">
@@ -382,8 +413,8 @@ export default function MemberDashboardPage() {
                                                 <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-slate-500">
                                                     <Dumbbell className="w-8 h-8" />
                                                 </div>
-                                                <div className="opacity-40 font-black italic text-foreground uppercase tracking-widest">No Tactical Plan Assigned</div>
-                                                <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest">Contact your trainer to deploy a regimen.</p>
+                                                <div className="opacity-40 font-black italic text-foreground uppercase tracking-widest">No Workout Plan Assigned</div>
+                                                <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest">Contact your trainer to assign a workout plan.</p>
                                             </div>
                                         ) : (
                                             <div className="space-y-6">
@@ -397,9 +428,18 @@ export default function MemberDashboardPage() {
                                                 <div className="space-y-4">
                                                     {data.workoutPlan.schedule.map((day) => (
                                                         <div key={day._id} className="glass-card bg-black/5 dark:bg-white/5 border border-white/10 overflow-hidden">
-                                                            <div className="bg-purple-500/10 px-4 py-2 border-b border-purple-500/20 flex items-center justify-between">
-                                                                <span className="text-[10px] font-black text-purple-500 uppercase tracking-[0.2em]">{day.day}</span>
-                                                                <span className="text-[10px] font-black text-white uppercase tracking-wider italic">{day.title}</span>
+                                                            <div className="bg-purple-500/10 px-4 py-4 border-b border-purple-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                                <div>
+                                                                    <span className="text-[10px] font-black text-purple-500 uppercase tracking-[0.2em]">{day.day}</span>
+                                                                    <h4 className="text-sm font-black text-white uppercase tracking-wider italic">{day.title}</h4>
+                                                                </div>
+                                                                <Button
+                                                                    onClick={() => router.push("/member/workout")}
+                                                                    className="bg-purple-500 text-white hover:bg-white hover:text-black font-black italic text-[10px] uppercase tracking-widest px-6 h-10 rounded-xl neon-glow transition-all"
+                                                                >
+                                                                    <Zap className="w-3.5 h-3.5 mr-2" />
+                                                                    START WORKOUT
+                                                                </Button>
                                                             </div>
                                                             <div className="divide-y divide-white/5">
                                                                 {day.exercises.map((ex, idx) => (
@@ -441,7 +481,7 @@ export default function MemberDashboardPage() {
 
                                     <TabsContent value="payments" className="mt-0 space-y-3">
                                         {payments.length === 0 ? (
-                                            <div className="py-20 text-center opacity-20 italic text-foreground">No credit transactions detected</div>
+                                            <div className="py-20 text-center opacity-20 italic text-foreground">No payment history found</div>
                                         ) : (
                                             payments.map((payment) => (
                                                 <div key={payment.id} className="flex items-center justify-between p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border group hover:border-blue-500/30 transition-all">
@@ -466,7 +506,7 @@ export default function MemberDashboardPage() {
 
                                     <TabsContent value="pauses" className="mt-0 space-y-3">
                                         {(!subscription?.pauseHistory || subscription.pauseHistory.length === 0) ? (
-                                            <div className="py-20 text-center opacity-20 italic text-foreground">No operational holds detected</div>
+                                            <div className="py-20 text-center opacity-20 italic text-foreground">No subscription pauses found</div>
                                         ) : (
                                             subscription.pauseHistory.map((pause, index) => (
                                                 <div key={index} className="flex items-start gap-5 p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border group hover:border-amber-500/30 transition-all">
@@ -476,7 +516,7 @@ export default function MemberDashboardPage() {
                                                     <div className="flex-1">
                                                         <div className="flex justify-between items-start mb-2">
                                                             <div>
-                                                                <p className="font-black italic uppercase text-sm text-foreground">System Freeze</p>
+                                                                <p className="font-black italic uppercase text-sm text-foreground">Subscription Paused</p>
                                                                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
                                                                     {new Date(pause.startDate).toLocaleDateString()}
                                                                     {pause.endDate ? ` — ${new Date(pause.endDate).toLocaleDateString()}` : " (ONGOING)"}
@@ -516,11 +556,11 @@ export default function MemberDashboardPage() {
                                 <Pause className="h-8 w-8 text-black" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black italic uppercase text-amber-500 mb-2 tracking-tighter">OPERATIONAL FREEZE DETECTED</h3>
+                                <h3 className="text-2xl font-black italic uppercase text-amber-500 mb-2 tracking-tighter">SUBSCRIPTION PAUSED</h3>
                                 <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest leading-relaxed">
-                                    Your tactical data link is currently suspended. Contact Command Center to initiate manual reactivation.
+                                    Your subscription is currently paused. Contact administration to resume it.
                                     {subscription.totalPausedDays > 0 && (
-                                        <span className="text-foreground block mt-1">TOTAL DURATION SUSPENDED: {subscription.totalPausedDays} CYCLES</span>
+                                        <span className="text-foreground block mt-1">TOTAL DAYS PAUSED: {subscription.totalPausedDays} DAYS</span>
                                     )}
                                 </p>
                             </div>

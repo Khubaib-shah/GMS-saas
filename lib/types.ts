@@ -12,6 +12,7 @@ export type Member = {
   gymId?: string
   trainerId?: string
   branchId?: string // Multi-branch support
+  workoutPlanId?: string
   deletedAt?: string | null // Soft delete
 }
 

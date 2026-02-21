@@ -49,17 +49,26 @@ export async function GET(req: Request) {
 
     try {
         await connectDB();
+        console.log("DEBUG: Dashboard fetching for:", tokenData.email, "Gym:", tokenData.gymId);
 
         // Get member
-        const member = await Member.findOne({
-            _id: tokenData.memberId,
-            gymId: tokenData.gymId,
-            deletedAt: null,
-        });
+        let member;
+        try {
+            member = await Member.findOne({
+                _id: tokenData.memberId,
+                gymId: tokenData.gymId,
+                deletedAt: null,
+            });
+        } catch (e) {
+            console.error("DEBUG: Member lookup error (possibly invalid ID):", e);
+            return NextResponse.json({ message: "Invalid member ID format" }, { status: 404 });
+        }
 
         if (!member) {
+            console.log("DEBUG: Member not found in DB for ID:", tokenData.memberId);
             return NextResponse.json({ message: "Member not found" }, { status: 404 });
         }
+        console.log("DEBUG: Member record found");
 
         // Get active subscription
         const subscription = await Subscription.findOne({
@@ -67,11 +76,12 @@ export async function GET(req: Request) {
             gymId: tokenData.gymId,
             deletedAt: null,
         }).sort({ endDate: -1 });
+        console.log("DEBUG: Subscription status:", subscription ? subscription.status : "NONE");
 
         // Get plan details if subscription exists
         let plan = null;
         if (subscription?.planId) {
-            plan = await Plan.findById(subscription.planId);
+            plan = await Plan.findOne({ id: subscription.planId, gymId: tokenData.gymId });
         }
 
         // Get recent payments (last 10)
@@ -174,12 +184,12 @@ export async function GET(req: Request) {
                     day: day.day,
                     title: day.title,
                     exercises: day.exercises.map((ex: any) => ({
-                        exercise: ex.exerciseId ? {
-                            id: ex.exerciseId._id.toString(),
-                            name: ex.exerciseId.name,
-                            muscleGroup: ex.exerciseId.muscleGroup,
-                            gifUrl: ex.exerciseId.gifUrl,
-                            equipment: ex.exerciseId.equipment,
+                        exercise: (ex.exerciseId && typeof ex.exerciseId === 'object') ? {
+                            id: ex.exerciseId._id?.toString() || ex.exerciseId.id || String(ex.exerciseId),
+                            name: ex.exerciseId.name || "Unknown Exercise",
+                            muscleGroup: ex.exerciseId.muscleGroup || "Other",
+                            gifUrl: ex.exerciseId.gifUrl || "",
+                            equipment: ex.exerciseId.equipment || "None",
                         } : null,
                         sets: ex.sets,
                         reps: ex.reps,
