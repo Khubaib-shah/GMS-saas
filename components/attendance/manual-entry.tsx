@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/lib/store";
-import { Check, X } from "lucide-react";
+import { Check, ChevronsUpDown, X, User } from "lucide-react";
 import { toast } from "sonner";
 import {
   Command,
@@ -32,7 +32,7 @@ export function ManualEntry() {
   const [result, setResult] = useState<any>(null);
 
   // Filter only active members (basic check) if needed, or show all
-  const members = store.members || []; 
+  const members = store.members || [];
 
   const handleAttendance = async () => {
     if (!selectedMember) return;
@@ -60,8 +60,7 @@ export function ManualEntry() {
 
       setResult(data);
       toast.success(
-        `Successfully ${isCheckout ? "Checked Out" : "Checked In"} ${
-          data.member?.fullName || selectedMember.firstName
+        `Successfully ${isCheckout ? "Checked Out" : "Checked In"} ${data.member?.fullName || selectedMember.firstName
         }`
       );
       setSelectedMember(null);
@@ -76,12 +75,12 @@ export function ManualEntry() {
   return (
     <div className="space-y-4 p-4 border rounded-lg bg-card">
       <h3 className="text-lg font-semibold">Manual Entry</h3>
-      
+
       <div className="flex items-center space-x-2 mb-4">
-        <Checkbox 
-            id="checkout-mode" 
-            checked={isCheckout} 
-            onCheckedChange={(checked) => setIsCheckout(checked as boolean)}
+        <Checkbox
+          id="checkout-mode"
+          checked={isCheckout}
+          onCheckedChange={(checked) => setIsCheckout(checked as boolean)}
         />
         <Label htmlFor="checkout-mode">Mark as Check-out</Label>
       </div>
@@ -98,13 +97,19 @@ export function ManualEntry() {
               {selectedMember
                 ? `${selectedMember.firstName} ${selectedMember.lastName || ""}`
                 : "Select member..."}
-              {/* <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /> */}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[300px] p-0">
+          <PopoverContent 
+            className="p-0"
+            style={{ width: "var(--radix-popover-trigger-width)" }}
+          >
             <Command>
               <CommandInput placeholder="Search member name..." />
-              <CommandList>
+              <CommandList 
+                className="max-h-[200px] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/40"
+                onWheel={(e) => e.stopPropagation()}
+              >
                 <CommandEmpty>No member found.</CommandEmpty>
                 <CommandGroup>
                   {members.map((member) => (
@@ -115,15 +120,18 @@ export function ManualEntry() {
                         setSelectedMember(member);
                         setOpen(false);
                       }}
+                      className="flex items-center gap-2 cursor-pointer"
                     >
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <span className="flex-1">
+                        {member.firstName} {member.lastName}
+                      </span>
                       <Check
-                        className={`mr-2 h-4 w-4 ${
-                          selectedMember?.id === member.id
-                            ? "opacity-100"
-                            : "opacity-0"
-                        }`}
+                        className={`h-4 w-4 ${selectedMember?.id === member.id
+                          ? "opacity-100"
+                          : "opacity-0"
+                          }`}
                       />
-                      {member.firstName} {member.lastName}
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -132,10 +140,10 @@ export function ManualEntry() {
           </PopoverContent>
         </Popover>
 
-        <Button 
-            onClick={handleAttendance} 
-            disabled={!selectedMember || loading}
-            className="w-full"
+        <Button
+          onClick={handleAttendance}
+          disabled={!selectedMember || loading}
+          className="w-full"
         >
           {loading ? "Processing..." : isCheckout ? "Check Out" : "Check In"}
         </Button>
@@ -143,10 +151,10 @@ export function ManualEntry() {
 
       {result && (
         <div className="mt-6 border-t pt-6">
-          <AttendanceResult 
-            data={result} 
-            isCheckout={isCheckout} 
-            onClose={() => setResult(null)} 
+          <AttendanceResult
+            data={result}
+            isCheckout={isCheckout}
+            onClose={() => setResult(null)}
           />
         </div>
       )}
