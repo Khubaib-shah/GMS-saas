@@ -1,0 +1,5 @@
+Fxes
+
+Fix gym suspend modal Show a modal 
+Fix Record Payment Select box
+i cannot see anything in change plan when i open select 
