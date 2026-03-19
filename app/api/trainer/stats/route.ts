@@ -3,14 +3,15 @@ import connectDB from "@/lib/db";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
 import User from "@/models/User";
-import { authorize } from "@/lib/api-middleware";
+import { requirePermission } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
 import mongoose from "mongoose";
 
 /**
  * GET /api/trainer/stats — Fetch dynamic stats for the logged-in trainer
  */
 export async function GET() {
-    const authResult = await authorize("trainer" as any);
+    const authResult = await requirePermission(PERMISSIONS.TRAINER_DASHBOARD_VIEW);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 

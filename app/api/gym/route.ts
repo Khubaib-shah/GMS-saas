@@ -1,29 +1,19 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { requireAuth, buildGymQuery } from "@/lib/api-middleware";
 import connectDB from "@/lib/db";
 import Gym from "@/models/Gym";
 import { NextResponse } from "next/server";
 import { getCache, setCache, deleteCache } from "@/lib/redis";
 
 export async function GET() {
+    const authResult = await requireAuth();
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
+    let gymId = session.user.gymId;
+
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
-
-        let gymId = session.user.gymId;
-        const isSuperAdmin = session.user.role === "super_admin";
-
-        if (!gymId && !isSuperAdmin) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
-
         await connectDB();
 
-        // If super admin and no gymId, pick the first gym
-        if (isSuperAdmin && !gymId) {
+        if (session.user.role === "super_admin" && !gymId) {
             const firstGym = await Gym.findOne().sort({ createdAt: 1 });
             if (firstGym) gymId = firstGym._id.toString();
         }
@@ -57,23 +47,15 @@ export async function GET() {
 }
 
 export async function PUT(req: Request) {
+    const authResult = await requireAuth();
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
+    let gymId = session.user.gymId;
+
     try {
-        const session = await getServerSession(authOptions);
-
-        if (!session) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
-
-        const isSuperAdmin = session.user.role === "super_admin";
-        let gymId = session.user.gymId;
-
-        if (!gymId && !isSuperAdmin) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-        }
-
         await connectDB();
 
-        if (isSuperAdmin && !gymId) {
+        if (session.user.role === "super_admin" && !gymId) {
             const firstGym = await Gym.findOne().sort({ createdAt: 1 });
             if (firstGym) gymId = firstGym._id.toString();
         }

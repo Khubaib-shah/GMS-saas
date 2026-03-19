@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { requirePermission, authorize } from "@/lib/api-middleware";
+import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import connectDB from "@/lib/db";
 import Exercise from "@/models/Exercise";
-import AuditLog from "@/models/AuditLog";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 
 /**
  * GET /api/exercises
@@ -11,7 +11,7 @@ import AuditLog from "@/models/AuditLog";
  * Trainers see public exercises + their own private ones.
  */
 export async function GET(req: Request) {
-    const authResult = await requirePermission(PERMISSIONS.PLANS_VIEW);
+    const authResult = await requirePermission(PERMISSIONS.EXERCISE_VIEW);
     if ("error" in authResult) return authResult.error;
 
     const { session } = authResult;
@@ -40,7 +40,7 @@ export async function GET(req: Request) {
  * Create a new exercise.
  */
 export async function POST(req: Request) {
-    const authResult = await authorize(PERMISSIONS.EXERCISE_CREATE);
+    const authResult = await requirePermission(PERMISSIONS.EXERCISE_CREATE);
     if ("error" in authResult) return authResult.error;
 
     const { session } = authResult;
@@ -69,14 +69,17 @@ export async function POST(req: Request) {
         });
 
         // Log audit
-        await AuditLog.create({
-            gymId: session.user.gymId,
-            performedBy: session.user.id,
-            action: "EXERCISE_CREATED",
-            entityType: "Exercise",
-            entityId: exercise._id,
-            newValue: exercise.toObject()
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "exercise",
+                exercise._id.toString(),
+                exercise.name,
+                { muscleGroup: exercise.muscleGroup },
+                req.headers
+            )
+        );
 
         return NextResponse.json(exercise, { status: 201 });
     } catch (error: any) {

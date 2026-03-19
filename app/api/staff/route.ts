@@ -1,29 +1,22 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
-import { logAudit, extractRequestInfo } from "@/lib/audit";
+import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 
 // GET /api/staff - List all staff for the gym
-export async function GET(req: Request) {
+export async function GET() {
+    const authResult = await requirePermission(PERMISSIONS.STAFF_VIEW);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
+    let gymId = session.user.gymId;
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        let gymId = (session.user as any).gymId;
-        const isSuperAdmin = (session.user as any).role === "super_admin";
-
-        if (!gymId && !isSuperAdmin) {
-            return NextResponse.json({ error: "No gym associated" }, { status: 400 });
-        }
-
         await connectDB();
 
-        if (isSuperAdmin && !gymId) {
+        if (session.user.role === "super_admin" && !gymId) {
             const Gym = require("@/models/Gym").default;
             const firstGym = await Gym.findOne().sort({ createdAt: 1 });
             if (firstGym) gymId = firstGym._id.toString();
@@ -54,29 +47,17 @@ export async function GET(req: Request) {
 
 // POST /api/staff - Create a new staff member
 export async function POST(req: Request) {
+    const authResult = await requirePermission(PERMISSIONS.STAFF_MANAGE);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
+    let gymId = session.user.gymId;
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        // Logic check: Only owner or manager (with perm) can add staff?
-        // Rely on caller checks or add here.
-        // Assuming Owner/Manager role is sufficient for now.
-        const role = (session.user as any).role;
-        const allowedRoles = ["super_admin", "gym_owner", "owner", "manager"];
-        if (!allowedRoles.includes(role)) {
-            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-        }
-
         const body = await req.json();
         const { fullName, email, password, role: newRole } = body;
-        let gymId = (session.user as any).gymId;
-        const isSuperAdmin = role === "super_admin";
-
         await connectDB();
 
-        if (isSuperAdmin && !gymId) {
+        if (session.user.role === "super_admin" && !gymId) {
             const Gym = require("@/models/Gym").default;
             const firstGym = await Gym.findOne().sort({ createdAt: 1 });
             if (firstGym) gymId = firstGym._id.toString();
@@ -96,7 +77,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid role selected" }, { status: 400 });
         }
 
-        if (role === 'manager' && newRole === 'manager') {
+        if (session.user.role === 'manager' && newRole === 'manager') {
             return NextResponse.json({ error: "Managers cannot create other Managers" }, { status: 403 });
         }
 
@@ -120,17 +101,17 @@ export async function POST(req: Request) {
         });
 
         // Audit Log
-        await logAudit({
-            gymId,
-            userId: (session.user as any).id,
-            userName: session?.user?.name || "User",
-            action: "create",
-            resource: "user",
-            resourceId: newUser._id.toString(),
-            resourceName: newUser.fullName,
-            details: { role: newRole, email },
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "user",
+                newUser._id.toString(),
+                newUser.fullName,
+                { role: newRole, email },
+                req.headers
+            )
+        );
 
         const { password: _, ...userWithoutPass } = newUser.toJSON();
         return NextResponse.json(userWithoutPass, { status: 201 });
@@ -143,24 +124,20 @@ export async function POST(req: Request) {
 
 // DELETE /api/staff?id=... - Soft delete staff
 export async function DELETE(req: Request) {
+    const authResult = await requirePermission(PERMISSIONS.STAFF_MANAGE);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
+    let gymId = session.user.gymId;
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        let gymId = (session.user as any).gymId;
-        const isSuperAdmin = (session.user as any).role === "super_admin";
-
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
         if (!id) {
             return NextResponse.json({ error: "ID required" }, { status: 400 });
         }
-
         await connectDB();
 
-        if (isSuperAdmin && !gymId) {
+        if (session.user.role === "super_admin" && !gymId) {
             const Gym = require("@/models/Gym").default;
             const firstGym = await Gym.findOne().sort({ createdAt: 1 });
             if (firstGym) gymId = firstGym._id.toString();
@@ -185,16 +162,17 @@ export async function DELETE(req: Request) {
         await user.save();
 
         // Audit
-        await logAudit({
-            gymId,
-            userId: (session.user as any).id,
-            userName: session?.user?.name || "User",
-            action: "delete",
-            resource: "user",
-            resourceId: user._id.toString(),
-            resourceName: user.fullName,
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "delete",
+                "user",
+                user._id.toString(),
+                user.fullName,
+                undefined,
+                req.headers
+            )
+        );
 
         return NextResponse.json({ success: true });
     } catch (error: any) {

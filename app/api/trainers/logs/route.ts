@@ -4,9 +4,10 @@ import TrainerSessionLog from "@/models/TrainerSessionLog";
 import TrainerBooking from "@/models/TrainerBooking";
 import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 
 export async function POST(req: Request) {
-    const authResult = await requirePermission(PERMISSIONS.STAFF_MANAGE); // Or trainer self
+    const authResult = await requirePermission(PERMISSIONS.BOOKING_CREATE);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
                 gymId: session.user.gymId,
                 branchId: booking.branchId
             },
-            { upsate: true, new: true, upsert: true }
+            { new: true, upsert: true }
         );
 
         // Auto-mark booking as completed if log is added
@@ -41,6 +42,19 @@ export async function POST(req: Request) {
             booking.status = "completed";
             await booking.save();
         }
+
+        // Audit Log
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "trainer_session_log",
+                log._id.toString(),
+                (booking.memberId || "Member").toString(),
+                { bookingId, trainerId: booking.trainerId },
+                req.headers
+            )
+        );
 
         return NextResponse.json(log);
     } catch (error) {
@@ -50,7 +64,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-    const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW);
+    const authResult = await requirePermission(PERMISSIONS.BOOKING_VIEW);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 

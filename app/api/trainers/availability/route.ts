@@ -3,10 +3,11 @@ import connectDB from "@/lib/db";
 import TrainerAvailability from "@/models/TrainerAvailability";
 import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { generateTrainerSlots } from "@/lib/services/trainer-slot-service";
 
 export async function GET(req: Request) {
-    const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW); // Adjust permission if needed
+    const authResult = await requirePermission(PERMISSIONS.AVAILABILITY_VIEW);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 
@@ -33,7 +34,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const authResult = await requirePermission(PERMISSIONS.STAFF_MANAGE); // Or trainer self-manage
+    const authResult = await requirePermission(PERMISSIONS.AVAILABILITY_MANAGE);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 
@@ -82,6 +83,19 @@ export async function POST(req: Request) {
 
         // Automatically generate slots for this new availability
         await generateTrainerSlots(trainerId, session.user.gymId, availability.branchId?.toString());
+
+        // Audit Log
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "availability",
+                availability._id.toString(),
+                (dayOfWeek || "Unknown").toString(),
+                { trainerId, dayOfWeek, startTime, endTime },
+                req.headers
+            )
+        );
 
         return NextResponse.json(availability, { status: 201 });
     } catch (error) {

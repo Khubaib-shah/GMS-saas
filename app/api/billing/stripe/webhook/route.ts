@@ -3,6 +3,7 @@ import { stripeService } from "@/lib/services/stripe";
 import connectDB from "@/lib/db";
 import Gym from "@/models/Gym";
 import PlatformPayment from "@/models/PlatformPayment";
+import { logAudit } from "@/lib/audit";
 
 export async function POST(req: Request) {
     const payload = await req.text();
@@ -45,6 +46,22 @@ export async function POST(req: Request) {
                 });
 
                 console.log(`[Stripe Webhook] Successfully processed payment for gym: ${gymId}`);
+
+                // Audit Log (System Action)
+                await logAudit({
+                    gymId,
+                    userId: "system_stripe",
+                    userName: "Stripe Webhook",
+                    action: "update",
+                    resource: "gym",
+                    resourceId: gymId,
+                    resourceName: gym.name,
+                    details: { 
+                        subscriptionUpdated: true, 
+                        stripeSessionId: session.id,
+                        newExpiry: newExpiry
+                    }
+                });
             }
         }
 

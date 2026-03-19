@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { requirePermission, authorize } from "@/lib/api-middleware";
+import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import connectDB from "@/lib/db";
 import WorkoutTemplate from "@/models/WorkoutTemplate";
-import AuditLog from "@/models/AuditLog";
+import { logAudit, createCrudAuditEntry, createUpdateDiff } from "@/lib/audit";
 
 /**
  * GET /api/workout-templates/[id]
@@ -11,7 +11,7 @@ import AuditLog from "@/models/AuditLog";
  */
 export async function GET(req: Request, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const authResult = await requirePermission(PERMISSIONS.PLANS_VIEW);
+    const authResult = await requirePermission(PERMISSIONS.WORKOUT_TEMPLATE_VIEW);
     if ("error" in authResult) return authResult.error;
 
     const { session } = authResult;
@@ -39,7 +39,7 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
  */
 export async function PUT(req: Request, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const authResult = await authorize(PERMISSIONS.WORKOUT_TEMPLATE_UPDATE);
+    const authResult = await requirePermission(PERMISSIONS.WORKOUT_TEMPLATE_UPDATE);
     if ("error" in authResult) return authResult.error;
 
     const { session } = authResult;
@@ -67,15 +67,17 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
         await template.save();
 
         // Log audit
-        await AuditLog.create({
-            gymId: session.user.gymId,
-            performedBy: session.user.id,
-            action: "TEMPLATE_UPDATED",
-            entityType: "WorkoutTemplate",
-            entityId: template._id,
-            oldValue: oldData,
-            newValue: template.toObject()
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "update",
+                "workout_template",
+                template._id.toString(),
+                template.name,
+                { diff: createUpdateDiff(oldData, template.toObject()) },
+                req.headers
+            )
+        );
 
         return NextResponse.json(template);
     } catch (error: any) {
@@ -89,7 +91,7 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
  */
 export async function DELETE(req: Request, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const authResult = await authorize(PERMISSIONS.PLANS_DELETE);
+    const authResult = await requirePermission(PERMISSIONS.WORKOUT_TEMPLATE_DELETE);
     if ("error" in authResult) return authResult.error;
 
     const { session } = authResult;
@@ -115,14 +117,17 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
         await template.save();
 
         // Log audit
-        await AuditLog.create({
-            gymId: session.user.gymId,
-            performedBy: session.user.id,
-            action: "TEMPLATE_DELETED",
-            entityType: "WorkoutTemplate",
-            entityId: params.id,
-            oldValue: oldData
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "delete",
+                "workout_template",
+                params.id,
+                template.name,
+                { reason: "soft_delete" },
+                req.headers
+            )
+        );
 
         return NextResponse.json({ message: "Template deactivated successfully" });
     } catch (error: any) {

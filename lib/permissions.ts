@@ -49,9 +49,11 @@ export const PERMISSIONS = {
     // Settings & Admin
     SETTINGS_VIEW: 'settings:view',
     SETTINGS_EDIT: 'settings:edit',
+    STAFF_VIEW: 'staff:view',
     STAFF_MANAGE: 'staff:manage',
     BRANCHES_MANAGE: 'branches:manage',
     AUDIT_VIEW: 'audit:view',
+    BILLING_VIEW: 'billing:view',
 
     // Trainer Profiles
     TRAINERS_VIEW: 'trainers:view',
@@ -69,13 +71,26 @@ export const PERMISSIONS = {
 
     // Trainer Workout Management (Structured)
     TRAINER_DASHBOARD_VIEW: 'trainer.dashboard.view',
+    EXERCISE_VIEW: 'exercise:view',
     EXERCISE_CREATE: 'exercise.create',
     EXERCISE_UPDATE: 'exercise.update',
+    EXERCISE_DELETE: 'exercise:delete',
+    WORKOUT_TEMPLATE_VIEW: 'workout.template:view',
     WORKOUT_TEMPLATE_CREATE: 'workout.template.create',
     WORKOUT_TEMPLATE_UPDATE: 'workout.template.update',
+    WORKOUT_TEMPLATE_DELETE: 'workout.template:delete',
     WORKOUT_PLAN_ASSIGN: 'workout.plan.assign',
     WORKOUT_PLAN_MODIFY: 'workout.plan.modify',
+    WORKOUT_PLAN_DELETE: 'workout.plan:delete',
     WORKOUT_LOG_VIEW: 'workout.log.view',
+    WORKOUT_LOG_CREATE: 'workout.log:create',
+
+    // Bookings & Availability
+    BOOKING_VIEW: 'booking:view',
+    BOOKING_CREATE: 'booking:create',
+    BOOKING_DELETE: 'booking:delete',
+    AVAILABILITY_VIEW: 'availability:view',
+    AVAILABILITY_MANAGE: 'availability:manage',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

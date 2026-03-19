@@ -1,9 +1,10 @@
+import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Subscription from "@/models/Subscription";
 import Payment from "@/models/Payment";
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { requirePermission } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry, createUpdateDiff } from "@/lib/audit";
 import mongoose from "mongoose";
 
 export async function PUT(
@@ -11,10 +12,9 @@ export async function PUT(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
-    if (!session || !(session.user as any).gymId) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requirePermission(PERMISSIONS.SUBSCRIPTIONS_EDIT);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
 
     try {
         const body = await req.json();
@@ -22,15 +22,36 @@ export async function PUT(
 
         const objectId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : id;
 
-        // Ensure subscription belongs to this gym
+        // Get old version for diff
+        const oldSub = await Subscription.findOne({ _id: objectId, gymId: session.user.gymId }).lean();
+        if (!oldSub) {
+             return NextResponse.json({ message: "Subscription not found" }, { status: 404 });
+        }
+
         const sub = await Subscription.findOneAndUpdate(
-            { _id: objectId, gymId: (session.user as any).gymId },
+            { _id: objectId, gymId: session.user.gymId },
             { $set: body },
             { new: true }
         );
 
         if (!sub) {
             return NextResponse.json({ message: "Subscription not found" }, { status: 404 });
+        }
+
+        // Audit Log
+        const diff = createUpdateDiff(oldSub as any, body);
+        if (Object.keys(diff).length > 0) {
+            await logAudit(
+                createCrudAuditEntry(
+                    session,
+                    "update",
+                    "subscription",
+                    id,
+                    (sub.planId || "Unknown Plan").toString(),
+                    { changes: diff },
+                    req.headers
+                )
+            );
         }
 
         return NextResponse.json(sub);
@@ -45,10 +66,9 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
-    if (!session || !(session.user as any).gymId) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requirePermission(PERMISSIONS.SUBSCRIPTIONS_DELETE);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
 
     try {
         await connectDB();
@@ -92,7 +112,19 @@ export async function DELETE(
 
         // 2. Delete the subscription
         await Subscription.findByIdAndDelete(objectId);
-        console.log(`[DELETE SUBSCRIPTION] Subscription ${id} deleted successfully.`);
+
+        // Audit Log
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "delete",
+                "subscription",
+                id,
+                (sub.planId || "Unknown Plan").toString(),
+                { subDeleted: true, paymentDeleted: !!sub.paymentId },
+                req.headers
+            )
+        );
 
         return NextResponse.json({ message: "Subscription and associated payment deleted" });
     } catch (error) {

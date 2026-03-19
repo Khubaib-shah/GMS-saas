@@ -79,17 +79,17 @@ export async function POST(req: Request) {
         const createdBranch = gym.branches[gym.branches.length - 1];
 
         // Audit log
-        await logAudit({
-            gymId: session.user.gymId,
-            userId: session.user.id,
-            userName: session.user.name,
-            action: "create",
-            resource: "branch",
-            resourceId: createdBranch._id.toString(),
-            resourceName: name,
-            details: { branch: newBranch },
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "branch",
+                createdBranch._id.toString(),
+                name,
+                { branch: newBranch },
+                req.headers
+            )
+        );
 
         return NextResponse.json({ branch: createdBranch }, { status: 201 });
     } catch (error) {
@@ -146,17 +146,17 @@ export async function PUT(req: Request) {
         await gym.save();
 
         // Audit log
-        await logAudit({
-            gymId: session.user.gymId,
-            userId: session.user.id,
-            userName: session.user.name,
-            action: "update",
-            resource: "branch",
-            resourceId: branchId,
-            resourceName: name || oldBranch.name,
-            details: { before: oldBranch, after: gym.branches[branchIndex] },
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "update",
+                "branch",
+                branchId,
+                name || oldBranch.name,
+                { before: oldBranch, after: gym.branches[branchIndex] },
+                req.headers
+            )
+        );
 
         return NextResponse.json({ branch: gym.branches[branchIndex] });
     } catch (error) {
@@ -199,17 +199,17 @@ export async function DELETE(req: Request) {
         await gym.save();
 
         // Audit log
-        await logAudit({
-            gymId: session.user.gymId,
-            userId: session.user.id,
-            userName: session.user.name,
-            action: "delete",
-            resource: "branch",
-            resourceId: branchId,
-            resourceName: branch.name,
-            details: { softDelete: true },
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "delete",
+                "branch",
+                branchId,
+                branch.name,
+                { softDelete: true },
+                req.headers
+            )
+        );
 
         return NextResponse.json({ message: "Branch deactivated" });
     } catch (error) {

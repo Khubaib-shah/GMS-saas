@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
-import { logAudit, extractRequestInfo } from "@/lib/audit";
+import { logAudit, extractRequestInfo, createCrudAuditEntry } from "@/lib/audit";
 import connectDB from "@/lib/db";
 import Subscription from "@/models/Subscription";
 import Member from "@/models/Member";
@@ -65,18 +65,21 @@ export async function POST(req: Request) {
         const memberName = member ? `${(member as any).firstName} ${(member as any).lastName || ""}`.trim() : "Unknown";
 
         // Audit log
-        await logAudit({
-            gymId: session.user.gymId,
-            userId: session.user.id,
-            userName: session.user.name,
-            action: "pause_subscription",
-            resource: "subscription",
-            resourceId: subscriptionId,
-            resourceName: `Subscription for ${memberName}`,
-            details: { reason, pausedAt: now.toISOString() },
-            branchId: session.user.branchId,
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "update",
+                "subscription",
+                subscriptionId,
+                `Subscription for ${memberName}`,
+                {
+                    action: "pause",
+                    reason,
+                    pausedAt: now.toISOString()
+                },
+                req.headers
+            )
+        );
 
         return NextResponse.json({
             message: "Subscription paused successfully",

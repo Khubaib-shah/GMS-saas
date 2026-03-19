@@ -59,25 +59,21 @@ export async function PUT(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
-    // Custom auth check: Manager OR Self
-    const session = await getServerSession(authOptions);
-    if (!session || !(session.user as any).gymId) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const authResult = await requirePermission(PERMISSIONS.TRAINERS_MANAGE);
+    // Allow self-edit if management permission is missing
+    let session = authResult as any;
+    if ("error" in authResult) {
+        // Direct session check for self-edit
+        const directSession = await getServerSession(authOptions);
+        if (!directSession || (directSession.user as any).id !== (await params).id) {
+            return authResult.error;
+        }
+        session = directSession;
     }
 
     const { id } = await params;
-    const userRole = (session.user as any).role;
     const userId = (session.user as any).id;
     const gymId = (session.user as any).gymId;
-
-    // Check if user has management permission OR is the user themselves
-    const canManage = hasPermission(userRole, PERMISSIONS.TRAINERS_MANAGE);
-    const isSelf = userId === id;
-
-    if (!canManage && !isSelf) {
-        console.log(`Permission denied for user ${userId} trying to update ${id}`);
-        return NextResponse.json({ message: "Permission denied" }, { status: 403 });
-    }
 
     const body = await req.json();
 

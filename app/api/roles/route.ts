@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Role from "@/models/Role";
-import { authorize, buildGymQuery } from "@/lib/api-middleware";
+import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
 import { CreateRoleSchema } from "@/lib/validations";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
@@ -10,10 +11,9 @@ import { ALL_PERMISSIONS } from "@/lib/permissions";
  * GET /api/roles — List all roles for the current gym
  */
 export async function GET() {
-    const result = await authorize("roles:view" as any);
-    if ("error" in result) return result.error;
-
-    const { session } = result;
+    const authResult = await requirePermission(PERMISSIONS.ROLES_VIEW);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
     await connectDB();
 
     const roles = await Role.find(buildGymQuery(session)).sort({ isSystemRole: -1, name: 1 }).lean();
@@ -25,10 +25,9 @@ export async function GET() {
  * POST /api/roles — Create a new custom role
  */
 export async function POST(req: Request) {
-    const result = await authorize("roles:create" as any);
-    if ("error" in result) return result.error;
-
-    const { session } = result;
+    const authResult = await requirePermission(PERMISSIONS.ROLES_CREATE);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
     const body = await req.json();
 
     const parsed = CreateRoleSchema.safeParse(body);

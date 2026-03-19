@@ -33,7 +33,15 @@ export type AuditResource =
     | 'role'
     | 'platform_settings'
     | 'gym_settings'
-    | 'subscription_plan';
+    | 'subscription_plan'
+    | 'exercise'
+    | 'workout_template'
+    | 'workout_assignment'
+    | 'workout_log'
+    | 'booking'
+    | 'availability'
+    | 'trainer_session_log'
+    | 'member';
 
 export interface AuditLogEntry {
     gymId: string;

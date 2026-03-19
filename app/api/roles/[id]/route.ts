@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Role from "@/models/Role";
-import { authorize, buildGymQuery } from "@/lib/api-middleware";
+import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
 import { UpdateRoleSchema } from "@/lib/validations";
 import { logAudit, createCrudAuditEntry, createUpdateDiff } from "@/lib/audit";
 
@@ -12,10 +13,9 @@ export async function PUT(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
-    const result = await authorize("roles:edit" as any);
-    if ("error" in result) return result.error;
-
-    const { session } = result;
+    const authResult = await requirePermission(PERMISSIONS.ROLES_EDIT);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
     const { id } = await params;
     const body = await req.json();
 
@@ -83,10 +83,9 @@ export async function DELETE(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
-    const result = await authorize("roles:delete" as any);
-    if ("error" in result) return result.error;
-
-    const { session } = result;
+    const authResult = await requirePermission(PERMISSIONS.ROLES_DELETE);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
     const { id } = await params;
 
     await connectDB();

@@ -1,19 +1,18 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { requirePermission } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
+import { invalidatePattern } from "@/lib/redis";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
-import { logAudit, extractRequestInfo } from "@/lib/audit";
-import { invalidatePattern } from "@/lib/redis";
 
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        const authResult = await requirePermission(PERMISSIONS.ATTENDANCE_CHECKOUT);
+        if ("error" in authResult) return authResult.error;
+        const { session } = authResult;
 
         const { memberId, gymId } = await req.json();
 
@@ -57,21 +56,20 @@ export async function POST(req: Request) {
         const memberName = member ? `${member.firstName} ${member.lastName || ""}`.trim() : "Unknown Member";
 
         // Log audit
-        await logAudit({
-            gymId,
-            userId: (session.user as any).id,
-            userName: session.user.name || "Unknown User",
-            action: "checkout",
-            resource: "attendance",
-            resourceId: attendance._id.toString(),
-            resourceName: memberName,
-            details: {
-                checkOutTime: attendance.checkOutTime,
-                durationMinutes: Math.floor((attendance.checkOutTime.getTime() - new Date(attendance.checkInTime).getTime()) / 60000)
-            },
-            branchId: attendance.branchId,
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "update",
+                "attendance",
+                attendance._id.toString(),
+                memberName,
+                {
+                    checkOutTime: attendance.checkOutTime,
+                    durationMinutes: Math.floor((attendance.checkOutTime.getTime() - new Date(attendance.checkInTime).getTime()) / 60000)
+                },
+                req.headers
+            )
+        );
 
         // Invalidate attendance report cache for this gym
         await invalidatePattern(`attendance:report:gym:${gymId}:*`);

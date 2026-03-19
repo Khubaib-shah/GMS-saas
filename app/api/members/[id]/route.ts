@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
-import { logAudit, extractRequestInfo, createUpdateDiff } from "@/lib/audit";
+import { logAudit, extractRequestInfo, createUpdateDiff, createCrudAuditEntry } from "@/lib/audit";
 import { getCache, setCache, deleteCache, invalidatePattern } from "@/lib/redis";
 
 export async function GET(
@@ -99,18 +99,17 @@ export async function PUT(
         // Audit log
         const diff = createUpdateDiff(oldMember as Record<string, any>, body);
         if (Object.keys(diff).length > 0) {
-            await logAudit({
-                gymId: session.user.gymId,
-                userId: session.user.id,
-                userName: session.user.name,
-                action: "update",
-                resource: "member",
-                resourceId: id,
-                resourceName: `${member?.firstName} ${member?.lastName || ""}`.trim(),
-                details: { changes: diff },
-                branchId: session.user.branchId,
-                ...extractRequestInfo(req.headers),
-            });
+            await logAudit(
+                createCrudAuditEntry(
+                    session,
+                    "update",
+                    "member",
+                    id,
+                    `${member?.firstName} ${member?.lastName || ""}`.trim(),
+                    { changes: diff },
+                    req.headers
+                )
+            );
         }
 
         // Invalidate profile cache and all list caches for this gym
@@ -155,18 +154,17 @@ export async function DELETE(
         }
 
         // Audit log
-        await logAudit({
-            gymId: session.user.gymId,
-            userId: session.user.id,
-            userName: session.user.name,
-            action: "delete",
-            resource: "member",
-            resourceId: id,
-            resourceName: `${member.firstName} ${member.lastName || ""}`.trim(),
-            details: { softDelete: true },
-            branchId: session.user.branchId,
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "delete",
+                "member",
+                id,
+                `${member.firstName} ${member.lastName || ""}`.trim(),
+                { softDelete: true },
+                req.headers
+            )
+        );
 
         // Cascading soft delete for subscriptions and payments
         // Using models directly ensuring they are loaded

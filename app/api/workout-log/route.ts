@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { attachTenantContext } from "@/lib/api-middleware";
-import { PERMISSIONS, hasPermission } from "@/lib/permissions";
+import { requirePermission } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import connectDB from "@/lib/db";
 import WorkoutLog from "@/models/WorkoutLog";
 import AssignedWorkoutPlan from "@/models/AssignedWorkoutPlan";
@@ -10,10 +11,9 @@ import AssignedWorkoutPlan from "@/models/AssignedWorkoutPlan";
  * Log a completed workout session.
  */
 export async function POST(req: Request) {
-    const result = await attachTenantContext();
-    if ("error" in result) return result.error;
-
-    const { session } = result;
+    const authResult = await requirePermission(PERMISSIONS.WORKOUT_LOG_CREATE);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
 
     try {
         const body = await req.json();
@@ -53,6 +53,19 @@ export async function POST(req: Request) {
             exercises
         });
 
+        // Audit Log
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "workout_log",
+                log._id.toString(),
+                (plan.memberId || "Member").toString(),
+                { planId, exerciseCount: exercises.length },
+                req.headers
+            )
+        );
+
         return NextResponse.json(log, { status: 201 });
     } catch (error: any) {
         console.error("Log error:", error);
@@ -65,10 +78,9 @@ export async function POST(req: Request) {
  * Fetch logs for a member (query param memberId).
  */
 export async function GET(req: Request) {
-    const result = await attachTenantContext();
-    if ("error" in result) return result.error;
-
-    const { session } = result;
+    const authResult = await requirePermission(PERMISSIONS.WORKOUT_LOG_VIEW);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
     const { searchParams } = new URL(req.url);
     const memberId = searchParams.get("memberId") || session.user.id;
 

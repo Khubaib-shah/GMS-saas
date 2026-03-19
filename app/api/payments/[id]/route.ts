@@ -1,8 +1,9 @@
+import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Payment from "@/models/Payment";
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { requirePermission } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry, createUpdateDiff } from "@/lib/audit";
 import mongoose from "mongoose";
 
 export async function PUT(
@@ -10,10 +11,9 @@ export async function PUT(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
-    if (!session || !(session.user as any).gymId) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requirePermission(PERMISSIONS.PAYMENTS_EDIT);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
 
     try {
         const body = await req.json();
@@ -27,15 +27,36 @@ export async function PUT(
             delete update.$set.receiptUrl;
         }
 
-        // Ensure payment belongs to this gym
+        // Get old version for diff
+        const oldPayment = await Payment.findOne({ _id: objectId, gymId: session.user.gymId }).lean();
+        if (!oldPayment) {
+            return NextResponse.json({ message: "Payment not found" }, { status: 404 });
+        }
+
         const payment = await Payment.findOneAndUpdate(
-            { _id: objectId, gymId: (session.user as any).gymId },
+            { _id: objectId, gymId: session.user.gymId },
             update,
             { new: true }
         );
 
         if (!payment) {
             return NextResponse.json({ message: "Payment not found" }, { status: 404 });
+        }
+
+        // Audit Log
+        const diff = createUpdateDiff(oldPayment as any, body);
+        if (Object.keys(diff).length > 0) {
+            await logAudit(
+                createCrudAuditEntry(
+                    session,
+                    "update",
+                    "payment",
+                    id,
+                    (payment.amount || 0).toString(),
+                    { changes: diff },
+                    req.headers
+                )
+            );
         }
 
         return NextResponse.json(payment.toJSON());
@@ -50,10 +71,9 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
-    if (!session || !(session.user as any).gymId) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requirePermission(PERMISSIONS.PAYMENTS_DELETE);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
 
     try {
         await connectDB();
@@ -73,6 +93,19 @@ export async function DELETE(
         if (!payment) {
             return NextResponse.json({ message: "Payment not found" }, { status: 404 });
         }
+
+        // Audit Log
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "delete",
+                "payment",
+                id,
+                (payment.amount || 0).toString(),
+                { softDelete: true },
+                req.headers
+            )
+        );
 
         return NextResponse.json({ message: "Payment deleted" });
     } catch (error) {

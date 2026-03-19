@@ -3,9 +3,9 @@ import Member from "@/models/Member";
 import { NextResponse } from "next/server";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import Subscription from "@/models/Subscription";
-import { isSubscriptionActive } from "@/lib/utils/file-utils";
+import { isSubscriptionActive } from "@/lib/subscription-utils";
 import { PERMISSIONS } from "@/lib/permissions";
-import { logAudit, extractRequestInfo } from "@/lib/audit";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 
 export async function GET(req: Request) {
@@ -111,18 +111,17 @@ export async function POST(req: Request) {
         const createdMember = Array.isArray(member) ? member[0] : member;
 
         // Audit log
-        await logAudit({
-            gymId: session.user.gymId,
-            userId: session.user.id,
-            userName: session.user.name,
-            action: "create",
-            resource: "member",
-            resourceId: createdMember._id.toString(),
-            resourceName: `${body.firstName || ""} ${body.lastName || ""}`.trim(),
-            details: { member: body },
-            branchId: session.user.branchId,
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "member",
+                createdMember._id.toString(),
+                `${body.firstName || ""} ${body.lastName || ""}`.trim(),
+                { member: body },
+                req.headers
+            )
+        );
 
         // Invalidate all member list caches for this gym on addition of new member
         await invalidatePattern(`members:list:gym:${session.user.gymId}:*`);

@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import PlatformPayment from "@/models/PlatformPayment";
 import Gym from "@/models/Gym";
-import { authorize } from "@/lib/api-middleware";
+import { requirePermission } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
 
 /**
  * GET /api/billing/platform — Fetch platform billing history and current plan for the gym
  */
 export async function GET() {
-    const authResult = await authorize("owner" as any); // Assuming owner/gym_owner can view this
+    const authResult = await requirePermission(PERMISSIONS.BILLING_VIEW);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 

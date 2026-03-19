@@ -7,7 +7,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 import mongoose from "mongoose";
 
 export async function GET(req: Request) {
-    const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW);
+    const authResult = await requirePermission(PERMISSIONS.BOOKING_VIEW);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 

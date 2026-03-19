@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { requirePermission, authorize } from "@/lib/api-middleware";
+import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import connectDB from "@/lib/db";
 import Exercise from "@/models/Exercise";
-import AuditLog from "@/models/AuditLog";
+import { logAudit, createCrudAuditEntry, createUpdateDiff } from "@/lib/audit";
 
 /**
  * GET /api/exercises/[id]
@@ -11,7 +11,7 @@ import AuditLog from "@/models/AuditLog";
  */
 export async function GET(req: Request, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const authResult = await requirePermission(PERMISSIONS.PLANS_VIEW);
+    const authResult = await requirePermission(PERMISSIONS.EXERCISE_VIEW);
     if ("error" in authResult) return authResult.error;
 
     const { session } = authResult;
@@ -39,7 +39,7 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
  */
 export async function PUT(req: Request, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const authResult = await authorize(PERMISSIONS.EXERCISE_UPDATE);
+    const authResult = await requirePermission(PERMISSIONS.EXERCISE_UPDATE);
     if ("error" in authResult) return authResult.error;
 
     const { session } = authResult;
@@ -67,15 +67,17 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
         await exercise.save();
 
         // Log audit
-        await AuditLog.create({
-            gymId: session.user.gymId,
-            performedBy: session.user.id,
-            action: "EXERCISE_UPDATED",
-            entityType: "Exercise",
-            entityId: exercise._id,
-            oldValue: oldData,
-            newValue: exercise.toObject()
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "update",
+                "exercise" as any,
+                exercise._id.toString(),
+                exercise.name,
+                { diff: createUpdateDiff(oldData, exercise.toObject()) },
+                req.headers
+            )
+        );
 
         return NextResponse.json(exercise);
     } catch (error: any) {
@@ -89,7 +91,7 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
  */
 export async function DELETE(req: Request, props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const authResult = await authorize(PERMISSIONS.PLANS_DELETE);
+    const authResult = await requirePermission(PERMISSIONS.EXERCISE_DELETE);
     if ("error" in authResult) return authResult.error;
 
     const { session } = authResult;
@@ -114,14 +116,17 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
         await Exercise.deleteOne({ _id: params.id });
 
         // Log audit
-        await AuditLog.create({
-            gymId: session.user.gymId,
-            performedBy: session.user.id,
-            action: "EXERCISE_DELETED",
-            entityType: "Exercise",
-            entityId: params.id,
-            oldValue: oldData
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "delete",
+                "exercise" as any,
+                params.id,
+                exercise.name,
+                undefined,
+                req.headers
+            )
+        );
 
         return NextResponse.json({ message: "Exercise deleted successfully" });
     } catch (error: any) {

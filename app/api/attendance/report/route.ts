@@ -1,28 +1,24 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
+import { requirePermission } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
 import { getCache, setCache } from "@/lib/redis";
 
 export async function GET(req: Request) {
+    const authResult = await requirePermission(PERMISSIONS.ATTENDANCE_VIEW);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
 
         const { searchParams } = new URL(req.url);
-        const gymId = searchParams.get("gymId");
+        const gymId = session.user.gymId;
         const date = searchParams.get("date"); // e.g., 2023-10-27
         const month = searchParams.get("month"); // e.g., 2023-10
 
-        if (!gymId) {
-            return NextResponse.json({ error: "Gym ID is required" }, { status: 400 });
-        }
-
-        const role = (session.user as any).role;
-        const trainerId = role === 'trainer' ? (session.user as any).id : 'all';
+        const role = session.user.role;
+        const trainerId = role === 'trainer' ? session.user.id : 'all';
         const cacheKey = `attendance:report:gym:${gymId}:date:${date || 'none'}:month:${month || 'none'}:trainer:${trainerId}`;
 
         // Cache-First

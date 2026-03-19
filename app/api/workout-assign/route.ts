@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-import { authorize } from "@/lib/api-middleware";
+import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import connectDB from "@/lib/db";
 import WorkoutPlan from "@/models/WorkoutPlan";
 import AssignedWorkoutPlan from "@/models/AssignedWorkoutPlan";
 import Member from "@/models/Member";
-import AuditLog from "@/models/AuditLog";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 
 /**
  * POST /api/workout-assign
  * Assign a template to one or more members.
  */
 export async function POST(req: Request) {
-    const authResult = await authorize(PERMISSIONS.WORKOUT_PLAN_ASSIGN);
+    const authResult = await requirePermission(PERMISSIONS.WORKOUT_PLAN_ASSIGN);
     if ("error" in authResult) return authResult.error;
 
     const { session } = authResult;
@@ -89,14 +89,17 @@ export async function POST(req: Request) {
             assignmentsCreated.push(assignment);
 
             // Log individual audit
-            await AuditLog.create({
-                gymId: session.user.gymId,
-                performedBy: session.user.id,
-                action: "PLAN_ASSIGNED",
-                entityType: "AssignedWorkoutPlan",
-                entityId: assignment._id,
-                newValue: assignment.toObject()
-            });
+            await logAudit(
+                createCrudAuditEntry(
+                    session,
+                    "create",
+                    "workout_assignment",
+                    assignment._id.toString(),
+                    memberId,
+                    { templateId, startDate: assignment.startDate },
+                    req.headers
+                )
+            );
         }
 
         return NextResponse.json({

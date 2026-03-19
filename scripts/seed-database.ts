@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
+
+// Main Models
 import Gym from "@/models/Gym";
 import User from "@/models/User";
 import Member from "@/models/Member";
@@ -16,6 +18,18 @@ import Exercise from "@/models/Exercise";
 import WorkoutPlan from "@/models/WorkoutPlan";
 import AssignedWorkoutPlan from "@/models/AssignedWorkoutPlan";
 import WorkoutLog from "@/models/WorkoutLog";
+
+// New Models
+import Role from "@/models/Role";
+import GymSettings from "@/models/GymSettings";
+import PlatformSettings from "@/models/PlatformSettings";
+import PlatformPlan from "@/models/PlatformPlan";
+import SubscriptionPlan from "@/models/SubscriptionPlan";
+import Attendance from "@/models/Attendance";
+import AuditLog from "@/models/AuditLog";
+
+// Permissions
+import { ROLE_PERMISSIONS, ALL_PERMISSIONS } from "@/lib/permissions";
 
 // Load environment variables
 function loadEnv() {
@@ -102,9 +116,27 @@ async function seed() {
             Exercise.deleteMany({}),
             WorkoutPlan.deleteMany({}),
             AssignedWorkoutPlan.deleteMany({}),
-            WorkoutLog.deleteMany({})
+            WorkoutLog.deleteMany({}),
+            Role.deleteMany({}),
+            GymSettings.deleteMany({}),
+            PlatformSettings.deleteMany({}),
+            PlatformPlan.deleteMany({}),
+            SubscriptionPlan.deleteMany({}),
+            Attendance.deleteMany({}),
+            AuditLog.deleteMany({})
         ]);
         console.log("Database cleaned");
+
+        // Seed Platform Settings
+        console.log("Seeding Platform Settings...");
+        await PlatformSettings.create({});
+
+        // Seed Platform Plans
+        await PlatformPlan.create([
+            { name: "Starter", slug: "starter", monthlyPricePKR: 5000, branchLimit: 1, maxStaffAccounts: 3 },
+            { name: "Professional", slug: "professional", monthlyPricePKR: 15000, branchLimit: 3, maxStaffAccounts: 10 },
+            { name: "Enterprise", slug: "enterprise", monthlyPricePKR: 50000, branchLimit: 10, maxStaffAccounts: 50 }
+        ]);
 
         const globalCredentials: any[] = [];
 
@@ -114,9 +146,9 @@ async function seed() {
         const hashedPassword = await hashPassword(defaultPassword);
         const hashedPin = await hashPassword(defaultPin);
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 3; i++) { // Seeding 3 gyms for variety
             const gymName = gymNames[i];
-            console.log(`Processing Gym ${i + 1}/10: ${gymName}`);
+            console.log(`Processing Gym ${i + 1}/3: ${gymName}`);
 
             const gymEmail = `contact@${gymName.toLowerCase().replace(/[^a-z]/g, "")}.com`;
 
@@ -127,6 +159,42 @@ async function seed() {
                 isActive: true,
                 branches: [{ name: "Main", address: addresses[i], phone: getRandomPhone(), email: gymEmail, isDefault: true }]
             });
+
+            // Seed Gym Settings
+            await GymSettings.create({
+                gymId: gym._id,
+                general: { name: gymName, address: addresses[i] }
+            });
+
+            // Seed Subscription Plan for the Gym (SaaS Tier)
+            await SubscriptionPlan.create({
+                gymId: gym._id,
+                tierName: "Professional",
+                active: true,
+                enabledFeatures: ["members", "subscriptions", "payments", "attendance", "workout_plans"]
+            });
+
+            // Seed Roles for this Gym
+            console.log(`  Seeding Roles for ${gymName}...`);
+            const rolesMap: Record<string, any> = {};
+            
+            const rolesToCreate = [
+                { name: "owner", permissions: ALL_PERMISSIONS, description: "Full access" },
+                { name: "manager", permissions: ROLE_PERMISSIONS.manager, description: "Management access" },
+                { name: "trainer", permissions: ROLE_PERMISSIONS.trainer, description: "Staff access" },
+                { name: "receptionist", permissions: ROLE_PERMISSIONS.receptionist, description: "Front desk access" }
+            ];
+
+            for (const r of rolesToCreate) {
+                const roleDoc = await Role.create({
+                    gymId: gym._id,
+                    name: r.name,
+                    permissions: r.permissions,
+                    isSystemRole: true,
+                    description: r.description
+                });
+                rolesMap[r.name] = roleDoc;
+            }
 
             const gymCreds: any = {
                 gymName,
@@ -143,7 +211,8 @@ async function seed() {
                 fullName: ownerName.full,
                 email: `owner@${gymName.toLowerCase().replace(/[^a-z]/g, "")}.com`,
                 password: hashedPassword,
-                role: "gym_owner",
+                role: "owner",
+                roleId: rolesMap["owner"]._id,
                 gymId: gym._id,
                 isActive: true
             });
@@ -159,6 +228,7 @@ async function seed() {
                     email: `manager@${gymName.toLowerCase().replace(/[^a-z]/g, "")}.com`,
                     password: hashedPassword,
                     role: "manager",
+                    roleId: rolesMap["manager"]._id,
                     gymId: gym._id,
                     isActive: true
                 }),
@@ -167,6 +237,7 @@ async function seed() {
                     email: `reception@${gymName.toLowerCase().replace(/[^a-z]/g, "")}.com`,
                     password: hashedPassword,
                     role: "receptionist",
+                    roleId: rolesMap["receptionist"]._id,
                     gymId: gym._id,
                     isActive: true
                 })
@@ -181,19 +252,17 @@ async function seed() {
             for (let t = 0; t < 2; t++) {
                 const tName = getRandomName();
                 const email = `${tName.first.toLowerCase()}.${gymName.substring(0, 3).toLowerCase().replace(/[^a-z]/g, "")}${t + 1}@gms.com`;
-                // Pick 2 random specialties
-                const trainSpecs = [];
-                trainSpecs.push(specialties[Math.floor(Math.random() * specialties.length)]);
-                trainSpecs.push(specialties[Math.floor(Math.random() * specialties.length)]);
+                const trainSpecs = [specialties[Math.floor(Math.random() * specialties.length)], specialties[Math.floor(Math.random() * specialties.length)]];
 
                 trainerDocs.push({
                     fullName: tName.full,
                     email,
                     password: hashedPassword,
                     role: "trainer",
+                    roleId: rolesMap["trainer"]._id,
                     gymId: gym._id,
                     isActive: true,
-                    bio: "Expert Trainer with 5+ years of experience helping clients achieve their fitness goals.",
+                    bio: "Expert Trainer assisting members with personalized workout plans.",
                     specialties: trainSpecs,
                     hourlyRate: 2000,
                     trainerStatus: "active"
@@ -204,17 +273,9 @@ async function seed() {
             // Exercise Seeding
             const commonExercises = [
                 { name: "Bench Press", group: "Chest", equip: "Barbell" },
-                { name: "Incline Dumbbell Press", group: "Chest", equip: "Dumbbell" },
                 { name: "Deadlift", group: "Back", equip: "Barbell" },
-                { name: "Pull-ups", group: "Back", equip: "Bodyweight" },
                 { name: "Squats", group: "Legs", equip: "Barbell" },
-                { name: "Leg Press", group: "Legs", equip: "Machine" },
-                { name: "Overhead Press", group: "Shoulders", equip: "Barbell" },
-                { name: "Lateral Raises", group: "Shoulders", equip: "Dumbbell" },
-                { name: "Bicep Curls", group: "Arms", equip: "Dumbbell" },
-                { name: "Tricep Pushdowns", group: "Arms", equip: "Machine" },
                 { name: "Plank", group: "Core", equip: "Bodyweight" },
-                { name: "Crunches", group: "Core", equip: "Bodyweight" },
                 { name: "Treadmill Run", group: "Cardio", equip: "Machine" }
             ];
 
@@ -229,61 +290,18 @@ async function seed() {
             }));
             const createdExercises = await Exercise.insertMany(exercisesToInsert);
 
-            // Workout Templates (WorkoutPlans)
+            // Workout Templates
             const templatesData = [
                 {
                     name: "Full Body Foundation",
-                    description: "Balanced full body workout for all levels.",
+                    description: "Balanced full body workout.",
                     schedule: [
                         {
                             day: "monday",
                             title: "Power Day",
                             exercises: [
                                 { exerciseId: createdExercises[0]._id, sets: 4, reps: "8-10", restSeconds: 90 },
-                                { exerciseId: createdExercises[4]._id, sets: 4, reps: "8-10", restSeconds: 120 },
-                                { exerciseId: createdExercises[2]._id, sets: 3, reps: "5-8", restSeconds: 180 }
-                            ]
-                        },
-                        {
-                            day: "wednesday",
-                            title: "Hypertrophy Day",
-                            exercises: [
-                                { exerciseId: createdExercises[1]._id, sets: 3, reps: "12-15", restSeconds: 60 },
-                                { exerciseId: createdExercises[3]._id, sets: 3, reps: "10-12", restSeconds: 60 },
-                                { exerciseId: createdExercises[5]._id, sets: 3, reps: "15-20", restSeconds: 90 }
-                            ]
-                        },
-                        {
-                            day: "friday",
-                            title: "Core & Cardio",
-                            exercises: [
-                                { exerciseId: createdExercises[10]._id, sets: 3, reps: "60s", restSeconds: 30 },
-                                { exerciseId: createdExercises[11]._id, sets: 3, reps: "20", restSeconds: 30 },
-                                { exerciseId: createdExercises[12]._id, sets: 1, reps: "20min", restSeconds: 0 }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    name: "Push/Pull Split",
-                    description: "Advanced split for maximum muscle growth.",
-                    schedule: [
-                        {
-                            day: "monday",
-                            title: "Push Focus",
-                            exercises: [
-                                { exerciseId: createdExercises[0]._id, sets: 4, reps: "8", restSeconds: 90 },
-                                { exerciseId: createdExercises[6]._id, sets: 3, reps: "10", restSeconds: 60 },
-                                { exerciseId: createdExercises[9]._id, sets: 3, reps: "12", restSeconds: 60 }
-                            ]
-                        },
-                        {
-                            day: "tuesday",
-                            title: "Pull Focus",
-                            exercises: [
-                                { exerciseId: createdExercises[2]._id, sets: 4, reps: "5", restSeconds: 120 },
-                                { exerciseId: createdExercises[3]._id, sets: 3, reps: "10", restSeconds: 90 },
-                                { exerciseId: createdExercises[8]._id, sets: 3, reps: "12", restSeconds: 60 }
+                                { exerciseId: createdExercises[1]._id, sets: 4, reps: "8-10", restSeconds: 120 }
                             ]
                         }
                     ]
@@ -299,93 +317,58 @@ async function seed() {
 
             // Trainer Schedules
             const slotsToInsert: any[] = [];
-            const availabilitiesToInsert = [];
-
             for (const trainer of createdTrainers) {
                 gymCreds.trainers.push({ name: trainer.fullName, email: trainer.email, password: defaultPassword });
                 trainers.push(trainer);
 
-                const days = [1, 2, 3, 4, 5, 6];
-                for (const day of days) {
-                    const availability = new TrainerAvailability({
-                        trainerId: trainer._id,
-                        dayOfWeek: day,
-                        startTime: "09:00",
-                        endTime: "18:00",
-                        slotDurationMinutes: 60,
-                        gymId: gym._id
-                    });
-                    availabilitiesToInsert.push(availability);
+                const availability = await TrainerAvailability.create({
+                    trainerId: trainer._id,
+                    dayOfWeek: 1, // Monday
+                    startTime: "09:00",
+                    endTime: "18:00",
+                    slotDurationMinutes: 60,
+                    gymId: gym._id
+                });
 
-                    // Generate slots for next 30 days
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    for (let d = 0; d < 30; d++) {
-                        const date = new Date(today);
-                        date.setDate(today.getDate() + d);
-                        if (date.getDay() === day) {
-                            for (let h = 9; h < 18; h++) {
-                                slotsToInsert.push({
-                                    trainerId: trainer._id,
-                                    availabilityId: availability._id,
-                                    date: new Date(date),
-                                    startTime: `${h.toString().padStart(2, '0')}:00`,
-                                    endTime: `${(h + 1).toString().padStart(2, '0')}:00`,
-                                    capacity: 1,
-                                    gymId: gym._id,
-                                    status: "available"
-                                });
-                            }
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                for (let d = 0; d < 7; d++) {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() + d);
+                    if (date.getDay() === 1) {
+                        for (let h = 9; h < 12; h++) {
+                            slotsToInsert.push({
+                                trainerId: trainer._id,
+                                availabilityId: availability._id,
+                                date: new Date(date),
+                                startTime: `${h.toString().padStart(2, '0')}:00`,
+                                endTime: `${(h + 1).toString().padStart(2, '0')}:00`,
+                                capacity: 1,
+                                gymId: gym._id,
+                                status: "available"
+                            });
                         }
                     }
                 }
             }
-
-            await TrainerAvailability.bulkSave(availabilitiesToInsert);
-
-            // Use insertMany to get _ids back for slots (important for booking)
-            // We'll insert in chunks but we need to keep track of them for booking assignments
-            // To simplify, we'll insert all slots (memory warning handled by loop previously, but for seed data usually ok up to 10k items)
-            // Chunk slots insertion to avoid memory issues
-            const chunkSize = 1000;
-            const allCreatedSlots: any[] = [];
-            for (let i = 0; i < slotsToInsert.length; i += chunkSize) {
-                const chunk = await TrainerSlot.insertMany(slotsToInsert.slice(i, i + chunkSize));
-                allCreatedSlots.push(...chunk);
-            }
+            const allCreatedSlots = await TrainerSlot.insertMany(slotsToInsert);
 
             // Plans
-            const plansToInsert = [];
-            const planNames = ["Silver", "Gold", "Platinum"];
-            const durations = [30, 60, 90];
-
-            for (let p = 0; p < 3; p++) {
-                plansToInsert.push({
-                    id: `${planNames[p].toLowerCase()}-${durations[p]}`,
-                    gymId: gym._id,
-                    name: `${planNames[p]} Plan`,
-                    price: 3000 + (p * 2000),
-                    duration: durations[p],
-                    description: `Access for ${durations[p]} days`
-                });
-            }
+            const plansToInsert = [
+                { id: "silver-30", gymId: gym._id, name: "Silver Plan", price: 3000, duration: 30, description: "Basic access" },
+                { id: "gold-60", gymId: gym._id, name: "Gold Plan", price: 5000, duration: 60, description: "Premium access" }
+            ];
             const createdPlans = await Plan.insertMany(plansToInsert);
 
             // Members
-            const memberCount = 50 + Math.floor(Math.random() * 21);
+            const memberCount = 10; // Further reduced for faster seeding
             const membersData = [];
-
             for (let m = 0; m < memberCount; m++) {
                 const mName = getRandomName();
-                const plan = createdPlans[Math.floor(Math.random() * createdPlans.length)];
-                const trainer = trainers[Math.floor(Math.random() * trainers.length)];
-
-                // Random join date
-                const daysOptions = [0, 10, 15, 25, 28, Math.floor(Math.random() * 30)];
-                const daysAgo = daysOptions[Math.floor(Math.random() * daysOptions.length)];
+                const plan = createdPlans[m % createdPlans.length];
+                const trainer = trainers[m % trainers.length];
                 const joinDate = new Date();
-                joinDate.setDate(joinDate.getDate() - daysAgo);
+                joinDate.setDate(joinDate.getDate() - (m % 30));
 
                 membersData.push({
                     firstName: mName.first,
@@ -395,167 +378,75 @@ async function seed() {
                     gymId: gym._id,
                     joinDate: joinDate.toISOString(),
                     trainerId: trainer._id,
-                    planId: plan.id, // Using String ID as per schema
+                    planId: plan.id,
                     portalPassword: hashedPassword,
                     portalPin: hashedPin,
                     portalEnabled: true,
                     status: "active"
                 });
             }
-
             const createdMembers = await Member.insertMany(membersData);
-            const subscriptionsWithDetails: any[] = []
 
-            // Subscriptions & Payments & Bookings
-            const paymentsToInsert: any[] = [];
-            const bookingsToInsert: any[] = [];
-            const slotsToUpdate: any[] = []; // IDs of slots to update bookedCount
+            // Subscriptions, Payments, Attendance & Bookings
+            const subscriptionsData = [];
+            const paymentsToInsert = [];
+            const attendanceToInsert = [];
 
-            const subscriptionsData = createdMembers.map(member => {
+            for (const member of createdMembers) {
                 const plan = createdPlans.find(p => p.id === member.planId);
-                const trainer = trainers.find(t => t._id.equals(member.trainerId));
-
-                // For JSON output
-                subscriptionsWithDetails.push({
-                    name: `${member.firstName} ${member.lastName}`,
-                    email: member.email,
-                    password: defaultPassword,
-                    pin: defaultPin,
-                    plan: plan?.name,
-                    trainer: trainer?.fullName
-                });
-
-                // 1. Create Payment
-                paymentsToInsert.push({
-                    memberId: member._id.toString(),
-                    amount: plan?.price || 3000,
-                    date: new Date().toISOString(),
-                    method: "cash",
-                    description: `Payment for ${plan?.name}`,
-                    gymId: gym._id,
-                    collectedBy: receptionist._id // Receptionist collected it
-                });
-
-                // 2. Book Slots (Assign random slots of the assigned trainer to this member)
-                // Filter slots for this trainer
-                const trainerSlots = allCreatedSlots.filter((s: any) => s.trainerId.equals(trainer?._id));
-                if (trainerSlots.length > 0) {
-                    // Pick 0 to 5 random slots
-                    const bookingsCount = Math.floor(Math.random() * 6);
-                    for (let b = 0; b < bookingsCount; b++) {
-                        const randomSlot = trainerSlots[Math.floor(Math.random() * trainerSlots.length)];
-                        bookingsToInsert.push({
-                            slotId: randomSlot._id,
-                            trainerId: trainer?._id,
-                            memberId: member._id,
-                            bookingSource: "member",
-                            status: "booked",
-                            gymId: gym._id
-                        });
-                        // Track slot to update capacity/bookedCount later (simplified for seed)
-                        slotsToUpdate.push(randomSlot._id);
-                    }
-                }
-
-                // Subscription dates should align with join date
                 const startDate = new Date(member.joinDate);
                 const endDate = new Date(startDate);
                 endDate.setDate(startDate.getDate() + (plan?.duration || 30));
 
-                return {
-                    memberId: member._id.toString(), // String ID as per schema
+                subscriptionsData.push({
+                    memberId: member._id,
                     planId: member.planId,
                     startDate: startDate.toISOString(),
                     endDate: endDate.toISOString(),
                     status: "active",
                     gymId: gym._id
-                };
-            });
+                });
+
+                paymentsToInsert.push({
+                    memberId: member._id,
+                    amount: plan?.price || 3000,
+                    date: new Date().toISOString(),
+                    method: "cash",
+                    description: `Payment for ${plan?.name}`,
+                    gymId: gym._id,
+                    collectedBy: receptionist._id
+                });
+
+                // Attendance
+                for (let a = 0; a < 2; a++) {
+                    const attDate = new Date();
+                    attDate.setDate(attDate.getDate() - a);
+                    attendanceToInsert.push({
+                        gymId: gym._id,
+                        memberId: member._id,
+                        date: attDate,
+                        checkInTime: new Date(attDate.setHours(9, 0, 0, 0)),
+                        status: "present"
+                    });
+                }
+
+                gymCreds.members.push({
+                    name: `${member.firstName} ${member.lastName}`,
+                    email: member.email,
+                    password: defaultPassword
+                });
+            }
 
             await Subscription.insertMany(subscriptionsData);
             await Payment.insertMany(paymentsToInsert);
-            await TrainerBooking.insertMany(bookingsToInsert);
+            await Attendance.insertMany(attendanceToInsert);
 
-            // Workout Assignments & Logs
-            const assignmentsToInsert = [];
-            const logsToInsert = [];
-
-            for (const member of createdMembers) {
-                const template = createdTemplates[Math.floor(Math.random() * createdTemplates.length)];
-
-                // 1. Assign Template
-                const assignment = {
-                    gymId: gym._id,
-                    memberId: member._id,
-                    trainerId: member.trainerId,
-                    templateId: template._id,
-                    startDate: new Date(),
-                    status: "active"
-                };
-                assignmentsToInsert.push(assignment);
-            }
-
-            const createdAssignments = await AssignedWorkoutPlan.insertMany(assignmentsToInsert);
-
-            // Seed some logs for history
-            for (const assignment of createdAssignments) {
-                const template = createdTemplates.find(t => t._id.equals(assignment.templateId));
-                if (!template) continue;
-
-                // Create a log for yesterday
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-
-                const log = {
-                    gymId: gym._id,
-                    memberId: assignment.memberId,
-                    trainerId: assignment.trainerId,
-                    planId: assignment._id,
-                    date: yesterday,
-                    exercises: template.schedule[0].exercises.map((ex: { exerciseId: any; sets: any; reps: any; }) => ({
-                        exerciseId: ex.exerciseId,
-                        setsCompleted: ex.sets,
-                        repsCompleted: ex.reps,
-                        weightUsed: 20 + Math.floor(Math.random() * 40),
-                        notes: "Good session"
-                    }))
-                };
-                logsToInsert.push(log);
-            }
-
-            await WorkoutLog.insertMany(logsToInsert);
-
-            // Update slots bookedCount
-            // Doing strictly one by one update is slow, but for seed it's acceptable vs complex bulkWrite
-            // Optimization: Filter unique IDs and $inc
-            const uniqueSlotIds = [...new Set(slotsToUpdate)];
-            if (uniqueSlotIds.length > 0) {
-                await TrainerSlot.updateMany(
-                    { _id: { $in: uniqueSlotIds } },
-                    { $inc: { bookedCount: 1 } }
-                );
-            }
-
-            gymCreds.members = subscriptionsWithDetails;
             globalCredentials.push(gymCreds);
         }
 
-        // Write output
-        console.log("💾 Writing credentials...");
+        // Final output
         fs.writeFileSync("seed_credentials.json", JSON.stringify(globalCredentials, null, 2));
-
-        console.log("\n SEEDING COMPLETE!");
-        console.log("Check 'seed_credentials.json' for full details.");
-
-        // Quick preview
-        const firstGym = globalCredentials[0];
-        if (firstGym) {
-            console.log(`\nExample Gym: ${firstGym.gymName}`);
-            console.log(`Owner: ${firstGym.owner.email} / ${firstGym.owner.password}`);
-            console.log(`Manager: ${firstGym.manager.email} / ${firstGym.manager.password}`);
-            console.log(`Trainer: ${firstGym.trainers[0].email} / ${firstGym.trainers[0].password}`);
-            console.log(`Member: ${firstGym.members[0].email} / ${firstGym.members[0].password}`);
-        }
+        console.log("\n SEEDING COMPLETE! Credentials saved to 'seed_credentials.json'.");
 
     } catch (error) {
         console.error("❌ Fatal Error:", error);

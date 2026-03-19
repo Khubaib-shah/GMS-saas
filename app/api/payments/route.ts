@@ -4,11 +4,12 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
-import { authorize, buildGymQuery } from "@/lib/api-middleware";
+import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 
 export async function GET() {
-    const authResult = await authorize(PERMISSIONS.PAYMENTS_VIEW);
+    const authResult = await requirePermission(PERMISSIONS.PAYMENTS_VIEW);
     if ('error' in authResult) return authResult.error;
     const { session } = authResult;
 
@@ -37,7 +38,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    const authResult = await authorize(PERMISSIONS.PAYMENTS_CREATE);
+    const authResult = await requirePermission(PERMISSIONS.PAYMENTS_CREATE);
     if ('error' in authResult) return authResult.error;
     const { session } = authResult;
 
@@ -47,8 +48,21 @@ export async function POST(req: Request) {
         const payment = await new Payment({
             ...body,
             gymId: session.user.gymId,
-            branchId: session.user.branchId
+            branchId: body.branchId || session.user.branchId
         }).save();
+
+        // Audit Log
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "payment",
+                payment._id.toString(),
+                (body.amount || 0).toString(),
+                { payment: body },
+                req.headers
+            )
+        );
 
         // Invalidate cache
         await invalidatePattern(`payments:list:gym:${session.user.gymId}`);

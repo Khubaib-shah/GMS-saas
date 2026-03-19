@@ -2,13 +2,16 @@ import mongoose from "mongoose";
 
 const AuditLogSchema = new mongoose.Schema({
     gymId: { type: mongoose.Schema.Types.ObjectId, ref: "Gym", required: true },
-    performedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    action: { type: String, required: true }, // e.g., "TEMPLATE_CREATED", "PLAN_ASSIGNED"
-    entityType: { type: String, required: true }, // e.g., "WorkoutTemplate", "AssignedWorkoutPlan"
-    entityId: { type: mongoose.Schema.Types.ObjectId, required: true },
-    oldValue: { type: mongoose.Schema.Types.Mixed },
-    newValue: { type: mongoose.Schema.Types.Mixed },
-    timestamp: { type: Date, default: Date.now }
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    userName: { type: String },
+    action: { type: String, required: true }, // e.g., "create", "update", "login"
+    resource: { type: String, required: true }, // e.g., "member", "payment"
+    resourceId: { type: String },
+    resourceName: { type: String },
+    details: { type: mongoose.Schema.Types.Mixed },
+    ipAddress: { type: String },
+    userAgent: { type: String },
+    branchId: { type: mongoose.Schema.Types.ObjectId },
 }, { timestamps: true });
 
 // Index for performance and tenant isolation

@@ -5,10 +5,11 @@ import TrainerSlot from "@/models/TrainerSlot";
 import Member from "@/models/Member";
 import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { isBefore, parse, format } from "date-fns";
 
 export async function POST(req: Request) {
-    const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW); // Adjust if specific 'BOOKING_CREATE' exists
+    const authResult = await requirePermission(PERMISSIONS.BOOKING_CREATE);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 
@@ -68,6 +69,19 @@ export async function POST(req: Request) {
         }
         await slot.save();
 
+        // Audit Log
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "booking",
+                booking._id.toString(),
+                (member.firstName + " " + (member.lastName || "")).trim(),
+                { slotId, date: slot.date, trainerId: slot.trainerId },
+                req.headers
+            )
+        );
+
         return NextResponse.json(booking, { status: 201 });
     } catch (error) {
         console.error("Create booking error:", error);
@@ -76,7 +90,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-    const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW);
+    const authResult = await requirePermission(PERMISSIONS.BOOKING_VIEW);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 

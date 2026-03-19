@@ -1,23 +1,17 @@
 import connectDB from "@/lib/db";
 import Plan from "@/models/Plan";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
-import { hasPermission, PERMISSIONS } from "@/lib/permissions";
+import { requirePermission } from "@/lib/api-middleware";
+import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 
 export async function GET() {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const role = (session.user as any).role;
-    const gymId = (session.user as any).gymId;
-
-    if (role !== "super_admin" && !gymId) {
-        return NextResponse.json({ message: "Unauthorized: No gym associated" }, { status: 401 });
-    }
+    const authResult = await requirePermission(PERMISSIONS.PLANS_VIEW);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
+    const gymId = session.user.gymId;
+    const role = session.user.role;
 
     const cacheKey = `plans:list:gym:${gymId || 'all'}`;
 
@@ -44,25 +38,17 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const role = (session.user as any).role;
-    const canCreate = hasPermission(role, PERMISSIONS.PLANS_CREATE);
-
-    if (!canCreate) {
-        return NextResponse.json({ message: "Forbidden: Insufficient permissions" }, { status: 403 });
-    }
+    const authResult = await requirePermission(PERMISSIONS.PLANS_CREATE);
+    if ("error" in authResult) return authResult.error;
+    const { session } = authResult;
 
     try {
         const body = await req.json();
         await connectDB();
-        const sessionGymId = (session.user as any).gymId;
+        const sessionGymId = session.user.gymId;
+        const role = session.user.role;
 
         // Use gymId from body if super_admin providing one, else use session gymId
-        // Since super_admin is restricted from creating plans, this will mostly use sessionGymId
         const targetGymId = (role === "super_admin" && body.gymId) ? body.gymId : sessionGymId;
 
         if (!targetGymId) {
@@ -77,10 +63,23 @@ export async function POST(req: Request) {
             }
         }
 
-        const plan = await Plan.create({
+        const plan = await new Plan({
             ...body,
             gymId: targetGymId
-        });
+        }).save();
+
+        // Audit Log
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "plan",
+                plan._id.toString(),
+                plan.name,
+                { plan: body },
+                req.headers
+            )
+        );
 
         // Invalidate list cache
         await invalidatePattern(`plans:list:gym:${targetGymId}`);

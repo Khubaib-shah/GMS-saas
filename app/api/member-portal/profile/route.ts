@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import connectDB from "@/lib/db";
 import Member from "@/models/Member";
+import { logAudit, createCrudAuditEntry, extractRequestInfo } from "@/lib/audit";
 
 const MEMBER_JWT_SECRET = process.env.NEXTAUTH_SECRET || "member-portal-secret";
 
@@ -102,6 +103,25 @@ export async function PATCH(req: Request) {
         if (!member) {
             return NextResponse.json({ message: "Member not found" }, { status: 404 });
         }
+
+        // Audit Log for member self-update
+        await logAudit({
+            gymId: tokenData.gymId,
+            userId: tokenData.memberId,
+            userName: `${member.firstName} ${member.lastName || ""}`.trim(),
+            action: "update",
+            resource: "member",
+            resourceId: tokenData.memberId,
+            resourceName: "Profile Update (Self)",
+            details: {
+                firstName: !!firstName,
+                lastName: !!lastName,
+                phone: !!phone,
+                passwordChanged: !!password,
+                pinChanged: !!pin
+            },
+            ...extractRequestInfo(req.headers)
+        });
 
         return NextResponse.json({
             message: "Profile updated successfully",

@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
-import { logAudit, extractRequestInfo } from "@/lib/audit";
+import { isSubscriptionActive } from "@/lib/subscription-utils";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
+import { invalidatePattern } from "@/lib/redis";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
 import Gym from "@/models/Gym";
-import { isSubscriptionActive } from "@/lib/utils/file-utils";
-import { invalidatePattern } from "@/lib/redis";
 
 export async function POST(req: Request) {
     const authResult = await requirePermission(PERMISSIONS.ATTENDANCE_CHECKIN);
@@ -141,18 +141,17 @@ export async function POST(req: Request) {
         );
 
         // 7. Audit log
-        await logAudit({
-            gymId,
-            userId: session.user.id,
-            userName: session.user.name,
-            action: "checkin",
-            resource: "attendance",
-            resourceId: newAttendance._id.toString(),
-            resourceName: `${member.firstName} ${member.lastName || ""}`.trim(),
-            details: { streak: newStreak },
-            branchId: branchId || session.user.branchId,
-            ...extractRequestInfo(req.headers),
-        });
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "attendance",
+                newAttendance._id.toString(),
+                `${member.firstName} ${member.lastName || ""}`.trim(),
+                { streak: newStreak },
+                req.headers
+            )
+        );
 
         // Invalidate attendance report cache for this gym
         await invalidatePattern(`attendance:report:gym:${gymId}:*`);

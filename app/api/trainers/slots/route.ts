@@ -6,7 +6,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 import { startOfDay, endOfDay, addDays } from "date-fns";
 
 export async function GET(req: Request) {
-    const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW);
+    const authResult = await requirePermission(PERMISSIONS.AVAILABILITY_VIEW);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
 

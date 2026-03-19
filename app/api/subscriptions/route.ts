@@ -4,11 +4,12 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
-import { authorize, buildGymQuery } from "@/lib/api-middleware";
+import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
+import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 
 export async function GET() {
-    const authResult = await authorize(PERMISSIONS.SUBSCRIPTIONS_VIEW);
+    const authResult = await requirePermission(PERMISSIONS.SUBSCRIPTIONS_VIEW);
     if ('error' in authResult) return authResult.error;
     const { session } = authResult;
 
@@ -37,7 +38,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    const authResult = await authorize(PERMISSIONS.SUBSCRIPTIONS_CREATE);
+    const authResult = await requirePermission(PERMISSIONS.SUBSCRIPTIONS_CREATE);
     if ('error' in authResult) return authResult.error;
     const { session } = authResult;
 
@@ -47,8 +48,21 @@ export async function POST(req: Request) {
         const sub = await new Subscription({
             ...body,
             gymId: session.user.gymId,
-            branchId: session.user.branchId
+            branchId: body.branchId || session.user.branchId
         }).save();
+
+        // Audit Log
+        await logAudit(
+            createCrudAuditEntry(
+                session,
+                "create",
+                "subscription",
+                sub._id.toString(),
+                (body.planId || "Unknown Plan").toString(),
+                { subscription: body },
+                req.headers
+            )
+        );
 
         // Invalidate cache
         await invalidatePattern(`subscriptions:list:gym:${session.user.gymId}`);
