@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "GymFlow - Modern Gym Management",
     description: "The complete toolkit for modern gym owners. Start managing your fitness business effectively today.",
-    url: "https://gymflow-management.vercel.app/", // Fallback URL
+    url: "https://gymflow-management.vercel.app/",
     siteName: "GymFlow",
     images: [
       {

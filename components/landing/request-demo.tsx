@@ -1,13 +1,78 @@
 "use client"
 
-
-import { CheckCircle2, ArrowRight } from 'lucide-react'
+import { useState } from 'react'
+import { CheckCircle2, ArrowRight, Loader2 } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 
+type FormData = {
+    firstName: string
+    lastName: string
+    email: string
+    gymName: string
+    members: string
+    message: string
+}
+
+type Status = 'idle' | 'loading' | 'success' | 'error'
+
 export const RequestDemo = () => {
+    const [formData, setFormData] = useState<FormData>({
+        firstName: '',
+        lastName: '',
+        email: '',
+        gymName: '',
+        members: '',
+        message: '',
+    })
+    const [status, setStatus] = useState<Status>('idle')
+    const [errorMsg, setErrorMsg] = useState('')
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
+        setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }))
+    }
+
+    const submitForm = async () => {
+        if (!formData.firstName || !formData.lastName || !formData.email || !formData.gymName) {
+            setErrorMsg('Please fill in all required fields.')
+            setStatus('error')
+            return
+        }
+
+        setStatus('loading')
+        setErrorMsg('')
+
+        try {
+            const res = await fetch('/api/request-demo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                setErrorMsg(data.error || 'Something went wrong.')
+                setStatus('error')
+                return
+            }
+
+            setStatus('success')
+        } catch {
+            setErrorMsg('Network error. Please try again.')
+            setStatus('error')
+        }
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        submitForm()
+    }
+
     return (
         <section id='request-demo' className="flex-1 flex flex-col items-center justify-center py-20 px-6 relative overflow-hidden">
             {/* Background Effects */}
@@ -50,62 +115,127 @@ export const RequestDemo = () => {
                     <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative">
                         <div className="absolute -top-px left-1/2 -translate-x-1/2 w-32 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent"></div>
 
-                        <h2 className="text-2xl font-semibold text-white mb-6">Tell us about your gym</h2>
-
-                        <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div className="space-y-2">
-                                    <Label htmlFor="firstName" className="text-slate-400">First Name</Label>
-                                    <Input id="firstName" placeholder="John" className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white" />
+                        {status === 'success' ? (
+                            <div className="flex flex-col items-center justify-center text-center py-12 gap-4">
+                                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                                    <CheckCircle2 className="w-9 h-9 text-primary" />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="lastName" className="text-slate-400">Last Name</Label>
-                                    <Input id="lastName" placeholder="Doe" className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white" />
-                                </div>
+                                <h2 className="text-2xl font-semibold text-white">Request Sent!</h2>
+                                <p className="text-slate-400 max-w-xs">
+                                    Thanks! We&apos;ll reach out to you within 1 business day to schedule your demo.
+                                </p>
                             </div>
+                        ) : (
+                            <>
+                                <h2 className="text-2xl font-semibold text-white mb-6">Tell us about your gym</h2>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="email" className="text-slate-400">Work Email</Label>
-                                <Input type="email" id="email" placeholder="john@elitefitness.com" className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white" />
-                            </div>
+                                <form className="space-y-5" onSubmit={handleSubmit}>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="firstName" className="text-slate-400">First Name</Label>
+                                            <Input
+                                                id="firstName"
+                                                placeholder="John"
+                                                required
+                                                value={formData.firstName}
+                                                onChange={handleChange}
+                                                className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="lastName" className="text-slate-400">Last Name</Label>
+                                            <Input
+                                                id="lastName"
+                                                placeholder="Doe"
+                                                required
+                                                value={formData.lastName}
+                                                onChange={handleChange}
+                                                className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
+                                            />
+                                        </div>
+                                    </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="gymName" className="text-slate-400">Gym or Studio Name</Label>
-                                <Input id="gymName" placeholder="Elite Fitness Studio" className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white" />
-                            </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email" className="text-slate-400">Work Email</Label>
+                                        <Input
+                                            type="email"
+                                            id="email"
+                                            placeholder="john@elitefitness.com"
+                                            required
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
+                                        />
+                                    </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="members" className="text-slate-400">Estimated Active Members</Label>
-                                <select
-                                    id="members"
-                                    className="flex h-12 w-full items-center justify-between rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    <option value="" className="bg-slate-900 text-slate-400">Select range...</option>
-                                    <option value="1-100" className="bg-slate-900">1 - 100</option>
-                                    <option value="101-500" className="bg-slate-900">101 - 500</option>
-                                    <option value="501-1000" className="bg-slate-900">501 - 1,000</option>
-                                    <option value="1000+" className="bg-slate-900">1,000+</option>
-                                </select>
-                            </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="gymName" className="text-slate-400">Gym or Studio Name</Label>
+                                        <Input
+                                            id="gymName"
+                                            placeholder="Elite Fitness Studio"
+                                            required
+                                            value={formData.gymName}
+                                            onChange={handleChange}
+                                            className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
+                                        />
+                                    </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="message" className="text-slate-400">Anything specific you're looking for?</Label>
-                                <Textarea
-                                    id="message"
-                                    placeholder="We're currently struggling with tracking manual payments..."
-                                    className="bg-white/5 border-white/10 focus-visible:ring-primary min-h-[100px] text-white resize-none"
-                                />
-                            </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="members" className="text-slate-400">Estimated Active Members</Label>
+                                        <select
+                                            id="members"
+                                            value={formData.members}
+                                            onChange={handleChange}
+                                            className="flex h-12 w-full items-center justify-between rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            <option value="" className="bg-slate-900 text-slate-400">Select range...</option>
+                                            <option value="1-100" className="bg-slate-900">1 - 100</option>
+                                            <option value="101-500" className="bg-slate-900">101 - 500</option>
+                                            <option value="501-1000" className="bg-slate-900">501 - 1,000</option>
+                                            <option value="1000+" className="bg-slate-900">1,000+</option>
+                                        </select>
+                                    </div>
 
-                            <Button className="w-full h-14 bg-primary text-black hover:bg-white transition-all text-base font-semibold group flex items-center justify-center gap-2 mt-4">
-                                Request Demo
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </Button>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="message" className="text-slate-400">Anything specific you&apos;re looking for?</Label>
+                                        <Textarea
+                                            id="message"
+                                            placeholder="We're currently struggling with tracking manual payments..."
+                                            value={formData.message}
+                                            onChange={handleChange}
+                                            className="bg-white/5 border-white/10 focus-visible:ring-primary min-h-[100px] text-white resize-none"
+                                        />
+                                    </div>
 
-                            <p className="text-center text-xs text-slate-500 pt-2">
-                                By submitting this form, you agree to our Terms of Service and Privacy Policy.
-                            </p>
-                        </form>
+                                    {status === 'error' && (
+                                        <p className="text-red-400 text-sm text-center">{errorMsg}</p>
+                                    )}
+
+                                    <Button
+                                        type="button"
+                                        onClick={submitForm}
+                                        disabled={status === 'loading'}
+                                        className="w-full h-14 bg-primary text-black hover:bg-white transition-all text-base font-semibold group flex items-center justify-center gap-2 mt-4 disabled:opacity-60"
+                                    >
+                                        {status === 'loading' ? (
+                                            <>
+                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                Sending...
+                                            </>
+                                        ) : (
+                                            <>
+                                                Request Demo
+                                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                            </>
+                                        )}
+                                    </Button>
+
+                                    <p className="text-center text-xs text-slate-500 pt-2">
+                                        By submitting this form, you agree to our Terms of Service and Privacy Policy.
+                                    </p>
+                                </form>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

@@ -20,11 +20,11 @@ export default async function proxy(req: NextRequest) {
     const isLoginPage = req.nextUrl.pathname.startsWith("/login");
     const isMemberPortal = req.nextUrl.pathname.match(/^\/member($|\/)/) || req.nextUrl.pathname.match(/^\/api\/member-portal($|\/)/);
     const isLandingPage = req.nextUrl.pathname === "/";
-    const isRequestDemoPage = req.nextUrl.pathname === "#request-demo";
+    const isRequestDemoApi = req.nextUrl.pathname === "/api/request-demo";
     const isAdmin = token?.role === "super_admin";
 
     // 1. Allow landing page, member portal, and request demo regardless of NextAuth session
-    if (isLandingPage || isMemberPortal || isRequestDemoPage) {
+    if (isLandingPage || isMemberPortal || isRequestDemoApi) {
         return NextResponse.next();
     }
 
@@ -74,6 +74,6 @@ export const config = {
          * - favicon.ico
          * - public assets (png, svg, jpg, etc.)
          */
-        "/((?!api/register|api/auth|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)",
+        "/((?!api/register|api/auth|api/request-demo|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)",
     ],
 };
