@@ -105,7 +105,10 @@ export function ManualEntry() {
             style={{ width: "var(--radix-popover-trigger-width)" }}
           >
             <Command>
-              <CommandInput placeholder="Search member name..." />
+              <CommandInput 
+                placeholder="Search member name..." 
+                className="border-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
+              />
               <CommandList 
                 className="max-h-[200px] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/40"
                 onWheel={(e) => e.stopPropagation()}
