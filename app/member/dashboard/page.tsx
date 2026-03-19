@@ -237,6 +237,20 @@ export default function MemberDashboardPage() {
             </header>
 
             <main className="container mx-auto px-6 py-10 space-y-10">
+                {subscription && subscription.daysUntilExpiry <= 3 && subscription.daysUntilExpiry > 0 && (
+                    <div className="glass-premium border-l-4 border-l-red-500 p-6 flex items-center justify-between gap-6 animate-in slide-in-from-top duration-500">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-red-500 flex items-center justify-center neon-glow-red animate-pulse">
+                                <Flame className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black italic uppercase text-red-500 tracking-tighter">Your membership is expiring soon!</h3>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Only {subscription.daysUntilExpiry} days remaining. Renew at the reception to avoid interruption.</p>
+                            </div>
+                        </div>
+                        <Activity className="w-10 h-10 text-red-500/20" />
+                    </div>
+                )}
                 {/* Stats Cards */}
                 <div className="grid gap-6 md:grid-cols-4">
                     <div className="glass-premium p-6 border-l-4 border-l-primary">
@@ -247,7 +261,10 @@ export default function MemberDashboardPage() {
                         {subscription ? (
                             <div className="space-y-3">
                                 <div className="flex items-end gap-2">
-                                    <span className="text-4xl font-black italic text-foreground line-height-1">
+                                    <span className={cn(
+                                        "text-4xl font-black italic line-height-1",
+                                        subscription.daysUntilExpiry <= 3 ? "text-red-500" : "text-foreground"
+                                    )}>
                                         {subscription.daysUntilExpiry}
                                     </span>
                                     <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pb-1">Days Left</span>
@@ -266,6 +283,14 @@ export default function MemberDashboardPage() {
                                         </Badge>
                                     )}
                                 </div>
+                                {subscription.daysUntilExpiry > 0 && subscription.daysUntilExpiry <= 3 && (
+                                    <div className="pt-2 animate-pulse">
+                                        <p className="text-[9px] font-black text-red-500 uppercase tracking-widest flex items-center gap-1">
+                                            <Flame className="w-3 h-3" />
+                                            Expiring scan! Renew soon
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <p className="text-muted-foreground font-bold italic text-sm">No Active Subscription</p>

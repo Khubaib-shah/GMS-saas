@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { AttendanceResult } from "./attendance-result";
 
 export function ManualEntry() {
   const store = useAppStore();
@@ -28,12 +29,15 @@ export function ManualEntry() {
   const [loading, setLoading] = useState(false);
   const [isCheckout, setIsCheckout] = useState(false);
 
+  const [result, setResult] = useState<any>(null);
+
   // Filter only active members (basic check) if needed, or show all
   const members = store.members || []; 
 
   const handleAttendance = async () => {
     if (!selectedMember) return;
     setLoading(true);
+    setResult(null);
     try {
       const endpoint = isCheckout
         ? "/api/attendance/check-out"
@@ -54,9 +58,10 @@ export function ManualEntry() {
         throw new Error(data.error || "Failed to mark attendance");
       }
 
+      setResult(data);
       toast.success(
         `Successfully ${isCheckout ? "Checked Out" : "Checked In"} ${
-          selectedMember.firstName
+          data.member?.fullName || selectedMember.firstName
         }`
       );
       setSelectedMember(null);
@@ -135,6 +140,16 @@ export function ManualEntry() {
           {loading ? "Processing..." : isCheckout ? "Check Out" : "Check In"}
         </Button>
       </div>
+
+      {result && (
+        <div className="mt-6 border-t pt-6">
+          <AttendanceResult 
+            data={result} 
+            isCheckout={isCheckout} 
+            onClose={() => setResult(null)} 
+          />
+        </div>
+      )}
     </div>
   );
 }

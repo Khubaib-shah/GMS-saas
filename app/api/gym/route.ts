@@ -8,9 +8,28 @@ import { getCache, setCache, deleteCache } from "@/lib/redis";
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
-        const gymId = (session.user as any).gymId;
-        if (!session || !gymId) {
+
+        if (!session) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        let gymId = session.user.gymId;
+        const isSuperAdmin = session.user.role === "super_admin";
+
+        if (!gymId && !isSuperAdmin) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        await connectDB();
+
+        // If super admin and no gymId, pick the first gym
+        if (isSuperAdmin && !gymId) {
+            const firstGym = await Gym.findOne().sort({ createdAt: 1 });
+            if (firstGym) gymId = firstGym._id.toString();
+        }
+
+        if (!gymId) {
+            return NextResponse.json({ message: "No gym context found" }, { status: 404 });
         }
 
         const cacheKey = `gym:profile:${gymId}`;
@@ -22,8 +41,6 @@ export async function GET() {
             return NextResponse.json(cachedGym);
         }
 
-        console.log(`[Redis MISS] ${cacheKey} - Fetching from DB`);
-        await connectDB();
         const gym = await Gym.findById(gymId);
 
         if (!gym) {
@@ -42,8 +59,27 @@ export async function GET() {
 export async function PUT(req: Request) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || !(session.user as any).gymId) {
+
+        if (!session) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        const isSuperAdmin = session.user.role === "super_admin";
+        let gymId = session.user.gymId;
+
+        if (!gymId && !isSuperAdmin) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        await connectDB();
+
+        if (isSuperAdmin && !gymId) {
+            const firstGym = await Gym.findOne().sort({ createdAt: 1 });
+            if (firstGym) gymId = firstGym._id.toString();
+        }
+
+        if (!gymId) {
+            return NextResponse.json({ message: "No gym context found" }, { status: 404 });
         }
 
         const body = await req.json();
@@ -51,7 +87,7 @@ export async function PUT(req: Request) {
 
         await connectDB();
         const gym = await Gym.findByIdAndUpdate(
-            (session.user as any).gymId,
+            gymId,
             { name, address, phone },
             { new: true }
         );
@@ -61,7 +97,7 @@ export async function PUT(req: Request) {
         }
 
         // Invalidate cache
-        await deleteCache(`gym:profile:${(session.user as any).gymId}`);
+        await deleteCache(`gym:profile:${gymId}`);
 
         return NextResponse.json(gym);
     } catch (error) {

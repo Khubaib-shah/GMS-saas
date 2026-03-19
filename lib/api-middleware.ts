@@ -6,6 +6,7 @@ import { Permission, hasPermission, getPermissionsForRole, hasAnyPermission } fr
 import connectDB from "@/lib/db";
 import Role from "@/models/Role";
 import SubscriptionPlan from "@/models/SubscriptionPlan";
+import Gym from "@/models/Gym";
 import jwt from "jsonwebtoken";
 
 export interface AuthenticatedSession {
@@ -125,7 +126,56 @@ export async function attachTenantContext(): Promise<{ session: AuthenticatedSes
 }
 
 // ─────────────────────────────────────────────────
-// 3. Permission Check Middleware
+// 3. Subscription Enforcement
+// ─────────────────────────────────────────────────
+
+/**
+ * Validates that the gym has an active subscription.
+ * If expired but not updated in DB, it updates the status to 'expired'.
+ * Returns null if active, or NextResponse if blocked.
+ */
+export async function checkGymSubscription(gymId: string): Promise<NextResponse | null> {
+    if (!gymId) return null;
+
+    await connectDB();
+    const gym = await Gym.findById(gymId).select("subscriptionStatus expiryDate trialEndsAt isSuspended").lean();
+
+    if (!gym) {
+        return NextResponse.json({ message: "Gym not found" }, { status: 404 });
+    }
+
+    if (gym.isSuspended) {
+        return NextResponse.json({ 
+            message: "Gym access suspended. Contact support.", 
+            status: "suspended" 
+        }, { status: 403 });
+    }
+
+    const now = new Date();
+    const expiry = gym.expiryDate ? new Date(gym.expiryDate) : null;
+    const trialExpiry = gym.trialEndsAt ? new Date(gym.trialEndsAt) : null;
+
+    // Check if actually expired
+    const isExpired = (expiry && now > expiry) || (gym.subscriptionStatus === "trial" && trialExpiry && now > trialExpiry);
+
+    if (isExpired && gym.subscriptionStatus !== "expired") {
+        // Auto-update status to expired in DB
+        await Gym.findByIdAndUpdate(gymId, { subscriptionStatus: "expired" });
+        gym.subscriptionStatus = "expired";
+    }
+
+    if (gym.subscriptionStatus === "expired") {
+        return NextResponse.json({ 
+            message: "Subscription expired. Please renew to continue.", 
+            status: "expired" 
+        }, { status: 403 });
+    }
+
+    return null;
+}
+
+// ─────────────────────────────────────────────────
+// 4. Permission Check Middleware
 // ─────────────────────────────────────────────────
 
 /**
@@ -144,6 +194,13 @@ export async function authorize(permission: Permission): Promise<{ session: Auth
     if ('error' in result) return result;
 
     const { session } = result;
+
+    // Optional: Skip subscription check for super_admins or specific billing routes
+    // But for general permissioned routes, enforce it.
+    if (session.user.role !== 'super_admin') {
+        const subError = await checkGymSubscription(session.user.gymId);
+        if (subError) return { error: subError };
+    }
 
     // Owner shortcut: owner always has full permissions
     // This is still permission-based — owner role is seeded with ALL_PERMISSIONS.
@@ -184,7 +241,16 @@ export async function requireAnyPermission(permissions: Permission[]): Promise<{
  * Simple auth check without permission requirements (just needs to be logged in with gymId)
  */
 export async function requireAuth(): Promise<{ session: AuthenticatedSession } | { error: NextResponse }> {
-    return attachTenantContext();
+    const result = await attachTenantContext();
+    if ('error' in result) return result;
+
+    // For generic auth, we still want to ensure they haven't been suspended
+    if (result.session.user.role !== 'super_admin') {
+        const subError = await checkGymSubscription(result.session.user.gymId);
+        if (subError) return { error: subError };
+    }
+
+    return result;
 }
 
 // Backward compat alias

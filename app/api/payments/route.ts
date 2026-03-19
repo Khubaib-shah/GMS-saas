@@ -44,11 +44,11 @@ export async function POST(req: Request) {
     try {
         const body = await req.json();
         await connectDB();
-        const payment = await Payment.create({
+        const payment = await new Payment({
             ...body,
             gymId: session.user.gymId,
             branchId: session.user.branchId
-        });
+        }).save();
 
         // Invalidate cache
         await invalidatePattern(`payments:list:gym:${session.user.gymId}`);

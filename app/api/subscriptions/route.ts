@@ -44,11 +44,11 @@ export async function POST(req: Request) {
     try {
         const body = await req.json();
         await connectDB();
-        const sub = await Subscription.create({
+        const sub = await new Subscription({
             ...body,
             gymId: session.user.gymId,
             branchId: session.user.branchId
-        });
+        }).save();
 
         // Invalidate cache
         await invalidatePattern(`subscriptions:list:gym:${session.user.gymId}`);

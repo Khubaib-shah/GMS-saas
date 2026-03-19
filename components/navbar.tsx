@@ -280,7 +280,7 @@ export function Navbar() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-white/5" />
             <DropdownMenuItem
-              onClick={() => router.push(isAdmin ? "/admin/settings" : "/settings")}
+              onClick={() => router.push("/settings")}
               className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
             >
               <User className="w-4 h-4" />
@@ -288,7 +288,7 @@ export function Navbar() {
             </DropdownMenuItem>
             {!isTrainer && (
               <DropdownMenuItem
-                onClick={() => router.push("/gym/settings")}
+                onClick={() => router.push("/settings")}
                 className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
               >
                 <SettingsIcon className="w-4 h-4" />

@@ -77,9 +77,15 @@ export const authOptions: NextAuthOptions = {
                 );
 
                 let isPremium = false;
+                let gymSuspended = false;
                 if (user.gymId) {
                     const gym = await Gym.findById(user.gymId);
                     isPremium = !!gym?.isPremium;
+
+                    // Block login if gym is suspended (super_admin can always log in)
+                    if (gym?.isSuspended && user.role !== "super_admin") {
+                        throw new Error("Your gym subscription is suspended. Please contact support.");
+                    }
                 }
 
                 return {

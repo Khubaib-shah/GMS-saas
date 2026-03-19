@@ -14,12 +14,25 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const gymId = (session.user as any).gymId;
-        if (!gymId) {
+        let gymId = (session.user as any).gymId;
+        const isSuperAdmin = (session.user as any).role === "super_admin";
+
+        if (!gymId && !isSuperAdmin) {
             return NextResponse.json({ error: "No gym associated" }, { status: 400 });
         }
 
         await connectDB();
+
+        if (isSuperAdmin && !gymId) {
+            const Gym = require("@/models/Gym").default;
+            const firstGym = await Gym.findOne().sort({ createdAt: 1 });
+            if (firstGym) gymId = firstGym._id.toString();
+        }
+
+        if (!gymId) {
+            return NextResponse.json({ error: "No gym context found" }, { status: 404 });
+        }
+
 
         // Fetch users in this gym who are staff (manager, receptionist, trainer)
         // Exclude the current user (owner/self) from the list if desired, or show all
@@ -58,7 +71,20 @@ export async function POST(req: Request) {
 
         const body = await req.json();
         const { fullName, email, password, role: newRole } = body;
-        const gymId = (session.user as any).gymId;
+        let gymId = (session.user as any).gymId;
+        const isSuperAdmin = role === "super_admin";
+
+        await connectDB();
+
+        if (isSuperAdmin && !gymId) {
+            const Gym = require("@/models/Gym").default;
+            const firstGym = await Gym.findOne().sort({ createdAt: 1 });
+            if (firstGym) gymId = firstGym._id.toString();
+        }
+
+        if (!gymId) {
+            return NextResponse.json({ error: "No gym context found" }, { status: 404 });
+        }
 
         if (!fullName || !email || !password || !newRole) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -70,12 +96,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid role selected" }, { status: 400 });
         }
 
-        // Restriction: Managers cannot create other Managers
         if (role === 'manager' && newRole === 'manager') {
             return NextResponse.json({ error: "Managers cannot create other Managers" }, { status: 403 });
         }
-
-        await connectDB();
 
         // Check duplicates
         const existing = await User.findOne({ email });
@@ -126,14 +149,26 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        let gymId = (session.user as any).gymId;
+        const isSuperAdmin = (session.user as any).role === "super_admin";
+
         const { searchParams } = new URL(req.url);
         const id = searchParams.get("id");
         if (!id) {
             return NextResponse.json({ error: "ID required" }, { status: 400 });
         }
 
-        const gymId = (session.user as any).gymId;
         await connectDB();
+
+        if (isSuperAdmin && !gymId) {
+            const Gym = require("@/models/Gym").default;
+            const firstGym = await Gym.findOne().sort({ createdAt: 1 });
+            if (firstGym) gymId = firstGym._id.toString();
+        }
+
+        if (!gymId) {
+            return NextResponse.json({ error: "No gym context found" }, { status: 404 });
+        }
 
         const user = await User.findOne({ _id: id, gymId });
         if (!user) {

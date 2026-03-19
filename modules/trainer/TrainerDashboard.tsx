@@ -14,12 +14,19 @@ import {
     CheckCircle2,
     Calendar,
     Send,
-    Terminal
+    Terminal,
+    RefreshCw,
+    Search,
+    UserCircle,
+    Mail,
+    Phone
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
 
 interface TrainerStats {
     totalMembers: number;
@@ -31,16 +38,49 @@ interface TrainerStats {
 
 export function TrainerDashboard() {
     const router = useRouter();
-    const [stats, setStats] = useState<TrainerStats>({
-        totalMembers: 42,
-        activePlans: 38,
-        membersWithoutPlans: 4,
-        todaySessions: 12,
-        complianceRate: 85
-    });
+    const [stats, setStats] = useState<TrainerStats | null>(null);
+    const [members, setMembers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const fetchTrainerData = async () => {
+        try {
+            const res = await fetch("/api/trainer/stats");
+            const d = await res.json();
+            if (res.ok) {
+                setStats(d.stats);
+                setMembers(d.members);
+            } else {
+                toast.error(d.message || "Failed to load dashboard");
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("An error occurred");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTrainerData();
+    }, []);
+
+    const filteredMembers = members.filter(m => 
+        m.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        m.phone?.includes(searchTerm)
+    );
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+                <RefreshCw className="w-8 h-8 text-primary animate-spin" />
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 animate-pulse">Syncing Trainer Node...</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
@@ -66,10 +106,10 @@ export function TrainerDashboard() {
             {/* KPI Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                    { label: "Total Members", val: stats.totalMembers, icon: Users, color: "primary" },
-                    { label: "Active Plans", val: stats.activePlans, icon: Activity, color: "blue" },
-                    { label: "Pending Assignments", val: stats.membersWithoutPlans, icon: AlertCircle, color: "red", alert: stats.membersWithoutPlans > 0 },
-                    { label: "Client Compliance", val: `${stats.complianceRate}%`, icon: TrendingUp, color: "green" }
+                    { label: "Total Members", val: stats?.totalMembers || 0, icon: Users, color: "primary" },
+                    { label: "Active Plans", val: stats?.activePlans || 0, icon: Activity, color: "blue" },
+                    { label: "Pending Assignments", val: stats?.membersWithoutPlans || 0, icon: AlertCircle, color: "red", alert: (stats?.membersWithoutPlans || 0) > 0 },
+                    { label: "Plan Compliance", val: `${stats?.complianceRate || 0}%`, icon: TrendingUp, color: "green" }
                 ].map((kpi, i) => (
                     <Card key={i} className="relative overflow-hidden group bg-slate-950/20 border-white/5 p-6 hover:border-primary/20 transition-all duration-500">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -skew-x-12 translate-x-8 -translate-y-8 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -90,27 +130,86 @@ export function TrainerDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Content Area */}
+                {/* Assigned Members List */}
                 <div className="lg:col-span-2 space-y-6">
                     <Card className="bg-slate-950/20 border-white/5 overflow-hidden">
-                        <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                        <div className="p-6 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <h3 className="text-sm font-black italic uppercase tracking-widest flex items-center gap-3">
-                                <Calendar className="w-4 h-4 text-primary" />
-                                Activity <span className="text-primary/40">Schedule</span>
+                                <Users className="w-4 h-4 text-primary" />
+                                Assigned <span className="text-primary/40">Members</span>
                             </h3>
-                            <Button variant="ghost" size="sm" className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">View All</Button>
+                            <div className="relative w-full md:w-64">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                <input 
+                                    type="text"
+                                    placeholder="Search by name or phone..."
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-xs font-bold text-white focus:outline-none focus:border-primary/40 transition-all"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
                         </div>
-                        <div className="p-6 space-y-4">
-                            {[1, 2, 3].map(i => (
-                                <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 group hover:bg-white/[0.05] transition-all cursor-pointer">
-                                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-xs font-black italic">09:00</div>
-                                    <div className="flex-1">
-                                        <h4 className="font-black italic uppercase tracking-tight group-hover:text-primary transition-colors">Member Training Plan</h4>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Strength Training // Session B</p>
-                                    </div>
-                                    <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-primary transition-colors" />
-                                </div>
-                            ))}
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="bg-white/[0.02] border-b border-white/5">
+                                        <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Member</th>
+                                        <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Plan Status</th>
+                                        <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest text-right">Activity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredMembers.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={3} className="px-6 py-12 text-center text-slate-500 italic text-sm">
+                                                No members found matching your search.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredMembers.map((m) => (
+                                            <tr key={m.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer group" onClick={() => router.push(`/members/${m.id}`)}>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                                                            <UserCircle className="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs font-black uppercase italic tracking-tight">{m.fullName}</p>
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <Phone className="w-2.5 h-2.5 text-slate-600" />
+                                                                <span className="text-[9px] text-slate-500 font-bold tracking-widest">{m.phone || "No Phone"}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className={cn(
+                                                            "w-1.5 h-1.5 rounded-full",
+                                                            m.workoutPlanName !== "No Plan" ? "bg-primary" : "bg-red-500 animate-pulse"
+                                                        )}></div>
+                                                        <span className="text-[10px] font-black uppercase italic tracking-tight text-foreground">{m.workoutPlanName}</span>
+                                                    </div>
+                                                    <p className="text-[9px] text-slate-500 uppercase font-bold mt-1 tracking-widest">
+                                                        Membership: <span className={m.subscriptionStatus === "active" ? "text-emerald-500" : "text-destructive"}>{m.subscriptionStatus}</span>
+                                                    </p>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="flex flex-col items-end gap-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <TrendingUp className="w-3 h-3 text-emerald-500" />
+                                                            <span className="text-xs font-black italic">{m.attendanceStreak} Day Streak</span>
+                                                        </div>
+                                                        <p className="text-[9px] text-slate-500 uppercase font-bold tracking-widest">
+                                                            {m.lastCheckIn ? `Last seen ${formatDistanceToNow(new Date(m.lastCheckIn))} ago` : "Never checked in"}
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </Card>
                 </div>
@@ -125,7 +224,7 @@ export function TrainerDashboard() {
                             <div>
                                 <h3 className="text-sm font-black italic uppercase tracking-[0.2em] text-primary mb-2">Management Console</h3>
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
-                                    Manage workout plans and templates.
+                                    Manage workout plans and templates for your assigned roster.
                                 </p>
                             </div>
 
@@ -167,21 +266,27 @@ export function TrainerDashboard() {
                     </Card>
 
                     <Card className="bg-slate-950/20 border-white/5 p-6">
-                        <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-4">System Status</h3>
+                        <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-4">Quick Alerts</h3>
                         <div className="space-y-4">
-                            <div className="space-y-1">
-                                <div className="flex justify-between text-[9px] font-bold italic mb-1 uppercase tracking-widest">
-                                    <span>Data Sync</span>
-                                    <span className="text-primary">100%</span>
+                            {(stats?.membersWithoutPlans || 0) > 0 && (
+                                <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10 grayscale hover:grayscale-0 transition-all cursor-pointer" onClick={() => setSearchTerm("")}>
+                                    <AlertCircle className="w-4 h-4 text-red-500 mt-0.5" />
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase text-red-500 tracking-wider">Action Required</p>
+                                        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1 leading-relaxed">
+                                            {stats?.membersWithoutPlans} Members have no workout plans assigned.
+                                        </p>
+                                    </div>
                                 </div>
-                                <Progress value={100} className="h-1 bg-white/5" />
-                            </div>
-                            <div className="space-y-1">
-                                <div className="flex justify-between text-[9px] font-bold italic mb-1 uppercase tracking-widest">
-                                    <span>Response Time</span>
-                                    <span className="text-blue-500">12ms</span>
+                            )}
+                            <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10 transition-all">
+                                <CheckCircle2 className="w-4 h-4 text-primary mt-0.5" />
+                                <div>
+                                    <p className="text-[10px] font-black uppercase text-primary tracking-wider">System Optimized</p>
+                                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1 leading-relaxed">
+                                        Trainer-Member node synchronization is complete.
+                                    </p>
                                 </div>
-                                <Progress value={12} className="h-1 bg-white/5" />
                             </div>
                         </div>
                     </Card>

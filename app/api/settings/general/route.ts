@@ -13,13 +13,26 @@ export async function GET() {
     if ("error" in result) return result.error;
 
     const { session } = result;
+    let gymId = session.user.gymId;
+    const isSuperAdmin = session.user.role === "super_admin";
+
     await connectDB();
 
-    let settings = await GymSettings.findOne({ gymId: session.user.gymId }).lean();
+    if (isSuperAdmin && !gymId) {
+        const Gym = require("@/models/Gym").default;
+        const firstGym = await Gym.findOne().sort({ createdAt: 1 });
+        if (firstGym) gymId = firstGym._id.toString();
+    }
+
+    if (!gymId) {
+        return NextResponse.json({ message: "No gym context found" }, { status: 404 });
+    }
+
+    let settings = await GymSettings.findOne({ gymId }).lean();
 
     // Auto-create settings document if it doesn't exist
     if (!settings) {
-        settings = await GymSettings.create({ gymId: session.user.gymId });
+        settings = await GymSettings.create({ gymId });
         settings = settings.toJSON();
     }
 
@@ -48,8 +61,20 @@ export async function PUT(req: Request) {
 
     await connectDB();
 
+    let gymId = session.user.gymId;
+    const isSuperAdmin = session.user.role === "super_admin";
+    if (isSuperAdmin && !gymId) {
+        const Gym = require("@/models/Gym").default;
+        const firstGym = await Gym.findOne().sort({ createdAt: 1 });
+        if (firstGym) gymId = firstGym._id.toString();
+    }
+
+    if (!gymId) {
+        return NextResponse.json({ message: "No gym context found" }, { status: 404 });
+    }
+
     // Get old values for audit
-    const oldSettings = await GymSettings.findOne({ gymId: session.user.gymId }).lean();
+    const oldSettings = await GymSettings.findOne({ gymId }).lean();
 
     const $set = buildSetObject("general", parsed.data);
     if (Object.keys($set).length === 0) {
@@ -57,7 +82,7 @@ export async function PUT(req: Request) {
     }
 
     const updated = await GymSettings.findOneAndUpdate(
-        { gymId: session.user.gymId },
+        { gymId },
         { $set },
         { new: true, upsert: true }
     ).lean();
@@ -68,7 +93,7 @@ export async function PUT(req: Request) {
             session,
             "update",
             "gym_settings",
-            session.user.gymId,
+            gymId,
             "General Settings",
             { before: (oldSettings as any)?.general, after: parsed.data },
             req.headers

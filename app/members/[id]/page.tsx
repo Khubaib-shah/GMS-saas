@@ -79,7 +79,9 @@ export default function MemberDetailPage({
     deletePayment,
     workoutPlans,
     loadWorkoutPlans,
-    assignWorkoutToMember
+    assignWorkoutToMember,
+    businessSettings,
+    loadBusinessSettings
   } = useAppStore();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -124,7 +126,8 @@ export default function MemberDetailPage({
         loadSubscriptions(),
         loadPayments(),
         loadPlans(),
-        loadWorkoutPlans()
+        loadWorkoutPlans(),
+        loadBusinessSettings()
       ]);
 
       // Fallback: If member not found in store, try fetching individually
@@ -557,6 +560,37 @@ export default function MemberDetailPage({
                   <p className="text-[11px] text-center text-muted-foreground italic">
                     New sub will start on {formatDate(activeSub.endDate)}
                   </p>
+                )}
+
+                {/* Price Breakdown */}
+                {selectedPlan && (
+                  <div className="pt-4 border-t border-border/40 space-y-2">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">Base Price</span>
+                      <span className="font-medium">{formatCurrency(plans.find(p => p.id === selectedPlan)?.price || 0)}</span>
+                    </div>
+                    {businessSettings.taxPercentage > 0 && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Tax ({businessSettings.taxPercentage}%)</span>
+                        <span className="font-medium text-amber-600">+{formatCurrency((plans.find(p => p.id === selectedPlan)?.price || 0) * (businessSettings.taxPercentage / 100))}</span>
+                      </div>
+                    )}
+                    {memberSubs.length === 0 && businessSettings.joiningFee > 0 && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Joining Fee</span>
+                        <span className="font-medium text-amber-600">+{formatCurrency(businessSettings.joiningFee)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm font-bold pt-1 border-t border-dashed">
+                      <span>Total Amount</span>
+                      <span className="text-primary">
+                        {formatCurrency(
+                          ((plans.find(p => p.id === selectedPlan)?.price || 0) * (1 + (businessSettings.taxPercentage / 100))) +
+                          (memberSubs.length === 0 ? businessSettings.joiningFee : 0)
+                        )}
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
             </Card>

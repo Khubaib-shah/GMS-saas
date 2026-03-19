@@ -48,11 +48,10 @@ export default function SettingsPage() {
   const isAdmin = userRole === "super_admin";
   const isTrainer = userRole === "trainer";
 
-  // Default tab logic: Admin -> account, Trainer -> profile, Owner -> gym
+  // Default tab logic: Trainer -> profile, Super Admin/Owner -> gym
   const getDefaultTab = () => {
-    if (isAdmin) return "account";
     if (isTrainer) return "profile";
-    return "gym"; // Owner/Manager default
+    return "gym"; // Default for all other roles including Super Admin
   };
 
   const [activeTab, setActiveTab] = useState<"gym" | "account" | "staff" | "profile" | "general_settings" | "business_settings" | "notifications" | "roles">(getDefaultTab());
@@ -94,9 +93,17 @@ export default function SettingsPage() {
     }
   }, [activeTab, isAdmin, isTrainer]);
 
-  // Initial load check
+  // Initial load check and URL tab sync
   useEffect(() => {
-    setActiveTab(getDefaultTab());
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab") as any;
+    const validTabs = ["gym", "account", "staff", "profile", "general_settings", "business_settings", "notifications", "roles"];
+
+    if (tab && validTabs.includes(tab)) {
+      setActiveTab(tab);
+    } else {
+      setActiveTab(getDefaultTab());
+    }
   }, [userRole]);
 
 
@@ -245,12 +252,12 @@ export default function SettingsPage() {
 
       {/* Tab Navigation */}
       <div className="flex gap-4 mb-8 border-b border-border flex-wrap">
-        {!isAdmin && !isTrainer && (
+        {(isAdmin || (!isAdmin && !isTrainer)) && (
           <button
             onClick={() => setActiveTab("gym")}
             className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "gym"
-                ? "text-primary border-primary"
-                : "text-muted-foreground border-transparent hover:text-foreground"
+              ? "text-primary border-primary"
+              : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
           >
             <Building2 className="w-4 h-4 inline-block mr-2" />
@@ -262,8 +269,8 @@ export default function SettingsPage() {
           <button
             onClick={() => setActiveTab("profile")}
             className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "profile"
-                ? "text-primary border-primary"
-                : "text-muted-foreground border-transparent hover:text-foreground"
+              ? "text-primary border-primary"
+              : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
           >
             <UserCheck className="w-4 h-4 inline-block mr-2" />
@@ -274,20 +281,20 @@ export default function SettingsPage() {
         <button
           onClick={() => setActiveTab("account")}
           className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "account"
-              ? "text-primary border-primary"
-              : "text-muted-foreground border-transparent hover:text-foreground"
+            ? "text-primary border-primary"
+            : "text-muted-foreground border-transparent hover:text-foreground"
             }`}
         >
           <User className="w-4 h-4 inline-block mr-2" />
           Account Details
         </button>
 
-        {!isAdmin && !isTrainer && (
+        {(isAdmin || (!isAdmin && !isTrainer)) && (
           <button
             onClick={() => setActiveTab("staff")}
             className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "staff"
-                ? "text-primary border-primary"
-                : "text-muted-foreground border-transparent hover:text-foreground"
+              ? "text-primary border-primary"
+              : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
           >
             <Users className="w-4 h-4 inline-block mr-2" />
@@ -296,13 +303,13 @@ export default function SettingsPage() {
         )}
 
         {/* New: Settings Modules */}
-        {!isAdmin && !isTrainer && can('settings:view' as any) && (
+        {(isAdmin || (!isAdmin && !isTrainer && can('settings:view' as any))) && (
           <>
             <button
               onClick={() => setActiveTab("general_settings")}
               className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "general_settings"
-                  ? "text-primary border-primary"
-                  : "text-muted-foreground border-transparent hover:text-foreground"
+                ? "text-primary border-primary"
+                : "text-muted-foreground border-transparent hover:text-foreground"
                 }`}
             >
               <Settings2 className="w-4 h-4 inline-block mr-2" />
@@ -311,8 +318,8 @@ export default function SettingsPage() {
             <button
               onClick={() => setActiveTab("business_settings")}
               className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "business_settings"
-                  ? "text-primary border-primary"
-                  : "text-muted-foreground border-transparent hover:text-foreground"
+                ? "text-primary border-primary"
+                : "text-muted-foreground border-transparent hover:text-foreground"
                 }`}
             >
               <DollarSign className="w-4 h-4 inline-block mr-2" />
@@ -321,8 +328,8 @@ export default function SettingsPage() {
             <button
               onClick={() => setActiveTab("notifications")}
               className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "notifications"
-                  ? "text-primary border-primary"
-                  : "text-muted-foreground border-transparent hover:text-foreground"
+                ? "text-primary border-primary"
+                : "text-muted-foreground border-transparent hover:text-foreground"
                 }`}
             >
               <Bell className="w-4 h-4 inline-block mr-2" />
@@ -331,12 +338,12 @@ export default function SettingsPage() {
           </>
         )}
 
-        {!isAdmin && !isTrainer && can('roles:view' as any) && (
+        {(isAdmin || (!isAdmin && !isTrainer && can('roles:view' as any))) && (
           <button
             onClick={() => setActiveTab("roles")}
             className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "roles"
-                ? "text-primary border-primary"
-                : "text-muted-foreground border-transparent hover:text-foreground"
+              ? "text-primary border-primary"
+              : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
           >
             <Shield className="w-4 h-4 inline-block mr-2" />

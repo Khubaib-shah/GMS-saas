@@ -159,8 +159,16 @@ export async function POST(req: Request) {
 
         return NextResponse.json({
             ...newAttendance.toJSON(),
-            memberName: `${member.firstName} ${member.lastName || ""}`.trim(),
-            streak: newStreak,
+            member: {
+                id: member._id,
+                fullName: `${member.firstName} ${member.lastName || ""}`.trim(),
+                attendanceStreak: newStreak,
+                activeSubscription: subscription ? {
+                    planName: subscription.planId, // Assuming planId is useful or we could fetch plan name
+                    endDate: subscription.endDate,
+                    status: subscription.status
+                } : null
+            }
         }, { status: 201 });
 
     } catch (error: any) {

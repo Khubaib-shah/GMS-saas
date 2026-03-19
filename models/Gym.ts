@@ -38,6 +38,25 @@ const GymSchema = new mongoose.Schema(
             type: [BranchSchema],
             default: [],
         },
+        // ── Platform Subscription Fields (managed by Super Admin) ──
+        platformPlanId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "PlatformPlan",
+            default: null,
+        },
+        subscriptionStatus: {
+            type: String,
+            enum: ["active", "trial", "expired", "suspended"],
+            default: "trial",
+        },
+        expiryDate: { type: Date, default: null },
+        trialEndsAt: { type: Date, default: null },
+        isSuspended: { type: Boolean, default: false },
+        suspendedAt: { type: Date, default: null },
+        suspensionReason: { type: String, default: null },
+        outstandingAmount: { type: Number, default: 0 }, // PKR
+        city: { type: String, default: "" },
+        deletedAt: { type: Date, default: null }, // soft delete
         // Settings for the gym
         settings: {
             allowMultipleBranches: { type: Boolean, default: false },

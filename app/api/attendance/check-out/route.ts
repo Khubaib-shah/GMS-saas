@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth-options";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import Member from "@/models/Member";
+import Subscription from "@/models/Subscription";
 import { logAudit, extractRequestInfo } from "@/lib/audit";
 import { invalidatePattern } from "@/lib/redis";
 
@@ -75,7 +76,26 @@ export async function POST(req: Request) {
         // Invalidate attendance report cache for this gym
         await invalidatePattern(`attendance:report:gym:${gymId}:*`);
 
-        return NextResponse.json(attendance, { status: 200 });
+        // Fetch subscription for feedback
+        const subscription = await Subscription.findOne({
+            memberId,
+            gymId,
+            deletedAt: null,
+        }).sort({ endDate: -1 });
+
+        return NextResponse.json({
+            ...attendance.toJSON(),
+            member: {
+                id: memberId,
+                fullName: memberName,
+                attendanceStreak: member?.attendanceStreak || 0,
+                activeSubscription: subscription ? {
+                    planName: subscription.planId,
+                    endDate: subscription.endDate,
+                    status: subscription.status
+                } : null
+            }
+        }, { status: 200 });
 
     } catch (error: any) {
         console.error("Check-out error:", error);

@@ -38,7 +38,7 @@ function LoginForm() {
         if (callbackUrl && callbackUrl !== "/dashboard") {
           router.push(callbackUrl);
         } else if (session?.user?.role === "super_admin") {
-          router.push("/admin");
+          router.push("/super-admin");
         } else {
           router.push("/dashboard");
         }

@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { toast } from "sonner"
 // import { localDb } from "./localDb"
-import type { Member, Plan, Subscription, Payment, Branch } from "./types"
+import type { Member, Plan, Subscription, Payment, Branch, BusinessSettings } from "./types"
 
 // ... (imports)
 
@@ -20,6 +20,8 @@ export type AppState = {
   }
   loadGymProfile: () => Promise<void>
   updateGymProfile: (data: Partial<AppState["gymProfile"]>) => void
+  businessSettings: BusinessSettings
+  loadBusinessSettings: () => Promise<void>
 
   // Members
   members: Member[]
@@ -99,6 +101,25 @@ export const useAppStore = create<AppState>()(
       },
       updateGymProfile: (data) =>
         set((state) => ({ gymProfile: { ...state.gymProfile, ...data } })),
+      businessSettings: {
+        taxPercentage: 0,
+        joiningFee: 0,
+        autoExpireDays: 0,
+        gracePeriodDays: 0,
+      },
+      loadBusinessSettings: async () => {
+        try {
+          const res = await fetch("/api/settings/business");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.business) {
+              set({ businessSettings: data.business });
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load business settings", error);
+        }
+      },
 
       loadGymProfile: async () => {
         try {
@@ -303,10 +324,10 @@ export const useAppStore = create<AppState>()(
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 memberId,
-                amount: plan.price,
+                amount: (plan.price * (1 + (state.businessSettings.taxPercentage / 100))) + (memberSubs.length === 0 ? state.businessSettings.joiningFee : 0),
                 date: new Date().toISOString(),
                 method: method || "cash",
-                description: `Renewal: ${plan.name} (Starts ${new Date(startDate).toLocaleDateString()})`,
+                description: `Renewal: ${plan.name} (Starts ${new Date(startDate).toLocaleDateString()})${state.businessSettings.taxPercentage > 0 ? ` incl. ${state.businessSettings.taxPercentage}% tax` : ""}${memberSubs.length === 0 && state.businessSettings.joiningFee > 0 ? " incl. joining fee" : ""}`,
                 receiptUrl: receiptUrl || undefined,
               }),
             });

@@ -266,7 +266,7 @@ export default function MembersPage() {
                                 description: "QR CRYPTOGRAPHIC PROTOCOLS REQUIRE PREMIUM ACCESS.",
                                 action: {
                                   label: "UPGRADE",
-                                  onClick: () => console.log("Upgrade clicked"),
+                                  onClick: () => { },
                                 },
                               });
                               return;
