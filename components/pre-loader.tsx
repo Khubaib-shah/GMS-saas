@@ -8,23 +8,15 @@ export function PreLoader() {
   const [shouldRender, setShouldRender] = useState(true)
 
   useEffect(() => {
-    const handleLoad = () => {
-      // Small delay for better UX and to ensure everything is settled
-      const timer = setTimeout(() => {
-        setLoading(false)
-        // Remove from DOM after the fade-out transition
-        const removeTimer = setTimeout(() => setShouldRender(false), 800)
-        return () => clearTimeout(removeTimer)
-      }, 1200)
-      return () => clearTimeout(timer)
-    }
+    // Start fading out after a fixed duration (branding/intro phase)
+    const timer = setTimeout(() => {
+      setLoading(false)
+      // Remove from DOM after the fade-out transition
+      const removeTimer = setTimeout(() => setShouldRender(false), 800)
+      return () => clearTimeout(removeTimer)
+    }, 1500) // Reduced from 1200 + window.onload delay
 
-    if (document.readyState === "complete") {
-      handleLoad()
-    } else {
-      window.addEventListener("load", handleLoad)
-      return () => window.removeEventListener("load", handleLoad)
-    }
+    return () => clearTimeout(timer)
   }, [])
 
   if (!shouldRender) return null

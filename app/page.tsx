@@ -1,19 +1,22 @@
 import { Navbar } from "@/components/landing/navbar"
 import { HeroSection } from "@/components/landing/hero-section"
 import { SocialProof } from "@/components/landing/social-proof"
-import { ProblemSection } from "@/components/landing/problem-section"
-import { SolutionSection } from "@/components/landing/solution-section"
-import { HowItWorks } from "@/components/landing/how-it-works"
-import { CoreFeatures } from "@/components/landing/core-features"
-import { RoleSystem } from "@/components/landing/role-system"
-import { ProductShowcase } from "@/components/landing/product-showcase"
-import { PricingSection } from "@/components/landing/pricing-section"
-import { CTASection } from "@/components/landing/cta-section"
-import { Footer } from "@/components/landing/footer"
-import { VideoShowcase } from "@/components/landing/video-showcase"
-import { Testimonials } from "@/components/landing/testimonials"
-import { RequestDemo } from "@/components/landing/request-demo";
-import { BackToTop } from "@/components/landing/back-to-top";
+import dynamic from "next/dynamic"
+
+// Lazy load below-the-fold components
+const VideoShowcase = dynamic(() => import("@/components/landing/video-showcase").then(mod => mod.VideoShowcase))
+const ProblemSection = dynamic(() => import("@/components/landing/problem-section").then(mod => mod.ProblemSection))
+const SolutionSection = dynamic(() => import("@/components/landing/solution-section").then(mod => mod.SolutionSection))
+const HowItWorks = dynamic(() => import("@/components/landing/how-it-works").then(mod => mod.HowItWorks))
+const CoreFeatures = dynamic(() => import("@/components/landing/core-features").then(mod => mod.CoreFeatures))
+const RoleSystem = dynamic(() => import("@/components/landing/role-system").then(mod => mod.RoleSystem))
+const ProductShowcase = dynamic(() => import("@/components/landing/product-showcase").then(mod => mod.ProductShowcase))
+const PricingSection = dynamic(() => import("@/components/landing/pricing-section").then(mod => mod.PricingSection))
+const Testimonials = dynamic(() => import("@/components/landing/testimonials").then(mod => mod.Testimonials))
+const CTASection = dynamic(() => import("@/components/landing/cta-section").then(mod => mod.CTASection))
+const RequestDemo = dynamic(() => import("@/components/landing/request-demo").then(mod => mod.RequestDemo))
+const Footer = dynamic(() => import("@/components/landing/footer").then(mod => mod.Footer))
+const BackToTop = dynamic(() => import("@/components/landing/back-to-top").then(mod => mod.BackToTop))
 
 export default function LandingPage() {
   return (

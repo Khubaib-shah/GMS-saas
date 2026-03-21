@@ -47,7 +47,7 @@ export function HeroSection() {
 
       {/* Dashboard Preview Mockup */}
       <div className="mt-10 w-full max-w-6xl mx-auto relative z-10 group perspective-1000">
-        <Image src="/assets/dashboard.png" alt="GymFlow Dashboard Mockup" className="w-full h-auto block object-cover relative z-10" width={1000} height={1000} />
+        <Image src="/assets/dashboard.png" alt="GymFlow Dashboard Mockup" className="w-full h-auto block object-cover relative z-10" width={1000} height={1000} priority={true} />
       </div>
     </section>
   )
