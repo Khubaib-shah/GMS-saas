@@ -17,7 +17,7 @@ import { BackToTop } from "@/components/landing/back-to-top";
 
 export default function LandingPage() {
   return (
-    <div className="relative flex flex-col min-h-screen bg-slate-950 text-white selection:bg-primary selection:text-black font-sans overflow-clip">
+    <div className="relative flex flex-col min-h-screen bg-transparent text-white selection:bg-primary selection:text-black font-sans overflow-clip">
       <Navbar />
       <main className="flex-1">
         <HeroSection />

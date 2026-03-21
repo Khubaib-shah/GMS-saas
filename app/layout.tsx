@@ -56,6 +56,7 @@ export const metadata: Metadata = {
 
 import SmoothScroller from "@/components/smooth-scroller";
 import { ThemeProvider } from "@/components/theme-provider";
+import { GlobalAntigravity } from "@/components/global-antigravity";
 
 export default function RootLayout({
   children,
@@ -71,6 +72,7 @@ export default function RootLayout({
           forcedTheme="dark"
           disableTransitionOnChange
         >
+          <GlobalAntigravity />
           <SmoothScroller />
           <LayoutWrapper>{children}</LayoutWrapper>
           <Toaster position="top-right" richColors />

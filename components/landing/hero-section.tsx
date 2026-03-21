@@ -1,10 +1,9 @@
+"use client";
+
 import { ArrowRight, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import dynamic from "next/dynamic"
-
-const Antigravity = dynamic(() => import("./antigravity"), { ssr: false })
 
 export function HeroSection() {
   return (
@@ -29,25 +28,6 @@ export function HeroSection() {
           Manage members, staff, payments, and operations with a single powerful system built for modern gyms. Say goodbye to spreadsheets and chaos.
         </p>
 
-        <div style={{ width: '100%', height: '400px', position: 'relative', marginBottom: '2.5rem', zIndex: 10 }}>
-          <Antigravity
-            count={300}
-            magnetRadius={6}
-            ringRadius={7}
-            waveSpeed={0.4}
-            waveAmplitude={1}
-            particleSize={1.5}
-            lerpSpeed={0.05}
-            color="#5227FF"
-            autoAnimate
-            particleVariance={1}
-            rotationSpeed={0}
-            depthFactor={1}
-            pulseSpeed={3}
-            particleShape="capsule"
-            fieldStrength={10}
-          />
-        </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="#request-demo" className="w-full sm:w-auto">
