@@ -97,7 +97,9 @@ async function reset() {
                 monthlyPricePKR: 3000,
                 branchLimit: 1,
                 maxStaffAccounts: 3,
-                featureFlags: ["members", "manualAttendance", "payments"]
+                featureFlags: ["members", "manualAttendance", "payments"],
+                sortOrder: 1,
+                isPopular: false
             },
             {
                 name: "Professional",
@@ -105,7 +107,9 @@ async function reset() {
                 monthlyPricePKR: 5000,
                 branchLimit: 3,
                 maxStaffAccounts: 10,
-                featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics"]
+                featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics"],
+                sortOrder: 2,
+                isPopular: true
             },
             {
                 name: "Enterprise",
@@ -113,7 +117,9 @@ async function reset() {
                 monthlyPricePKR: 8000,
                 branchLimit: 10,
                 maxStaffAccounts: 50,
-                featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics", "workoutPlanner", "auditLogs"]
+                featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics", "workoutPlanner", "auditLogs"],
+                sortOrder: 3,
+                isPopular: false
             }
         ]);
         console.log("Platform Settings and Plans re-seeded.");

@@ -14,6 +14,8 @@ interface PlatformPlan {
   branchLimit: number
   maxStaffAccounts: number
   featureFlags: string[]
+  isPopular?: boolean
+  sortOrder?: number
 }
 
 export function PricingSection() {
@@ -26,7 +28,8 @@ export function PricingSection() {
         const res = await fetch("/api/platform/plans")
         const data = await res.json()
         if (data.plans) {
-          setPlans(data.plans)
+          const sortedPlans = [...data.plans].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+          setPlans(sortedPlans)
         }
       } catch (error) {
         console.error("Failed to fetch plans:", error)
@@ -80,25 +83,25 @@ export function PricingSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {plans.map((plan) => {
-            const isProfessional = plan.slug === "professional" || plan.name.toLowerCase() === "professional"
+            const isPopular = plan.isPopular
             const features = getFeatures(plan)
 
             return (
               <div
                 key={plan.id}
-                className={`relative flex flex-col p-8 rounded-3xl transition-transform duration-300 ${isProfessional
+                className={`relative flex flex-col p-8 rounded-3xl transition-transform duration-300 ${isPopular
                   ? "bg-slate-900 border-2 border-primary shadow-[0_0_40px_rgba(190,255,0,0.15)] transform scale-100 md:scale-105 z-10"
                   : "bg-white/5 border border-white/10 hover:border-white/20"
                   }`}
               >
-                {isProfessional && (
+                {isPopular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-black font-bold uppercase tracking-wider text-xs px-4 py-1 rounded-full">
                     MOST POPULAR
                   </div>
                 )}
 
                 <div className="mb-8">
-                  <h3 className={`text-2xl font-bold mb-2 ${isProfessional ? "text-primary" : "text-white"}`}>{plan.name}</h3>
+                  <h3 className={`text-2xl font-bold mb-2 ${isPopular ? "text-primary" : "text-white"}`}>{plan.name}</h3>
                   <p className="text-slate-400 text-sm h-10">{plan.description || `For ${plan.name.toLowerCase()} owners.`}</p>
                   <div className="mt-6 flex items-end gap-2">
                     <span className="text-4xl font-bold text-white">₨ {plan.monthlyPricePKR.toLocaleString()}</span>
@@ -109,7 +112,7 @@ export function PricingSection() {
                 <div className="flex-1 space-y-4 mb-8">
                   {features.map((feature, j) => (
                     <div key={j} className="flex items-start gap-3">
-                      <CheckCircle2 className={`w-5 h-5 shrink-0 ${isProfessional ? "text-primary" : "text-slate-500"}`} />
+                      <CheckCircle2 className={`w-5 h-5 shrink-0 ${isPopular ? "text-primary" : "text-slate-500"}`} />
                       <span className="text-slate-300 text-sm">{feature}</span>
                     </div>
                   ))}
@@ -117,7 +120,7 @@ export function PricingSection() {
 
                 <Link href={`/signup?plan=${encodeURIComponent(plan.slug)}`}>
                   <Button
-                    className={`w-full py-6 text-base font-semibold rounded-xl transition-all ${isProfessional
+                    className={`w-full py-6 text-base font-semibold rounded-xl transition-all ${isPopular
                       ? "bg-primary text-black hover:bg-white"
                       : "bg-white/10 text-white hover:bg-white/20"
                       }`}
