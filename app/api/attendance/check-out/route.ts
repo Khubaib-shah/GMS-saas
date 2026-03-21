@@ -7,6 +7,7 @@ import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
+import SubscriptionPlan from "@/models/SubscriptionPlan";
 
 export async function POST(req: Request) {
     try {

@@ -65,9 +65,9 @@ async function reset() {
 
         // 1. Clear all business data collections completely
         const collectionsToClear = [
-            Gym, Member, Plan, Subscription, TrainerAvailability, 
-            TrainerSlot, TrainerBooking, Payment, Exercise, 
-            WorkoutPlan, AssignedWorkoutPlan, WorkoutLog, Role, 
+            Gym, Member, Plan, Subscription, TrainerAvailability,
+            TrainerSlot, TrainerBooking, Payment, Exercise,
+            WorkoutPlan, AssignedWorkoutPlan, WorkoutLog, Role,
             GymSettings, SubscriptionPlan, Attendance, AuditLog,
             PlatformPayment, TrainerSessionLog, WorkoutTemplate
         ];
@@ -80,7 +80,7 @@ async function reset() {
         // 2. Clear Users EXCEPT Super Admins
         const userResult = await User.deleteMany({ role: { $ne: "super_admin" } });
         console.log(`Cleared non-admin Users: deleted ${userResult.deletedCount} items.`);
-        
+
         const remainingAdmins = await User.countDocuments({ role: "super_admin" });
         console.log(`Preserved ${remainingAdmins} Super Admin(s).`);
 
@@ -91,27 +91,27 @@ async function reset() {
 
         await PlatformSettings.create({});
         await PlatformPlan.create([
-            { 
-                name: "Starter", 
-                slug: "starter", 
-                monthlyPricePKR: 3000, 
-                branchLimit: 1, 
+            {
+                name: "Starter",
+                slug: "starter",
+                monthlyPricePKR: 3000,
+                branchLimit: 1,
                 maxStaffAccounts: 3,
                 featureFlags: ["members", "manualAttendance", "payments"]
             },
-            { 
-                name: "Professional", 
-                slug: "professional", 
-                monthlyPricePKR: 5000, 
-                branchLimit: 3, 
+            {
+                name: "Professional",
+                slug: "professional",
+                monthlyPricePKR: 5000,
+                branchLimit: 3,
                 maxStaffAccounts: 10,
                 featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics"]
             },
-            { 
-                name: "Enterprise", 
-                slug: "enterprise", 
-                monthlyPricePKR: 8000, 
-                branchLimit: 10, 
+            {
+                name: "Enterprise",
+                slug: "enterprise",
+                monthlyPricePKR: 8000,
+                branchLimit: 10,
                 maxStaffAccounts: 50,
                 featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics", "workoutPlanner", "auditLogs"]
             }
@@ -121,7 +121,7 @@ async function reset() {
         console.log("--- Reset Complete ---");
 
     } catch (error) {
-        console.error("❌ Reset Error:", error);
+        console.error("Reset Error:", error);
     } finally {
         await mongoose.connection.close();
         process.exit(0);
