@@ -1,5 +1,5 @@
-/// <reference types="@react-three/fiber" />
 "use client";
+/// <reference types="@react-three/fiber" />
 
 /* eslint-disable react/no-unknown-property */
 import { Canvas, useFrame, useThree } from '@react-three/fiber';

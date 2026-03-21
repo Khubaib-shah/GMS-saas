@@ -2,7 +2,9 @@ import { ArrowRight, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import Antigravity from "./antigravity"
+import dynamic from "next/dynamic"
+
+const Antigravity = dynamic(() => import("./antigravity"), { ssr: false })
 
 export function HeroSection() {
   return (
