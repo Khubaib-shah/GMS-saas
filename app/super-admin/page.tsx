@@ -11,6 +11,12 @@ import {
     Activity,
     Users,
 } from "lucide-react";
+import {
+    BarChart, Bar,
+    AreaChart, Area,
+    PieChart, Pie, Cell,
+    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+} from "recharts";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
@@ -165,37 +171,23 @@ export default function SuperAdminDashboard() {
                     <h3 className="text-sm font-semibold text-white mb-4">
                         Monthly Gym Registrations
                     </h3>
-                    <div className="space-y-3">
+                    <div className="h-[250px] w-full mt-4">
                         {(charts.registrationTrend || []).length === 0 ? (
-                            <p className="text-xs text-slate-500">No registration data yet</p>
+                            <div className="h-full flex items-center justify-center text-xs text-slate-500">No registration data yet</div>
                         ) : (
-                            charts.registrationTrend.map((item: any) => (
-                                <div key={item._id} className="flex items-center gap-3">
-                                    <span className="text-xs text-slate-400 w-20 shrink-0">
-                                        {item._id}
-                                    </span>
-                                    <div className="flex-1 h-6 bg-white/[0.03] rounded-md overflow-hidden">
-                                        <div
-                                            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md transition-all duration-500"
-                                            style={{
-                                                width: `${Math.min(
-                                                    100,
-                                                    (item.count /
-                                                        Math.max(
-                                                            ...charts.registrationTrend.map(
-                                                                (t: any) => t.count
-                                                            )
-                                                        )) *
-                                                    100
-                                                )}%`,
-                                            }}
-                                        />
-                                    </div>
-                                    <span className="text-xs font-semibold text-white w-8 text-right">
-                                        {item.count}
-                                    </span>
-                                </div>
-                            ))
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={charts.registrationTrend} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                                    <XAxis dataKey="_id" stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                                    <Tooltip 
+                                        contentStyle={{ backgroundColor: '#111118', borderColor: '#ffffff10', borderRadius: '8px' }}
+                                        itemStyle={{ color: '#fff' }}
+                                        cursor={{ fill: '#ffffff05' }}
+                                    />
+                                    <Bar dataKey="count" name="Registrations" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
                         )}
                     </div>
                 </div>
@@ -205,37 +197,35 @@ export default function SuperAdminDashboard() {
                     <h3 className="text-sm font-semibold text-white mb-4">
                         Monthly Platform Revenue
                     </h3>
-                    <div className="space-y-3">
+                    <div className="h-[250px] w-full mt-4">
                         {(charts.revenueTrend || []).length === 0 ? (
-                            <p className="text-xs text-slate-500">No revenue data yet</p>
+                            <div className="h-full flex items-center justify-center text-xs text-slate-500">No revenue data yet</div>
                         ) : (
-                            charts.revenueTrend.map((item: any) => (
-                                <div key={item._id} className="flex items-center gap-3">
-                                    <span className="text-xs text-slate-400 w-20 shrink-0">
-                                        {item._id}
-                                    </span>
-                                    <div className="flex-1 h-6 bg-white/[0.03] rounded-md overflow-hidden">
-                                        <div
-                                            className="h-full bg-gradient-to-r from-emerald-500 to-green-400 rounded-md transition-all duration-500"
-                                            style={{
-                                                width: `${Math.min(
-                                                    100,
-                                                    (item.total /
-                                                        Math.max(
-                                                            ...charts.revenueTrend.map(
-                                                                (t: any) => t.total
-                                                            )
-                                                        )) *
-                                                    100
-                                                )}%`,
-                                            }}
-                                        />
-                                    </div>
-                                    <span className="text-xs font-semibold text-emerald-400 w-24 text-right">
-                                        {formatPKR(item.total)}
-                                    </span>
-                                </div>
-                            ))
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={charts.revenueTrend} margin={{ top: 5, right: 5, left: 10, bottom: 5 }}>
+                                    <defs>
+                                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                                    <XAxis dataKey="_id" stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} />
+                                    <YAxis 
+                                        stroke="#ffffff50" 
+                                        fontSize={12} 
+                                        tickLine={false} 
+                                        axisLine={false}
+                                        tickFormatter={(value) => `₨ ${value >= 1000 ? (value / 1000) + 'k' : value}`}
+                                    />
+                                    <Tooltip 
+                                        contentStyle={{ backgroundColor: '#111118', borderColor: '#ffffff10', borderRadius: '8px' }}
+                                        itemStyle={{ color: '#10b981' }}
+                                        formatter={(value: number) => [formatPKR(value), "Revenue"]}
+                                    />
+                                    <Area type="monotone" dataKey="total" name="Revenue" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
                         )}
                     </div>
                 </div>
@@ -247,35 +237,33 @@ export default function SuperAdminDashboard() {
                     <h3 className="text-sm font-semibold text-white mb-4">
                         Plan Distribution
                     </h3>
-                    <div className="space-y-3">
+                    <div className="h-[250px] w-full mt-4">
                         {(charts.planDistribution || []).length === 0 ? (
-                            <p className="text-xs text-slate-500">No plans assigned yet</p>
+                            <div className="h-full flex items-center justify-center text-xs text-slate-500">No plans assigned yet</div>
                         ) : (
-                            charts.planDistribution.map((p: any, i: number) => {
-                                const colors = [
-                                    "bg-indigo-500",
-                                    "bg-emerald-500",
-                                    "bg-amber-500",
-                                    "bg-rose-500",
-                                    "bg-violet-500",
-                                ];
-                                return (
-                                    <div key={i} className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <div
-                                                className={`w-3 h-3 rounded-full ${colors[i % colors.length]
-                                                    }`}
-                                            />
-                                            <span className="text-sm text-slate-300">
-                                                {p.name}
-                                            </span>
-                                        </div>
-                                        <span className="text-sm font-bold text-white">
-                                            {p.count}
-                                        </span>
-                                    </div>
-                                );
-                            })
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                                    <Pie
+                                        data={charts.planDistribution}
+                                        cx="50%"
+                                        cy="45%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="count"
+                                    >
+                                        {charts.planDistribution.map((entry: any, index: number) => {
+                                            const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#f43f5e", "#8b5cf6"];
+                                            return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />;
+                                        })}
+                                    </Pie>
+                                    <Tooltip 
+                                        contentStyle={{ backgroundColor: '#111118', borderColor: '#ffffff10', borderRadius: '8px' }}
+                                        itemStyle={{ color: '#fff' }}
+                                    />
+                                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#cbd5e1' }} />
+                                </PieChart>
+                            </ResponsiveContainer>
                         )}
                     </div>
                 </div>
