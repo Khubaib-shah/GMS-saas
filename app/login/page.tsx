@@ -6,15 +6,26 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, Shield, ArrowRight, Trophy, Eye, EyeOff } from "lucide-react";
+import { Zap, Shield, ArrowRight, Trophy, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSuspendedModal, setShowSuspendedModal] = useState(false);
+  const [suspensionReason, setSuspensionReason] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -31,7 +42,12 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error("Invalid credentials. Try again.");
+        if (result.error.startsWith("SUSPENDED:")) {
+          setSuspensionReason(result.error.replace("SUSPENDED:", ""));
+          setShowSuspendedModal(true);
+        } else {
+          toast.error(result.error || "Invalid credentials. Try again.");
+        }
       } else {
         const res = await fetch("/api/auth/session");
         const session = await res.json();
@@ -133,6 +149,36 @@ function LoginForm() {
           </a>
         </p>
       </div>
+
+      <AlertDialog open={showSuspendedModal} onOpenChange={setShowSuspendedModal}>
+        <AlertDialogContent className="bg-slate-900 border-white/10">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white flex items-center gap-2 uppercase tracking-tighter italic font-black text-2xl">
+              <AlertCircle className="text-red-500 w-6 h-6" /> Account Suspended
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400 font-medium">
+              Your gym account has been suspended by the administration.
+              <br /><br />
+              <span className="text-red-500/80 font-bold uppercase text-[10px] tracking-widest">Reason:</span>{" "}
+              <span className="text-white font-bold">{suspensionReason}</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction 
+              onClick={() => setShowSuspendedModal(false)}
+              className="bg-transparent border border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wider"
+            >
+              Close
+            </AlertDialogAction>
+            <AlertDialogAction 
+              onClick={() => window.open("https://wa.me/923149784156?text=Hello%2C%20I%20am%20having%20issues%20with%20my%20suspended%20account.", "_blank")}
+              className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider"
+            >
+              Contact Support
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -153,7 +199,7 @@ export default function LoginPage() {
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
 
         <div className="relative z-10 text-left max-w-xl">
           <div className="flex items-center gap-3 mb-10">

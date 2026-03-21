@@ -84,7 +84,8 @@ export const authOptions: NextAuthOptions = {
 
                     // Block login if gym is suspended (super_admin can always log in)
                     if (gym?.isSuspended && user.role !== "super_admin") {
-                        throw new Error("Your gym subscription is suspended. Please contact support.");
+                        const reason = gym.suspensionReason || "Administrative Action";
+                        throw new Error(`SUSPENDED:${reason}`);
                     }
                 }
 
