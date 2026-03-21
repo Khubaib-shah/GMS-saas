@@ -44,8 +44,10 @@ export default function GymsPage() {
     const [gyms, setGyms] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
     const [cityFilter, setCityFilter] = useState("");
+    const [debouncedCity, setDebouncedCity] = useState("");
     const [page, setPage] = useState(1);
     const [showDeleted, setShowDeleted] = useState(false);
     const [pagination, setPagination] = useState<any>({ total: 0, totalPages: 1 });
@@ -53,13 +55,30 @@ export default function GymsPage() {
     const [gymToDelete, setGymToDelete] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Debounce search and city filters
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+            setPage(1);
+        }, 700);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedCity(cityFilter);
+            setPage(1);
+        }, 700);
+        return () => clearTimeout(timer);
+    }, [cityFilter]);
+
     const fetchGyms = useCallback(async () => {
         setLoading(true);
         try {
             const params = new URLSearchParams();
-            if (search) params.set("search", search);
+            if (debouncedSearch) params.set("search", debouncedSearch);
             if (statusFilter) params.set("status", statusFilter);
-            if (cityFilter) params.set("city", cityFilter);
+            if (debouncedCity) params.set("city", debouncedCity);
             if (showDeleted) params.set("isDeleted", "true");
             params.set("page", page.toString());
             params.set("limit", "15");
@@ -73,11 +92,10 @@ export default function GymsPage() {
         } finally {
             setLoading(false);
         }
-    }, [search, statusFilter, cityFilter, page, showDeleted]);
+    }, [debouncedSearch, statusFilter, debouncedCity, page, showDeleted]);
 
     useEffect(() => {
-        const timeout = setTimeout(fetchGyms, 300);
-        return () => clearTimeout(timeout);
+        fetchGyms();
     }, [fetchGyms]);
 
     const handleHardDelete = async () => {
@@ -112,7 +130,7 @@ export default function GymsPage() {
                     </p>
                 </div>
 
-                <Button 
+                <Button
                     onClick={() => setIsCreateModalOpen(true)}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
                 >
@@ -129,16 +147,16 @@ export default function GymsPage() {
                         type="text"
                         placeholder="Search by gym name..."
                         value={search}
-                        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                        onChange={(e) => setSearch(e.target.value)}
                         className="w-full pl-9 pr-4 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
                     />
                 </div>
 
                 <Select
                     value={statusFilter || "all"}
-                    onValueChange={(value) => { 
-                        setStatusFilter(value === "all" ? "" : value); 
-                        setPage(1); 
+                    onValueChange={(value) => {
+                        setStatusFilter(value === "all" ? "" : value);
+                        setPage(1);
                     }}
                 >
                     <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-sm text-slate-300 h-[42px] min-w-[140px]">
@@ -157,16 +175,16 @@ export default function GymsPage() {
                     type="text"
                     placeholder="Filter by city..."
                     value={cityFilter}
-                    onChange={(e) => { setCityFilter(e.target.value); setPage(1); }}
+                    onChange={(e) => setCityFilter(e.target.value)}
                     className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 min-w-[150px]"
                 />
 
-                <Button 
+                <Button
                     variant={showDeleted ? "default" : "outline"}
                     className={cn(
-                        "h-[42px] px-4", 
-                        !showDeleted 
-                            ? "bg-transparent border-white/[0.08] text-slate-300 hover:text-white" 
+                        "h-[42px] px-4",
+                        !showDeleted
+                            ? "bg-transparent border-white/[0.08] text-slate-300 hover:text-white"
                             : "bg-rose-500/20 text-rose-400 border-rose-500/50 hover:bg-rose-500/30 font-medium"
                     )}
                     onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
@@ -277,7 +295,7 @@ export default function GymsPage() {
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center justify-end gap-2">
                                                     {gym.deletedAt && (
-                                                        <button 
+                                                        <button
                                                             className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
                                                             title="Delete Permanently"
                                                             onClick={(e) => {
@@ -325,7 +343,7 @@ export default function GymsPage() {
                 )}
             </div>
 
-            <CreateGymModal 
+            <CreateGymModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSuccess={fetchGyms}
