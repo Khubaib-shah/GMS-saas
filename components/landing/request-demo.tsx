@@ -113,7 +113,7 @@ export const RequestDemo = () => {
 
                 {/* Right Side: Form */}
                 <div className="order-2 lg:order-2">
-                    <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative">
+                    <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl relative">
                         <div className="absolute -top-px left-1/2 -translate-x-1/2 w-32 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent"></div>
 
                         {status === 'success' ? (
