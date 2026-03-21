@@ -13,10 +13,11 @@ import { Footer } from "@/components/landing/footer"
 import { VideoShowcase } from "@/components/landing/video-showcase"
 import { Testimonials } from "@/components/landing/testimonials"
 import { RequestDemo } from "@/components/landing/request-demo";
+import { BackToTop } from "@/components/landing/back-to-top";
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 text-white selection:bg-primary selection:text-black font-sans overflow-x-hidden">
+    <div className="relative flex flex-col min-h-screen bg-slate-950 text-white selection:bg-primary selection:text-black font-sans overflow-clip">
       <Navbar />
       <main className="flex-1">
         <HeroSection />
@@ -34,6 +35,7 @@ export default function LandingPage() {
         <RequestDemo />
       </main>
       <Footer />
+      <BackToTop />
     </div>
   )
 }
