@@ -22,10 +22,11 @@ export async function GET(req: Request) {
     const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
+    const isDeleted = searchParams.get("isDeleted") === "true";
 
     await connectDB();
 
-    const filter: any = { deletedAt: null };
+    const filter: any = isDeleted ? { deletedAt: { $ne: null } } : { deletedAt: null };
 
     if (search) {
         filter.$or = [

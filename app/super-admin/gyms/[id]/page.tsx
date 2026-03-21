@@ -55,6 +55,7 @@ export default function GymDetailPage() {
     const [showSuspendModal, setShowSuspendModal] = useState(false);
     const [suspensionReason, setSuspensionReason] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showHardDeleteModal, setShowHardDeleteModal] = useState(false);
     const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
     const [paymentForm, setPaymentForm] = useState({ amount: "", method: "cash", notes: "", expiryDate: "" });
     const [extendDays, setExtendDays] = useState("30");
@@ -124,9 +125,10 @@ export default function GymDetailPage() {
         active: { label: "Active", cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
         trial: { label: "Trial", cls: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
         expired: { label: "Expired", cls: "bg-red-500/10 text-red-400 border-red-500/20" },
-        suspended: { label: "Suspended", cls: "bg-rose-500/10 text-rose-300 border-rose-500/20" },
+        suspended: { label: "Suspended", cls: "bg-amber-500/10 text-amber-300 border-amber-500/20" },
+        deleted: { label: "Deleted", cls: "bg-rose-500/10 text-rose-400 border-rose-500/20" },
     };
-    const badge = statusBadge[gym.subscriptionStatus] || statusBadge.trial;
+    const badge = gym.deletedAt ? statusBadge.deleted : (statusBadge[gym.subscriptionStatus] || statusBadge.trial);
 
     return (
         <div className="space-y-6">
@@ -207,82 +209,103 @@ export default function GymDetailPage() {
             <div className="rounded-xl border border-white/[0.06] bg-[#0d0d14] p-5">
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Gym Actions</h3>
                 <div className="flex flex-wrap gap-3">
-                    {gym.subscriptionStatus !== "active" && (
-                        <ActionButton
-                            icon={CheckCircle}
-                            label="Activate"
-                            color="emerald"
-                            loading={actionLoading === "activate"}
-                            onClick={() => doAction("activate")}
-                        />
-                    )}
-                    {!gym.isSuspended ? (
-                        <ActionButton
-                            icon={Ban}
-                            label="Suspend"
-                            color="red"
-                            loading={actionLoading === "suspend"}
-                            onClick={() => setShowSuspendModal(true)}
-                        />
+                    {gym.deletedAt ? (
+                        <>
+                            <ActionButton
+                                icon={RefreshCw}
+                                label="Restore Gym"
+                                color="emerald"
+                                loading={actionLoading === "restore"}
+                                onClick={() => doAction("restore")}
+                            />
+                            <ActionButton
+                                icon={Trash2}
+                                label="Delete Permanently"
+                                color="red"
+                                loading={actionLoading === "hardDelete"}
+                                onClick={() => setShowHardDeleteModal(true)}
+                            />
+                        </>
                     ) : (
-                        <ActionButton
-                            icon={ShieldOff}
-                            label="Unsuspend"
-                            color="amber"
-                            loading={actionLoading === "unsuspend"}
-                            onClick={() => doAction("unsuspend")}
-                        />
+                        <>
+                            {gym.subscriptionStatus !== "active" && (
+                                <ActionButton
+                                    icon={CheckCircle}
+                                    label="Activate"
+                                    color="emerald"
+                                    loading={actionLoading === "activate"}
+                                    onClick={() => doAction("activate")}
+                                />
+                            )}
+                            {!gym.isSuspended ? (
+                                <ActionButton
+                                    icon={Ban}
+                                    label="Suspend"
+                                    color="red"
+                                    loading={actionLoading === "suspend"}
+                                    onClick={() => setShowSuspendModal(true)}
+                                />
+                            ) : (
+                                <ActionButton
+                                    icon={ShieldOff}
+                                    label="Unsuspend"
+                                    color="amber"
+                                    loading={actionLoading === "unsuspend"}
+                                    onClick={() => doAction("unsuspend")}
+                                />
+                            )}
+                            <ActionButton
+                                icon={Clock}
+                                label="Extend Subscription"
+                                color="blue"
+                                loading={actionLoading === "extend"}
+                                onClick={() => setShowExtendModal(true)}
+                            />
+                            <ActionButton
+                                icon={Plus}
+                                label="Record Payment"
+                                color="green"
+                                onClick={() => setShowPaymentModal(true)}
+                            />
+                            <ActionButton
+                                icon={Key}
+                                label="Reset Owner Password"
+                                color="amber"
+                                loading={actionLoading === "resetPassword"}
+                                onClick={() => setShowResetPasswordModal(true)}
+                            />
+
+                            <div className="w-[200px]">
+                                <Select
+                                    value={gym.plan?.id || ""}
+                                    onValueChange={(value) => {
+                                        if (value && value !== (gym.plan?.id || "")) {
+                                            doAction("changePlan", { planId: value });
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08] h-[34px] px-3 w-full text-slate-300 text-sm">
+                                        <SelectValue placeholder="Change Plan..." />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-[#1a1a24] border-white/[0.08] text-white z-[70] max-h-60 overflow-y-auto custom-scrollbar">
+                                        {plans.map((p: any) => (
+                                            <SelectItem key={p._id || p.id} value={p._id || p.id}>
+                                                {p.name} — {formatPKR(p.monthlyPricePKR)}/mo
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <ActionButton
+                                icon={Trash2}
+                                label="Soft Delete"
+                                color="rose"
+                                loading={actionLoading === "softDelete"}
+                                onClick={() => setShowDeleteModal(true)}
+                            />
+                        </>
                     )}
-                    <ActionButton
-                        icon={Clock}
-                        label="Extend Subscription"
-                        color="blue"
-                        loading={actionLoading === "extend"}
-                        onClick={() => setShowExtendModal(true)}
-                    />
-                    <ActionButton
-                        icon={Plus}
-                        label="Record Payment"
-                        color="green"
-                        onClick={() => setShowPaymentModal(true)}
-                    />
-                    <ActionButton
-                        icon={Key}
-                        label="Reset Owner Password"
-                        color="amber"
-                        loading={actionLoading === "resetPassword"}
-                        onClick={() => setShowResetPasswordModal(true)}
-                    />
-
-                    <div className="w-[200px]">
-                        <Select
-                            value={gym.plan?.id || ""}
-                            onValueChange={(value) => {
-                                if (value && value !== (gym.plan?.id || "")) {
-                                    doAction("changePlan", { planId: value });
-                                }
-                            }}
-                        >
-                            <SelectTrigger className="bg-white/[0.04] border-white/[0.08] h-[34px] px-3 w-full text-slate-300 text-sm">
-                                <SelectValue placeholder="Change Plan..." />
-                            </SelectTrigger>
-                            <SelectContent className="bg-[#1a1a24] border-white/[0.08] text-white z-[70] max-h-60 overflow-y-auto custom-scrollbar">
-                                {plans.map((p: any) => (
-                                    <SelectItem key={p._id || p.id} value={p._id || p.id}>
-                                        {p.name} — {formatPKR(p.monthlyPricePKR)}/mo
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <ActionButton
-                        icon={Trash2}
-                        label="Soft Delete"
-                        color="rose"
-                        loading={actionLoading === "softDelete"}
-                        onClick={() => setShowDeleteModal(true)}
-                    />
                 </div>
             </div>
 
@@ -488,13 +511,43 @@ export default function GymDetailPage() {
                                 Cancel
                             </button>
                             <button
-                                onClick={() => {
-                                    doAction("softDelete");
+                                onClick={async () => {
+                                    await doAction("softDelete");
                                     setShowDeleteModal(false);
+                                    router.push("/super-admin/gyms");
                                 }}
                                 className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition-colors"
                             >
                                 Delete Gym
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Hard Delete Modal */}
+            {showHardDeleteModal && (
+                <Modal onClose={() => setShowHardDeleteModal(false)} title="Confirm Permanent Delete">
+                    <div className="space-y-4">
+                        <p className="text-sm font-bold text-red-500 uppercase tracking-wider">Warning: Irreversible Action</p>
+                        <p className="text-sm text-slate-300">This will completely delete the gym and <strong className="text-white">all</strong> of its associated user accounts, members, payments, and subscriptions from the database permanently.</p>
+                        <div className="flex gap-3 justify-end mt-4">
+                            <button
+                                onClick={() => setShowHardDeleteModal(false)}
+                                className="px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white text-sm font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    await doAction("hardDelete");
+                                    setShowHardDeleteModal(false);
+                                    router.push("/super-admin/gyms");
+                                }}
+                                disabled={actionLoading === "hardDelete"}
+                                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                            >
+                                {actionLoading === "hardDelete" ? "Deleting..." : "Delete Permanently"}
                             </button>
                         </div>
                     </div>

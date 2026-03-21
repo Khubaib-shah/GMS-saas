@@ -83,6 +83,11 @@ export const authOptions: NextAuthOptions = {
                     const gym = await subscriptionService.checkAndUpdateGymSubscriptionStatus(user.gymId.toString());
                     isPremium = !!gym?.isPremium;
 
+                    // Block login if gym is deleted or deactivated
+                    if (gym?.deletedAt || gym?.isActive === false) {
+                        throw new Error(`SUSPENDED:This gym has been deactivated or deleted by the administration.`);
+                    }
+
                     // Block login if gym is suspended (super_admin can always log in)
                     if (gym?.isSuspended && user.role !== "super_admin") {
                         const reason = gym.suspensionReason || "Administrative Action";

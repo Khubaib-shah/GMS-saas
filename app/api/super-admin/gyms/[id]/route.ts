@@ -69,6 +69,7 @@ export async function GET(
             outstandingAmount: (gym as any).outstandingAmount || 0,
             plan: (gym as any).platformPlanId || null,
             createdAt: (gym as any).createdAt,
+            deletedAt: (gym as any).deletedAt || null,
         },
         owner: owner
             ? {
@@ -255,6 +256,29 @@ export async function PATCH(
             await gym.save();
             await deleteCache(`gym:profile:${id}`);
             return NextResponse.json({ message: "Gym soft-deleted" });
+        }
+
+        case "restore": {
+            gym.deletedAt = null;
+            gym.isActive = true;
+            await gym.save();
+            await deleteCache(`gym:profile:${id}`);
+            return NextResponse.json({ message: "Gym restored successfully" });
+        }
+
+        case "hardDelete": {
+            // Delete the gym and all associated data permanently
+            await Promise.all([
+                Gym.findByIdAndDelete(id),
+                User.deleteMany({ gymId: id }),
+                Member.deleteMany({ gymId: id }),
+                Subscription.deleteMany({ gymId: id }),
+                Payment.deleteMany({ gymId: id }),
+                PlatformPayment.deleteMany({ gymId: id }),
+                SubscriptionPlan.deleteMany({ gymId: id })
+            ]);
+            await deleteCache(`gym:profile:${id}`);
+            return NextResponse.json({ message: "Gym permanently deleted" });
         }
 
         default:
