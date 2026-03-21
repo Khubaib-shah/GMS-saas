@@ -23,8 +23,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "User with this email already exists" }, { status: 400 });
         }
 
-        // Get Plan
-        const plan = await PlatformPlan.findOne({ name: planName || "Professional" });
+        // Get Plan (Support slug or name)
+        const plan = await PlatformPlan.findOne({ 
+            $or: [
+                { slug: planName }, 
+                { name: planName },
+                { name: "Professional" } // Final fallback
+            ] 
+        });
         if (!plan) {
             return NextResponse.json({ message: "Selected plan not found" }, { status: 404 });
         }
@@ -55,7 +61,7 @@ export async function POST(req: Request) {
             planName: plan.name,
             amount: plan.monthlyPricePKR,
             successUrl: `${process.env.NEXTAUTH_URL}/login?message=Welcome! Login to access your gym.`,
-            cancelUrl: `${process.env.NEXTAUTH_URL}/signup?plan=${plan.name}&error=payment_cancelled`,
+            cancelUrl: `${process.env.NEXTAUTH_URL}/signup?plan=${plan.slug}&error=payment_cancelled`,
             customerEmail: email,
         });
 

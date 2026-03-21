@@ -23,10 +23,14 @@ export default async function proxy(req: NextRequest) {
     const isSignupPage = req.nextUrl.pathname.startsWith("/signup");
     const isSignupApi = req.nextUrl.pathname.startsWith("/api/auth/signup");
     const isRequestDemoApi = req.nextUrl.pathname === "/api/request-demo";
+    const isPlatformPlansApi = req.nextUrl.pathname === "/api/platform/plans";
     const isAdmin = token?.role === "super_admin";
 
-    // 1. Allow landing page, member portal, signup, and request demo regardless of NextAuth session
-    if (isLandingPage || isMemberPortal || isRequestDemoApi || isSignupPage || isSignupApi) {
+    // Debugging (Remove after fixing)
+    console.log("[Proxy Debug]:", { pathname: req.nextUrl.pathname, isAuth, isAdmin, tokenRole: token?.role });
+
+    // 1. Allow landing page, member portal, signup, request demo, and platform plans regardless of NextAuth session
+    if (isLandingPage || isMemberPortal || isRequestDemoApi || isSignupPage || isSignupApi || isPlatformPlansApi) {
         return NextResponse.next();
     }
 
@@ -34,7 +38,7 @@ export default async function proxy(req: NextRequest) {
     if (isLoginPage) {
         if (isAuth) {
             if (isAdmin) {
-                return NextResponse.redirect(new URL("/admin", req.url));
+                return NextResponse.redirect(new URL("/super-admin", req.url));
             }
             return NextResponse.redirect(new URL("/dashboard", req.url));
         }
@@ -47,18 +51,19 @@ export default async function proxy(req: NextRequest) {
         if (req.nextUrl.search) {
             from += req.nextUrl.search;
         }
+        console.log("[Proxy Redirect]: No token found, sending to login from", from);
         return NextResponse.redirect(
             new URL(`/login?callbackUrl=${encodeURIComponent(from)}`, req.url)
         );
     }
 
-    // 4. Super admin visiting /dashboard -> Redirect to /admin
+    // 4. Super admin visiting /dashboard -> Redirect to /super-admin
     if (req.nextUrl.pathname.startsWith("/dashboard") && isAdmin) {
-        return NextResponse.redirect(new URL("/admin", req.url));
+        return NextResponse.redirect(new URL("/super-admin", req.url));
     }
 
-    // 5. Regular user visiting /admin -> Redirect to /dashboard
-    if (req.nextUrl.pathname.startsWith("/admin") && !isAdmin) {
+    // 5. Regular user visiting /admin or /super-admin -> Redirect to /dashboard
+    if ((req.nextUrl.pathname.startsWith("/admin") || req.nextUrl.pathname.startsWith("/super-admin")) && !isAdmin) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 

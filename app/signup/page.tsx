@@ -30,7 +30,8 @@ function SignupForm() {
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const planName = searchParams.get("plan") || "Professional";
+  const rawPlan = searchParams.get("plan") || "professional";
+  const planName = rawPlan.charAt(0).toUpperCase() + rawPlan.slice(1);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
