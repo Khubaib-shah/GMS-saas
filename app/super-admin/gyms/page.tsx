@@ -11,8 +11,11 @@ import {
     ExternalLink,
     Users,
     CreditCard,
+    Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { CreateGymModal } from "@/components/super-admin/create-gym-modal";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
@@ -34,6 +37,7 @@ export default function GymsPage() {
     const [cityFilter, setCityFilter] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState<any>({ total: 0, totalPages: 1 });
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     const fetchGyms = useCallback(async () => {
         setLoading(true);
@@ -71,6 +75,14 @@ export default function GymsPage() {
                         {pagination.total || 0} gyms registered on the platform
                     </p>
                 </div>
+
+                <Button 
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                >
+                    <Plus className="w-4 h-4" />
+                    Create Gym
+                </Button>
             </div>
 
             {/* Filters */}
@@ -241,6 +253,12 @@ export default function GymsPage() {
                     </div>
                 )}
             </div>
+
+            <CreateGymModal 
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSuccess={fetchGyms}
+            />
         </div>
     );
 }

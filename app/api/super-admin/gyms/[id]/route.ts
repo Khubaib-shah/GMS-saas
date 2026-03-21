@@ -6,6 +6,7 @@ import Member from "@/models/Member";
 import Payment from "@/models/Payment";
 import Subscription from "@/models/Subscription";
 import PlatformPayment from "@/models/PlatformPayment";
+import SubscriptionPlan from "@/models/SubscriptionPlan";
 import bcrypt from "bcryptjs";
 import { requireSuperAdmin } from "@/lib/api-middleware";
 import { deleteCache } from "@/lib/redis";
@@ -116,6 +117,14 @@ export async function PATCH(
             gym.suspensionReason = null;
             gym.isActive = true;
             await gym.save();
+
+            // Sync SubscriptionPlan
+            await SubscriptionPlan.findOneAndUpdate(
+                { gymId: id },
+                { active: true },
+                { upsert: true }
+            );
+
             await deleteCache(`gym:profile:${id}`);
             return NextResponse.json({ message: "Gym activated", gym });
         }
@@ -152,6 +161,14 @@ export async function PATCH(
             gym.subscriptionStatus = "active";
             gym.isSuspended = false;
             await gym.save();
+
+            // Sync SubscriptionPlan
+            await SubscriptionPlan.findOneAndUpdate(
+                { gymId: id },
+                { active: true, expiresAt: base },
+                { upsert: true }
+            );
+
             await deleteCache(`gym:profile:${id}`);
             return NextResponse.json({ message: `Extended by ${days} days`, gym });
         }
@@ -163,6 +180,22 @@ export async function PATCH(
             }
             gym.platformPlanId = planId;
             await gym.save();
+
+            // Sync SubscriptionPlan features
+            const PlatformPlan = (await import("@/models/PlatformPlan")).default;
+            const plan = await PlatformPlan.findById(planId);
+            if (plan) {
+                await SubscriptionPlan.findOneAndUpdate(
+                    { gymId: id },
+                    { 
+                        tierName: plan.name, 
+                        enabledFeatures: plan.featureFlags || [],
+                        active: true 
+                    },
+                    { upsert: true }
+                );
+            }
+
             await deleteCache(`gym:profile:${id}`);
             return NextResponse.json({ message: "Plan changed", gym });
         }
@@ -191,6 +224,14 @@ export async function PATCH(
             gym.isSuspended = false;
             gym.outstandingAmount = Math.max(0, (gym.outstandingAmount || 0) - amount);
             await gym.save();
+
+            // Sync SubscriptionPlan
+            await SubscriptionPlan.findOneAndUpdate(
+                { gymId: id },
+                { active: true, expiresAt: gym.expiryDate },
+                { upsert: true }
+            );
+
             await deleteCache(`gym:profile:${id}`);
 
             return NextResponse.json({ message: "Payment recorded", gym });

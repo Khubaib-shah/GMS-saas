@@ -5,6 +5,7 @@ import User from "@/models/User";
 import Member from "@/models/Member";
 import Payment from "@/models/Payment";
 import { requireSuperAdmin } from "@/lib/api-middleware";
+import bcrypt from "bcryptjs";
 
 /**
  * GET /api/super-admin/gyms — List all gyms with stats
@@ -88,4 +89,94 @@ export async function GET(req: Request) {
             totalPages: Math.ceil(total / limit),
         },
     });
+}
+
+/**
+ * POST /api/super-admin/gyms — Manually create a new gym and owner
+ */
+export async function POST(req: Request) {
+    const authResult = await requireSuperAdmin();
+    if ("error" in authResult) return authResult.error;
+
+    try {
+        const body = await req.json();
+        const {
+            gymName,
+            ownerName,
+            ownerEmail,
+            ownerPassword,
+            planId,
+            city,
+            phone,
+            address,
+        } = body;
+
+        if (!gymName || !ownerName || !ownerEmail || !ownerPassword || !planId) {
+            return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+        }
+
+        await connectDB();
+
+        // 1. Check if plan exists
+        const PlatformPlan = (await import("@/models/PlatformPlan")).default;
+        const plan = await PlatformPlan.findById(planId);
+        if (!plan) {
+            return NextResponse.json({ message: "Platform plan not found" }, { status: 404 });
+        }
+
+        // 2. Check if owner email exists
+        const existingUser = await User.findOne({ email: ownerEmail.toLowerCase() });
+        if (existingUser) {
+            return NextResponse.json({ message: "User with this email already exists" }, { status: 400 });
+        }
+
+        // 3. Create Gym
+        const gym = await Gym.create({
+            name: gymName,
+            city: city || "",
+            phone: phone || "",
+            address: address || "",
+            subscriptionStatus: "active",
+            platformPlanId: planId,
+            expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days
+            branches: [{
+                name: "Main Branch",
+                address: address || "",
+                phone: phone || "",
+                email: ownerEmail,
+                isDefault: true
+            }]
+        });
+
+        // 4. Create Owner User
+        const hashedPassword = await bcrypt.hash(ownerPassword, 10);
+        const user = await User.create({
+            fullName: ownerName,
+            email: ownerEmail.toLowerCase(),
+            password: hashedPassword,
+            role: "owner",
+            gymId: gym._id,
+            status: "active",
+        });
+
+        // 5. Create SubscriptionPlan (Feature Gating)
+        const SubscriptionPlan = (await import("@/models/SubscriptionPlan")).default;
+        await SubscriptionPlan.create({
+            gymId: gym._id,
+            tierName: plan.name,
+            active: true,
+            enabledFeatures: plan.featureFlags || [],
+            expiresAt: gym.expiryDate
+        });
+
+        return NextResponse.json({
+            message: "Gym and Owner created successfully",
+            gymId: gym._id,
+            userId: user._id
+        }, { status: 201 });
+
+    } catch (error: any) {
+        console.error("Manual gym creation error:", error);
+        return NextResponse.json({ message: error.message || "Internal Server Error" }, { status: 500 });
+    }
 }

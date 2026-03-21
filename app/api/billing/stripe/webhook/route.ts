@@ -51,6 +51,20 @@ export async function POST(req: Request) {
                     notes: `Stripe Payment Session: ${sessionId}`,
                 });
 
+                // Sync SubscriptionPlan
+                const SubscriptionPlan = (await import("@/models/SubscriptionPlan")).default;
+                await SubscriptionPlan.findOneAndUpdate(
+                    { gymId },
+                    { 
+                        active: true, 
+                        expiresAt: newExpiry,
+                        // If it doesn't exist, we might need to find the plan to get features, 
+                        // but usually it should exist if they signed up.
+                        // For safety, we can just ensure it's active.
+                    },
+                    { upsert: true }
+                );
+
                 console.log(`[Stripe Webhook] Successfully processed payment for gym: ${gymId}`);
 
                 // Audit Log (System Action)
