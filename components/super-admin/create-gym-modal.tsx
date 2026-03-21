@@ -39,6 +39,7 @@ export function CreateGymModal({ isOpen, onClose, onSuccess }: CreateGymModalPro
         city: "",
         phone: "",
         address: "",
+        trialDays: 14,
     });
 
     useEffect(() => {
@@ -87,6 +88,7 @@ export function CreateGymModal({ isOpen, onClose, onSuccess }: CreateGymModalPro
                 city: "",
                 phone: "",
                 address: "",
+                trialDays: 14,
             });
         } catch (error: any) {
             toast.error(error.message);
@@ -206,6 +208,19 @@ export function CreateGymModal({ isOpen, onClose, onSuccess }: CreateGymModalPro
                             placeholder="Gym physical location"
                             value={formData.address}
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                            className="bg-white/[0.04] border-white/[0.08]"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="trialDays">Trial Period (Days)</Label>
+                        <Input
+                            id="trialDays"
+                            type="number"
+                            min="0"
+                            placeholder="14"
+                            value={formData.trialDays}
+                            onChange={(e) => setFormData({ ...formData, trialDays: parseInt(e.target.value) || 0 })}
                             className="bg-white/[0.04] border-white/[0.08]"
                         />
                     </div>

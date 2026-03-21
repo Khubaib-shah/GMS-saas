@@ -11,6 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
@@ -28,6 +35,9 @@ export function EditGymModal({ isOpen, onClose, onSuccess, gym }: EditGymModalPr
         city: "",
         phone: "",
         address: "",
+        trialEndsAt: "",
+        expiryDate: "",
+        subscriptionStatus: "",
     });
 
     useEffect(() => {
@@ -37,6 +47,9 @@ export function EditGymModal({ isOpen, onClose, onSuccess, gym }: EditGymModalPr
                 city: gym.city || "",
                 phone: gym.phone || "",
                 address: gym.address || "",
+                trialEndsAt: gym.trialEndsAt ? new Date(gym.trialEndsAt).toISOString().split('T')[0] : "",
+                expiryDate: gym.expiryDate ? new Date(gym.expiryDate).toISOString().split('T')[0] : "",
+                subscriptionStatus: gym.subscriptionStatus || "",
             });
         }
     }, [gym, isOpen]);
@@ -115,6 +128,48 @@ export function EditGymModal({ isOpen, onClose, onSuccess, gym }: EditGymModalPr
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                             className="bg-white/[0.04] border-white/[0.08]"
                         />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="trialEndsAt">Trial Ends At</Label>
+                            <Input
+                                id="trialEndsAt"
+                                type="date"
+                                value={formData.trialEndsAt}
+                                onChange={(e) => setFormData({ ...formData, trialEndsAt: e.target.value })}
+                                className="bg-white/[0.04] border-white/[0.08]"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="expiryDate">Subscription Expiry</Label>
+                            <Input
+                                id="expiryDate"
+                                type="date"
+                                value={formData.expiryDate}
+                                onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
+                                className="bg-white/[0.04] border-white/[0.08]"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="subscriptionStatus">Subscription Status</Label>
+                        <Select
+                            value={formData.subscriptionStatus}
+                            onValueChange={(value) => setFormData({ ...formData, subscriptionStatus: value })}
+                        >
+                            <SelectTrigger className="bg-white/[0.04] border-white/[0.08] w-full">
+                                <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#1a1a24] border-white/[0.08] text-white">
+                                <SelectItem value="trial">Trial</SelectItem>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="expired">Expired</SelectItem>
+                                <SelectItem value="suspended">Suspended</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <DialogFooter className="pt-4">

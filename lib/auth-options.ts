@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import Gym from "@/models/Gym";
+import { subscriptionService } from "@/lib/services/subscription";
 
 // Rate limiting constants
 const MAX_FAILED_ATTEMPTS = 5;
@@ -79,13 +80,18 @@ export const authOptions: NextAuthOptions = {
                 let isPremium = false;
                 let gymSuspended = false;
                 if (user.gymId) {
-                    const gym = await Gym.findById(user.gymId);
+                    const gym = await subscriptionService.checkAndUpdateGymSubscriptionStatus(user.gymId.toString());
                     isPremium = !!gym?.isPremium;
 
                     // Block login if gym is suspended (super_admin can always log in)
                     if (gym?.isSuspended && user.role !== "super_admin") {
                         const reason = gym.suspensionReason || "Administrative Action";
                         throw new Error(`SUSPENDED:${reason}`);
+                    }
+
+                    // Block login if gym subscription is expired
+                    if (gym?.subscriptionStatus === "expired" && user.role !== "super_admin") {
+                        throw new Error(`EXPIRED:Your subscription or trial package has expired. Please contact support to renew.`);
                     }
                 }
 

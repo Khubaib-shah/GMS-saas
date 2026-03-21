@@ -26,6 +26,8 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showSuspendedModal, setShowSuspendedModal] = useState(false);
   const [suspensionReason, setSuspensionReason] = useState("");
+  const [showExpiredModal, setShowExpiredModal] = useState(false);
+  const [expiredReason, setExpiredReason] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -45,6 +47,9 @@ function LoginForm() {
         if (result.error.startsWith("SUSPENDED:")) {
           setSuspensionReason(result.error.replace("SUSPENDED:", ""));
           setShowSuspendedModal(true);
+        } else if (result.error.startsWith("EXPIRED:")) {
+          setExpiredReason(result.error.replace("EXPIRED:", ""));
+          setShowExpiredModal(true);
         } else {
           toast.error(result.error || "Invalid credentials. Try again.");
         }
@@ -175,6 +180,36 @@ function LoginForm() {
               className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider"
             >
               Contact Support
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showExpiredModal} onOpenChange={setShowExpiredModal}>
+        <AlertDialogContent className="bg-slate-900 border-white/10">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white flex items-center gap-2 uppercase tracking-tighter italic font-black text-2xl">
+              <AlertCircle className="text-orange-500 w-6 h-6" /> Account Expired
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400 font-medium">
+              {expiredReason}
+              <br /><br />
+              <span className="text-orange-500/80 font-bold uppercase text-[10px] tracking-widest">Notice:</span>{" "}
+              <span className="text-white font-bold">Please renew to continue accessing GymFlow.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction 
+              onClick={() => setShowExpiredModal(false)}
+              className="bg-transparent border border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wider"
+            >
+              Close
+            </AlertDialogAction>
+            <AlertDialogAction 
+              onClick={() => window.open("https://wa.me/923149784156?text=Hello%2C%20I%20would%20like%20to%20renew%20my%20gym%20subscription.", "_blank")}
+              className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider"
+            >
+              Renew Subscription
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

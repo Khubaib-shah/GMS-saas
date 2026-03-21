@@ -275,7 +275,7 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await req.json();
-        const { name, city, phone, address } = body;
+        const { name, city, phone, address, trialEndsAt, expiryDate, subscriptionStatus } = body;
 
         await connectDB();
         const gym = await Gym.findById(id);
@@ -287,6 +287,9 @@ export async function PUT(
         if (city !== undefined) gym.city = city;
         if (phone !== undefined) gym.phone = phone;
         if (address !== undefined) gym.address = address;
+        if (trialEndsAt !== undefined) gym.trialEndsAt = trialEndsAt ? new Date(trialEndsAt) : null;
+        if (expiryDate !== undefined) gym.expiryDate = expiryDate ? new Date(expiryDate) : null;
+        if (subscriptionStatus !== undefined) gym.subscriptionStatus = subscriptionStatus;
 
         await gym.save();
         await deleteCache(`gym:profile:${id}`);

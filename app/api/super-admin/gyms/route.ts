@@ -109,6 +109,7 @@ export async function POST(req: Request) {
             city,
             phone,
             address,
+            trialDays = 14,
         } = body;
 
         if (!gymName || !ownerName || !ownerEmail || !ownerPassword || !planId) {
@@ -131,14 +132,16 @@ export async function POST(req: Request) {
         }
 
         // 3. Create Gym
+        const trialEndDate = new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000);
         const gym = await Gym.create({
             name: gymName,
             city: city || "",
             phone: phone || "",
             address: address || "",
-            subscriptionStatus: "active",
+            subscriptionStatus: "trial",
             platformPlanId: planId,
-            expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days
+            trialEndsAt: trialEndDate,
+            expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days when active
             branches: [{
                 name: "Main Branch",
                 address: address || "",
