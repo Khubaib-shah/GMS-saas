@@ -19,6 +19,13 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CreateGymModal } from "@/components/super-admin/create-gym-modal";
 import { toast } from "sonner";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
@@ -127,17 +134,24 @@ export default function GymsPage() {
                     />
                 </div>
 
-                <select
-                    value={statusFilter}
-                    onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-                    className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-slate-300 focus:outline-none focus:border-indigo-500/50 appearance-none cursor-pointer min-w-[140px]"
+                <Select
+                    value={statusFilter || "all"}
+                    onValueChange={(value) => { 
+                        setStatusFilter(value === "all" ? "" : value); 
+                        setPage(1); 
+                    }}
                 >
-                    <option value="">All Statuses</option>
-                    <option value="active">Active</option>
-                    <option value="trial">Trial</option>
-                    <option value="expired">Expired</option>
-                    <option value="suspended">Suspended</option>
-                </select>
+                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-sm text-slate-300 h-[42px] min-w-[140px]">
+                        <SelectValue placeholder="All Statuses" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a24] border-white/[0.08] text-white">
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="trial">Trial</SelectItem>
+                        <SelectItem value="expired">Expired</SelectItem>
+                        <SelectItem value="suspended">Suspended</SelectItem>
+                    </SelectContent>
+                </Select>
 
                 <input
                     type="text"
