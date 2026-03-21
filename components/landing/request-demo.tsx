@@ -82,7 +82,7 @@ export const RequestDemo = () => {
             <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
 
                 {/* Left Side: Value Proposition */}
-                <div className="order-2 lg:order-1">
+                <div className="order-1 lg:order-1">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6 tracking-widest">
                         BOOK A FREE DEMO
                     </div>
@@ -111,7 +111,7 @@ export const RequestDemo = () => {
                 </div>
 
                 {/* Right Side: Form */}
-                <div className="order-1 lg:order-2">
+                <div className="order-2 lg:order-2">
                     <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative">
                         <div className="absolute -top-px left-1/2 -translate-x-1/2 w-32 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent"></div>
 

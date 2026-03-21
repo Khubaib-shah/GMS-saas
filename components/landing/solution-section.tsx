@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 
 export function SolutionSection() {
   return (
-    <section className="py-24 px-6 bg-slate-950 relative overflow-hidden">
+    <section id="solution" className="py-24 px-6 bg-slate-950 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] opacity-50"></div>
       
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 relative z-10">

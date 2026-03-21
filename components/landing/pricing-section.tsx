@@ -1,5 +1,6 @@
 import { CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export function PricingSection() {
   const plans = [
@@ -89,7 +90,7 @@ export function PricingSection() {
                 ))}
               </div>
 
-              <a href={`/#request-demo?plan=${encodeURIComponent(plan.name)}`}>
+              <Link href={`/signup?plan=${encodeURIComponent(plan.name)}`}>
                 <Button
                   className={`w-full py-6 text-base font-semibold rounded-xl transition-all ${plan.highlight
                     ? "bg-primary text-black hover:bg-white"
@@ -98,7 +99,7 @@ export function PricingSection() {
                 >
                   Get Started
                 </Button>
-              </a>
+              </Link>
             </div>
           ))}
         </div>

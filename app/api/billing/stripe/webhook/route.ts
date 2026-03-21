@@ -10,13 +10,19 @@ export async function POST(req: Request) {
     const sig = req.headers.get("stripe-signature") || "";
 
     try {
-        // In dummy mode, we don't actually verify signatures
-        const event = JSON.parse(payload);
+        // Real signature verification
+        let event;
+        try {
+            event = await stripeService.verifyWebhookSignature(payload, sig);
+        } catch (err: any) {
+            console.error(`[Stripe Webhook Signature Error]: ${err.message}`);
+            return NextResponse.json({ message: "Invalid signature" }, { status: 400 });
+        }
 
-        if (event.type === "checkout.session.completed") {
-            const session = event.data.object;
-            const { gymId, planId, planName } = session.metadata || {};
-            const amount = session.amount_total;
+        const result = await stripeService.handleWebhookEvent(event);
+
+        if (result.success && result.gymId) {
+            const { gymId, planId, planName, amount, sessionId } = result;
 
             await connectDB();
             
@@ -24,7 +30,7 @@ export async function POST(req: Request) {
             const gym = await Gym.findById(gymId);
             if (gym) {
                 const newExpiry = new Date();
-                newExpiry.setMonth(newExpiry.getMonth() + 1); // Mock 1 month extension
+                newExpiry.setMonth(newExpiry.getMonth() + 1); // 1 month extension
 
                 gym.expiryDate = newExpiry;
                 gym.subscriptionStatus = "active";
@@ -37,12 +43,12 @@ export async function POST(req: Request) {
                     gymId,
                     planId,
                     planName: planName || "SaaS Plan",
-                    amountPKR: amount,
+                    amountPKR: (amount || 0) / 100, // Convert from cents
                     paymentMethod: "online", // Stripe
                     paymentDate: new Date(),
                     expiryDate: newExpiry,
-                    enteredBy: "system_stripe", // Mock system user
-                    notes: `Stripe Payment: ${session.id}`,
+                    enteredBy: "system_stripe",
+                    notes: `Stripe Payment Session: ${sessionId}`,
                 });
 
                 console.log(`[Stripe Webhook] Successfully processed payment for gym: ${gymId}`);
@@ -58,7 +64,7 @@ export async function POST(req: Request) {
                     resourceName: gym.name,
                     details: { 
                         subscriptionUpdated: true, 
-                        stripeSessionId: session.id,
+                        stripeSessionId: sessionId,
                         newExpiry: newExpiry
                     }
                 });

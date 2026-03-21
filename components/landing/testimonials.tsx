@@ -86,7 +86,7 @@ export function Testimonials() {
   }, [emblaApi, onSelect])
 
   return (
-    <section className="py-28 px-6 bg-slate-950 relative overflow-hidden">
+    <section id="testimonials" className="py-28 px-6 bg-slate-950 relative overflow-hidden">
       {/* Ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
 

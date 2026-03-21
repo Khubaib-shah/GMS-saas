@@ -50,7 +50,8 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const isLoginPage = pathname === "/login"
   const isMemberPortal = pathname?.match(/^\/member($|\/)/)
   const isSuperAdmin = pathname?.startsWith("/super-admin")
-  const isPublicPage = isLandingPage || isLoginPage || isMemberPortal || isSuperAdmin
+  const isSignupPage = pathname?.startsWith("/signup")
+  const isPublicPage = isLandingPage || isLoginPage || isMemberPortal || isSuperAdmin || isSignupPage
 
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
 

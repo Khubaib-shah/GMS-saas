@@ -2,4 +2,7 @@ Fxes
 
 Fix gym suspend modal Show a modal 
 Fix Record Payment Select box
-i cannot see anything in change plan when i open select 
+Fix the change plan when i open select the ui is not the  same as our theme it simple select option not styled one
+fix soft Delete open a Confirmation modal
+
+Remove Theme Toggle from the tour guide

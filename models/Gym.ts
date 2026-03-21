@@ -46,7 +46,7 @@ const GymSchema = new mongoose.Schema(
         },
         subscriptionStatus: {
             type: String,
-            enum: ["active", "trial", "expired", "suspended"],
+            enum: ["active", "trial", "expired", "suspended", "pending"],
             default: "trial",
         },
         expiryDate: { type: Date, default: null },
@@ -87,5 +87,11 @@ GymSchema.set("toJSON", {
         delete ret._id;
     },
 });
+
+// Handle model compilation for Next.js HMR
+if (process.env.NODE_ENV === "development") {
+    // This forces the model to be re-compiled with the updated schema
+    delete mongoose.models.Gym;
+}
 
 export default mongoose.models.Gym || mongoose.model("Gym", GymSchema);

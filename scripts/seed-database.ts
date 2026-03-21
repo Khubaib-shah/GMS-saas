@@ -133,9 +133,9 @@ async function seed() {
 
         // Seed Platform Plans
         await PlatformPlan.create([
-            { name: "Starter", slug: "starter", monthlyPricePKR: 5000, branchLimit: 1, maxStaffAccounts: 3 },
-            { name: "Professional", slug: "professional", monthlyPricePKR: 15000, branchLimit: 3, maxStaffAccounts: 10 },
-            { name: "Enterprise", slug: "enterprise", monthlyPricePKR: 50000, branchLimit: 10, maxStaffAccounts: 50 }
+            { name: "Starter", slug: "starter", monthlyPricePKR: 3000, branchLimit: 1, maxStaffAccounts: 3 },
+            { name: "Professional", slug: "professional", monthlyPricePKR: 5000, branchLimit: 3, maxStaffAccounts: 10 },
+            { name: "Enterprise", slug: "enterprise", monthlyPricePKR: 8000, branchLimit: 10, maxStaffAccounts: 50 }
         ]);
 
         const globalCredentials: any[] = [];
@@ -177,7 +177,7 @@ async function seed() {
             // Seed Roles for this Gym
             console.log(`  Seeding Roles for ${gymName}...`);
             const rolesMap: Record<string, any> = {};
-            
+
             const rolesToCreate = [
                 { name: "owner", permissions: ALL_PERMISSIONS, description: "Full access" },
                 { name: "manager", permissions: ROLE_PERMISSIONS.manager, description: "Management access" },

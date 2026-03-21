@@ -20,11 +20,13 @@ export default async function proxy(req: NextRequest) {
     const isLoginPage = req.nextUrl.pathname.startsWith("/login");
     const isMemberPortal = req.nextUrl.pathname.match(/^\/member($|\/)/) || req.nextUrl.pathname.match(/^\/api\/member-portal($|\/)/);
     const isLandingPage = req.nextUrl.pathname === "/";
+    const isSignupPage = req.nextUrl.pathname.startsWith("/signup");
+    const isSignupApi = req.nextUrl.pathname.startsWith("/api/auth/signup");
     const isRequestDemoApi = req.nextUrl.pathname === "/api/request-demo";
     const isAdmin = token?.role === "super_admin";
 
-    // 1. Allow landing page, member portal, and request demo regardless of NextAuth session
-    if (isLandingPage || isMemberPortal || isRequestDemoApi) {
+    // 1. Allow landing page, member portal, signup, and request demo regardless of NextAuth session
+    if (isLandingPage || isMemberPortal || isRequestDemoApi || isSignupPage || isSignupApi) {
         return NextResponse.next();
     }
 

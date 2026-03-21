@@ -1,8 +1,12 @@
-/**
- * Dummy Stripe Service
- * This service mocks Stripe interactions for development.
- * Real credentials and implementation will be added later.
- */
+import Stripe from "stripe";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY is not defined in environment variables");
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2026-02-25.clover", // or latest stable version
+});
 
 export const stripeService = {
     async createCheckoutSession(params: {
@@ -14,40 +18,65 @@ export const stripeService = {
         cancelUrl: string;
         customerEmail?: string;
     }) {
-        console.log("[Mock Stripe] Creating checkout session for:", params);
-        
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            line_items: [
+                {
+                    price_data: {
+                        currency: "pkr",
+                        product_data: {
+                            name: params.planName,
+                            description: `Subscription for ${params.planName}`,
+                        },
+                        unit_amount: params.amount * 100, // Stripe expects amounts in cents
+                    },
+                    quantity: 1,
+                },
+            ],
+            mode: "payment", // or 'subscription' if using recurring prices
+            success_url: params.successUrl,
+            cancel_url: params.cancelUrl,
+            customer_email: params.customerEmail,
+            metadata: {
+                gymId: params.gymId,
+                planId: params.planId,
+                planName: params.planName,
+            },
+        });
 
-        // Return a mock session object
         return {
-            id: `mock_cs_${Math.random().toString(36).substring(7)}`,
-            url: `${params.successUrl}?session_id=mock_session_${Date.now()}`,
-            amount_total: params.amount,
-            currency: 'pkr',
-            payment_status: 'unpaid',
+            id: session.id,
+            url: session.url as string,
+            amount_total: session.amount_total as number,
+            currency: session.currency as string,
+            payment_status: session.payment_status,
         };
     },
 
     async verifyWebhookSignature(payload: string, signature: string) {
-        // Always true for dummy implementation
-        return true;
+        if (!process.env.STRIPE_WEBHOOK_SECRET) {
+            throw new Error("STRIPE_WEBHOOK_SECRET is not defined in environment variables");
+        }
+        return stripe.webhooks.constructEvent(
+            payload,
+            signature,
+            process.env.STRIPE_WEBHOOK_SECRET
+        );
     },
 
-    async handleWebhookEvent(event: any) {
-        console.log("[Mock Stripe] Handling webhook event:", event.type);
-        
-        // Mock event handling
+    async handleWebhookEvent(event: Stripe.Event) {
         switch (event.type) {
-            case 'checkout.session.completed':
+            case "checkout.session.completed":
+                const session = event.data.object as Stripe.Checkout.Session;
                 return {
                     success: true,
-                    gymId: event.data.object.metadata.gymId,
-                    planId: event.data.object.metadata.planId,
-                    amount: event.data.object.amount_total,
+                    gymId: session.metadata?.gymId,
+                    planId: session.metadata?.planId,
+                    amount: session.amount_total,
+                    sessionId: session.id,
                 };
             default:
                 return { success: false };
         }
-    }
+    },
 };
