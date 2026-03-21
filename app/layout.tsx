@@ -57,6 +57,7 @@ export const metadata: Metadata = {
 import SmoothScroller from "@/components/smooth-scroller";
 import { ThemeProvider } from "@/components/theme-provider";
 import { GlobalAntigravity } from "@/components/global-antigravity";
+import { PreLoader } from "@/components/pre-loader";
 
 export default function RootLayout({
   children,
@@ -72,6 +73,7 @@ export default function RootLayout({
           forcedTheme="dark"
           disableTransitionOnChange
         >
+          <PreLoader />
           <GlobalAntigravity />
           <SmoothScroller />
           <LayoutWrapper>{children}</LayoutWrapper>

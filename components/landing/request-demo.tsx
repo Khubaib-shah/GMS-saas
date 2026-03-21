@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 type FormData = {
     firstName: string
@@ -182,18 +183,20 @@ export const RequestDemo = () => {
 
                                     <div className="space-y-2">
                                         <Label htmlFor="members" className="text-slate-400">Estimated Active Members</Label>
-                                        <select
-                                            id="members"
+                                        <Select
                                             value={formData.members}
-                                            onChange={handleChange}
-                                            className="flex h-12 w-full items-center justify-between rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                                            onValueChange={(value) => setFormData(prev => ({ ...prev, members: value }))}
                                         >
-                                            <option value="" className="bg-slate-900 text-slate-400">Select range...</option>
-                                            <option value="1-100" className="bg-slate-900">1 - 100</option>
-                                            <option value="101-500" className="bg-slate-900">101 - 500</option>
-                                            <option value="501-1000" className="bg-slate-900">501 - 1,000</option>
-                                            <option value="1000+" className="bg-slate-900">1,000+</option>
-                                        </select>
+                                            <SelectTrigger className="h-12 w-full bg-white/5 border-white/10 text-white focus:ring-primary py-4">
+                                                <SelectValue placeholder="Select range..." />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                                <SelectItem value="1-100">1 - 100</SelectItem>
+                                                <SelectItem value="101-500">101 - 500</SelectItem>
+                                                <SelectItem value="501-1000">501 - 1,000</SelectItem>
+                                                <SelectItem value="1000+">1,000+</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div className="space-y-2">
