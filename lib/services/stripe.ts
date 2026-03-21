@@ -69,14 +69,15 @@ export const stripeService = {
             case "checkout.session.completed":
                 const session = event.data.object as Stripe.Checkout.Session;
                 return {
-                    success: true,
+                    success: true as const,
                     gymId: session.metadata?.gymId,
                     planId: session.metadata?.planId,
+                    planName: session.metadata?.planName,
                     amount: session.amount_total,
                     sessionId: session.id,
                 };
             default:
-                return { success: false };
+                return { success: false as const };
         }
     },
 };

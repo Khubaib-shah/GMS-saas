@@ -23,9 +23,19 @@ import {
     CheckCircle,
     Ban,
     Plus,
+    Edit2,
+    X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { EditGymModal } from "@/components/super-admin/edit-gym-modal";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
@@ -41,6 +51,11 @@ export default function GymDetailPage() {
     const [actionLoading, setActionLoading] = useState("");
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showExtendModal, setShowExtendModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showSuspendModal, setShowSuspendModal] = useState(false);
+    const [suspensionReason, setSuspensionReason] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
     const [paymentForm, setPaymentForm] = useState({ amount: "", method: "cash", notes: "", expiryDate: "" });
     const [extendDays, setExtendDays] = useState("30");
     const [plans, setPlans] = useState<any[]>([]);
@@ -126,6 +141,13 @@ export default function GymDetailPage() {
                 <div className="flex-1">
                     <div className="flex items-center gap-3">
                         <h1 className="text-xl font-bold text-white">{gym.name}</h1>
+                        <button
+                            onClick={() => setShowEditModal(true)}
+                            className="p-1.5 rounded-md bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 hover:text-white transition-colors"
+                            title="Edit Gym Info"
+                        >
+                            <Edit2 className="w-3.5 h-3.5" />
+                        </button>
                         <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border", badge.cls)}>
                             {badge.label}
                         </span>
@@ -200,10 +222,7 @@ export default function GymDetailPage() {
                             label="Suspend"
                             color="red"
                             loading={actionLoading === "suspend"}
-                            onClick={() => {
-                                const reason = prompt("Suspension reason:");
-                                if (reason) doAction("suspend", { reason });
-                            }}
+                            onClick={() => setShowSuspendModal(true)}
                         />
                     ) : (
                         <ActionButton
@@ -232,38 +251,37 @@ export default function GymDetailPage() {
                         label="Reset Owner Password"
                         color="amber"
                         loading={actionLoading === "resetPassword"}
-                        onClick={() => {
-                            if (confirm("Reset owner password to 'password123'?")) {
-                                doAction("resetPassword", { newPassword: "password123" });
-                            }
-                        }}
+                        onClick={() => setShowResetPasswordModal(true)}
                     />
 
-                    <select
-                        className="px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-slate-300 focus:outline-none focus:border-indigo-500/50"
-                        value={gym.plan?.id || ""}
-                        onChange={(e) => {
-                            if (e.target.value && e.target.value !== (gym.plan?.id || "")) {
-                                doAction("changePlan", { planId: e.target.value });
-                            }
-                        }}
-                    >
-                        <option value="">Change Plan...</option>
-                        {plans.map((p: any) => (
-                            <option key={p._id || p.id} value={p._id || p.id}>{p.name} — {formatPKR(p.monthlyPricePKR)}/mo</option>
-                        ))}
-                    </select>
+                    <div className="w-[200px]">
+                        <Select
+                            value={gym.plan?.id || ""}
+                            onValueChange={(value) => {
+                                if (value && value !== (gym.plan?.id || "")) {
+                                    doAction("changePlan", { planId: value });
+                                }
+                            }}
+                        >
+                            <SelectTrigger className="bg-white/[0.04] border-white/[0.08] h-[34px] px-3 w-full text-slate-300 text-sm">
+                                <SelectValue placeholder="Change Plan..." />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#1a1a24] border-white/[0.08] text-white z-[70] max-h-60 overflow-y-auto custom-scrollbar">
+                                {plans.map((p: any) => (
+                                    <SelectItem key={p._id || p.id} value={p._id || p.id}>
+                                        {p.name} — {formatPKR(p.monthlyPricePKR)}/mo
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
                     <ActionButton
                         icon={Trash2}
                         label="Soft Delete"
                         color="rose"
                         loading={actionLoading === "softDelete"}
-                        onClick={() => {
-                            if (confirm("This will deactivate the gym. Are you sure?")) {
-                                doAction("softDelete");
-                            }
-                        }}
+                        onClick={() => setShowDeleteModal(true)}
                     />
                 </div>
             </div>
@@ -313,15 +331,23 @@ export default function GymDetailPage() {
                                 className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:outline-none focus:border-indigo-500/50"
                             />
                         </div>
-                        <button
-                            onClick={() => {
-                                doAction("extend", { days: parseInt(extendDays) });
-                                setShowExtendModal(false);
-                            }}
-                            className="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
-                        >
-                            Extend
-                        </button>
+                        <div className="flex gap-3 justify-end pt-2">
+                            <button
+                                onClick={() => setShowExtendModal(false)}
+                                className="px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white text-sm font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    doAction("extend", { days: parseInt(extendDays) });
+                                    setShowExtendModal(false);
+                                }}
+                                className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+                            >
+                                Extend
+                            </button>
+                        </div>
                     </div>
                 </Modal>
             )}
@@ -342,17 +368,21 @@ export default function GymDetailPage() {
                         </div>
                         <div>
                             <label className="text-xs text-slate-400 block mb-1">Payment Method</label>
-                            <select
+                            <Select
                                 value={paymentForm.method}
-                                onChange={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })}
-                                className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 text-sm focus:outline-none focus:border-indigo-500/50"
+                                onValueChange={(value) => setPaymentForm({ ...paymentForm, method: value })}
                             >
-                                <option value="cash">Cash</option>
-                                <option value="bank_transfer">Bank Transfer</option>
-                                <option value="jazzcash">JazzCash</option>
-                                <option value="easypaisa">EasyPaisa</option>
-                                <option value="other">Other</option>
-                            </select>
+                                <SelectTrigger className="bg-white/[0.04] border-white/[0.08] w-full text-slate-300 h-[38px]">
+                                    <SelectValue placeholder="Select Method" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-[#1a1a24] border-white/[0.08] text-white z-[70] max-h-60 overflow-y-auto custom-scrollbar">
+                                    <SelectItem value="cash">Cash</SelectItem>
+                                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                                    <SelectItem value="jazzcash">JazzCash</SelectItem>
+                                    <SelectItem value="easypaisa">EasyPaisa</SelectItem>
+                                    <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div>
                             <label className="text-xs text-slate-400 block mb-1">New Expiry Date</label>
@@ -372,26 +402,137 @@ export default function GymDetailPage() {
                                 className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:outline-none focus:border-indigo-500/50 resize-none"
                             />
                         </div>
-                        <button
-                            onClick={() => {
-                                doAction("markPaid", {
-                                    amount: parseInt(paymentForm.amount),
-                                    method: paymentForm.method,
-                                    notes: paymentForm.notes,
-                                    expiryDate: paymentForm.expiryDate,
-                                    planName: gym.plan?.name || "",
-                                });
-                                setShowPaymentModal(false);
-                                setPaymentForm({ amount: "", method: "cash", notes: "", expiryDate: "" });
-                            }}
-                            disabled={!paymentForm.amount || !paymentForm.expiryDate}
-                            className="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors disabled:opacity-40"
-                        >
-                            Record Payment
-                        </button>
+                        <div className="flex gap-3 justify-end pt-2">
+                            <button
+                                onClick={() => {
+                                    setShowPaymentModal(false);
+                                    setPaymentForm({ amount: "", method: "cash", notes: "", expiryDate: "" });
+                                }}
+                                className="px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white text-sm font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    doAction("markPaid", {
+                                        amount: parseInt(paymentForm.amount),
+                                        method: paymentForm.method,
+                                        notes: paymentForm.notes,
+                                        expiryDate: paymentForm.expiryDate,
+                                        planName: gym.plan?.name || "",
+                                    });
+                                    setShowPaymentModal(false);
+                                    setPaymentForm({ amount: "", method: "cash", notes: "", expiryDate: "" });
+                                }}
+                                disabled={!paymentForm.amount || !paymentForm.expiryDate}
+                                className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors disabled:opacity-40"
+                            >
+                                Record Payment
+                            </button>
+                        </div>
                     </div>
                 </Modal>
             )}
+
+            {/* Suspend Modal */}
+            {showSuspendModal && (
+                <Modal onClose={() => setShowSuspendModal(false)} title="Suspend Gym">
+                    <div className="space-y-4">
+                        <p className="text-sm text-slate-300">Are you sure you want to suspend this gym? Please provide a reason.</p>
+                        <div>
+                            <label className="text-xs text-slate-400 block mb-1">Reason</label>
+                            <input
+                                type="text"
+                                value={suspensionReason}
+                                onChange={(e) => setSuspensionReason(e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white text-sm focus:outline-none focus:border-indigo-500/50"
+                                placeholder="e.g. Payment overdue"
+                            />
+                        </div>
+                        <div className="flex gap-3 justify-end mt-4">
+                            <button
+                                onClick={() => setShowSuspendModal(false)}
+                                className="px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white text-sm font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (suspensionReason) {
+                                        doAction("suspend", { reason: suspensionReason });
+                                        setShowSuspendModal(false);
+                                        setSuspensionReason("");
+                                    } else {
+                                        toast.error("Reason is required");
+                                    }
+                                }}
+                                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors"
+                            >
+                                Suspend Gym
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Delete Modal */}
+            {showDeleteModal && (
+                <Modal onClose={() => setShowDeleteModal(false)} title="Confirm Soft Delete">
+                    <div className="space-y-4">
+                        <p className="text-sm text-slate-300">This will deactivate the gym. Are you sure you want to proceed?</p>
+                        <div className="flex gap-3 justify-end mt-4">
+                            <button
+                                onClick={() => setShowDeleteModal(false)}
+                                className="px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white text-sm font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    doAction("softDelete");
+                                    setShowDeleteModal(false);
+                                }}
+                                className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition-colors"
+                            >
+                                Delete Gym
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Reset Password Modal */}
+            {showResetPasswordModal && (
+                <Modal onClose={() => setShowResetPasswordModal(false)} title="Reset Owner Password">
+                    <div className="space-y-4">
+                        <p className="text-sm text-slate-300">Are you sure you want to reset the owner's password to <strong className="text-white">password123</strong>?</p>
+                        <div className="flex gap-3 justify-end mt-4">
+                            <button
+                                onClick={() => setShowResetPasswordModal(false)}
+                                className="px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white text-sm font-medium transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    doAction("resetPassword", { newPassword: "password123" });
+                                    setShowResetPasswordModal(false);
+                                }}
+                                className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors"
+                            >
+                                Reset Password
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            <EditGymModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                onSuccess={fetchGym}
+                gym={gym}
+            />
         </div>
     );
 }
@@ -450,8 +591,14 @@ function ActionButton({ icon: Icon, label, color, loading, onClick }: any) {
 function Modal({ onClose, title, children }: { onClose: () => void; title: string; children: React.ReactNode }) {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-            <div className="bg-[#111118] border border-white/[0.08] rounded-xl p-6 w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
-                <h3 className="text-sm font-semibold text-white mb-4">{title}</h3>
+            <div className="bg-[#111118] border border-white/[0.08] rounded-xl p-6 w-full max-w-md shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+                >
+                    <X className="w-4 h-4" />
+                </button>
+                <h3 className="text-sm font-semibold text-white mb-4 pr-6">{title}</h3>
                 {children}
             </div>
         </div>

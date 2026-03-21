@@ -261,3 +261,39 @@ export async function PATCH(
             return NextResponse.json({ message: "Unknown action" }, { status: 400 });
     }
 }
+
+/**
+ * PUT /api/super-admin/gyms/[id] — General gym update
+ */
+export async function PUT(
+    req: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const authResult = await requireSuperAdmin();
+    if ("error" in authResult) return authResult.error;
+
+    try {
+        const { id } = await params;
+        const body = await req.json();
+        const { name, city, phone, address } = body;
+
+        await connectDB();
+        const gym = await Gym.findById(id);
+        if (!gym) {
+            return NextResponse.json({ message: "Gym not found" }, { status: 404 });
+        }
+
+        if (name) gym.name = name;
+        if (city !== undefined) gym.city = city;
+        if (phone !== undefined) gym.phone = phone;
+        if (address !== undefined) gym.address = address;
+
+        await gym.save();
+        await deleteCache(`gym:profile:${id}`);
+
+        return NextResponse.json({ message: "Gym updated successfully", gym });
+    } catch (error: any) {
+        console.error("Gym update error:", error);
+        return NextResponse.json({ message: error.message || "Internal Server Error" }, { status: 500 });
+    }
+}

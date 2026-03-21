@@ -133,7 +133,7 @@ export default function SuperAdminDashboard() {
                 {kpiCards.map((kpi) => (
                     <div
                         key={kpi.label}
-                        className="group relative rounded-xl border border-white/[0.06] bg-[#0d0d14] p-5 hover:border-white/[0.12] transition-all duration-300"
+                        className="group relative rounded-xl border border-white/[0.06] bg-[#0d0d14] p-5 hover:border-white/[0.12] transition-all duration-300 overflow-hidden"
                     >
                         <div className="flex items-start justify-between">
                             <div>
