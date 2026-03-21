@@ -9,6 +9,7 @@ import Attendance from "@/models/Attendance";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
 import Gym from "@/models/Gym";
+import SubscriptionPlan from "@/models/SubscriptionPlan";
 
 export async function POST(req: Request) {
     const authResult = await requirePermission(PERMISSIONS.ATTENDANCE_CHECKIN);
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
     const { session } = authResult;
 
     try {
-        const { memberId, branchId } = await req.json();
+        const { memberId, branchId, method = "manual" } = await req.json();
 
         if (!memberId) {
             return NextResponse.json({ error: "Member ID is required" }, { status: 400 });
@@ -26,6 +27,20 @@ export async function POST(req: Request) {
         const gymId = session.user.gymId;
 
         await connectDB();
+
+        // 0. Feature Gate Check (Manual vs QR)
+        const subPlan = await SubscriptionPlan.findOne({ gymId, active: true }).lean();
+        if (!subPlan) {
+            return NextResponse.json({ error: "No active subscription plan" }, { status: 403 });
+        }
+
+        const requiredFeature = method === "qr" ? "qrAttendance" : "manualAttendance";
+        if (!subPlan.enabledFeatures?.includes(requiredFeature)) {
+            return NextResponse.json({
+                error: `Feature not available on your plan: ${method === "qr" ? "QR Attendance" : "Manual Attendance"}`,
+                feature: requiredFeature
+            }, { status: 403 });
+        }
 
         // Get gym settings for attendance rules
         const gym = await Gym.findById(gymId).lean();
@@ -125,6 +140,7 @@ export async function POST(req: Request) {
             date: startOfDay,
             checkInTime: new Date(),
             status: "present",
+            checkInMethod: method,
             branchId: branchId || session.user.branchId,
         });
 

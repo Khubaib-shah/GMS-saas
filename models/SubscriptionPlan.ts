@@ -26,7 +26,7 @@ const SubscriptionPlanSchema = new mongoose.Schema(
         },
         enabledFeatures: {
             type: [String],
-            default: ["members", "subscriptions", "payments", "attendance"],
+            default: ["members", "subscriptions", "payments", "manualAttendance", "qrAttendance"],
         },
     },
     { timestamps: true }

@@ -39,16 +39,19 @@ export function PricingSection() {
 
   const getFeatures = (plan: PlatformPlan) => {
     const features = [
-      `${plan.branchLimit === 1 ? "1 Branch" : `Up to ${plan.branchLimit} Branches`}`,
-      `${plan.maxStaffAccounts} Staff Accounts`,
+      `${plan.branchLimit === 1 ? "1 Branch" : plan.branchLimit >= 3 && plan.branchLimit <= 5 ? `Up to ${plan.branchLimit} Branches` : `Unlimited Branches`}`,
+      `${plan.maxStaffAccounts === 3 ? "Up to 3 Staff Accounts" : plan.maxStaffAccounts >= 3 && plan.maxStaffAccounts <= 10 ? `Up to ${plan.maxStaffAccounts} Staff Accounts` : `Unlimited Staff Accounts`}`,
     ]
 
     if (plan.featureFlags.includes("members")) features.push("Member Management")
-    if (plan.featureFlags.includes("attendance")) features.push("QR/Manual Attendance")
+    if (plan.featureFlags.includes("manualAttendance")) features.push("Manual Attendance")
+    if (plan.featureFlags.includes("qrAttendance")) features.push("QR Code Attendance")
     if (plan.featureFlags.includes("payments")) features.push("Financial Reports")
     if (plan.featureFlags.includes("trainersModule")) features.push("Trainer Management")
     if (plan.featureFlags.includes("workoutPlanner")) features.push("Workout Planner")
-    
+    if (plan.featureFlags.includes("analytics")) features.push("Advanced Analytics")
+    if (plan.featureFlags.includes("auditLogs")) features.push("Security Audit Logs")
+
     return features
   }
 

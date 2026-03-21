@@ -8,6 +8,7 @@ const AttendanceSchema = new mongoose.Schema(
         checkInTime: { type: Date, required: true },
         checkOutTime: { type: Date },
         status: { type: String, enum: ["present", "absent", "late"], default: "present" },
+        checkInMethod: { type: String, enum: ["manual", "qr"], default: "manual" },
         // Multi-branch support - which branch was the check-in at
         branchId: { type: mongoose.Schema.Types.ObjectId },
     },

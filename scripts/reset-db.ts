@@ -91,9 +91,30 @@ async function reset() {
 
         await PlatformSettings.create({});
         await PlatformPlan.create([
-            { name: "Starter", slug: "starter", monthlyPricePKR: 3000, branchLimit: 1, maxStaffAccounts: 3 },
-            { name: "Professional", slug: "professional", monthlyPricePKR: 5000, branchLimit: 3, maxStaffAccounts: 10 },
-            { name: "Enterprise", slug: "enterprise", monthlyPricePKR: 8000, branchLimit: 10, maxStaffAccounts: 50 }
+            { 
+                name: "Starter", 
+                slug: "starter", 
+                monthlyPricePKR: 3000, 
+                branchLimit: 1, 
+                maxStaffAccounts: 3,
+                featureFlags: ["members", "manualAttendance", "payments"]
+            },
+            { 
+                name: "Professional", 
+                slug: "professional", 
+                monthlyPricePKR: 5000, 
+                branchLimit: 3, 
+                maxStaffAccounts: 10,
+                featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics"]
+            },
+            { 
+                name: "Enterprise", 
+                slug: "enterprise", 
+                monthlyPricePKR: 8000, 
+                branchLimit: 10, 
+                maxStaffAccounts: 50,
+                featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics", "workoutPlanner", "auditLogs"]
+            }
         ]);
         console.log("Platform Settings and Plans re-seeded.");
 

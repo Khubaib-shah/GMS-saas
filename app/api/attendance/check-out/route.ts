@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         if ("error" in authResult) return authResult.error;
         const { session } = authResult;
 
-        const { memberId, gymId } = await req.json();
+        const { memberId, gymId, method = "manual" } = await req.json();
 
         if (!memberId || !gymId) {
             return NextResponse.json(
@@ -24,6 +24,20 @@ export async function POST(req: Request) {
         }
 
         await connectDB();
+
+        // 0. Feature Gate Check (Manual vs QR)
+        const subPlan = await SubscriptionPlan.findOne({ gymId, active: true }).lean();
+        if (!subPlan) {
+            return NextResponse.json({ error: "No active subscription plan" }, { status: 403 });
+        }
+
+        const requiredFeature = method === "qr" ? "qrAttendance" : "manualAttendance";
+        if (!subPlan.enabledFeatures?.includes(requiredFeature)) {
+            return NextResponse.json({
+                error: `Feature not available on your plan: ${method === "qr" ? "QR Attendance" : "Manual Attendance"}`,
+                feature: requiredFeature
+            }, { status: 403 });
+        }
 
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
