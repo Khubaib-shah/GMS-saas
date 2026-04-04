@@ -6,7 +6,7 @@ const Antigravity = dynamic(() => import("./landing/antigravity"), { ssr: false 
 
 export function GlobalAntigravity() {
   return (
-    <div className="fixed inset-0 w-full h-full z-[-1] pointer-events-none opacity-80">
+    <div className="hidden md:block fixed inset-0 w-full h-full z-[-1] pointer-events-none opacity-80">
       <Antigravity
         count={300}
         magnetRadius={6}

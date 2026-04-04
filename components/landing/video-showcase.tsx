@@ -32,8 +32,16 @@ export function VideoShowcase() {
                             <div className="absolute inset-0 bg-gradient-to-tr from-slate-950/35 to-slate-800/35">
                                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
                                 {/* We keep the iframe but without autoplay and pointer events so it acts as a thumbnail */}
-                                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/yo6-_FYRHhc?si=LlNHlBRrACcmxo5P&controls=0" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen
-                                    className="w-full h-full object-cover opacity-30 mix-blend-overlay group-hover:scale-105 transition-transform duration-1000 ease-out pointer-events-none"
+                               <iframe
+                                  width="100%"
+                                  height="100%"
+                                  src="https://www.youtube.com/embed/Y-x0efG1seA?controls=0"
+                                  title="YouTube video player"
+                                  frameBorder="0"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                  referrerPolicy="strict-origin-when-cross-origin"
+                                  allowFullScreen
+                                  className="w-full h-full object-cover opacity-30 mix-blend-overlay group-hover:scale-105 transition-transform duration-1000 ease-out pointer-events-none"
                                 ></iframe>
                                 <div className="absolute inset-0 bg-slate-950/5 group-hover:bg-transparent transition-colors duration-700"></div>
                             </div>
