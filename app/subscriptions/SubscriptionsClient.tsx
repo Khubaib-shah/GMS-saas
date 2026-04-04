@@ -61,7 +61,7 @@ export default function SubscriptionsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
-  
+
   // Pause/Resume state
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
@@ -254,7 +254,7 @@ export default function SubscriptionsPage() {
         <h2 className="text-xl font-semibold text-foreground mb-6">
           Available Plans
         </h2>
-        
+
         {isAdmin ? (
           <Card className="overflow-hidden">
             <Table>
@@ -275,17 +275,17 @@ export default function SubscriptionsPage() {
                     const memberCount = store.subscriptions.filter(
                       (s) => s.planId === plan.id
                     ).length;
-                    
+
                     return (
                       <TableRow key={plan.mongoId || `${plan.gymId}-${plan.id}`}>
                         <TableCell className="font-medium">
                           {gym?.name || "Unknown Gym"}
                         </TableCell>
                         <TableCell>
-                           <div className="flex flex-col">
-                             <span className="font-semibold">{plan.name}</span>
-                             <span className="text-xs text-muted-foreground">{plan.id}</span>
-                           </div>
+                          <div className="flex flex-col">
+                            <span className="font-semibold">{plan.name}</span>
+                            <span className="text-xs text-muted-foreground">{plan.id}</span>
+                          </div>
                         </TableCell>
                         <TableCell>{formatCurrency(plan.price)}</TableCell>
                         <TableCell>{plan.duration} days</TableCell>
@@ -295,36 +295,36 @@ export default function SubscriptionsPage() {
                           </span>
                         </TableCell>
                         {(canEditPlans || canDeletePlans) && (
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                             {canEditPlans && (
-                             <Button
-                               variant="ghost"
-                               size="sm"
-                               onClick={() => {
-                                 setSelectedPlan(plan);
-                                 setEditFormData({
-                                   ...plan,
-                                   price: plan.price,
-                                 });
-                                 setShowEditModal(true);
-                               }}
-                             >
-                               <Edit2 className="w-4 h-4" />
-                             </Button>
-                             )}
-                             {canDeletePlans && (
-                             <Button
-                               variant="ghost"
-                               size="sm"
-                               className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                               onClick={() => setPlanToDelete(plan.id)}
-                             >
-                               <Trash2 className="w-4 h-4" />
-                             </Button>
-                             )}
-                          </div>
-                        </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              {canEditPlans && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedPlan(plan);
+                                    setEditFormData({
+                                      ...plan,
+                                      price: plan.price,
+                                    });
+                                    setShowEditModal(true);
+                                  }}
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                              {canDeletePlans && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  onClick={() => setPlanToDelete(plan.id)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
                         )}
                       </TableRow>
                     );
@@ -386,34 +386,34 @@ export default function SubscriptionsPage() {
                   {(canEditPlans || canDeletePlans) && (
                     <div className="flex gap-2 items-center justify-center mt-auto">
                       {canEditPlans && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => {
-                          setSelectedPlan(plan);
-                          setEditFormData({
-                            ...plan,
-                            price: plan.price,
-                          });
-                          setShowEditModal(true);
-                        }}
-                      >
-                        <Edit2 className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => {
+                            setSelectedPlan(plan);
+                            setEditFormData({
+                              ...plan,
+                              price: plan.price,
+                            });
+                            setShowEditModal(true);
+                          }}
+                        >
+                          <Edit2 className="w-4 h-4 mr-2" />
+                          Edit
+                        </Button>
                       )}
 
                       {canDeletePlans && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => setPlanToDelete(plan.id)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Delete
-                      </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setPlanToDelete(plan.id)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </Button>
                       )}
                     </div>
                   )}
@@ -452,11 +452,11 @@ export default function SubscriptionsPage() {
                     <TableCell>{formatDate(sub.startDate)}</TableCell>
                     <TableCell>{
                       sub.status === "paused"
-                       ? <div>
-                           <span className="line-through text-muted-foreground text-xs block">{formatDate(sub.originalEndDate || sub.endDate)}</span>
-                           <span>{formatDate(sub.endDate)}</span>
-                         </div>
-                       : formatDate(sub.endDate)
+                        ? <div>
+                          <span className="line-through text-muted-foreground text-xs block">{formatDate(sub.originalEndDate || sub.endDate)}</span>
+                          <span>{formatDate(sub.endDate)}</span>
+                        </div>
+                        : formatDate(sub.endDate)
                     }</TableCell>
                     <TableCell>
                       <span
@@ -465,15 +465,15 @@ export default function SubscriptionsPage() {
                           sub.status === "paused"
                             ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                             : isSubscriptionActive(sub.endDate, sub.status)
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                         )}
                       >
                         {sub.status === "paused"
                           ? "Paused"
                           : isSubscriptionActive(sub.endDate, sub.status)
-                          ? "Active"
-                          : "Expired"}
+                            ? "Active"
+                            : "Expired"}
                       </span>
                       {sub.totalPausedDays ? (
                         <div className="text-[10px] text-muted-foreground mt-1">
@@ -515,7 +515,7 @@ export default function SubscriptionsPage() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={6}
                     className="h-24 text-center text-muted-foreground"
                   >
                     No subscriptions yet.

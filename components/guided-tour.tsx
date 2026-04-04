@@ -47,17 +47,7 @@ const dashboardSteps = [
             </div>
         ),
     },
-    {
-        selector: '[data-tour="navbar-theme"]',
-        content: () => (
-            <div className="space-y-3">
-                <h3 className="font-black text-lg italic tracking-tight">Theme Toggle</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                    Switch between <strong>Light</strong> and <strong>Dark</strong> mode. Your preference is saved automatically.
-                </p>
-            </div>
-        ),
-    },
+
     {
         selector: '[data-tour="navbar-notifications"]',
         content: () => (

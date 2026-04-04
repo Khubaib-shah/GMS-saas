@@ -3,31 +3,31 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Loader2, 
-  Download, 
-  Filter, 
-  X, 
-  ChevronLeft, 
+import {
+  Loader2,
+  Download,
+  Filter,
+  X,
+  ChevronLeft,
   ChevronRight,
   Eye,
   RefreshCw
@@ -98,13 +98,13 @@ export default function AuditLogsClient() {
       const params = new URLSearchParams();
       params.set("page", pagination.page.toString());
       params.set("limit", pagination.limit.toString());
-      
+
       if (resource && resource !== "all") params.set("resource", resource);
       if (action && action !== "all") params.set("action", action);
       if (userId) params.set("userId", userId);
 
       const res = await fetch(`/api/audit-logs?${params.toString()}`);
-      
+
       if (!res.ok) {
         if (res.status === 403) {
           toast.error("You don't have permission to view audit logs");
@@ -132,7 +132,7 @@ export default function AuditLogsClient() {
   useEffect(() => {
     fetchLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.page, resource, action]); 
+  }, [pagination.page, resource, action]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
@@ -202,7 +202,7 @@ export default function AuditLogsClient() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Action</label>
               <Select value={action} onValueChange={setAction}>
@@ -221,9 +221,9 @@ export default function AuditLogsClient() {
             <div className="space-y-2">
               <label className="text-sm font-medium">User ID</label>
               <div className="flex gap-2">
-                <Input 
-                  placeholder="Search by User ID..." 
-                  value={userId} 
+                <Input
+                  placeholder="Search by User ID..."
+                  value={userId}
                   onChange={(e) => setUserId(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
                 />
@@ -243,8 +243,8 @@ export default function AuditLogsClient() {
         </CardContent>
       </Card>
 
-      <Card>
-        <div className="rounded-md border">
+      <Card className="gap-0 py-3">
+        <div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -300,7 +300,7 @@ export default function AuditLogsClient() {
                       </div>
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground font-mono">
-                       {JSON.stringify(log.details || {})}
+                      {JSON.stringify(log.details || {})}
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" onClick={() => setSelectedLog(log)}>
@@ -314,24 +314,24 @@ export default function AuditLogsClient() {
             </TableBody>
           </Table>
         </div>
-        
+
         {/* Pagination */}
-        <div className="flex items-center justify-between p-4 border-t">
+        <div className="flex items-center justify-between p-2 border-t">
           <div className="text-sm text-muted-foreground">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
           </div>
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page <= 1 || loading}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages || loading}
             >
@@ -350,42 +350,42 @@ export default function AuditLogsClient() {
               Action ID: {selectedLog?.id}
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedLog && (
             <div className="grid gap-4 py-4">
-               <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
-                 <div>
-                   <h4 className="text-sm font-medium text-muted-foreground mb-1">Timestamp</h4>
-                   <p className="text-sm">{format(new Date(selectedLog.createdAt), "PPP pp")}</p>
-                 </div>
-                 <div>
-                   <h4 className="text-sm font-medium text-muted-foreground mb-1">IP Address</h4>
-                   <p className="font-mono text-sm">{selectedLog.ipAddress || "N/A"}</p>
-                 </div>
-                 <div>
-                   <h4 className="text-sm font-medium text-muted-foreground mb-1">User</h4>
-                   <p className="text-sm">{selectedLog.userName} <span className="text-xs text-muted-foreground">({selectedLog.userId})</span></p>
-                 </div>
-                 <div>
-                   <h4 className="text-sm font-medium text-muted-foreground mb-1">Resource</h4>
-                   <p className="capitalize text-sm">{selectedLog.resource} <span className="text-xs text-muted-foreground">({selectedLog.resourceId})</span></p>
-                 </div>
-                 {selectedLog.userAgent && (
-                   <div className="col-span-2">
-                     <h4 className="text-sm font-medium text-muted-foreground mb-1">User Agent</h4>
-                     <p className="text-xs text-muted-foreground break-all">{selectedLog.userAgent}</p>
-                   </div>
-                 )}
-               </div>
+              <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Timestamp</h4>
+                  <p className="text-sm">{format(new Date(selectedLog.createdAt), "PPP pp")}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">IP Address</h4>
+                  <p className="font-mono text-sm">{selectedLog.ipAddress || "N/A"}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">User</h4>
+                  <p className="text-sm">{selectedLog.userName} <span className="text-xs text-muted-foreground">({selectedLog.userId})</span></p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Resource</h4>
+                  <p className="capitalize text-sm">{selectedLog.resource} <span className="text-xs text-muted-foreground">({selectedLog.resourceId})</span></p>
+                </div>
+                {selectedLog.userAgent && (
+                  <div className="col-span-2">
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">User Agent</h4>
+                    <p className="text-xs text-muted-foreground break-all">{selectedLog.userAgent}</p>
+                  </div>
+                )}
+              </div>
 
-               <div>
-                 <h4 className="text-sm font-medium text-muted-foreground mb-2">Change Details (JSON)</h4>
-                 <div className="bg-slate-950 text-slate-50 p-4 rounded-md overflow-x-auto">
-                   <pre className="text-xs font-mono">
-                     {JSON.stringify(selectedLog.details, null, 2)}
-                   </pre>
-                 </div>
-               </div>
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-2">Change Details (JSON)</h4>
+                <div className="bg-slate-950 text-slate-50 p-4 rounded-md overflow-x-auto">
+                  <pre className="text-xs font-mono">
+                    {JSON.stringify(selectedLog.details, null, 2)}
+                  </pre>
+                </div>
+              </div>
             </div>
           )}
         </DialogContent>

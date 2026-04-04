@@ -29,8 +29,10 @@ export default async function proxy(req: NextRequest) {
     // Debugging (Remove after fixing)
     console.log("[Proxy Debug]:", { pathname: req.nextUrl.pathname, isAuth, isAdmin, tokenRole: token?.role });
 
-    // 1. Allow landing page, member portal, signup, request demo, and platform plans regardless of NextAuth session
-    if (isLandingPage || isMemberPortal || isRequestDemoApi || isSignupPage || isSignupApi || isPlatformPlansApi) {
+    const isSeedApi = req.nextUrl.pathname.startsWith("/api/seed");
+
+    // 1. Allow landing page, member portal, signup, request demo, platform plans, and seed regardless of NextAuth session
+    if (isLandingPage || isMemberPortal || isRequestDemoApi || isSignupPage || isSignupApi || isPlatformPlansApi || isSeedApi) {
         return NextResponse.next();
     }
 
@@ -81,6 +83,6 @@ export const config = {
          * - favicon.ico
          * - public assets (png, svg, jpg, etc.)
          */
-        "/((?!api/register|api/auth|api/request-demo|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)",
+        "/((?!api/seed|api/register|api/auth|api/request-demo|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)",
     ],
 };
