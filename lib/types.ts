@@ -103,3 +103,9 @@ export type AuditLogEntry = {
   userAgent?: string
 }
 
+export type BusinessSettings = {
+  taxPercentage: number
+  joiningFee: number
+  autoExpireDays: number
+  gracePeriodDays: number
+}

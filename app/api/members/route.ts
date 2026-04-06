@@ -101,11 +101,40 @@ export async function POST(req: Request) {
         const body = await req.json();
         await connectDB();
 
+        // Sanitize: remove empty/invalid values that would cause MongoDB CastError
+        const sanitizedBody = { ...body };
+        // trainerId must be a valid ObjectId or undefined
+        if (!sanitizedBody.trainerId || sanitizedBody.trainerId === "__none__" || sanitizedBody.trainerId === "") {
+            delete sanitizedBody.trainerId;
+        }
+        // Remove empty email to avoid duplicate key errors on sparse unique index
+        if (!sanitizedBody.email || sanitizedBody.email.trim() === "") {
+            delete sanitizedBody.email;
+        }
+        // Remove empty phone
+        if (!sanitizedBody.phone || sanitizedBody.phone.trim() === "") {
+            delete sanitizedBody.phone;
+        }
+
+        console.log("[POST /api/members] Sanitized payload:", { ...sanitizedBody, photoBase64: sanitizedBody.photoBase64 ? "[BASE64]" : undefined });
+
         // Auto-inject gymId and optional branchId
+        const gymId = session.user.gymId;
+
+        if (!gymId && session.user.role !== 'super_admin') {
+            return NextResponse.json({ message: "Gym ID is required to create a member" }, { status: 400 });
+        }
+
+        // If super_admin, we might expect gymId in the body or they just can't create members this way
+        const targetGymId = gymId || sanitizedBody.gymId;
+        if (!targetGymId) {
+            return NextResponse.json({ message: "Contextual Gym ID missing. Super-admins must provide a gymId." }, { status: 400 });
+        }
+
         const memberData = {
-            ...body,
-            gymId: session.user.gymId,
-            branchId: body.branchId || session.user.branchId || undefined,
+            ...sanitizedBody,
+            gymId: targetGymId,
+            branchId: sanitizedBody.branchId || session.user.branchId || undefined,
         };
         const member = await Member.create(memberData);
         const createdMember = Array.isArray(member) ? member[0] : member;

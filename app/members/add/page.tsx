@@ -8,8 +8,16 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ChevronLeft, Upload, Users, AlertCircle } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { type Member } from "@/lib/types";
 import { fileToBase64 } from "@/lib/utils/file-utils";
 import { toast } from "sonner";
 
@@ -35,7 +43,7 @@ export default function AddMemberPage() {
     email: "",
     phone: "",
     gender: "male",
-    planId: "plan_basic",
+    planId: "",
     notes: "",
     trainerId: "",
   });
@@ -44,7 +52,14 @@ export default function AddMemberPage() {
   useEffect(() => {
     store.loadPlans();
     fetchTrainers();
-  }, [store.members]);
+  }, []);
+
+  // Auto-set planId to first available plan when plans load
+  useEffect(() => {
+    if (store.plans.length > 0 && !formData.planId) {
+      setFormData((prev) => ({ ...prev, planId: store.plans[0].id }));
+    }
+  }, [store.plans]);
 
   const fetchTrainers = async () => {
     try {
@@ -77,25 +92,38 @@ export default function AddMemberPage() {
     setLoading(true);
 
     try {
-      // Simulate slight delay for UX
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      const newMember = await store.addMember({
+      const payload: Omit<Member, "id"> = {
         ...formData,
         photoBase64: photoBase64,
         joinDate: new Date().toISOString(),
-      });
+      };
+      // Clean up empty optional fields to prevent API errors
+      if (!payload.trainerId) delete payload.trainerId;
+      if (!payload.email) delete payload.email;
+      if (!payload.phone) delete payload.phone;
+      if (!payload.notes) delete payload.notes;
+      console.log("[AddMember] Submitting payload:", { ...payload, photoBase64: payload.photoBase64 ? "[BASE64_IMAGE]" : null });
+
+      const newMember = await store.addMember(payload);
+
+      // Validate that we got a valid member ID back
+      if (!newMember?.id) {
+        throw new Error("Member created but no ID returned");
+      }
+
+      console.log("[AddMember] Member created with ID:", newMember.id);
 
       // Create a subscription for the member
       const plan = store.plans.find((p) => p.id === formData.planId);
-      if (plan && newMember) {
+      if (plan) {
         await store.renewSubscription(newMember.id, formData.planId, plan.duration);
       }
 
       toast.success("Member added successfully!");
       router.push(`/members/${newMember.id}`);
-    } catch (error) {
-      toast.error("Failed to add member");
+    } catch (error: any) {
+      console.error("[AddMember] Error:", error);
+      toast.error(error?.message || "Failed to add member");
     } finally {
       setLoading(false);
     }
@@ -114,10 +142,10 @@ export default function AddMemberPage() {
           <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
             ADD <span className="text-primary neon-text">MEMBER</span>
           </h1>
-          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
+          <div className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
             Please fill out the form below to add a new member.
-          </p>
+          </div>
         </div>
         <Link
           href="/members"
@@ -251,38 +279,46 @@ export default function AddMemberPage() {
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
                   Gender
                 </label>
-                <select
+                <Select
                   value={formData.gender}
-                  onChange={(e) =>
+                  onValueChange={(value) =>
                     setFormData({
                       ...formData,
-                      gender: e.target.value as "male" | "female" | "other",
+                      gender: value as "male" | "female" | "other",
                     })
                   }
-                  className="h-12 w-full px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                 >
-                  <option value="male" className="bg-slate-900">Male</option>
-                  <option value="female" className="bg-slate-900">Female</option>
-                  <option value="other" className="bg-slate-900">Other</option>
-                </select>
+                  <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 border-white/10">
+                    <SelectItem value="male" className="text-[10px] font-bold uppercase tracking-widest">MALE</SelectItem>
+                    <SelectItem value="female" className="text-[10px] font-bold uppercase tracking-widest">FEMALE</SelectItem>
+                    <SelectItem value="other" className="text-[10px] font-bold uppercase tracking-widest">OTHER</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
                   Membership Plan *
                 </label>
-                <select
+                <Select
                   value={formData.planId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, planId: e.target.value })
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, planId: value })
                   }
-                  className="h-12 w-full px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                 >
-                  {store.plans.map((plan) => (
-                    <option key={plan.id} value={plan.id} className="bg-slate-900">
-                      {plan.name.toUpperCase()} - ₨ {plan.price}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                    <SelectValue placeholder="Select plan" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 border-white/10">
+                    {store.plans.map((plan) => (
+                      <SelectItem key={plan.id} value={plan.id} className="text-[10px] font-bold uppercase tracking-widest">
+                        {plan.name.toUpperCase()} - ₨ {plan.price}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -291,20 +327,24 @@ export default function AddMemberPage() {
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
                   Assign Trainer
                 </label>
-                <select
-                  value={formData.trainerId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, trainerId: e.target.value })
+                <Select
+                  value={formData.trainerId || "__none__"}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, trainerId: value === "__none__" ? "" : value })
                   }
-                  className="h-12 w-full px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                 >
-                  <option value="" className="bg-slate-900">No Trainer Assigned</option>
-                  {trainers.map((trainer) => (
-                    <option key={trainer._id || trainer.id} value={trainer._id || trainer.id} className="bg-slate-900">
-                      {trainer.fullName.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                    <SelectValue placeholder="Select trainer" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-900 border-white/10">
+                    <SelectItem value="__none__" className="text-[10px] font-bold uppercase tracking-widest">NO TRAINER ASSIGNED</SelectItem>
+                    {trainers.map((trainer) => (
+                      <SelectItem key={trainer._id || trainer.id} value={trainer._id || trainer.id} className="text-[10px] font-bold uppercase tracking-widest">
+                        {trainer.fullName.toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -389,7 +429,7 @@ export default function AddMemberPage() {
                 <div>
                   <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic mb-2 block">Details</span>
                   <p className="text-xs font-bold text-foreground tracking-widest uppercase">{formData.gender || "---"}</p>
-                  <p className="text-xs font-bold text-slate-400 tracking-widest mt-1 uppercase">PLAN: {store.plans.find(p => p.id === formData.planId)?.name || "---"}</p>
+                  <p className="text-xs font-bold text-slate-400 tracking-widest mt-1 uppercase">PLAN: {(formData.planId && store.plans.find(p => p.id === formData.planId)?.name) || (store.plans.length > 0 ? "SELECT A PLAN" : "LOADING...")}</p>
                 </div>
               </div>
 

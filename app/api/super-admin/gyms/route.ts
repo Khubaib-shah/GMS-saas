@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
+import PlatformPlan from "@/models/PlatformPlan"; // PRE-REGISTER: Important for population
 import Gym from "@/models/Gym";
 import User from "@/models/User";
 import Member from "@/models/Member";
@@ -14,51 +15,71 @@ export async function GET(req: Request) {
     const result = await requireSuperAdmin();
     if ("error" in result) return result.error;
 
-    const { searchParams } = new URL(req.url);
-    const search = searchParams.get("search") || "";
-    const status = searchParams.get("status") || "";
-    const city = searchParams.get("city") || "";
-    const sortBy = searchParams.get("sortBy") || "createdAt";
-    const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const isDeleted = searchParams.get("isDeleted") === "true";
+    try {
+        const { searchParams } = new URL(req.url);
+        const search = searchParams.get("search") || "";
+        const status = searchParams.get("status") || "";
+        const city = searchParams.get("city") || "";
+        const sortBy = searchParams.get("sortBy") || "createdAt";
+        const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "20");
+        const isDeleted = searchParams.get("isDeleted") === "true";
 
-    await connectDB();
+        await connectDB();
 
-    const filter: any = isDeleted ? { deletedAt: { $ne: null } } : { deletedAt: null };
+        // ─────────────────────────────────────────────────
+        // CRITICAL: Ensure models are registered explicitly
+        // This prevents the "Schema hasn't been registered" error
+        // ─────────────────────────────────────────────────
+        if (!PlatformPlan) {
+            console.error("[SuperAdminGyms] PlatformPlan model is UNDEFINED");
+        } else {
+            console.log("[SuperAdminGyms] Using model:", PlatformPlan.modelName);
+        }
 
-    if (search) {
-        filter.$or = [
-            { name: { $regex: search, $options: "i" } },
-        ];
-    }
-    if (status) filter.subscriptionStatus = status;
-    if (city) filter.city = { $regex: city, $options: "i" };
+        const filter: any = isDeleted ? { deletedAt: { $ne: null } } : { deletedAt: null };
 
-    const [gyms, total] = await Promise.all([
-        Gym.find(filter)
-            .populate("platformPlanId", "name")
-            .sort({ [sortBy]: sortOrder })
-            .skip((page - 1) * limit)
-            .limit(limit)
-            .lean(),
-        Gym.countDocuments(filter),
-    ]);
+        if (search) {
+            filter.$or = [
+                { name: { $regex: search, $options: "i" } },
+            ];
+        }
+        if (status) filter.subscriptionStatus = status;
+        if (city) filter.city = { $regex: city, $options: "i" };
 
-    // Enrich with owner info, member count, revenue
-    const enriched = await Promise.all(
-        gyms.map(async (gym: any) => {
-            const [owner, memberCount, revenueAgg] = await Promise.all([
-                User.findOne({ gymId: gym._id, role: { $in: ["gym_owner", "owner"] } })
-                    .select("fullName email")
-                    .lean(),
-                Member.countDocuments({ gymId: gym._id }),
-                Payment.aggregate([
-                    { $match: { gymId: gym._id } },
-                    { $group: { _id: null, total: { $sum: "$amount" } } },
-                ]),
-            ]);
+        const [gyms, total, allPlans] = await Promise.all([
+            Gym.find(filter)
+                .sort({ [sortBy]: sortOrder })
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .lean(),
+            Gym.countDocuments(filter),
+            PlatformPlan.find({}).select("name").lean(),
+        ]);
+
+        const gymIds = gyms.map((g: any) => g._id);
+
+        // Batch fetch Owners, Member counts, and Revenue to avoid N+1
+        const [owners, memberCounts, revenueAggs] = await Promise.all([
+            User.find({ gymId: { $in: gymIds }, role: { $in: ["gym_owner", "owner"] } })
+                .select("fullName email gymId")
+                .lean(),
+            Member.aggregate([
+                { $match: { gymId: { $in: gymIds } } },
+                { $group: { _id: "$gymId", count: { $sum: 1 } } }
+            ]),
+            Payment.aggregate([
+                { $match: { gymId: { $in: gymIds } } },
+                { $group: { _id: "$gymId", total: { $sum: "$amount" } } }
+            ])
+        ]);
+
+        const enriched = gyms.map((gym: any) => {
+            const owner = owners.find((o: any) => o.gymId.toString() === gym._id.toString());
+            const memberCount = memberCounts.find((m: any) => m._id.toString() === gym._id.toString())?.count || 0;
+            const revenue = revenueAggs.find((r: any) => r._id.toString() === gym._id.toString())?.total || 0;
+            const platformPlan = allPlans.find((p: any) => p._id.toString() === gym.platformPlanId?.toString());
 
             return {
                 id: gym._id.toString(),
@@ -67,29 +88,32 @@ export async function GET(req: Request) {
                 phone: gym.phone || "",
                 ownerName: owner?.fullName || "N/A",
                 ownerEmail: owner?.email || "N/A",
-                planName: gym.platformPlanId?.name || "No Plan",
+                planName: platformPlan?.name || "No Plan",
                 branchCount: gym.branches?.length || 0,
                 subscriptionStatus: gym.subscriptionStatus || "trial",
                 expiryDate: gym.expiryDate,
                 trialEndsAt: gym.trialEndsAt,
                 isSuspended: gym.isSuspended || false,
                 totalMembers: memberCount,
-                totalRevenue: revenueAgg[0]?.total || 0,
+                totalRevenue: revenue,
                 outstandingAmount: gym.outstandingAmount || 0,
                 createdAt: gym.createdAt,
             };
-        })
-    );
+        });
 
-    return NextResponse.json({
-        gyms: enriched,
-        pagination: {
-            total,
-            page,
-            limit,
-            totalPages: Math.ceil(total / limit),
-        },
-    });
+        return NextResponse.json({
+            gyms: enriched,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+            },
+        });
+    } catch (error: any) {
+        console.error("[SuperAdminGyms] GET error:", error);
+        return NextResponse.json({ message: "Failed to fetch gyms list", error: error.message }, { status: 500 });
+    }
 }
 
 /**
@@ -120,7 +144,6 @@ export async function POST(req: Request) {
         await connectDB();
 
         // 1. Check if plan exists
-        const PlatformPlan = (await import("@/models/PlatformPlan")).default;
         const plan = await PlatformPlan.findById(planId);
         if (!plan) {
             return NextResponse.json({ message: "Platform plan not found" }, { status: 404 });

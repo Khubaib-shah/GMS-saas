@@ -162,17 +162,30 @@ export const useAppStore = create<AppState>()(
       },
 
       addMember: async (data) => {
+        console.log("[addMember] Request payload:", JSON.stringify(data, null, 2));
         const res = await fetch("/api/members", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
-        const newMember = await res.json();
-        if (newMember && newMember.id) {
-          set((state) => ({
-            members: [newMember, ...state.members],
-          }));
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ message: "Unknown error" }));
+          console.error("[addMember] API error:", res.status, errorData);
+          throw new Error(errorData.message || "Failed to create member");
         }
+
+        const newMember = await res.json();
+        console.log("[addMember] API response:", JSON.stringify({ id: newMember.id, firstName: newMember.firstName }, null, 2));
+
+        if (!newMember || !newMember.id) {
+          console.error("[addMember] Response missing 'id' field:", newMember);
+          throw new Error("Member created but response missing ID");
+        }
+
+        set((state) => ({
+          members: [newMember, ...state.members],
+        }));
         return newMember;
       },
 

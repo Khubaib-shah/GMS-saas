@@ -19,6 +19,11 @@ export async function GET(
     const { session } = authResult;
     const { id } = await params;
 
+    // Defensive guard: reject obviously invalid IDs early
+    if (!id || id === "undefined" || id === "null" || !mongoose.Types.ObjectId.isValid(id)) {
+        return NextResponse.json({ message: "Invalid member ID" }, { status: 400 });
+    }
+
     const cacheKey = `member:profile:${id}`;
 
     try {
@@ -78,6 +83,11 @@ export async function PUT(
     const { id } = await params;
     const body = await req.json();
 
+    // Defensive guard
+    if (!id || id === "undefined" || id === "null" || !mongoose.Types.ObjectId.isValid(id)) {
+        return NextResponse.json({ message: "Invalid member ID" }, { status: 400 });
+    }
+
     try {
         await connectDB();
 
@@ -135,6 +145,11 @@ export async function DELETE(
 
     const { session } = authResult;
     const { id } = await params;
+
+    // Defensive guard
+    if (!id || id === "undefined" || id === "null" || !mongoose.Types.ObjectId.isValid(id)) {
+        return NextResponse.json({ message: "Invalid member ID" }, { status: 400 });
+    }
 
     try {
         await connectDB();

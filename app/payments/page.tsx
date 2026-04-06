@@ -95,10 +95,10 @@ export default function PaymentsPage() {
         <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
           PAYMENT <span className="text-primary neon-text">LOGS</span>
         </h1>
-        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
+        <div className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
           Revenue tracking and transaction audit active.
-        </p>
+        </div>
       </div>
 
       {/* Stats */}

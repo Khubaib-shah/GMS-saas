@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -106,10 +113,10 @@ export default function MembersPage() {
           <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
             MEMBER <span className="text-primary neon-text">DIRECTORY</span>
           </h1>
-          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
+          <div className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
             Member database and subscription management active.
-          </p>
+          </div>
         </div>
         {((session?.user as any)?.role !== 'trainer') && (
           <Link href="/members/add">
@@ -145,17 +152,21 @@ export default function MembersPage() {
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
               STATUS_FILTER
             </label>
-            <select
+            <Select
               value={filterStatus}
-              onChange={(e) =>
-                setFilterStatus(e.target.value as "all" | "active" | "expired")
+              onValueChange={(value) =>
+                setFilterStatus(value as "all" | "active" | "expired")
               }
-              className="h-12 px-6 rounded-xl border-transparent bg-white/5 text-white font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
             >
-              <option value="all">ALL_MEMBERS</option>
-              <option value="active">ACTIVE_MEMBERS</option>
-              <option value="expired">EXPIRED_MEMBERS</option>
-            </select>
+              <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                <SelectValue placeholder="Filter status" />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-900 border-white/10">
+                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">ALL_MEMBERS</SelectItem>
+                <SelectItem value="active" className="text-[10px] font-bold uppercase tracking-widest">ACTIVE_MEMBERS</SelectItem>
+                <SelectItem value="expired" className="text-[10px] font-bold uppercase tracking-widest">EXPIRED_MEMBERS</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
