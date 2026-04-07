@@ -1,18 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-    CreditCard, 
-    Calendar, 
-    DollarSign, 
-    AlertTriangle, 
-    Receipt, 
-    Clock, 
-    CheckCircle2, 
+import {
+    CreditCard,
+    Calendar,
+    AlertTriangle,
+    Receipt,
+    Clock,
+    CheckCircle2,
     ArrowRight,
-    RefreshCw,
-    ShieldCheck
+    ShieldCheck,
 } from "lucide-react";
+import { DashboardHeader as DashboardHeaderComp } from "@/components/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -51,7 +50,7 @@ export default function PlatformBillingPage() {
             const res = await fetch("/api/billing/stripe/create-checkout-session", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     planSlug,
                     successUrl: window.location.origin + "/admin/billing?success=true",
                     cancelUrl: window.location.origin + "/admin/billing",
@@ -70,16 +69,7 @@ export default function PlatformBillingPage() {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="flex flex-col items-center gap-2">
-                    <RefreshCw className="w-8 h-8 text-primary animate-spin" />
-                    <p className="text-muted-foreground animate-pulse">Synchronizing platform data...</p>
-                </div>
-            </div>
-        );
-    }
+
 
     if (!data?.gym) return null;
 
@@ -89,19 +79,12 @@ export default function PlatformBillingPage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-10 animate-fade-in pb-20">
-            {/* Header HUD */}
-            <div className="relative">
-                <div className="flex items-center gap-4 mb-2">
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic">Platform Operations</span>
-                    <div className="h-px w-24 bg-primary/20"></div>
-                </div>
-                <h1 className="text-5xl font-black text-foreground italic tracking-tighter uppercase leading-none">
-                    BILLING & <span className="text-primary">SUBSCRIPTION</span>
-                </h1>
-                <p className="text-muted-foreground text-sm mt-4 font-medium">Manage your GMS SaaS subscription and view platform transaction records.</p>
-                
-                <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]"></div>
-            </div>
+            <DashboardHeaderComp
+                title="BILLING &"
+                highlight="SUBSCRIPTION"
+                subtitle="PLATFORM: OPERATIONS_v1"
+                description="Manage your GMS SaaS subscription and view platform transaction records."
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 {/* Left: Current Subscription Details */}
@@ -110,14 +93,14 @@ export default function PlatformBillingPage() {
                         <div className="absolute top-0 right-0 p-4">
                             <ShieldCheck className="w-12 h-12 text-primary/10" />
                         </div>
-                        
+
                         <div>
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-2 block">Current Status</span>
                             <div className="flex items-center gap-3">
                                 <div className={cn(
                                     "w-3 h-3 rounded-full animate-pulse shadow-[0_0_8px]",
-                                    gym.subscriptionStatus === "active" ? "bg-emerald-500 shadow-emerald-500/50" : 
-                                    isTrial ? "bg-blue-500 shadow-blue-500/50" : "bg-destructive shadow-destructive/50"
+                                    gym.subscriptionStatus === "active" ? "bg-emerald-500 shadow-emerald-500/50" :
+                                        isTrial ? "bg-blue-500 shadow-blue-500/50" : "bg-destructive shadow-destructive/50"
                                 )}></div>
                                 <h3 className="text-2xl font-black italic tracking-tight uppercase">
                                     {gym.subscriptionStatus === "active" ? "Subscribed" : isTrial ? "Free Trial" : "Expired"}
@@ -153,7 +136,7 @@ export default function PlatformBillingPage() {
                             )}
                         </div>
 
-                        <Button 
+                        <Button
                             className="w-full h-14 bg-primary text-black hover:bg-white font-black italic tracking-tighter text-lg rounded-xl transition-all uppercase shadow-lg shadow-primary/20"
                             onClick={() => handlePurchase(gym.plan?.slug || "standard")}
                             disabled={isProcessing}

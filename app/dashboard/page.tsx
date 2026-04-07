@@ -9,6 +9,7 @@ import { useAppStore } from "@/lib/store";
 import { isSubscriptionActive, daysUntilExpiry, formatCurrency } from "@/lib/utils/file-utils";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 export default function DashboardPage() {
   const store = useAppStore();
@@ -78,38 +79,17 @@ export default function DashboardPage() {
       return daysLeft > 0 && daysLeft <= 7;
     }).length;
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground animate-pulse font-black uppercase tracking-widest text-[10px]">Loading Dashboard Data...</p>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="space-y-10 animate-fade-up">
-      {/* DASHBOARD HEADER */}
-      <div className="relative flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-4">
-        <div className="relative">
-          <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary shadow-lg"></div>
-          <div className="flex items-center gap-4 mb-2">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
-              {isTrainer ? 'Trainer Analytics' : 'System Overview'}
-            </span>
-            <div className="h-px flex-1 bg-white/5"></div>
-          </div>
-          <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
-            {isTrainer ? 'TRAINER' : 'ADMIN'} <span className="text-primary">{isTrainer ? 'DASHBOARD' : 'CONSOLE'}</span>
-          </h1>
-          <div className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-            {isTrainer ? `Managing ${totalMembers} members.` : 'Dashboard is active and monitoring.'}
-          </div>
-        </div>
-
+      <DashboardHeader
+        title={isTrainer ? "TRAINER" : "ADMIN"}
+        highlight={isTrainer ? "DASHBOARD" : "CONSOLE"}
+        subtitle={isTrainer ? "ANALYTICS: PERFORMANCE_TRACKING" : "SYSTEM: OPERATIONAL_OVERVIEW"}
+        description={isTrainer ? `Managing ${totalMembers} members.` : 'Dashboard is active and monitoring.'}
+        descriptionIconColor={isTrainer ? "emerald" : "primary"}
+      >
         {isTrainer && (
           <div className="flex flex-wrap items-center gap-3">
             <Button
@@ -137,7 +117,7 @@ export default function DashboardPage() {
             </Button>
           </div>
         )}
-      </div>
+      </DashboardHeader>
 
       {/* Stats Grid */}
       <div data-tour="dashboard-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

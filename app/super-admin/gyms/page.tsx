@@ -15,6 +15,7 @@ import {
     Trash2,
     X,
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CreateGymModal } from "@/components/super-admin/create-gym-modal";
@@ -120,24 +121,22 @@ export default function GymsPage() {
     };
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Gym Management</h1>
-                    <p className="text-sm text-slate-500 mt-1">
-                        {pagination.total || 0} gyms registered on the platform
-                    </p>
-                </div>
-
+        <div className="space-y-6 animate-fade-in">
+            <DashboardHeader
+                title="GYM"
+                highlight="NETWORK"
+                subtitle="ADMIN: GYM_REGISTRY_v3"
+                description={`${pagination.total || 0} gyms registered on the platform`}
+                descriptionIconColor="emerald"
+            >
                 <Button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                    className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2"
                 >
-                    <Plus className="w-4 h-4" />
-                    Create Gym
+                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                    CREATE NEW GYM
                 </Button>
-            </div>
+            </DashboardHeader>
 
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-3">
@@ -222,17 +221,7 @@ export default function GymsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {loading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
-                                    <tr key={i} className="border-b border-white/[0.04]">
-                                        {Array.from({ length: 10 }).map((_, j) => (
-                                            <td key={j} className="px-4 py-4">
-                                                <div className="h-4 w-20 bg-white/[0.04] rounded animate-pulse" />
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))
-                            ) : gyms.length === 0 ? (
+                            {gyms.length === 0 && !loading ? (
                                 <tr>
                                     <td colSpan={10} className="px-4 py-12 text-center text-slate-500">
                                         No gyms found matching your criteria

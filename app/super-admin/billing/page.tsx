@@ -11,6 +11,7 @@ import {
     Calendar,
     Building2,
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
 
 function formatPKR(amount: number) {
@@ -49,11 +50,14 @@ export default function BillingPage() {
     const pagination = data?.pagination || {};
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Platform Billing</h1>
-                <p className="text-sm text-slate-500 mt-1">Manual billing records for all gyms</p>
-            </div>
+        <div className="space-y-6 animate-fade-in">
+            <DashboardHeader
+                title="PLATFORM"
+                highlight="REVENUE"
+                subtitle="ADMIN: FINANCIALS_v3"
+                description="Manual billing records for all gyms"
+                descriptionIconColor="emerald"
+            />
 
             {/* KPI Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -123,17 +127,7 @@ export default function BillingPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {loading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
-                                    <tr key={i} className="border-b border-white/[0.04]">
-                                        {Array.from({ length: 8 }).map((_, j) => (
-                                            <td key={j} className="px-4 py-4">
-                                                <div className="h-4 w-20 bg-white/[0.04] rounded animate-pulse" />
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))
-                            ) : payments.length === 0 ? (
+                            {payments.length === 0 && !loading ? (
                                 <tr>
                                     <td colSpan={8} className="px-4 py-12 text-center text-slate-500">
                                         No billing records found

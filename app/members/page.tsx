@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Search, Plus, Trash2, QrCode, Sparkles, Users } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { MemberQrDialog } from "@/components/member-qr-dialog";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
@@ -102,22 +103,12 @@ export default function MembersPage() {
 
   return (
     <div className="space-y-10 animate-fade-up">
-      {/* HUD HEADER */}
-      <div className="flex items-center justify-between mb-12 relative">
-        <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
-        <div>
-          <div className="flex items-center gap-4 mb-2">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">DIRECTORY: MEMBER_LIST_v4</span>
-            <div className="h-px w-24 bg-black/5 dark:bg-white/5"></div>
-          </div>
-          <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
-            MEMBER <span className="text-primary neon-text">DIRECTORY</span>
-          </h1>
-          <div className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
-            Member database and subscription management active.
-          </div>
-        </div>
+      <DashboardHeader
+        title="MEMBER"
+        highlight="DIRECTORY"
+        subtitle="DIRECTORY: MEMBER_LIST_v4"
+        description="Member database and subscription management active."
+      >
         {((session?.user as any)?.role !== 'trainer') && (
           <Link href="/members/add">
             <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
@@ -126,7 +117,7 @@ export default function MembersPage() {
             </Button>
           </Link>
         )}
-      </div>
+      </DashboardHeader>
 
       {/* Search & Filter - Bento Style */}
       <div className="glass-premium p-8 mb-8 border-border">

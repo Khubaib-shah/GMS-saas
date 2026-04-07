@@ -5,18 +5,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ManualEntry } from "@/components/attendance/manual-entry";
 import { AttendanceScanner } from "@/components/attendance/attendance-scanner";
 import { AttendanceStats } from "@/components/attendance/attendance-stats";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
 
 export default function AttendancePage() {
@@ -37,32 +38,35 @@ export default function AttendancePage() {
     }, []);
 
     const fetchReports = async () => {
-         if (!store.gymProfile?._id) return;
-         setLoadingReports(true);
-         try {
-             // Default to today
-             const today = new Date().toISOString().split('T')[0];
-             const res = await fetch(`/api/attendance/report?gymId=${store.gymProfile._id}&date=${today}`);
-             const data = await res.json();
-             if (Array.isArray(data)) {
-                 setReports(data);
-             } else {
-                 setReports([]);
-             }
-         } catch(e) {
-             console.error("Error fetching reports", e);
-             setReports([]);
-         } finally {
-             setLoadingReports(false);
-         }
+        if (!store.gymProfile?._id) return;
+        setLoadingReports(true);
+        try {
+            // Default to today
+            const today = new Date().toISOString().split('T')[0];
+            const res = await fetch(`/api/attendance/report?gymId=${store.gymProfile._id}&date=${today}`);
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                setReports(data);
+            } else {
+                setReports([]);
+            }
+        } catch (e) {
+            console.error("Error fetching reports", e);
+            setReports([]);
+        } finally {
+            setLoadingReports(false);
+        }
     };
 
     return (
-        <div className="container mx-auto p-6 space-y-8 animate-fade-in">
-             <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Attendance</h1>
-                <p className="text-muted-foreground">Manage daily check-ins and view reports.</p>
-            </div>
+        <div className="container mx-auto space-y-8 animate-fade-in">
+            <DashboardHeader
+                title="ATTENDANCE"
+                highlight="TRACKING"
+                subtitle="SYSTEM: ATTENDANCE_v1"
+                description="Manage daily check-ins and view reports."
+                descriptionIconColor="emerald"
+            />
 
             <AttendanceStats />
 

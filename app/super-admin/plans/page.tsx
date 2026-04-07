@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
@@ -135,12 +136,13 @@ export default function PlansPage() {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Platform Plans</h1>
-                    <p className="text-sm text-slate-500 mt-1">Manage subscription plans for gyms</p>
-                </div>
+        <div className="space-y-6 animate-fade-in">
+            <DashboardHeader
+                title="PLATFORM"
+                highlight="PLANS"
+                subtitle="ADMIN: SUBSCRIPTION_MODELS_v2"
+                description="Configure pricing and feature tiers for gyms."
+            >
                 {!showForm && (
                     <button
                         onClick={() => {
@@ -148,12 +150,13 @@ export default function PlansPage() {
                             setEditingId(null);
                             setShowForm(true);
                         }}
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+                        className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2"
                     >
-                        <Plus className="w-4 h-4" /> Create Plan
+                        <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                        CREATE NEW PLAN
                     </button>
                 )}
-            </div>
+            </DashboardHeader>
 
             {/* Create/Edit Form */}
             {showForm && (
@@ -284,14 +287,9 @@ export default function PlansPage() {
                 </div>
             )}
 
-            {/* Plans Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {loading
-                    ? Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="h-[280px] rounded-xl bg-white/[0.03] border border-white/[0.06] animate-pulse" />
-                    ))
-                    : plans.length === 0
-                        ? (
+                {plans.length === 0 && !loading
+                    ? (
                             <div className="col-span-full text-center py-16">
                                 <CreditCard className="w-12 h-12 text-slate-600 mx-auto mb-3" />
                                 <p className="text-slate-400">No plans created yet</p>

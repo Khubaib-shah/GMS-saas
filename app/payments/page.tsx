@@ -7,6 +7,7 @@ import { TrendingUp, DollarSign, AlertCircle } from "lucide-react"
 import { useAppStore } from "@/lib/store"
 import { formatDate, formatCurrency } from "@/lib/utils/file-utils"
 import { StatsCard } from "@/components/stats-card"
+import { DashboardHeader } from "@/components/dashboard-header"
 import {
   Table,
   TableBody,
@@ -85,21 +86,13 @@ export default function PaymentsPage() {
 
   return (
     <div className="space-y-10 animate-fade-up">
-      {/* HUD HEADER */}
-      <div className="relative">
-        <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
-        <div className="flex items-center gap-4 mb-2">
-          <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">FINANCIAL_LEDGER: REVENUE_STREAM_v2</span>
-          <div className="h-px flex-1 bg-white/5"></div>
-        </div>
-        <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
-          PAYMENT <span className="text-primary neon-text">LOGS</span>
-        </h1>
-        <div className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-          Revenue tracking and transaction audit active.
-        </div>
-      </div>
+      <DashboardHeader
+        title="PAYMENT"
+        highlight="LOGS"
+        subtitle="FINANCIAL_LEDGER: REVENUE_STREAM_v2"
+        description="Revenue tracking and transaction audit active."
+        descriptionIconColor="emerald"
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

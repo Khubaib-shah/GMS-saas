@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Plus, Building2, Users, Phone, MapPin, Mail, Lock, CheckCircle2, XCircle, Trash2 } from "lucide-react"
+import { DashboardHeader } from "@/components/dashboard-header";
 import {
   Dialog,
   DialogContent,
@@ -153,18 +154,18 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="flex items-center justify-between gap-6">
-        <div>
-          <h1 className="text-4xl font-black italic tracking-tighter text-foreground uppercase mb-2">Gym Registry</h1>
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] italic">Manage SaaS tenants and their owners</p>
-        </div>
-
+    <div className="space-y-10 animate-fade-in">
+      <DashboardHeader
+        title="GYM"
+        highlight="REGISTRY"
+        subtitle="TENANT: MANAGEMENT_v2"
+        description="Manage SaaS tenants and their owners"
+      >
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-3 bg-primary text-primary-foreground hover:bg-foreground hover:text-background font-black italic uppercase tracking-wider h-12 px-6 rounded-xl transition-all neon-glow">
+            <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95 group gap-3 neon-glow">
               <Plus className="w-5 h-5" />
-              Register New Gym
+              REGISTER NEW GYM
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
@@ -245,7 +246,7 @@ export default function AdminDashboard() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+      </DashboardHeader>
 
       <Card className="glass-premium overflow-hidden border-border bg-card dark:bg-slate-950/40">
         <Table>

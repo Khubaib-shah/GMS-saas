@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/lib/store";
+import { DashboardHeader } from "@/components/dashboard-header";
 import {
   isSubscriptionActive,
   formatDate,
@@ -232,22 +233,19 @@ export default function SubscriptionsPage() {
 
   return (
     <div className="container mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Subscriptions
-          </h1>
-          <p className="text-muted-foreground">
-            Manage subscription plans and member subscriptions
-          </p>
-        </div>
+      <DashboardHeader
+        title="SUBSCRIPTION"
+        highlight="PLANS"
+        subtitle="MANAGEMENT: BILLING_PROTOCOLS_v3"
+        description="Manage subscription plans and member subscriptions"
+      >
         {(canCreatePlans || status === "loading") && (
-          <Button onClick={() => setShowAddModal(true)} className="gap-2" disabled={status === "loading"}>
-            <Plus className="w-4 h-4" />
-            {status === "loading" ? "Loading..." : "Add Plan"}
+          <Button onClick={() => setShowAddModal(true)} className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" disabled={status === "loading"}>
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+            {status === "loading" ? "Loading..." : "ADD NEW PLAN"}
           </Button>
         )}
-      </div>
+      </DashboardHeader>
 
       {/* Plans Section */}
       <div className="mb-12">
@@ -340,7 +338,7 @@ export default function SubscriptionsPage() {
             </Table>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPlans.map((plan) => {
               const memberCount = store.subscriptions.filter(
                 (s) => s.planId === plan.id

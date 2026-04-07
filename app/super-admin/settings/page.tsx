@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Save, Loader2, Settings, Shield, Globe, Bell } from "lucide-react";
 import { toast } from "sonner";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 export default function PlatformSettingsPage() {
     const [settings, setSettings] = useState<any>(null);
@@ -34,30 +35,25 @@ export default function PlatformSettingsPage() {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
-            </div>
-        );
-    }
+
 
     return (
-        <div className="space-y-6 max-w-4xl">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Platform Settings</h1>
-                    <p className="text-sm text-slate-500 mt-1">Global configuration for the SaaS platform</p>
-                </div>
+        <div className="space-y-6 max-w-4xl animate-fade-in">
+            <DashboardHeader
+                title="SYSTEM"
+                highlight="SETTINGS"
+                subtitle="ADMIN: CORE_CONFIG_v5"
+                description="Global configuration for the SaaS platform"
+            >
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                    className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2 disabled:opacity-50"
                 >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    {saving ? "Saving..." : "Save Changes"}
+                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                    {saving ? "SAVING..." : "SAVE CHANGES"}
                 </button>
-            </div>
+            </DashboardHeader>
 
             {/* Subscription Settings */}
             <Section icon={Shield} title="Subscription Settings">

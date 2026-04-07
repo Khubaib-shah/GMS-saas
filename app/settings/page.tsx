@@ -40,6 +40,7 @@ import { BusinessSettings } from "@/components/settings/BusinessSettings";
 import { NotificationSettings } from "@/components/settings/NotificationSettings";
 import { RoleManagement } from "@/components/settings/RoleManagement";
 import { usePermissions } from "@/hooks/use-permissions";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -239,16 +240,16 @@ export default function SettingsPage() {
     }
   }
 
-  if (isLoading) return <div className="p-8">Loading settings...</div>
+
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account and preferences
-        </p>
-      </div>
+    <div className="animate-fade-up space-y-10">
+      <DashboardHeader
+        title="SYSTEM"
+        highlight="CONFIG"
+        subtitle="MANAGEMENT: SETTINGS_v4"
+        description="Configure your gym profile, staff, and account preferences."
+      />
 
       {/* Tab Navigation */}
       <div className="flex gap-4 mb-8 border-b border-border flex-wrap">

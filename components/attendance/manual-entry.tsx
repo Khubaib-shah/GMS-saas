@@ -100,16 +100,16 @@ export function ManualEntry() {
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent 
+          <PopoverContent
             className="p-0"
             style={{ width: "var(--radix-popover-trigger-width)" }}
           >
             <Command>
-              <CommandInput 
-                placeholder="Search member name..." 
+              <CommandInput
+                placeholder="Search member name..."
                 className="border-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
               />
-              <CommandList 
+              <CommandList
                 className="max-h-[200px] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/40"
                 onWheel={(e) => e.stopPropagation()}
               >
@@ -123,7 +123,7 @@ export function ManualEntry() {
                         setSelectedMember(member);
                         setOpen(false);
                       }}
-                      className="flex items-center gap-2 cursor-pointer"
+                      className="flex items-center gap-2 cursor-pointer mb-1"
                     >
                       <User className="h-4 w-4 text-muted-foreground" />
                       <span className="flex-1">

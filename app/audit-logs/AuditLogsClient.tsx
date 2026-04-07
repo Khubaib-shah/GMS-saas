@@ -32,6 +32,7 @@ import {
   Eye,
   RefreshCw
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { AuditLogEntry } from "@/lib/types";
@@ -161,95 +162,108 @@ export default function AuditLogsClient() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Audit Logs</h1>
-          <p className="text-muted-foreground">
-            Track system activity and user actions
-          </p>
-        </div>
+    <div className="space-y-10 animate-fade-up">
+      <DashboardHeader
+        title="AUDIT"
+        highlight="LOGS"
+        subtitle="SYSTEM: ACTIVITY_MONITOR_v1"
+        description="Track system activity and user actions"
+      >
         <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchLogs} disabled={loading}>
+          <Button
+            variant="outline"
+            onClick={fetchLogs}
+            disabled={loading}
+            className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+          >
             <RefreshCw className={cn("h-4 w-4 mr-2", loading && "animate-spin")} />
-            Refresh
+            REFRESH
           </Button>
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+          >
             <Download className="h-4 w-4 mr-2" />
-            Export
+            EXPORT
+          </Button>
+        </div>
+      </DashboardHeader>
+
+      {/* ULTRA-COMPACT FILTERS HUD */}
+      <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-6 backdrop-blur-md">
+        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
+          <Filter className="w-3.5 h-3.5 text-primary/50" />
+          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">QUERY</span>
+        </div>
+
+        <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-2">
+          <Select value={resource} onValueChange={setResource}>
+            <SelectTrigger className="h-9 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+              <span className="text-slate-500 mr-2">RES:</span>
+              <SelectValue placeholder="ALL" />
+            </SelectTrigger>
+            <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
+              <SelectItem value="all" className="text-[10px] font-bold italic uppercase">ALL_RESOURCES</SelectItem>
+              {RESOURCES.map(r => (
+                <SelectItem key={r} value={r} className="text-[10px] font-bold italic uppercase">{r}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={action} onValueChange={setAction}>
+            <SelectTrigger className="h-9 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+              <span className="text-slate-500 mr-2">ACT:</span>
+              <SelectValue placeholder="ALL" />
+            </SelectTrigger>
+            <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
+              <SelectItem value="all" className="text-[10px] font-bold italic uppercase">ALL_ACTIONS</SelectItem>
+              {ACTIONS.map(a => (
+                <SelectItem key={a} value={a} className="text-[10px] font-bold italic uppercase">{a.replace('_', ' ')}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="relative group">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 uppercase italic">ID:</div>
+            <InputField
+              placeholder="SEARCH..."
+              value={userId}
+              onChange={(val) => setUserId(val)}
+              onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
+              className="h-9 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider pl-8 w-full focus:ring-0"
+              hideLabel
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-1 pl-2 border-l border-white/10">
+          <Button 
+            onClick={handleApplyFilters}
+            className="h-9 px-4 bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-[10px] rounded-lg neon-glow"
+          >
+            EXECUTE
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={handleResetFilters}
+            className="h-9 w-9 text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-lg p-0"
+          >
+            <X className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-          <CardDescription>Filter logs by resource, action, or user</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Resource</label>
-              <Select value={resource} onValueChange={setResource}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Resources" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Resources</SelectItem>
-                  {RESOURCES.map(r => (
-                    <SelectItem key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Action</label>
-              <Select value={action} onValueChange={setAction}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Actions" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Actions</SelectItem>
-                  {ACTIONS.map(a => (
-                    <SelectItem key={a} value={a}>{a.replace('_', ' ').charAt(0).toUpperCase() + a.replace('_', ' ').slice(1)}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <InputField
-              label="User ID"
-              placeholder="Search by User ID..."
-              value={userId}
-              onChange={(val) => setUserId(val)}
-              onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
-            />
-
-            <div className="flex items-end gap-2">
-              <Button onClick={handleApplyFilters} className="w-full">
-                <Filter className="h-4 w-4 mr-2" />
-                Apply
-              </Button>
-              <Button variant="ghost" onClick={handleResetFilters} title="Reset Filters">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="gap-0 py-3">
+      <Card className="glass-premium border-white/5 bg-slate-950/20 backdrop-blur-xl overflow-hidden rounded-xl border-t-0 -mt-1 relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/20 after:to-transparent">
         <div>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-[180px]">Date & Time</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Action</TableHead>
-                <TableHead>Resource</TableHead>
-                <TableHead>Details</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
+              <TableRow className="border-white/5 bg-white/[0.02]">
+                <TableHead className="w-[150px] text-[10px] font-black uppercase italic tracking-widest py-2">TIMESTAMP</TableHead>
+                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">OPERATOR_IDENTITY</TableHead>
+                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">ACTION_TYPE</TableHead>
+                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">RESOURCE_TARGET</TableHead>
+                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">METADATA_SNAPSHOT</TableHead>
+                <TableHead className="w-[80px] text-[10px] font-black uppercase italic tracking-widest py-2 text-right">ACCESS</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -268,40 +282,40 @@ export default function AuditLogsClient() {
                 </TableRow>
               ) : (
                 logs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell className="font-mono text-xs whitespace-nowrap">
-                      {format(new Date(log.createdAt), "MMM d, yyyy HH:mm:ss")}
+                  <TableRow key={log.id} className="border-white/5 hover:bg-white/[0.02] transition-colors group">
+                    <TableCell className="font-mono text-[10px] whitespace-nowrap py-2 text-slate-400 group-hover:text-primary transition-colors">
+                      {format(new Date(log.createdAt), "MM.dd.yy // HH:mm:ss")}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-2">
                       <div className="flex flex-col">
-                        <span className="font-medium">{log.userName || "Unknown"}</span>
-                        <span className="text-xs text-muted-foreground truncate max-w-[120px]" title={log.userId}>
+                        <span className="font-black text-[10px] uppercase italic tracking-tight text-foreground">{log.userName || "SYSTEM_DAEMON"}</span>
+                        <span className="text-[9px] font-mono text-slate-500 truncate max-w-[100px]" title={log.userId}>
                           {log.userId}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge className={cn("capitalize font-normal whitespace-nowrap", getActionColor(log.action))} variant="outline">
-                        {log.action.replace('_', ' ')}
+                    <TableCell className="py-2">
+                      <Badge className={cn("text-[9px] font-black uppercase tracking-widest h-5 px-2 rounded-md", getActionColor(log.action))} variant="outline">
+                        {log.action.replace('_', ':')}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-2">
                       <div className="flex flex-col">
-                        <span className="capitalize">{log.resource}</span>
+                        <span className="text-[10px] font-bold uppercase text-slate-300">{log.resource}</span>
                         {log.resourceName && (
-                          <span className="text-xs text-muted-foreground truncate max-w-[150px]" title={log.resourceName}>
+                          <span className="text-[9px] text-slate-500 truncate max-w-[120px] italic" title={log.resourceName}>
                             {log.resourceName}
                           </span>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground font-mono">
+                    <TableCell className="max-w-[150px] truncate text-[9px] text-slate-500 font-mono py-2">
                       {JSON.stringify(log.details || {})}
                     </TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm" onClick={() => setSelectedLog(log)}>
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">View</span>
+                    <TableCell className="py-2 text-right">
+                      <Button variant="ghost" size="sm" onClick={() => setSelectedLog(log)} className="h-7 w-7 p-0 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-md">
+                        <Eye className="h-3.5 w-3.5" />
+                        <span className="sr-only">VIEW_DETAILS</span>
                       </Button>
                     </TableCell>
                   </TableRow>

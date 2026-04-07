@@ -21,6 +21,7 @@ import { InputField } from "@/components/ui/input-field";
 import { toast } from "sonner";
 import Link from "next/link";
 import { WorkoutPlanBuilder } from "@/components/workout-plan-builder";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 export default function WorkoutPlansPage() {
     const { data: session } = useSession();
@@ -57,41 +58,24 @@ export default function WorkoutPlansPage() {
         );
     }, [workoutPlans, searchQuery]);
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-vh-[400px]">
-                <div className="flex flex-col items-center gap-2">
-                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                    <p className="text-muted-foreground animate-pulse font-black uppercase tracking-widest text-[10px]">Loading Plans...</p>
-                </div>
-            </div>
-        );
-    }
+
 
     return (
         <div className="space-y-10 animate-fade-up">
-            {/* Header */}
-            <div className="relative">
-                <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
-                <div className="flex items-center justify-between">
-                    <div>
-                        <div className="flex items-center gap-4 mb-2">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">MANAGEMENT: WORKOUT_PLANS</span>
-                            <div className="h-px w-24 bg-white/5"></div>
-                        </div>
-                        <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
-                            WORKOUT <span className="text-primary neon-text">PLANS</span>
-                        </h1>
-                    </div>
-                    <Button className="h-14 px-8 rounded-2xl shadow-lg shadow-primary/20 bg-primary text-primary-foreground hover:scale-105 transition-transform" onClick={() => {
-                        setEditingPlan(null);
-                        setIsBuilderOpen(true);
-                    }}>
-                        <Plus className="w-5 h-5 mr-2" />
-                        New Plan
-                    </Button>
-                </div>
-            </div>
+            <DashboardHeader
+                title="WORKOUT"
+                highlight="PLANS"
+                subtitle="MANAGEMENT: WORKOUT_PLANS"
+                description="Create and manage training programs for your clients."
+            >
+                <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" onClick={() => {
+                    setEditingPlan(null);
+                    setIsBuilderOpen(true);
+                }}>
+                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                    NEW PLAN
+                </Button>
+            </DashboardHeader>
 
             {/* Search & Filters */}
             <div className="flex flex-col md:flex-row gap-4 items-center">
