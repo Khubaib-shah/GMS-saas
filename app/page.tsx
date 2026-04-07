@@ -3,6 +3,10 @@ import { HeroSection } from "@/components/landing/hero-section"
 import { SocialProof } from "@/components/landing/social-proof"
 import dynamic from "next/dynamic"
 
+import { PreLoader } from "@/components/pre-loader"
+import { GlobalAntigravity } from "@/components/global-antigravity"
+import SmoothScroller from "@/components/smooth-scroller"
+
 // Lazy load below-the-fold components
 const VideoShowcase = dynamic(() => import("@/components/landing/video-showcase").then(mod => mod.VideoShowcase))
 const ProblemSection = dynamic(() => import("@/components/landing/problem-section").then(mod => mod.ProblemSection))
@@ -21,6 +25,9 @@ const BackToTop = dynamic(() => import("@/components/landing/back-to-top").then(
 export default function LandingPage() {
   return (
     <div className="relative flex flex-col min-h-screen bg-transparent text-white selection:bg-primary selection:text-black font-sans overflow-clip">
+      <PreLoader />
+      <GlobalAntigravity />
+      <SmoothScroller />
       <Navbar />
       <main className="flex-1">
         <HeroSection />
