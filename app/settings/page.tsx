@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Card } from "@/components/ui/card";
 import { Lock, Building2, User, LogOut, Users, Plus, Trash2, Save, UserCheck, Settings2, DollarSign, Bell, Shield } from "lucide-react";
 import { toast } from "sonner";
@@ -360,30 +360,25 @@ export default function SettingsPage() {
           </h2>
           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSaveGym(); }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Gym Name
-                </label>
-                <Input
-                  value={gymData.name}
-                  onChange={(e) =>
-                    setGymData({ ...gymData, name: e.target.value })
-                  }
-                  placeholder="Your Gym Name"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Phone Number
-                </label>
-                <Input
-                  value={gymData.phone}
-                  onChange={(e) =>
-                    setGymData({ ...gymData, phone: e.target.value })
-                  }
-                  placeholder="Phone Number"
-                />
-              </div>
+              <InputField
+                label="Gym Name"
+                validateType="text"
+                value={gymData.name}
+                onChange={(val) =>
+                  setGymData({ ...gymData, name: val })
+                }
+                placeholder="Your Gym Name"
+                required
+              />
+              <InputField
+                label="Phone Number"
+                validateType="phone"
+                value={gymData.phone}
+                onChange={(val) =>
+                  setGymData({ ...gymData, phone: val })
+                }
+                placeholder="Phone Number"
+              />
             </div>
 
             <div className="space-y-2">
@@ -424,11 +419,13 @@ export default function SettingsPage() {
                     <AvatarFallback>IMG</AvatarFallback>
                   </Avatar>
                 )}
-                <Input
+                <InputField
+                  hideLabel
                   type="file"
+                  validateType="text"
                   accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
+                  onChange={(val: string, e: any) => {
+                    const file = (e?.target as HTMLInputElement).files?.[0];
                     if (file) {
                       if (file.size > 4 * 1024 * 1024) { // 4MB limit
                         toast.error("Image size too large (max 4MB)");
@@ -457,14 +454,13 @@ export default function SettingsPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Specialties (comma separated)</Label>
-              <Input
-                value={trainerData.specialties}
-                onChange={(e) => setTrainerData({ ...trainerData, specialties: e.target.value })}
-                placeholder="Yoga, HIIT, Nutrition"
-              />
-            </div>
+            <InputField
+              label="Specialties (comma separated)"
+              validateType="text"
+              value={trainerData.specialties}
+              onChange={(val) => setTrainerData({ ...trainerData, specialties: val })}
+              placeholder="Yoga, HIIT, Nutrition"
+            />
 
             <div className="pt-6 border-t border-border">
               <Button onClick={handleUpdateProfile}>
@@ -495,18 +491,31 @@ export default function SettingsPage() {
                     <DialogDescription>Create a login for your staff member.</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label>Full Name</Label>
-                      <Input required value={staffFormData.fullName} onChange={e => setStaffFormData({ ...staffFormData, fullName: e.target.value })} placeholder="Jane Doe" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Email</Label>
-                      <Input required type="email" value={staffFormData.email} onChange={e => setStaffFormData({ ...staffFormData, email: e.target.value })} placeholder="jane@gymflow.com" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Password</Label>
-                      <Input required type="password" value={staffFormData.password} onChange={e => setStaffFormData({ ...staffFormData, password: e.target.value })} />
-                    </div>
+                    <InputField
+                      label="Full Name"
+                      validateType="name"
+                      required
+                      value={staffFormData.fullName}
+                      onChange={val => setStaffFormData({ ...staffFormData, fullName: val })}
+                      placeholder="Jane Doe"
+                    />
+                    <InputField
+                      label="Email"
+                      validateType="email"
+                      required
+                      type="email"
+                      value={staffFormData.email}
+                      onChange={val => setStaffFormData({ ...staffFormData, email: val })}
+                      placeholder="jane@gymflow.com"
+                    />
+                    <InputField
+                      label="Password"
+                      validateType="password"
+                      required
+                      type="password"
+                      value={staffFormData.password}
+                      onChange={val => setStaffFormData({ ...staffFormData, password: val })}
+                    />
                     <div className="space-y-2">
                       <Label>Role</Label>
                       <Select value={staffFormData.role} onValueChange={v => setStaffFormData({ ...staffFormData, role: v })}>

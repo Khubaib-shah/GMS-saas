@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Search, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -88,16 +88,14 @@ export function BookingModal({ isOpen, onClose, slot, onSuccess }: BookingModalP
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Search Member</Label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Name or email..."
-                className="pl-9"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
+            <InputField
+              hideLabel
+              validateType="text"
+              placeholder="Name or email..."
+              value={search}
+              onChange={(val) => setSearch(val)}
+              leadingIcon={<Search className="w-4 h-4" />}
+            />
             {members.length > 0 && !selectedMember && (
                 <div className="border rounded-lg max-h-40 overflow-auto bg-muted/20">
                     {members.map(m => (

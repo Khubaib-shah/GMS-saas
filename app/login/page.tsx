@@ -5,7 +5,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Zap, Shield, ArrowRight, Trophy, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
@@ -85,25 +85,20 @@ function LoginForm() {
       </div>
 
       <form onSubmit={handleLogin} className="space-y-6">
-        <div>
-          <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
-            Identity Email
-          </label>
-          <Input
-            type="email"
-            placeholder="ACCESS@GYMFLOW.COM"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-white/5 border-white/10 text-white placeholder:text-slate-700 font-bold uppercase tracking-wider h-12 rounded-xl focus:bg-white/10"
-            required
-          />
-        </div>
+        <InputField
+          label="Identity Email"
+          validateType="email"
+          placeholder="ACCESS@GYMFLOW.COM"
+          value={email}
+          onChange={(val) => setEmail(val)}
+          required
+        />
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
               Security Key
-            </label>
+            </span>
             <a
               href="#"
               className="text-[10px] font-black text-primary hover:text-white transition-colors uppercase tracking-widest"
@@ -111,19 +106,20 @@ function LoginForm() {
               Reset Key?
             </a>
           </div>
-          <div className="relative group">
-            <Input
+          <div className="relative group/password">
+            <InputField
               type={showPassword ? "text" : "password"}
+              validateType="password"
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full pr-12 bg-white/5 border-white/10 text-white placeholder:text-slate-700 font-bold h-12 rounded-xl focus:bg-white/10"
+              onChange={(val) => setPassword(val)}
+              hideLabel
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors z-20"
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>

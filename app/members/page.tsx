@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { Search, Plus, Trash2, QrCode, Sparkles, Users } from "lucide-react";
 import { MemberQrDialog } from "@/components/member-qr-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Card } from "@/components/ui/card";
 import {
   Select,
@@ -132,21 +132,17 @@ export default function MembersPage() {
       <div className="glass-premium p-8 mb-8 border-border">
         <div className="flex gap-8 items-end flex-wrap">
           <div className="flex-1 min-w-64">
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-              SEARCH_MEMBERS
-            </label>
-            <div className="relative group">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
-              <Input
-                placeholder="BY NAME, EMAIL OR PHONE..."
-                value={searchTerm || store.searchQuery}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  store.setSearchQuery(e.target.value);
-                }}
-                className="pl-12 h-12 bg-white/5 border-transparent focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-xl"
-              />
-            </div>
+            <InputField
+              label="Search Members"
+              validateType="text"
+              placeholder="BY NAME, EMAIL OR PHONE..."
+              value={searchTerm || store.searchQuery}
+              onChange={(val) => {
+                setSearchTerm(val);
+                store.setSearchQuery(val);
+              }}
+              leadingIcon={<Search className="w-4 h-4" />}
+            />
           </div>
           <div>
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">

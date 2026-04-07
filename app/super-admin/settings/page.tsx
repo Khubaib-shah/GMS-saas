@@ -155,7 +155,12 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     );
 }
 
-function Toggle({ label, description, checked, onChange }: any) {
+function Toggle({ label, description, checked, onChange }: { 
+    label: string; 
+    description?: string; 
+    checked: boolean; 
+    onChange: (v: boolean) => void 
+}) {
     return (
         <div className="flex items-center justify-between py-2">
             <div>

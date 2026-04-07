@@ -9,7 +9,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import {
     Select,
@@ -82,75 +82,57 @@ export function EditGymModal({ isOpen, onClose, onSuccess, gym }: EditGymModalPr
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px] bg-[#0d0d14] border-white/[0.08] text-white">
+            <DialogContent className="sm:max-w-[425px] bg-[#0d0d14] border-white/8 text-white">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold">Edit Gym Details</DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="name">Gym Name</Label>
-                        <Input
-                            id="name"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="bg-white/[0.04] border-white/[0.08]"
-                            required
+                    <InputField
+                        label="Gym Name"
+                        validateType="text"
+                        value={formData.name}
+                        onChange={(val) => setFormData({ ...formData, name: val })}
+                        required
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <InputField
+                            label="City"
+                            validateType="text"
+                            value={formData.city}
+                            onChange={(val) => setFormData({ ...formData, city: val })}
+                        />
+                        <InputField
+                            label="Phone"
+                            validateType="phone"
+                            value={formData.phone}
+                            onChange={(val) => setFormData({ ...formData, phone: val })}
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="city">City</Label>
-                            <Input
-                                id="city"
-                                value={formData.city}
-                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                className="bg-white/[0.04] border-white/[0.08]"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Phone</Label>
-                            <Input
-                                id="phone"
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                className="bg-white/[0.04] border-white/[0.08]"
-                            />
-                        </div>
-                    </div>
+                    <InputField
+                        label="Address"
+                        validateType="text"
+                        value={formData.address}
+                        onChange={(val) => setFormData({ ...formData, address: val })}
+                    />
 
-                    <div className="space-y-2">
-                        <Label htmlFor="address">Address</Label>
-                        <Input
-                            id="address"
-                            value={formData.address}
-                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            className="bg-white/[0.04] border-white/[0.08]"
+                    <div className="grid grid-cols-2 gap-4">
+                        <InputField
+                            label="Trial Ends At"
+                            validateType="text"
+                            type="date"
+                            value={formData.trialEndsAt}
+                            onChange={(val) => setFormData({ ...formData, trialEndsAt: val })}
                         />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="trialEndsAt">Trial Ends At</Label>
-                            <Input
-                                id="trialEndsAt"
-                                type="date"
-                                value={formData.trialEndsAt}
-                                onChange={(e) => setFormData({ ...formData, trialEndsAt: e.target.value })}
-                                className="bg-white/[0.04] border-white/[0.08]"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="expiryDate">Subscription Expiry</Label>
-                            <Input
-                                id="expiryDate"
-                                type="date"
-                                value={formData.expiryDate}
-                                onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
-                                className="bg-white/[0.04] border-white/[0.08]"
-                            />
-                        </div>
+                        <InputField
+                            label="Subscription Expiry"
+                            validateType="text"
+                            type="date"
+                            value={formData.expiryDate}
+                            onChange={(val) => setFormData({ ...formData, expiryDate: val })}
+                        />
                     </div>
 
                     <div className="space-y-2">
@@ -159,10 +141,10 @@ export function EditGymModal({ isOpen, onClose, onSuccess, gym }: EditGymModalPr
                             value={formData.subscriptionStatus}
                             onValueChange={(value) => setFormData({ ...formData, subscriptionStatus: value })}
                         >
-                            <SelectTrigger className="bg-white/[0.04] border-white/[0.08] w-full">
-                                <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-[#1a1a24] border-white/[0.08] text-white">
+                        <SelectTrigger className="bg-white/4 border-white/8 w-full">
+                            <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#1a1a24] border-white/8 text-white">
                                 <SelectItem value="trial">Trial</SelectItem>
                                 <SelectItem value="active">Active</SelectItem>
                                 <SelectItem value="expired">Expired</SelectItem>
@@ -177,7 +159,7 @@ export function EditGymModal({ isOpen, onClose, onSuccess, gym }: EditGymModalPr
                             type="button"
                             variant="outline"
                             onClick={onClose}
-                            className="border-white/[0.08] hover:bg-white/[0.04]"
+                            className="border-white/8 hover:bg-white/4"
                         >
                             Cancel
                         </Button>

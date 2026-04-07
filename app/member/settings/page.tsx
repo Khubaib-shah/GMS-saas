@@ -3,8 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { InputField } from "@/components/ui/input-field";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
@@ -198,43 +197,39 @@ export default function MemberSettingsPage() {
                     <TabsContent value="personal" className="space-y-6 outline-none">
                         <form onSubmit={handleProfileUpdate} className="glass border border-white/5 rounded-2xl p-8 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">First Name</Label>
-                                    <Input
-                                        value={profile.firstName}
-                                        onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
-                                        className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">Last Name</Label>
-                                    <Input
-                                        value={profile.lastName}
-                                        onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
-                                        className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none text-primary">Email Address</Label>
-                                <Input
-                                    value={profile.email}
-                                    disabled
-                                    className="bg-white/5 border-white/10 text-slate-500 rounded-xl h-12 font-bold cursor-not-allowed opacity-50"
+                                <InputField
+                                    label="First Name"
+                                    validateType="name"
+                                    value={profile.firstName}
+                                    onChange={(val) => setProfile({ ...profile, firstName: val })}
+                                    className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
                                 />
-                                <p className="text-[9px] font-bold text-slate-600 uppercase tracking-tight pl-1 italic">Note: Email cannot be changed.</p>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">Phone Number</Label>
-                                <Input
-                                    value={profile.phone}
-                                    onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                                    placeholder="03XX-XXXXXXX"
+                                <InputField
+                                    label="Last Name"
+                                    validateType="name"
+                                    value={profile.lastName}
+                                    onChange={(val) => setProfile({ ...profile, lastName: val })}
                                     className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
                                 />
                             </div>
+
+                            <InputField
+                                label="Email Address"
+                                validateType="email"
+                                value={profile.email}
+                                disabled
+                                className="bg-white/5 border-white/10 text-slate-500 rounded-xl h-12 font-bold cursor-not-allowed opacity-50"
+                                description="Note: Email cannot be changed."
+                            />
+
+                            <InputField
+                                label="Phone Number"
+                                validateType="phone"
+                                value={profile.phone}
+                                onChange={(val) => setProfile({ ...profile, phone: val })}
+                                placeholder="03XX-XXXXXXX"
+                                className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
+                            />
 
                             <Button
                                 type="submit"
@@ -251,53 +246,48 @@ export default function MemberSettingsPage() {
                         <form onSubmit={handleSecurityUpdate} className="glass border border-white/5 rounded-2xl p-8 space-y-6">
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">New Password</Label>
                                     <div className="relative">
-                                        <Input
+                                        <InputField
+                                            label="New Password"
+                                            validateType="password"
                                             type={showPassword ? "text" : "password"}
                                             value={security.password}
-                                            onChange={(e) => setSecurity({ ...security, password: e.target.value })}
+                                            onChange={(val) => setSecurity({ ...security, password: val })}
                                             className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold pr-12 focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
                                             placeholder="Enter new password"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors"
+                                            className="absolute right-4 bottom-3 text-slate-500 hover:text-primary transition-colors z-10"
                                         >
                                             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                         </button>
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none">Confirm New Password</Label>
-                                    <Input
-                                        type="password"
-                                        value={security.confirmPassword}
-                                        onChange={(e) => setSecurity({ ...security, confirmPassword: e.target.value })}
-                                        className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
-                                        placeholder="Repeat new password"
-                                    />
-                                </div>
+                                <InputField
+                                    label="Confirm New Password"
+                                    validateType="password"
+                                    type="password"
+                                    value={security.confirmPassword}
+                                    onChange={(val) => setSecurity({ ...security, confirmPassword: val })}
+                                    className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
+                                    placeholder="Repeat new password"
+                                />
                             </div>
 
                             <div className="h-px bg-white/5 my-8" />
 
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1 leading-none text-primary">Login PIN</Label>
-                                <Input
-                                    type="text"
-                                    maxLength={6}
-                                    value={security.pin}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, "");
-                                        setSecurity({ ...security, pin: value });
-                                    }}
-                                    className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
-                                    placeholder="4-6 digit numeric PIN"
-                                />
-                                <p className="text-[9px] font-bold text-slate-600 uppercase tracking-tight pl-1 italic">Set a PIN for quick login access.</p>
-                            </div>
+                            <InputField
+                                label="Login PIN"
+                                validateType="number"
+                                maxLength={6}
+                                value={security.pin}
+                                onChange={(val) => setSecurity({ ...security, pin: val })}
+                                className="bg-white/5 border-white/10 text-white rounded-xl h-12 font-bold focus-visible:ring-primary focus-visible:border-primary placeholder:text-slate-700"
+                                placeholder="4-6 digit numeric PIN"
+                                description="Set a PIN for quick login access."
+                            />
 
                             <Button
                                 type="submit"

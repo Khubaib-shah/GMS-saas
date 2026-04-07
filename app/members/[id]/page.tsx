@@ -48,7 +48,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { formatCurrency, formatDate, isSubscriptionActive } from "@/lib/utils/file-utils";
 
@@ -343,7 +343,7 @@ export default function MemberDetailPage({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Profile Card */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="overflow-hidden border-none shadow-xl shadow-foreground/[0.03]">
+          <Card className="overflow-hidden border-none shadow-xl shadow-foreground/3">
             <div className="relative h-32 bg-gradient-to-br from-primary/80 to-primary">
               {/* Pattern Overlay */}
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '16px 16px' }} />
@@ -439,7 +439,7 @@ export default function MemberDetailPage({
         <div className="lg:col-span-8 space-y-8">
           {/* Quick Stats / Action Card - Moved to Right Column */}
           {((session?.user as any)?.role !== 'trainer') && (
-            <Card className="p-6 border-none shadow-xl shadow-foreground/[0.03] space-y-6">
+            <Card className="p-6 border-none shadow-xl shadow-foreground/3 space-y-6">
               <h3 className="font-bold flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary" />
                 Manage Subscription
@@ -463,19 +463,15 @@ export default function MemberDetailPage({
                     </select>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Duration (Days)</label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
-                        value={renewDays}
-                        onChange={(e) => setRenewDays(Number(e.target.value))}
-                        placeholder="Days"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">DAYS</span>
-                    </div>
-                  </div>
+                  <InputField
+                    label="Duration (Days)"
+                    type="number"
+                    validateType="number"
+                    value={String(renewDays)}
+                    onChange={(val) => setRenewDays(Number(val))}
+                    placeholder="Days"
+                    className="bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -597,7 +593,7 @@ export default function MemberDetailPage({
           )}
           {/* Active Status Banner - Visible to all roles */}
           <Card className={cn(
-            "p-6 border-l-4 shadow-lg shadow-foreground/[0.02] flex items-center justify-between",
+            "p-6 border-l-4 shadow-lg shadow-foreground/2 flex items-center justify-between",
             activeSub ? "border-l-emerald-500 bg-emerald-50/10" : "border-l-destructive bg-destructive/5"
           )}>
             <div className="flex items-center gap-4">
@@ -718,7 +714,7 @@ export default function MemberDetailPage({
                   Payment Records
                 </h3>
 
-                <Card className="overflow-hidden border-none shadow-xl shadow-foreground/[0.02]">
+                <Card className="overflow-hidden border-none shadow-xl shadow-foreground/2">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                       <thead>
@@ -807,7 +803,7 @@ export default function MemberDetailPage({
                   Workout Plan
                 </h3>
 
-                <Card className="p-6 border-none shadow-xl shadow-foreground/[0.02] flex items-center justify-between">
+                <Card className="p-6 border-none shadow-xl shadow-foreground/2 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                       <Dumbbell className="w-6 h-6" />
@@ -917,19 +913,15 @@ export default function MemberDetailPage({
 
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-amount">Amount ({gymProfile.name})</Label>
-                <div className="relative">
-                  <CreditCard className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="edit-amount"
-                    type="number"
-                    value={paymentEditData.amount}
-                    className="pl-9"
-                    onChange={(e) => setPaymentEditData({ ...paymentEditData, amount: Number(e.target.value) })}
-                  />
-                </div>
-              </div>
+              <InputField
+                label={`Amount (${gymProfile.name})`}
+                type="number"
+                validateType="number"
+                value={String(paymentEditData.amount)}
+                onChange={(val) => setPaymentEditData({ ...paymentEditData, amount: Number(val) })}
+                leadingIcon={<CreditCard className="w-4 h-4" />}
+                className="pl-9"
+              />
               <div className="space-y-2">
                 <Label htmlFor="edit-method">Method</Label>
                 <select
@@ -947,29 +939,23 @@ export default function MemberDetailPage({
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="edit-date">Transaction Date</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="edit-date"
-                  type="date"
-                  className="pl-9"
-                  value={paymentEditData.date ? new Date(paymentEditData.date).toISOString().split('T')[0] : ""}
-                  onChange={(e) => setPaymentEditData({ ...paymentEditData, date: new Date(e.target.value).toISOString() })}
-                />
-              </div>
-            </div>
+            <InputField
+              label="Transaction Date"
+              type="date"
+              validateType="text"
+              value={paymentEditData.date ? new Date(paymentEditData.date).toISOString().split('T')[0] : ""}
+              onChange={(val) => setPaymentEditData({ ...paymentEditData, date: new Date(val).toISOString() })}
+              leadingIcon={<Calendar className="w-4 h-4" />}
+              className="pl-9"
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="edit-desc">Description</Label>
-              <Input
-                id="edit-desc"
-                placeholder="e.g. Monthly Renewal"
-                value={paymentEditData.description}
-                onChange={(e) => setPaymentEditData({ ...paymentEditData, description: e.target.value })}
-              />
-            </div>
+            <InputField
+              label="Description"
+              validateType="text"
+              placeholder="e.g. Monthly Renewal"
+              value={paymentEditData.description}
+              onChange={(val) => setPaymentEditData({ ...paymentEditData, description: val })}
+            />
 
             <div className="space-y-2">
               <Label className="flex items-center justify-between">

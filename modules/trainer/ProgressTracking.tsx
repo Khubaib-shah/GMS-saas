@@ -15,7 +15,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
@@ -61,10 +61,13 @@ export function ProgressTracking() {
                 {/* Member Sidebar */}
                 <Card className="lg:col-span-1 bg-slate-950/20 border-white/5 p-6 h-fit space-y-6">
                     <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">Active Members</h3>
-                    <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                        <Input placeholder="Search members..." className="pl-10 h-10 bg-white/5 border-white/5 text-xs font-bold rounded-xl" />
-                    </div>
+                    <InputField
+                        hideLabel
+                        validateType="text"
+                        placeholder="Search members..."
+                        className="bg-white/5 border-white/5 text-xs font-bold rounded-xl"
+                        leadingIcon={<Search className="w-4 h-4" />}
+                    />
 
                     <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                         {[1, 2, 3, 4, 5].map(i => (
@@ -73,7 +76,7 @@ export function ProgressTracking() {
                                 onClick={() => setSelectedMemberId(String(i))}
                                 className={cn(
                                     "p-4 rounded-xl border transition-all cursor-pointer group flex items-center justify-between",
-                                    selectedMemberId === String(i) ? "bg-primary/10 border-primary/30" : "bg-white/[0.02] border-white/5 hover:bg-white/5"
+                                    selectedMemberId === String(i) ? "bg-primary/10 border-primary/30" : "bg-white/2 border-white/5 hover:bg-white/5"
                                 )}
                             >
                                 <div className="flex items-center gap-3">
@@ -94,7 +97,7 @@ export function ProgressTracking() {
                 {/* Main Analytics View */}
                 <div className="lg:col-span-3 space-y-8">
                     {!selectedMemberId ? (
-                        <div className="flex flex-col items-center justify-center h-[500px] border border-dashed border-white/10 rounded-3xl bg-white/[0.01]">
+                        <div className="flex flex-col items-center justify-center h-[500px] border border-dashed border-white/10 rounded-3xl bg-white/1">
                             <TrendingUp className="w-16 h-16 text-slate-800 mb-6" />
                             <h3 className="text-lg font-black italic uppercase tracking-widest text-slate-500">Awaiting Member Selection</h3>
                             <p className="text-[10px] text-slate-600 mt-2 font-medium italic uppercase">Select a member from the list to view their training logs.</p>
@@ -150,7 +153,7 @@ export function ProgressTracking() {
                             <div className="space-y-4">
                                 <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 pl-2">Training Logs</h3>
                                 {[1, 2, 3].map(i => (
-                                    <Card key={i} className="bg-slate-950/20 border-white/5 p-6 hover:bg-white/[0.02] transition-colors group cursor-pointer">
+                                    <Card key={i} className="bg-slate-950/20 border-white/5 p-6 hover:bg-white/2 transition-colors group cursor-pointer">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-6">
                                                 <div className="flex flex-col">

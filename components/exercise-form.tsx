@@ -12,7 +12,7 @@ import {
     Info
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Textarea } from "@/components/ui/textarea";
 import {
     Dialog,
@@ -135,7 +135,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[80vw] w-[80vw] bg-background border-white/5 p-0 shadow-2xl overflow-y-auto">
-                <DialogHeader className="p-8 pb-6 border-b border-white/5 bg-white/[0.02] relative shrink-0">
+                <DialogHeader className="p-8 pb-6 border-b border-white/5 bg-white/2 relative shrink-0">
                     <div className="absolute top-0 right-0 w-32 h-full bg-primary/5 -skew-x-12 translate-x-10 opacity-50" />
                     <div className="relative">
                         <div className="flex items-center gap-3 mb-3">
@@ -152,19 +152,17 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                         {/* Primary Info */}
                         <div className="space-y-6">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
-                                    <Clipboard className="w-3 h-3 text-primary" />
-                                    Exercise Name
-                                </Label>
-                                <Input
-                                    disabled={isViewMode}
-                                    placeholder="e.g., Barbell Bench Press"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="bg-white/5 border-white/5 focus:border-primary/50 text-white font-bold uppercase tracking-tight h-12 rounded-xl"
-                                />
-                            </div>
+                            <InputField
+                                label="Exercise Name"
+                                validateType="text"
+                                disabled={isViewMode}
+                                placeholder="e.g., Barbell Bench Press"
+                                value={formData.name}
+                                onChange={(val) => setFormData({ ...formData, name: val })}
+                                leadingIcon={<Clipboard className="w-3 h-3" />}
+                                required
+                                className="font-bold uppercase tracking-tight h-12 rounded-xl"
+                            />
 
                             <div className="space-y-2">
                                 <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
@@ -189,19 +187,16 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                                 </Select>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
-                                    <Dumbbell className="w-3 h-3 text-primary" />
-                                    Equipment Required
-                                </Label>
-                                <Input
-                                    disabled={isViewMode}
-                                    placeholder="e.g., Barbell, Dumbbell"
-                                    value={formData.equipment}
-                                    onChange={(e) => setFormData({ ...formData, equipment: e.target.value })}
-                                    className="bg-white/5 border-white/5 focus:border-primary/50 text-white font-bold uppercase h-12 rounded-xl"
-                                />
-                            </div>
+                            <InputField
+                                label="Equipment Required"
+                                validateType="text"
+                                disabled={isViewMode}
+                                placeholder="e.g., Barbell, Dumbbell"
+                                value={formData.equipment}
+                                onChange={(val) => setFormData({ ...formData, equipment: val })}
+                                leadingIcon={<Dumbbell className="w-3 h-3" />}
+                                className="font-bold uppercase h-12 rounded-xl"
+                            />
                         </div>
 
                         {/* Additional Info */}
@@ -243,7 +238,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-6 rounded-2xl bg-white/[0.02] border border-white/5">
+                    <div className="flex items-center justify-between p-6 rounded-2xl bg-white/2 border border-white/5">
                         <div className="flex items-center gap-4">
                             <div className={cn(
                                 "w-10 h-10 rounded-xl flex items-center justify-center transition-all",

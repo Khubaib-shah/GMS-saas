@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { InputField } from "@/components/ui/input-field"
 import { TrendingUp, DollarSign, AlertCircle } from "lucide-react"
 import { useAppStore } from "@/lib/store"
 import { formatDate, formatCurrency } from "@/lib/utils/file-utils"
@@ -124,18 +124,16 @@ export default function PaymentsPage() {
       <div className="glass-premium p-8 border-border">
         <div className="flex flex-col sm:flex-row gap-8 items-end">
           <div className="flex-1 w-full sm:w-auto">
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">SEARCH_SUBJECT_NAME</label>
-            <div className="relative group">
-              <Input
-                placeholder="PROBING DATA..."
-                value={searchTerm || store.searchQuery}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value)
-                  store.setSearchQuery(e.target.value)
-                }}
-                className="h-12 bg-white/5 border-transparent focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-xl"
-              />
-            </div>
+            <InputField
+              label="Search Subject Name"
+              validateType="text"
+              placeholder="PROBING DATA..."
+              value={searchTerm || store.searchQuery}
+              onChange={(val) => {
+                setSearchTerm(val)
+                store.setSearchQuery(val)
+              }}
+            />
           </div>
           <div className="w-full sm:w-auto">
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">TEMPORAL_PERIOD</label>

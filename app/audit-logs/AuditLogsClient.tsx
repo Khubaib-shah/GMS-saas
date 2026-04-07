@@ -12,7 +12,7 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import {
   Select,
   SelectContent,
@@ -218,17 +218,13 @@ export default function AuditLogsClient() {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">User ID</label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Search by User ID..."
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
-                />
-              </div>
-            </div>
+            <InputField
+              label="User ID"
+              placeholder="Search by User ID..."
+              value={userId}
+              onChange={(val) => setUserId(val)}
+              onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
+            />
 
             <div className="flex items-end gap-2">
               <Button onClick={handleApplyFilters} className="w-full">

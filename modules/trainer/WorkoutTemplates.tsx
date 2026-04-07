@@ -17,7 +17,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -73,24 +73,23 @@ export function WorkoutTemplates() {
                 </div>
             </div>
 
-            {/* Controls */}
             <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary transition-colors" />
-                    <Input
-                        placeholder="SEARCH_TEMPLATES..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="pl-12 h-14 bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
-                    />
-                </div>
+                <InputField
+                    hideLabel
+                    validateType="text"
+                    placeholder="SEARCH_TEMPLATES..."
+                    value={search}
+                    onChange={(val) => setSearch(val)}
+                    leadingIcon={<Search className="w-5 h-5" />}
+                    className="h-14 bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
+                />
             </div>
 
             {/* Templates List */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {loading ? (
                     [1, 2, 3, 4].map(i => (
-                        <div key={i} className="h-44 rounded-3xl bg-white/[0.02] border border-white/5 animate-pulse" />
+                        <div key={i} className="h-44 rounded-3xl bg-white/2 border border-white/5 animate-pulse" />
                     ))
                 ) : filtered.length > 0 ? (
                     filtered.map((template) => (

@@ -5,7 +5,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Zap, Shield, ArrowRight, Trophy, Building2, Mail, Lock, User as UserIcon, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -90,66 +90,53 @@ function SignupForm() {
 
         <form onSubmit={handlePreSignup} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
-            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest flex items-center gap-2">
-              <Building2 className="w-3 h-3 text-primary" /> Gym Name
-            </label>
-            <Input
-              name="gymName"
+            <InputField
+              label="Gym Name"
+              validateType="text"
               placeholder="TITAN FITNESS CENTER"
               value={formData.gymName}
-              onChange={handleChange}
-              className="w-full bg-white/5 border-white/10 text-white placeholder:text-slate-700 font-bold uppercase tracking-wider h-12 rounded-xl focus:bg-white/10"
+              onChange={(val) => setFormData({ ...formData, gymName: val })}
               required
             />
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest flex items-center gap-2">
-              <UserIcon className="w-3 h-3 text-primary" /> Full Name
-            </label>
-            <Input
-              name="fullName"
+            <InputField
+              label="Full Name"
+              validateType="name"
               placeholder="JOHN DOE"
               value={formData.fullName}
-              onChange={handleChange}
-              className="w-full bg-white/5 border-white/10 text-white placeholder:text-slate-700 font-bold uppercase tracking-wider h-12 rounded-xl focus:bg-white/10"
+              onChange={(val) => setFormData({ ...formData, fullName: val })}
               required
             />
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest flex items-center gap-2">
-              <Mail className="w-3 h-3 text-primary" /> Email
-            </label>
-            <Input
-              name="email"
-              type="email"
+            <InputField
+              label="Email"
+              validateType="email"
               placeholder="BOSS@GYMFLOW.COM"
               value={formData.email}
-              onChange={handleChange}
-              className="w-full bg-white/5 border-white/10 text-white placeholder:text-slate-700 font-bold uppercase tracking-wider h-12 rounded-xl focus:bg-white/10"
+              onChange={(val) => setFormData({ ...formData, email: val })}
               required
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest flex items-center gap-2">
-              <Lock className="w-3 h-3 text-primary" /> Security Key (Password)
-            </label>
-            <div className="relative group">
-              <Input
-                name="password"
+            <div className="relative group/password-signup">
+              <InputField
+                label="Security Key (Password)"
+                validateType="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={formData.password}
-                onChange={handleChange}
-                className="w-full pr-12 bg-white/5 border-white/10 text-white placeholder:text-slate-700 font-bold h-12 rounded-xl focus:bg-white/10"
+                onChange={(val) => setFormData({ ...formData, password: val })}
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                className="absolute right-4 top-[42px] -translate-y-1/2 text-slate-500 hover:text-white transition-colors z-20"
                 tabIndex={-1}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -222,7 +209,7 @@ export default function SignupPage() {
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-slate-950 via-slate-950/80 to-transparent"></div>
 
         <div className="relative z-10 text-left max-w-xl">
           <div className="flex items-center gap-3 mb-10">

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -133,19 +133,19 @@ export function AssignWorkout() {
                         </Badge>
                     </div>
 
-                    <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                        <Input
-                            placeholder="Search name or email..."
-                            value={searchMember}
-                            onChange={(e) => setSearchMember(e.target.value)}
-                            className="pl-12 h-12 bg-white/5 border-white/5 rounded-xl font-bold tracking-tight text-xs"
-                        />
-                    </div>
+                    <InputField
+                        hideLabel
+                        validateType="text"
+                        placeholder="Search name or email..."
+                        value={searchMember}
+                        onChange={(val) => setSearchMember(val)}
+                        leadingIcon={<Search className="w-4 h-4" />}
+                        className="h-12 bg-white/5 border-white/5 rounded-xl font-bold tracking-tight text-xs"
+                    />
 
                     <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar overscroll-contain relative isolate">
                         {loading ? (
-                            [1, 2, 3].map(i => <div key={i} className="h-14 rounded-xl bg-white/[0.02] animate-pulse" />)
+                            [1, 2, 3].map(i => <div key={i} className="h-14 rounded-xl bg-white/2 animate-pulse" />)
                         ) : filteredMembers.length > 0 ? (
                             filteredMembers.map(m => (
                                 <div
@@ -155,7 +155,7 @@ export function AssignWorkout() {
                                         "flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer group",
                                         selectedMembers.includes(m.id)
                                             ? "bg-primary/10 border-primary/30"
-                                            : "bg-white/[0.02] border-white/5 hover:bg-white/5"
+                                            : "bg-white/2 border-white/5 hover:bg-white/5"
                                     )}
                                 >
                                     <div className="flex items-center gap-4">
@@ -198,7 +198,7 @@ export function AssignWorkout() {
 
                         <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                             {loading ? (
-                                [1, 2].map(i => <div key={i} className="h-20 rounded-xl bg-white/[0.02] animate-pulse" />)
+                                [1, 2].map(i => <div key={i} className="h-20 rounded-xl bg-white/2 animate-pulse" />)
                             ) : workoutPlans.map((t: any) => (
                                 <div
                                     key={t._id || t.id}
@@ -207,7 +207,7 @@ export function AssignWorkout() {
                                         "p-6 rounded-2xl border transition-all cursor-pointer group flex items-center justify-between",
                                         selectedTemplate === (t._id || t.id)
                                             ? "bg-primary text-black border-primary shadow-lg"
-                                            : "bg-white/[0.02] border-white/5 hover:bg-white/5"
+                                            : "bg-white/2 border-white/5 hover:bg-white/5"
                                     )}
                                 >
                                     <div>

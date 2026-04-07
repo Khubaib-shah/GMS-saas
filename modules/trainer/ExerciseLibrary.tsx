@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -133,17 +133,16 @@ export function ExerciseLibrary() {
                 </div>
             </div>
 
-            {/* Controls */}
             <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary transition-colors" />
-                    <Input
-                        placeholder="Search exercises by name or muscle group..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="pl-12 h-14 bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
-                    />
-                </div>
+                <InputField
+                    hideLabel
+                    validateType="text"
+                    placeholder="Search exercises by name or muscle group..."
+                    value={search}
+                    onChange={(val) => setSearch(val)}
+                    leadingIcon={<Search className="w-5 h-5" />}
+                    className="h-14 bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
+                />
                 <Button variant="outline" className="h-14 px-6 rounded-2xl bg-slate-950/20 border-white/5 hover:border-primary/20 hover:bg-white/5 text-[11px] font-black italic uppercase tracking-widest gap-3">
                     <Filter className="w-4 h-4" />
                     Filters
@@ -154,7 +153,7 @@ export function ExerciseLibrary() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {loading ? (
                     [1, 2, 3, 4, 5, 6].map(i => (
-                        <div key={i} className="h-32 rounded-3xl bg-white/[0.02] border border-white/5 animate-pulse" />
+                        <div key={i} className="h-32 rounded-3xl bg-white/2 border border-white/5 animate-pulse" />
                     ))
                 ) : filtered.length > 0 ? (
                     filtered.map((ex) => (

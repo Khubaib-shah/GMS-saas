@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -268,31 +268,41 @@ export default function TrainerDetailPage({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Years of Experience</Label>
-                        <Input type="number" value={formData.experienceYears} onChange={(e) => setFormData({...formData, experienceYears: Number(e.target.value)})} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Hourly Rate ($)</Label>
-                        <Input type="number" value={formData.hourlyRate} onChange={(e) => setFormData({...formData, hourlyRate: Number(e.target.value)})} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Max Members / Slot</Label>
-                        <Input type="number" value={formData.maxMembersPerSlot} onChange={(e) => setFormData({...formData, maxMembersPerSlot: Number(e.target.value)})} />
-                    </div>
+                  <InputField
+                    label="Years of Experience"
+                    validateType="number"
+                    value={formData.experienceYears.toString()}
+                    onChange={(val) => setFormData({ ...formData, experienceYears: Number(val) })}
+                  />
+                  <InputField
+                    label="Hourly Rate ($)"
+                    validateType="number"
+                    value={formData.hourlyRate.toString()}
+                    onChange={(val) => setFormData({ ...formData, hourlyRate: Number(val) })}
+                  />
+                  <InputField
+                    label="Max Members / Slot"
+                    validateType="number"
+                    value={formData.maxMembersPerSlot.toString()}
+                    onChange={(val) => setFormData({ ...formData, maxMembersPerSlot: Number(val) })}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Bio</Label>
                   <Textarea value={formData.bio} onChange={(e) => setFormData({ ...formData, bio: e.target.value })} rows={4} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Specialties (comma separated)</Label>
-                  <Input value={formData.specialties} onChange={(e) => setFormData({ ...formData, specialties: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Certifications (comma separated)</Label>
-                  <Input value={formData.certifications} onChange={(e) => setFormData({ ...formData, certifications: e.target.value })} />
-                </div>
+                <InputField
+                  label="Specialties (comma separated)"
+                  validateType="text"
+                  value={formData.specialties}
+                  onChange={(val) => setFormData({ ...formData, specialties: val })}
+                />
+                <InputField
+                  label="Certifications (comma separated)"
+                  validateType="text"
+                  value={formData.certifications}
+                  onChange={(val) => setFormData({ ...formData, certifications: val })}
+                />
                 <div className="flex justify-end gap-2 pt-4">
                   <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
                   <Button onClick={handleUpdate}><Save className="w-4 h-4 mr-2" /> Save Changes</Button>

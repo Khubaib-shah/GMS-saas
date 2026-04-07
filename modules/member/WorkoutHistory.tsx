@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -52,21 +52,23 @@ export function WorkoutHistory() {
             </div>
 
             {/* Search */}
-            <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <Input
-                    placeholder="Search workout history..."
-                    className="pl-12 h-12 bg-white/5 border-white/5 rounded-2xl font-black italic uppercase tracking-widest text-[10px]"
-                />
-            </div>
+            <InputField
+                hideLabel
+                validateType="text"
+                placeholder="Search workout history..."
+                value={search}
+                onChange={(val) => setSearch(val)}
+                leadingIcon={<Search className="w-4 h-4" />}
+                className="h-12 bg-white/5 border-white/5 rounded-2xl font-black italic uppercase tracking-widest text-[10px]"
+            />
 
             {/* Log List */}
             <div className="space-y-4">
                 {loading ? (
-                    [1, 2, 3].map(i => <div key={i} className="h-24 rounded-2xl bg-white/[0.02] animate-pulse" />)
+                    [1, 2, 3].map(i => <div key={i} className="h-24 rounded-2xl bg-white/2 animate-pulse" />)
                 ) : logs.length > 0 ? (
                     logs.map((log) => (
-                        <Card key={log._id} className="bg-slate-950/20 border-white/5 p-6 hover:bg-white/[0.02] transition-colors group cursor-pointer relative overflow-hidden">
+                        <Card key={log._id} className="bg-slate-950/20 border-white/5 p-6 hover:bg-white/2 transition-colors group cursor-pointer relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-full bg-primary/5 -skew-x-12 translate-x-16 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                             <div className="flex items-center justify-between relative">

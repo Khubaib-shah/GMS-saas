@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -56,28 +55,43 @@ export function GeneralSettings() {
             <h3 className="text-lg font-semibold mb-4">General Settings</h3>
             <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Gym Name</Label>
-                        <Input value={data.name} onChange={e => setData({ ...data, name: e.target.value })} placeholder="My Gym" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Currency</Label>
-                        <Input value={data.currency} onChange={e => setData({ ...data, currency: e.target.value })} placeholder="USD" />
-                    </div>
+                    <InputField
+                        label="Gym Name"
+                        validateType="text"
+                        value={data.name}
+                        onChange={val => setData({ ...data, name: val })}
+                        placeholder="My Gym"
+                    />
+                    <InputField
+                        label="Currency"
+                        validateType="text"
+                        value={data.currency}
+                        onChange={val => setData({ ...data, currency: val })}
+                        placeholder="USD"
+                    />
                 </div>
-                <div className="space-y-2">
-                    <Label>Address</Label>
-                    <Input value={data.address} onChange={e => setData({ ...data, address: e.target.value })} placeholder="123 Main St" />
-                </div>
+                <InputField
+                    label="Address"
+                    validateType="text"
+                    value={data.address}
+                    onChange={val => setData({ ...data, address: val })}
+                    placeholder="123 Main St"
+                />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Timezone</Label>
-                        <Input value={data.timezone} onChange={e => setData({ ...data, timezone: e.target.value })} placeholder="UTC" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Logo URL</Label>
-                        <Input value={data.logo} onChange={e => setData({ ...data, logo: e.target.value })} placeholder="https://..." />
-                    </div>
+                    <InputField
+                        label="Timezone"
+                        validateType="text"
+                        value={data.timezone}
+                        onChange={val => setData({ ...data, timezone: val })}
+                        placeholder="UTC"
+                    />
+                    <InputField
+                        label="Logo URL"
+                        validateType="text"
+                        value={data.logo}
+                        onChange={val => setData({ ...data, logo: val })}
+                        placeholder="https://..."
+                    />
                 </div>
                 <div className="pt-4 border-t border-border">
                     <Button onClick={handleSave} disabled={saving}>

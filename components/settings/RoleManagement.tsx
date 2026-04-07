@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -161,23 +161,22 @@ export function RoleManagement() {
                         </DialogHeader>
 
                         <div className="space-y-4 py-2">
-                            <div className="space-y-2">
-                                <Label>Role Name</Label>
-                                <Input
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="e.g. shift_supervisor"
-                                    disabled={editingRole?.isSystemRole}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Description</Label>
-                                <Input
-                                    value={formData.description}
-                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="What this role is for"
-                                />
-                            </div>
+                            <InputField
+                                label="Role Name"
+                                validateType="text"
+                                value={formData.name}
+                                onChange={val => setFormData({ ...formData, name: val })}
+                                placeholder="e.g. shift_supervisor"
+                                disabled={editingRole?.isSystemRole}
+                                required
+                            />
+                            <InputField
+                                label="Description"
+                                validateType="text"
+                                value={formData.description}
+                                onChange={val => setFormData({ ...formData, description: val })}
+                                placeholder="What this role is for"
+                            />
 
                             {/* Permission Matrix */}
                             <div className="space-y-3">

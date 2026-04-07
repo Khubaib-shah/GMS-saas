@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/lib/store";
 import { Scan, RotateCcw, Camera, Keyboard } from "lucide-react";
@@ -177,11 +177,13 @@ export function AttendanceScanner() {
       ) : (
         <>
           <form onSubmit={handleManualScan} className="flex gap-2">
-            <Input
+            <InputField
               ref={inputRef}
+              hideLabel
+              validateType="text"
               placeholder="Scan or type Member ID..."
               value={scanValue}
-              onChange={(e) => setScanValue(e.target.value)}
+              onChange={(val) => setScanValue(val)}
               disabled={loading}
               autoComplete="off"
             />

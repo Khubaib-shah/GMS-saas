@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { toast } from "sonner";
 import Link from "next/link";
 import { WorkoutPlanBuilder } from "@/components/workout-plan-builder";
@@ -95,24 +95,24 @@ export default function WorkoutPlansPage() {
 
             {/* Search & Filters */}
             <div className="flex flex-col md:flex-row gap-4 items-center">
-                <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <Input
-                        placeholder="SEARCH PLANS..."
-                        className="h-14 pl-12 rounded-2xl bg-card border-none shadow-xl shadow-foreground/[0.02] focus-visible:ring-primary"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
+                <InputField
+                    hideLabel
+                    validateType="text"
+                    placeholder="SEARCH PLANS..."
+                    value={searchQuery}
+                    onChange={(val) => setSearchQuery(val)}
+                    leadingIcon={<Search className="w-5 h-5" />}
+                    className="h-14 rounded-2xl bg-card border-none shadow-xl shadow-foreground/2 focus-visible:ring-primary"
+                />
             </div>
 
             {/* Main Grid */}
             {filteredPlans.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredPlans.map((plan) => (
-                        <Card key={plan._id || plan.id} className="group relative overflow-hidden border-none shadow-xl shadow-foreground/[0.03] bg-card hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
+                        <Card key={plan._id || plan.id} className="group relative overflow-hidden border-none shadow-xl shadow-foreground/3 bg-card hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
                             {/* Accent Line */}
-                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
 
                             <div className="p-6 space-y-6">
                                 <div className="flex items-start justify-between">
@@ -202,7 +202,7 @@ export default function WorkoutPlansPage() {
             <Card className="p-6 bg-primary/5 border-primary/10 overflow-hidden relative">
                 <div className="absolute right-0 top-0 w-32 h-full bg-primary/10 -skew-x-12 translate-x-12" />
                 <div className="relative flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
                         <Info className="w-5 h-5" />
                     </div>
                     <div>

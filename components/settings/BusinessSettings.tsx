@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -55,26 +54,41 @@ export function BusinessSettings() {
             <h3 className="text-lg font-semibold mb-4">Business Settings</h3>
             <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Tax Percentage (%)</Label>
-                        <Input type="number" min={0} max={100} value={data.taxPercentage} onChange={e => setData({ ...data, taxPercentage: parseFloat(e.target.value) || 0 })} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Joining Fee</Label>
-                        <Input type="number" min={0} value={data.joiningFee} onChange={e => setData({ ...data, joiningFee: parseFloat(e.target.value) || 0 })} />
-                    </div>
+                    <InputField
+                        label="Tax Percentage (%)"
+                        validateType="number"
+                        min={0}
+                        max={100}
+                        value={data.taxPercentage.toString()}
+                        onChange={val => setData({ ...data, taxPercentage: parseFloat(val) || 0 })}
+                    />
+                    <InputField
+                        label="Joining Fee"
+                        validateType="number"
+                        min={0}
+                        value={data.joiningFee.toString()}
+                        onChange={val => setData({ ...data, joiningFee: parseFloat(val) || 0 })}
+                    />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Auto-Expire Days</Label>
-                        <Input type="number" min={0} max={365} value={data.autoExpireDays} onChange={e => setData({ ...data, autoExpireDays: parseInt(e.target.value) || 0 })} />
-                        <p className="text-xs text-muted-foreground">Days after which expired subscriptions are auto-archived (0 = disabled)</p>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Grace Period Days</Label>
-                        <Input type="number" min={0} max={90} value={data.gracePeriodDays} onChange={e => setData({ ...data, gracePeriodDays: parseInt(e.target.value) || 0 })} />
-                        <p className="text-xs text-muted-foreground">Days after expiry before membership is suspended</p>
-                    </div>
+                    <InputField
+                        label="Auto-Expire Days"
+                        validateType="number"
+                        min={0}
+                        max={365}
+                        value={data.autoExpireDays.toString()}
+                        onChange={val => setData({ ...data, autoExpireDays: parseInt(val) || 0 })}
+                        description="Days after which expired subscriptions are auto-archived (0 = disabled)"
+                    />
+                    <InputField
+                        label="Grace Period Days"
+                        validateType="number"
+                        min={0}
+                        max={90}
+                        value={data.gracePeriodDays.toString()}
+                        onChange={val => setData({ ...data, gracePeriodDays: parseInt(val) || 0 })}
+                        description="Days after expiry before membership is suspended"
+                    />
                 </div>
                 <div className="pt-4 border-t border-border">
                     <Button onClick={handleSave} disabled={saving}>

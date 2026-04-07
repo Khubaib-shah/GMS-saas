@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Trash2, Plus, Clock, Calendar } from "lucide-react";
@@ -90,19 +90,28 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
             </select>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Start Time</Label>
-              <Input type="time" value={newAvail.startTime} onChange={(e) => setNewAvail({ ...newAvail, startTime: e.target.value })} />
-            </div>
-            <div className="space-y-2">
-              <Label>End Time</Label>
-              <Input type="time" value={newAvail.endTime} onChange={(e) => setNewAvail({ ...newAvail, endTime: e.target.value })} />
-            </div>
+            <InputField
+              label="Start Time"
+              type="time"
+              validateType="text"
+              value={newAvail.startTime}
+              onChange={(val) => setNewAvail({ ...newAvail, startTime: val })}
+            />
+            <InputField
+              label="End Time"
+              type="time"
+              validateType="text"
+              value={newAvail.endTime}
+              onChange={(val) => setNewAvail({ ...newAvail, endTime: val })}
+            />
           </div>
-          <div className="space-y-2">
-            <Label>Slot Duration (minutes)</Label>
-            <Input type="number" value={newAvail.slotDurationMinutes} onChange={(e) => setNewAvail({ ...newAvail, slotDurationMinutes: Number(e.target.value) })} />
-          </div>
+          <InputField
+            label="Slot Duration (minutes)"
+            type="number"
+            validateType="number"
+            value={String(newAvail.slotDurationMinutes)}
+            onChange={(val) => setNewAvail({ ...newAvail, slotDurationMinutes: Number(val) })}
+          />
           <Button className="w-full" onClick={handleAdd} disabled={loading}>Add Entry</Button>
         </CardContent>
       </Card>

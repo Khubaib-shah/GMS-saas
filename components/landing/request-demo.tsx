@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { CheckCircle2, ArrowRight, Loader2 } from 'lucide-react'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
+import { InputField } from '@/components/ui/input-field'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Label } from '../ui/label'
 
 type FormData = {
     firstName: string
@@ -132,54 +132,50 @@ export const RequestDemo = () => {
 
                                 <form className="space-y-5" onSubmit={handleSubmit}>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="firstName" className="text-slate-400">First Name</Label>
-                                            <Input
-                                                id="firstName"
-                                                placeholder="John"
-                                                required
-                                                value={formData.firstName}
-                                                onChange={handleChange}
-                                                className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="lastName" className="text-slate-400">Last Name</Label>
-                                            <Input
-                                                id="lastName"
-                                                placeholder="Doe"
-                                                required
-                                                value={formData.lastName}
-                                                onChange={handleChange}
-                                                className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email" className="text-slate-400">Work Email</Label>
-                                        <Input
-                                            type="email"
-                                            id="email"
-                                            placeholder="john@elitefitness.com"
+                                        <InputField
+                                            id="firstName"
+                                            label="First Name"
+                                            validateType="name"
+                                            placeholder="John"
                                             required
-                                            value={formData.email}
-                                            onChange={handleChange}
+                                            value={formData.firstName}
+                                            onChange={(val) => setFormData(prev => ({ ...prev, firstName: val }))}
+                                            className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
+                                        />
+                                        <InputField
+                                            id="lastName"
+                                            label="Last Name"
+                                            validateType="name"
+                                            placeholder="Doe"
+                                            required
+                                            value={formData.lastName}
+                                            onChange={(val) => setFormData(prev => ({ ...prev, lastName: val }))}
                                             className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
                                         />
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <Label htmlFor="gymName" className="text-slate-400">Gym or Studio Name</Label>
-                                        <Input
-                                            id="gymName"
-                                            placeholder="Elite Fitness Studio"
-                                            required
-                                            value={formData.gymName}
-                                            onChange={handleChange}
-                                            className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
-                                        />
-                                    </div>
+                                    <InputField
+                                        type="email"
+                                        id="email"
+                                        label="Work Email"
+                                        validateType="email"
+                                        placeholder="john@elitefitness.com"
+                                        required
+                                        value={formData.email}
+                                        onChange={(val) => setFormData(prev => ({ ...prev, email: val }))}
+                                        className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
+                                    />
+
+                                    <InputField
+                                        id="gymName"
+                                        label="Gym or Studio Name"
+                                        validateType="text"
+                                        placeholder="Elite Fitness Studio"
+                                        required
+                                        value={formData.gymName}
+                                        onChange={(val) => setFormData(prev => ({ ...prev, gymName: val }))}
+                                        className="bg-white/5 border-white/10 focus-visible:ring-primary h-12 text-white"
+                                    />
 
                                     <div className="space-y-2">
                                         <Label htmlFor="members" className="text-slate-400">Estimated Active Members</Label>

@@ -15,7 +15,7 @@ import {
     Info
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import {
@@ -196,15 +196,13 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                     {/* Left Panel: Plan Meta & Exercise Browser */}
                     <div className="w-full md:w-[380px] shrink-0 border-r border-white/5 bg-slate-950/10 p-8 space-y-10 overflow-y-auto custom-scrollbar">
                         <div className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic block">PLAN NAME</label>
-                                <Input
-                                    placeholder="e.g., Strength Training (Core)"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="bg-white/5 border-transparent focus:border-primary/50 font-bold uppercase tracking-tighter italic h-12 rounded-xl"
-                                />
-                            </div>
+                            <InputField
+                                label="Plan Name"
+                                validateType="text"
+                                placeholder="e.g., Strength Training (Core)"
+                                value={name}
+                                onChange={(val) => setName(val)}
+                            />
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic block">PLAN OBJECTIVE</label>
                                 <Textarea
@@ -217,22 +215,21 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                         </div>
 
                         <div className="space-y-4 pt-4 border-t border-white/5">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic block">EXERCISE LIBRARY</label>
-                            <div className="relative group">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
-                                <Input
-                                    placeholder="SEARCH EXERCISES..."
-                                    value={exerciseSearch}
-                                    onChange={(e) => setExerciseSearch(e.target.value)}
-                                    className="pl-10 h-10 bg-white/5 border-transparent focus:border-primary/50 text-[10px] font-bold rounded-lg"
-                                />
-                            </div>
+                            <InputField
+                                label="Exercise Library"
+                                validateType="text"
+                                placeholder="SEARCH EXERCISES..."
+                                value={exerciseSearch}
+                                onChange={(val) => setExerciseSearch(val)}
+                                leadingIcon={<Search className="w-4 h-4" />}
+                                className="h-10 bg-white/5 border-transparent focus:border-primary/50 text-[10px] font-bold rounded-lg"
+                            />
 
                             <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                                 {filteredExercises.map(ex => (
                                     <Card
                                         key={ex.id || ex._id}
-                                        className="p-3 bg-white/[0.03] border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer group"
+                                        className="p-3 bg-white/3 border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer group"
                                         onClick={() => handleAddExercise(activeTab, ex)}
                                     >
                                         <div className="flex items-center justify-between">
@@ -289,7 +286,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
 
                                         <div className="space-y-4 overflow-y-auto">
                                             {schedule.find(d => d.day === day.id)?.exercises.map((ex: any, idx: number) => (
-                                                <Card key={`${day.id}-${idx}`} className="p-4 bg-white/[0.02] border-white/5 hover:border-primary/20 transition-all group overflow-hidden relative">
+                                                <Card key={`${day.id}-${idx}`} className="p-4 bg-white/2 border-white/5 hover:border-primary/20 transition-all group overflow-hidden relative">
                                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary transform -translate-x-full group-hover:translate-x-0 transition-transform"></div>
 
                                                     <div className="flex flex-col lg:flex-row lg:items-center gap-6">
@@ -307,39 +304,31 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                         </div>
 
                                                         <div className="flex items-center gap-4 flex-wrap">
-                                                            <div className="space-y-1">
-                                                                <span className="text-[8px] font-black text-slate-600 uppercase block tracking-widest pl-1">SETS</span>
-                                                                <Input
-                                                                    type="number"
-                                                                    className="w-16 h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
-                                                                    value={ex.sets}
-                                                                    onChange={(e) => handleUpdateExercise(day.id, idx, { sets: e.target.value })}
-                                                                />
-                                                            </div>
-                                                            <div className="space-y-1">
-                                                                <span className="text-[8px] font-black text-slate-600 uppercase block tracking-widest pl-1">REPS</span>
-                                                                <Input
-                                                                    className="w-20 h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg uppercase"
-                                                                    value={ex.reps}
-                                                                    onChange={(e) => handleUpdateExercise(day.id, idx, { reps: e.target.value })}
-                                                                />
-                                                            </div>
-                                                            <div className="space-y-1">
-                                                                <span className="text-[8px] font-black text-slate-600 uppercase block tracking-widest pl-1">REST</span>
-                                                                <div className="relative">
-                                                                    <Input
-                                                                        type="number"
-                                                                        className="w-20 h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg pr-7"
-                                                                        value={ex.restSeconds}
-                                                                        onChange={(e) => handleUpdateExercise(day.id, idx, { restSeconds: e.target.value })}
-                                                                    />
-                                                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-black text-slate-600 uppercase italic">S</span>
-                                                                </div>
-                                                            </div>
+                                                            <InputField
+                                                                label="SETS"
+                                                                validateType="number"
+                                                                className="w-16 h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
+                                                                value={ex.sets.toString()}
+                                                                onChange={(val) => handleUpdateExercise(day.id, idx, { sets: val })}
+                                                            />
+                                                            <InputField
+                                                                label="REPS"
+                                                                validateType="text"
+                                                                className="w-20 h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg uppercase"
+                                                                value={ex.reps}
+                                                                onChange={(val) => handleUpdateExercise(day.id, idx, { reps: val })}
+                                                            />
+                                                            <InputField
+                                                                label="REST (S)"
+                                                                validateType="number"
+                                                                className="w-24 h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
+                                                                value={ex.restSeconds.toString()}
+                                                                onChange={(val) => handleUpdateExercise(day.id, idx, { restSeconds: val })}
+                                                            />
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-10 w-10 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl"
+                                                                className="h-10 w-10 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl mt-4"
                                                                 onClick={() => handleRemoveExercise(day.id, idx)}
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
@@ -350,7 +339,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                             ))}
 
                                             {(!schedule.find(d => d.day === day.id)?.exercises.length) && (
-                                                <div className="py-20 flex flex-col items-center border border-dashed border-white/10 rounded-3xl bg-white/[0.01]">
+                                                <div className="py-20 flex flex-col items-center border border-dashed border-white/10 rounded-3xl bg-white/1">
                                                     <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
                                                         <Dumbbell className="w-8 h-8 text-slate-700" />
                                                     </div>

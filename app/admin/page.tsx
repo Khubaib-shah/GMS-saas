@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { InputField } from "@/components/ui/input-field"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -177,71 +177,59 @@ export default function AdminDashboard() {
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="gymName">Gym Name</Label>
-                    <Input
-                      id="gymName"
-                      required
-                      value={formData.gymName}
-                      onChange={(e) => setFormData({ ...formData, gymName: e.target.value })}
-                      placeholder="Empire Fitness"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="gymPhone">Gym Phone</Label>
-                    <Input
-                      id="gymPhone"
-                      value={formData.gymPhone}
-                      onChange={(e) => setFormData({ ...formData, gymPhone: e.target.value })}
-                      placeholder="+1 234 567 890"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="gymAddress">Address</Label>
-                  <Input
-                    id="gymAddress"
-                    value={formData.gymAddress}
-                    onChange={(e) => setFormData({ ...formData, gymAddress: e.target.value })}
-                    placeholder="123 Street Name, City"
+                  <InputField
+                    label="Gym Name"
+                    validateType="text"
+                    required
+                    value={formData.gymName}
+                    onChange={(val) => setFormData({ ...formData, gymName: val })}
+                    placeholder="Empire Fitness"
+                  />
+                  <InputField
+                    label="Gym Phone"
+                    validateType="phone"
+                    value={formData.gymPhone}
+                    onChange={(val) => setFormData({ ...formData, gymPhone: val })}
+                    placeholder="+1 234 567 890"
                   />
                 </div>
+                <InputField
+                  label="Address"
+                  validateType="text"
+                  value={formData.gymAddress}
+                  onChange={(val) => setFormData({ ...formData, gymAddress: val })}
+                  placeholder="123 Street Name, City"
+                />
 
                 <div className="border-t pt-4 mt-2">
                   <h4 className="text-sm font-semibold mb-3">Owner Details</h4>
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="ownerName">Full Name</Label>
-                      <Input
-                        id="ownerName"
-                        required
-                        value={formData.ownerName}
-                        onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
-                        placeholder="John Doe"
-                      />
-                    </div>
+                    <InputField
+                      label="Full Name"
+                      validateType="name"
+                      required
+                      value={formData.ownerName}
+                      onChange={(val) => setFormData({ ...formData, ownerName: val })}
+                      placeholder="John Doe"
+                    />
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="ownerEmail">Email</Label>
-                        <Input
-                          id="ownerEmail"
-                          type="email"
-                          required
-                          value={formData.ownerEmail}
-                          onChange={(e) => setFormData({ ...formData, ownerEmail: e.target.value })}
-                          placeholder="owner@gym.com"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="ownerPassword">Password</Label>
-                        <Input
-                          id="ownerPassword"
-                          type="password"
-                          required
-                          value={formData.ownerPassword}
-                          onChange={(e) => setFormData({ ...formData, ownerPassword: e.target.value })}
-                        />
-                      </div>
+                      <InputField
+                        label="Email"
+                        validateType="email"
+                        type="email"
+                        required
+                        value={formData.ownerEmail}
+                        onChange={(val) => setFormData({ ...formData, ownerEmail: val })}
+                        placeholder="owner@gym.com"
+                      />
+                      <InputField
+                        label="Password"
+                        validateType="password"
+                        type="password"
+                        required
+                        value={formData.ownerPassword}
+                        onChange={(val) => setFormData({ ...formData, ownerPassword: val })}
+                      />
                     </div>
                   </div>
                 </div>

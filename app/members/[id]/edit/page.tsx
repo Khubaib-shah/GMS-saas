@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, Upload } from "lucide-react";
 import { useAppStore } from "@/lib/store";
@@ -172,61 +172,47 @@ export default function EditMemberPage({
 
           {/* Name Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                First Name *
-              </label>
-              <Input
-                placeholder="John"
-                value={formData.firstName}
-                onChange={(e) =>
-                  setFormData({ ...formData, firstName: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Last Name
-              </label>
-              <Input
-                placeholder="Doe"
-                value={formData.lastName}
-                onChange={(e) =>
-                  setFormData({ ...formData, lastName: e.target.value })
-                }
-              />
-            </div>
+            <InputField
+              label="First Name"
+              validateType="name"
+              placeholder="John"
+              value={formData.firstName}
+              onChange={(val) =>
+                setFormData({ ...formData, firstName: val })
+              }
+              required
+            />
+            <InputField
+              label="Last Name"
+              validateType="name"
+              placeholder="Doe"
+              value={formData.lastName}
+              onChange={(val) =>
+                setFormData({ ...formData, lastName: val })
+              }
+            />
           </div>
 
           {/* Contact Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Email
-              </label>
-              <Input
-                type="email"
-                placeholder="john@example.com"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Phone Number
-              </label>
-              <Input
-                type="tel"
-                placeholder="+1-234-567-8900"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-              />
-            </div>
+            <InputField
+              label="Email"
+              validateType="email"
+              placeholder="john@example.com"
+              value={formData.email}
+              onChange={(val) =>
+                setFormData({ ...formData, email: val })
+              }
+            />
+            <InputField
+              label="Phone Number"
+              validateType="phone"
+              placeholder="+92 XXX XXXXXXX"
+              value={formData.phone}
+              onChange={(val) =>
+                setFormData({ ...formData, phone: val })
+              }
+            />
           </div>
 
           {/* Gender & Plan */}

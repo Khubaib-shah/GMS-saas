@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Bell, Search, ChevronDown, CreditCard, UserPlus, AlertTriangle, Menu, X, Moon, Sun, Activity } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { InputField } from "@/components/ui/input-field"
 import { Button } from "@/components/ui/button"
 import { useSession, signOut } from "next-auth/react"
 import { useAppStore } from "@/lib/store"
@@ -156,15 +156,15 @@ export function Navbar() {
         )}
         {/* Search Bar - Subtler */}
         <div data-tour="navbar-search" className="flex-1 max-w-sm hidden md:block">
-          <div className="relative group">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500 group-hover:text-primary transition-colors" />
-            <Input
-              placeholder="SEARCH DASHBOARD..."
-              className="pl-10 h-10 bg-black/5 dark:bg-white/5 border-transparent focus:bg-black/10 dark:focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 w-[200px] lg:w-[300px] rounded-xl"
-              value={store.searchQuery}
-              onChange={(e) => store.setSearchQuery(e.target.value)}
-            />
-          </div>
+          <InputField
+            hideLabel
+            validateType="text"
+            placeholder="SEARCH DASHBOARD..."
+            className="h-10 bg-black/5 dark:bg-white/5 border-transparent focus:bg-black/10 dark:focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 w-[200px] lg:w-[300px] rounded-xl"
+            value={store.searchQuery}
+            onChange={(val) => store.setSearchQuery(val)}
+            leadingIcon={<Search className="w-4 h-4" />}
+          />
         </div>
       </div>
 

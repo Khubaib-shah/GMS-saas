@@ -6,7 +6,6 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
   Select,
@@ -20,6 +19,7 @@ import { useAppStore } from "@/lib/store";
 import { type Member } from "@/lib/types";
 import { fileToBase64 } from "@/lib/utils/file-utils";
 import { toast } from "sonner";
+import { InputField } from "@/components/ui/input-field";
 
 export default function AddMemberPage() {
   const router = useRouter();
@@ -212,65 +212,47 @@ export default function AddMemberPage() {
 
             {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  First Name *
-                </label>
-                <Input
-                  placeholder="EX: JOHN"
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, firstName: e.target.value.toUpperCase() })
-                  }
-                  required
-                  className="h-12 bg-white/5 border-transparent focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  Last Name
-                </label>
-                <Input
-                  placeholder="EX: DOE"
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, lastName: e.target.value.toUpperCase() })
-                  }
-                  className="h-12 bg-white/5 border-transparent focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-xl"
-                />
-              </div>
+              <InputField
+                label="First Name"
+                validateType="name"
+                placeholder="EX: JOHN"
+                value={formData.firstName}
+                onChange={(val) =>
+                  setFormData({ ...formData, firstName: val.toUpperCase() })
+                }
+                required
+              />
+              <InputField
+                label="Last Name"
+                validateType="name"
+                placeholder="EX: DOE"
+                value={formData.lastName}
+                onChange={(val) =>
+                  setFormData({ ...formData, lastName: val.toUpperCase() })
+                }
+              />
             </div>
 
             {/* Contact Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  Email Address
-                </label>
-                <Input
-                  type="email"
-                  placeholder="user@example.com"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="h-12 bg-white/5 border-transparent focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider transition-all duration-300 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-                  Phone Number
-                </label>
-                <Input
-                  type="tel"
-                  placeholder="+92 XXX XXXXXXX"
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  className="h-12 bg-white/5 border-transparent focus:bg-white/10 focus:border-primary/50 text-[11px] font-bold tracking-wider transition-all duration-300 rounded-xl"
-                />
-              </div>
+              <InputField
+                label="Email Address"
+                validateType="email"
+                placeholder="user@example.com"
+                value={formData.email}
+                onChange={(val) =>
+                  setFormData({ ...formData, email: val })
+                }
+              />
+              <InputField
+                label="Phone Number"
+                validateType="phone"
+                placeholder="+92 XXX XXXXXXX"
+                value={formData.phone}
+                onChange={(val) =>
+                  setFormData({ ...formData, phone: val })
+                }
+              />
             </div>
 
             {/* Gender & Plan */}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -127,41 +127,34 @@ export default function MemberLoginPage() {
                         <div className="p-8">
                             <TabsContent value="password" m-0>
                                 <form onSubmit={handleEmailPasswordLogin} className="space-y-6">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</Label>
-                                        <div className="relative group">
-                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
-                                            <Input
-                                                id="email"
-                                                type="email"
-                                                placeholder="ACCESS@GYMFLOW.COM"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                className="pl-12 bg-white/5 border-border text-white font-bold h-12 rounded-xl focus:bg-white/10 transition-all"
-                                                autoFocus
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="password" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</Label>
-                                        <div className="relative group">
-                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
-                                            <Input
-                                                id="password"
-                                                type={showPassword ? "text" : "password"}
-                                                placeholder="••••••••"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                className="pl-12 pr-12 bg-white/5 border-border text-white font-bold h-12 rounded-xl focus:bg-white/10 transition-all"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
-                                            >
-                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                            </button>
-                                        </div>
+                                    <InputField
+                                        label="Email Address"
+                                        validateType="email"
+                                        placeholder="ACCESS@GYMFLOW.COM"
+                                        value={email}
+                                        onChange={(val) => setEmail(val)}
+                                        leadingIcon={<Mail className="h-4 w-4" />}
+                                        required
+                                        autoFocus
+                                    />
+                                    <div className="relative group/password-member">
+                                        <InputField
+                                            label="Password"
+                                            validateType="password"
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="••••••••"
+                                            value={password}
+                                            onChange={(val) => setPassword(val)}
+                                            leadingIcon={<Lock className="h-4 w-4" />}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-[42px] -translate-y-1/2 text-slate-500 hover:text-white transition-colors z-20"
+                                        >
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
                                     </div>
                                     <Button
                                         type="submit"
@@ -176,41 +169,35 @@ export default function MemberLoginPage() {
 
                             <TabsContent value="pin">
                                 <form onSubmit={handlePinLogin} className="space-y-6">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="pin-email" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</Label>
-                                        <div className="relative group">
-                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
-                                            <Input
-                                                id="pin-email"
-                                                type="email"
-                                                placeholder="ACCESS@GYMFLOW.COM"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                className="pl-12 bg-white/5 border-white/10 text-white font-bold h-12 rounded-xl focus:bg-white/10 transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="pin" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Enter PIN</Label>
-                                        <div className="relative group">
-                                            <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary transition-colors" />
-                                            <Input
-                                                id="pin"
-                                                type={showPin ? "text" : "password"}
-                                                placeholder="••••"
-                                                maxLength={6}
-                                                value={pin}
-                                                onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
-                                                className="pl-12 pr-12 bg-white/5 border-white/10 text-white font-bold text-2xl tracking-[0.5em] h-14 rounded-xl focus:bg-white/10 text-center transition-all"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPin(!showPin)}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
-                                            >
-                                                {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                            </button>
-                                        </div>
+                                    <InputField
+                                        label="Email Address"
+                                        validateType="email"
+                                        placeholder="ACCESS@GYMFLOW.COM"
+                                        value={email}
+                                        onChange={(val) => setEmail(val)}
+                                        leadingIcon={<Mail className="h-4 w-4" />}
+                                        required
+                                    />
+                                    <div className="relative group/pin-member">
+                                        <InputField
+                                            label="Enter PIN"
+                                            validateType="number"
+                                            type={showPin ? "text" : "password"}
+                                            placeholder="••••"
+                                            maxLength={6}
+                                            value={pin}
+                                            onChange={(val) => setPin(val.replace(/\D/g, ""))}
+                                            leadingIcon={<Hash className="h-4 w-4" />}
+                                            className="font-bold text-2xl tracking-[0.5em] h-14 text-center"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPin(!showPin)}
+                                            className="absolute right-4 top-[44px] -translate-y-1/2 text-slate-500 hover:text-white transition-colors z-20"
+                                        >
+                                            {showPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
                                     </div>
                                     <Button
                                         type="submit"

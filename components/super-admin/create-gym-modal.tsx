@@ -9,7 +9,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import {
     Select,
@@ -99,24 +99,21 @@ export function CreateGymModal({ isOpen, onClose, onSuccess }: CreateGymModalPro
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[500px] bg-[#0d0d14] border-white/[0.08] text-white">
+            <DialogContent className="sm:max-w-[500px] bg-[#0d0d14] border-white/8 text-white">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold">Create New Gym</DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="gymName">Gym Name *</Label>
-                            <Input
-                                id="gymName"
-                                placeholder="Enter gym name"
-                                required
-                                value={formData.gymName}
-                                onChange={(e) => setFormData({ ...formData, gymName: e.target.value })}
-                                className="bg-white/[0.04] border-white/[0.08]"
-                            />
-                        </div>
+                        <InputField
+                            label="Gym Name"
+                            validateType="text"
+                            placeholder="Enter gym name"
+                            required
+                            value={formData.gymName}
+                            onChange={(val) => setFormData({ ...formData, gymName: val })}
+                        />
                         <div className="space-y-2 w-full">
                             <Label htmlFor="planId">Platform Plan *</Label>
                             <Select
@@ -124,10 +121,10 @@ export function CreateGymModal({ isOpen, onClose, onSuccess }: CreateGymModalPro
                                 onValueChange={(value) => setFormData({ ...formData, planId: value })}
 
                             >
-                                <SelectTrigger className="bg-white/[0.04] border-white/[0.08] w-full">
+                                <SelectTrigger className="bg-white/4 border-white/8 w-full">
                                     <SelectValue placeholder="Select plan" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1a1a24] border-white/[0.08] text-white">
+                                <SelectContent className="bg-[#1a1a24] border-white/8 text-white">
                                     {plans.map((plan) => (
                                         <SelectItem key={plan._id} value={plan._id}>
                                             {plan.name}
@@ -139,98 +136,74 @@ export function CreateGymModal({ isOpen, onClose, onSuccess }: CreateGymModalPro
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="ownerName">Owner Name *</Label>
-                            <Input
-                                id="ownerName"
-                                placeholder="Full name"
-                                required
-                                value={formData.ownerName}
-                                onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
-                                className="bg-white/[0.04] border-white/[0.08]"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="ownerEmail">Owner Email *</Label>
-                            <Input
-                                id="ownerEmail"
-                                type="email"
-                                placeholder="email@example.com"
-                                required
-                                value={formData.ownerEmail}
-                                onChange={(e) => setFormData({ ...formData, ownerEmail: e.target.value })}
-                                className="bg-white/[0.04] border-white/[0.08]"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="ownerPassword">Owner Password *</Label>
-                        <Input
-                            id="ownerPassword"
-                            type="password"
-                            placeholder="Minimum 6 characters"
+                        <InputField
+                            label="Owner Name"
+                            validateType="text"
+                            placeholder="Full name"
                             required
-                            minLength={6}
-                            value={formData.ownerPassword}
-                            onChange={(e) => setFormData({ ...formData, ownerPassword: e.target.value })}
-                            className="bg-white/[0.04] border-white/[0.08]"
+                            value={formData.ownerName}
+                            onChange={(val) => setFormData({ ...formData, ownerName: val })}
+                        />
+                        <InputField
+                            label="Owner Email"
+                            validateType="email"
+                            placeholder="email@example.com"
+                            required
+                            value={formData.ownerEmail}
+                            onChange={(val) => setFormData({ ...formData, ownerEmail: val })}
                         />
                     </div>
+
+                    <InputField
+                        label="Owner Password"
+                        validateType="password"
+                        placeholder="Minimum 6 characters"
+                        required
+                        minLength={6}
+                        value={formData.ownerPassword}
+                        onChange={(val) => setFormData({ ...formData, ownerPassword: val })}
+                    />
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="city">City</Label>
-                            <Input
-                                id="city"
-                                placeholder="e.g. Karachi"
-                                value={formData.city}
-                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                className="bg-white/[0.04] border-white/[0.08]"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Phone</Label>
-                            <Input
-                                id="phone"
-                                placeholder="e.g. 0300-1234567"
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                className="bg-white/[0.04] border-white/[0.08]"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="address">Full Address</Label>
-                        <Input
-                            id="address"
-                            placeholder="Gym physical location"
-                            value={formData.address}
-                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            className="bg-white/[0.04] border-white/[0.08]"
+                        <InputField
+                            label="City"
+                            validateType="text"
+                            placeholder="e.g. Karachi"
+                            value={formData.city}
+                            onChange={(val) => setFormData({ ...formData, city: val })}
+                        />
+                        <InputField
+                            label="Phone"
+                            validateType="phone"
+                            placeholder="e.g. 03001234567"
+                            value={formData.phone}
+                            onChange={(val) => setFormData({ ...formData, phone: val })}
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="trialDays">Trial Period (Days)</Label>
-                        <Input
-                            id="trialDays"
-                            type="number"
-                            min="0"
-                            placeholder="14"
-                            value={formData.trialDays}
-                            onChange={(e) => setFormData({ ...formData, trialDays: parseInt(e.target.value) || 0 })}
-                            className="bg-white/[0.04] border-white/[0.08]"
-                        />
-                    </div>
+                    <InputField
+                        label="Full Address"
+                        validateType="text"
+                        placeholder="Gym physical location"
+                        value={formData.address}
+                        onChange={(val) => setFormData({ ...formData, address: val })}
+                    />
+
+                    <InputField
+                        label="Trial Period (Days)"
+                        validateType="number"
+                        min="0"
+                        placeholder="14"
+                        value={formData.trialDays.toString()}
+                        onChange={(val) => setFormData({ ...formData, trialDays: parseInt(val) || 0 })}
+                    />
 
                     <DialogFooter className="pt-4">
                         <Button
                             type="button"
                             variant="outline"
                             onClick={onClose}
-                            className="border-white/[0.08] hover:bg-white/[0.04]"
+                            className="border-white/8 hover:bg-white/4"
                         >
                             Cancel
                         </Button>

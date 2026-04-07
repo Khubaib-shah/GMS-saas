@@ -33,7 +33,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
+import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -537,30 +537,27 @@ export default function SubscriptionsPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-name">Plan Name</Label>
-              <Input
-                id="edit-name"
-                value={editFormData?.name || ""}
-                onChange={(e) =>
-                  setEditFormData({ ...editFormData, name: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-price">Price</Label>
-              <Input
-                id="edit-price"
-                type="number"
-                value={editFormData?.price ?? ""}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    price: e.target.value === "" ? "" : Number(e.target.value),
-                  })
-                }
-              />
-            </div>
+            <InputField
+              label="Plan Name"
+              validateType="text"
+              value={editFormData?.name || ""}
+              onChange={(val) =>
+                setEditFormData({ ...editFormData, name: val })
+              }
+              required
+            />
+            <InputField
+              label="Price"
+              validateType="number"
+              value={editFormData?.price?.toString() ?? ""}
+              onChange={(val) =>
+                setEditFormData({
+                  ...editFormData,
+                  price: val === "" ? "" : Number(val),
+                })
+              }
+              required
+            />
             <div className="space-y-2">
               <Label htmlFor="edit-description">Description</Label>
               <Textarea
@@ -613,59 +610,51 @@ export default function SubscriptionsPage() {
                 </select>
               </div>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="id">Plan ID (Unique)</Label>
-              <Input
-                id="id"
-                value={addFormData.id}
-                onChange={(e) =>
-                  setAddFormData({ ...addFormData, id: e.target.value })
-                }
-                placeholder="e.g. plan_gold"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Plan Name</Label>
-              <Input
-                id="name"
-                value={addFormData.name}
-                onChange={(e) =>
-                  setAddFormData({ ...addFormData, name: e.target.value })
-                }
-                placeholder="Gold Plan"
-              />
-            </div>
+            <InputField
+              label="Plan ID (Unique)"
+              validateType="text"
+              placeholder="e.g. plan_gold"
+              value={addFormData.id}
+              onChange={(val) =>
+                setAddFormData({ ...addFormData, id: val })
+              }
+              required
+            />
+            <InputField
+              label="Plan Name"
+              validateType="text"
+              placeholder="Gold Plan"
+              value={addFormData.name}
+              onChange={(val) =>
+                setAddFormData({ ...addFormData, name: val })
+              }
+              required
+            />
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="price">Price</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={addFormData.price}
-                  onChange={(e) =>
-                    setAddFormData({
-                      ...addFormData,
-                      price:
-                        e.target.value === "" ? "" : Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duration (Days)</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  value={addFormData.duration}
-                  onChange={(e) =>
-                    setAddFormData({
-                      ...addFormData,
-                      duration:
-                        e.target.value === "" ? "" : Number(e.target.value),
-                    })
-                  }
-                />
-              </div>
+              <InputField
+                label="Price"
+                validateType="number"
+                value={addFormData.price.toString()}
+                onChange={(val) =>
+                  setAddFormData({
+                    ...addFormData,
+                    price: val === "" ? "" : Number(val),
+                  })
+                }
+                required
+              />
+              <InputField
+                label="Duration (Days)"
+                validateType="number"
+                value={addFormData.duration.toString()}
+                onChange={(val) =>
+                  setAddFormData({
+                    ...addFormData,
+                    duration: val === "" ? "" : Number(val),
+                  })
+                }
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
