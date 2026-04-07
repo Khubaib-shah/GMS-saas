@@ -57,21 +57,11 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
       initialValue: controlledValue || "",
       required,
       customRule,
+      onValueChange: onChange,
+      onValidationError,
     })
 
-    // Notify parent of changes
-    React.useEffect(() => {
-      // Only call onChange if it's NOT a file input, as file inputs are handled manually in handleChange
-      // to avoid losing the event object.
-      if (onChange && validateType !== 'text' && props.type !== 'file') {
-        onChange(value)
-      }
-    }, [value, onChange, validateType, props.type])
 
-    // Notify parent of errors
-    React.useEffect(() => {
-      if (onValidationError) onValidationError(error)
-    }, [error, onValidationError])
 
     return (
       <Field className={cn("w-full", className)}>
@@ -91,10 +81,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             {...props}
             ref={ref}
             value={value}
-            onChange={(e) => {
-              handleChange(e);
-              if (onChange) onChange(e.target.value, e);
-            }}
+            onChange={handleChange}
             onBlur={handleBlur}
             onPaste={handlePaste}
             placeholder={placeholder}

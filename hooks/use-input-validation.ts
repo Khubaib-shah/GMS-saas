@@ -17,6 +17,8 @@ interface UseInputValidationOptions {
     errorMessage: string
     restrictPattern?: RegExp
   }
+  onValueChange?: (value: string, event?: any) => void
+  onValidationError?: (error: string) => void
 }
 
 export function useInputValidation({
@@ -24,6 +26,8 @@ export function useInputValidation({
   initialValue = "",
   required = false,
   customRule,
+  onValueChange,
+  onValidationError,
 }: UseInputValidationOptions) {
   const [value, setValue] = useState(initialValue)
   const [error, setError] = useState("")
@@ -42,8 +46,9 @@ export function useInputValidation({
     
     const result = validateValue(val, type, customRule)
     setError(result.errorMessage)
+    if (onValidationError) onValidationError(result.errorMessage)
     return result.isValid
-  }, [type, required, customRule])
+  }, [type, required, customRule, onValidationError])
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newValue = e.target.value
@@ -59,10 +64,11 @@ export function useInputValidation({
     }
 
     setValue(newValue)
+    if (onValueChange) onValueChange(newValue, e)
     if (isTouched) {
       validate(newValue)
     }
-  }, [value, type, customRule, isTouched, validate])
+  }, [value, type, customRule, isTouched, validate, onValueChange])
 
   const handleBlur = useCallback(() => {
     setIsTouched(true)
@@ -80,10 +86,11 @@ export function useInputValidation({
         e.preventDefault()
         const newVal = value + filteredData
         setValue(newVal)
+        if (onValueChange) onValueChange(newVal)
         validate(newVal)
       }
     }
-  }, [value, type, customRule, validate])
+  }, [value, type, customRule, validate, onValueChange])
 
   const getSanitizedValue = useCallback(() => {
     return sanitizeInput(value, type)

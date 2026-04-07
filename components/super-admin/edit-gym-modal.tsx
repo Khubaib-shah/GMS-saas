@@ -94,6 +94,11 @@ export function EditGymModal({ isOpen, onClose, onSuccess, gym }: EditGymModalPr
                         value={formData.name}
                         onChange={(val) => setFormData({ ...formData, name: val })}
                         required
+                        customRule={{
+                            pattern: /^[A-Za-z0-9\s\-\&\.]+$/,
+                            restrictPattern: /[A-Za-z0-9\s\-\&\.]/,
+                            errorMessage: "Only letters, numbers, and basic punctuation (- & .) are allowed",
+                        }}
                     />
 
                     <div className="grid grid-cols-2 gap-4">
