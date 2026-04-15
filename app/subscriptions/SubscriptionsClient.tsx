@@ -234,15 +234,15 @@ export default function SubscriptionsPage() {
   return (
     <div className="container mx-auto">
       <DashboardHeader
-        title="SUBSCRIPTION"
+        title="GYM"
         highlight="PLANS"
-        subtitle="MANAGEMENT: BILLING_PROTOCOLS_v3"
-        description="Manage subscription plans and member subscriptions"
+        subtitle="Manage your gym's membership plans"
+        description="Create and update plans for your members"
       >
         {(canCreatePlans || status === "loading") && (
           <Button onClick={() => setShowAddModal(true)} className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" disabled={status === "loading"}>
             <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-            {status === "loading" ? "Loading..." : "ADD NEW PLAN"}
+            {status === "loading" ? "Loading..." : "Add Plan"}
           </Button>
         )}
       </DashboardHeader>

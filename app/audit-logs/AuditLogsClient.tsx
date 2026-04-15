@@ -164,10 +164,10 @@ export default function AuditLogsClient() {
   return (
     <div className="space-y-10 animate-fade-up">
       <DashboardHeader
-        title="AUDIT"
-        highlight="LOGS"
-        subtitle="SYSTEM: ACTIVITY_MONITOR_v1"
-        description="Track system activity and user actions"
+        title="ACTIVITY"
+        highlight="HISTORY"
+        subtitle="Track your gym's activity"
+        description="See everything that happens in your gym"
       >
         <div className="flex gap-2">
           <Button
@@ -193,17 +193,17 @@ export default function AuditLogsClient() {
       <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-6 backdrop-blur-md">
         <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
           <Filter className="w-3.5 h-3.5 text-primary/50" />
-          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">QUERY</span>
+          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">FILTER</span>
         </div>
 
         <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-2">
           <Select value={resource} onValueChange={setResource}>
             <SelectTrigger className="h-9 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
-              <span className="text-slate-500 mr-2">RES:</span>
-              <SelectValue placeholder="ALL" />
+              <span className="text-slate-500 mr-2">Resource:</span>
+              <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-              <SelectItem value="all" className="text-[10px] font-bold italic uppercase">ALL_RESOURCES</SelectItem>
+              <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Types</SelectItem>
               {RESOURCES.map(r => (
                 <SelectItem key={r} value={r} className="text-[10px] font-bold italic uppercase">{r}</SelectItem>
               ))}
@@ -212,11 +212,11 @@ export default function AuditLogsClient() {
 
           <Select value={action} onValueChange={setAction}>
             <SelectTrigger className="h-9 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
-              <span className="text-slate-500 mr-2">ACT:</span>
-              <SelectValue placeholder="ALL" />
+              <span className="text-slate-500 mr-2">Action:</span>
+              <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-              <SelectItem value="all" className="text-[10px] font-bold italic uppercase">ALL_ACTIONS</SelectItem>
+              <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Actions</SelectItem>
               {ACTIONS.map(a => (
                 <SelectItem key={a} value={a} className="text-[10px] font-bold italic uppercase">{a.replace('_', ' ')}</SelectItem>
               ))}
@@ -224,9 +224,9 @@ export default function AuditLogsClient() {
           </Select>
 
           <div className="relative group">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 uppercase italic">ID:</div>
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 uppercase italic">Search:</div>
             <InputField
-              placeholder="SEARCH..."
+              placeholder="Search records..."
               value={userId}
               onChange={(val) => setUserId(val)}
               onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
@@ -241,7 +241,7 @@ export default function AuditLogsClient() {
             onClick={handleApplyFilters}
             className="h-9 px-4 bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-[10px] rounded-lg neon-glow"
           >
-            EXECUTE
+            Apply
           </Button>
           <Button 
             variant="ghost" 
@@ -258,12 +258,12 @@ export default function AuditLogsClient() {
           <Table>
             <TableHeader>
               <TableRow className="border-white/5 bg-white/[0.02]">
-                <TableHead className="w-[150px] text-[10px] font-black uppercase italic tracking-widest py-2">TIMESTAMP</TableHead>
-                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">OPERATOR_IDENTITY</TableHead>
-                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">ACTION_TYPE</TableHead>
-                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">RESOURCE_TARGET</TableHead>
-                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">METADATA_SNAPSHOT</TableHead>
-                <TableHead className="w-[80px] text-[10px] font-black uppercase italic tracking-widest py-2 text-right">ACCESS</TableHead>
+                <TableHead className="w-[150px] text-[10px] font-black uppercase italic tracking-widest py-2">TIME</TableHead>
+                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">USER</TableHead>
+                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">ACTION</TableHead>
+                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">TARGET</TableHead>
+                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">DETAILS</TableHead>
+                <TableHead className="w-[80px] text-[10px] font-black uppercase italic tracking-widest py-2 text-right">VIEW</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -288,7 +288,7 @@ export default function AuditLogsClient() {
                     </TableCell>
                     <TableCell className="py-2">
                       <div className="flex flex-col">
-                        <span className="font-black text-[10px] uppercase italic tracking-tight text-foreground">{log.userName || "SYSTEM_DAEMON"}</span>
+                        <span className="font-black text-[10px] uppercase italic tracking-tight text-foreground">{log.userName || "System"}</span>
                         <span className="text-[9px] font-mono text-slate-500 truncate max-w-[100px]" title={log.userId}>
                           {log.userId}
                         </span>
@@ -315,7 +315,7 @@ export default function AuditLogsClient() {
                     <TableCell className="py-2 text-right">
                       <Button variant="ghost" size="sm" onClick={() => setSelectedLog(log)} className="h-7 w-7 p-0 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-md">
                         <Eye className="h-3.5 w-3.5" />
-                        <span className="sr-only">VIEW_DETAILS</span>
+                        <span className="sr-only">View Details</span>
                       </Button>
                     </TableCell>
                   </TableRow>

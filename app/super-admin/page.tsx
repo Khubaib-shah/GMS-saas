@@ -115,8 +115,8 @@ export default function SuperAdminDashboard() {
             <DashboardHeader
                 title="PLATFORM"
                 highlight="OVERVIEW"
-                subtitle="ADMIN: SYSTEM_CORE_v5"
-                description="Monitor all gyms, revenue, and platform health"
+                subtitle="Platform statistics and health"
+                description="Overview of all gym performance."
                 descriptionIconColor="emerald"
             />
 

@@ -3,11 +3,11 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
-import { 
-  Field, 
-  FieldLabel, 
-  FieldError, 
-  FieldDescription 
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldDescription
 } from "@/components/ui/field"
 import { useInputValidation } from "@/hooks/use-input-validation"
 import { type ValidationType } from "@/lib/utils/validators"
@@ -30,11 +30,11 @@ interface InputFieldProps extends Omit<React.ComponentProps<typeof Input>, "onCh
 }
 
 const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ 
-    label, 
-    validateType = "text", 
-    description, 
-    required, 
+  ({
+    label,
+    validateType = "text",
+    description,
+    required,
     hideLabel = false,
     leadingIcon,
     value: controlledValue,
@@ -43,7 +43,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     customRule,
     className,
     placeholder,
-    ...props 
+    ...props
   }, ref) => {
     const {
       value,
@@ -66,11 +66,11 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     return (
       <Field className={cn("w-full", className)}>
         {label && !hideLabel && (
-          <FieldLabel className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
+          <FieldLabel className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
             {label} {required && <span className="text-primary">*</span>}
           </FieldLabel>
         )}
-        
+
         <div className="relative group/input-field">
           {leadingIcon && (
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input-field:text-primary transition-colors z-10">
@@ -87,16 +87,16 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             placeholder={placeholder}
             aria-invalid={isInvalid}
             className={cn(
-              "h-12 bg-white/5 border-transparent focus:bg-white/10 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-xl",
+              "h-12 bg-white/5 border-transparent focus:bg-white/10 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-md",
               leadingIcon && "pl-12",
-              isInvalid 
-                ? "border-destructive/50 focus:border-destructive ring-destructive/20" 
+              isInvalid
+                ? "border-destructive/50 focus:border-destructive ring-destructive/20"
                 : "focus:border-primary/50",
               !isInvalid && value && "border-primary/20",
               className
             )}
           />
-          
+
           {/* Tactical status indicator (bottom right) */}
           {value && !isInvalid && validateType !== "text" && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-50 group-focus-within/input-field:opacity-100 transition-opacity">
@@ -107,7 +107,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
         </div>
 
         {description && <FieldDescription className="text-[9px] text-slate-500 font-bold uppercase">{description}</FieldDescription>}
-        
+
         {error && !hideLabel && (
           <FieldError className="text-[10px] font-bold italic tracking-wider mt-1 text-destructive animate-fade-in">
             {error}

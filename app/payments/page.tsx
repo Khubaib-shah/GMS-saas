@@ -88,26 +88,26 @@ export default function PaymentsPage() {
     <div className="space-y-10 animate-fade-up">
       <DashboardHeader
         title="PAYMENT"
-        highlight="LOGS"
-        subtitle="FINANCIAL_LEDGER: REVENUE_STREAM_v2"
-        description="Revenue tracking and transaction audit active."
+        highlight="HISTORY"
+        subtitle="Track your gym's income"
+        description="View all payments received from members."
         descriptionIconColor="emerald"
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard
-          title="GROSS_REVENUE"
+          title="Total Revenue"
           value={`₨ ${formatCurrency(totalRevenue).replace("PKR", "")}`}
           icon={<DollarSign className="w-5 h-5" />}
         />
         <StatsCard
-          title="TRANS_TOTAL"
+          title="Total Transactions"
           value={paidCount.toString()}
           icon={<AlertCircle className="w-5 h-5" />}
         />
         <StatsCard
-          title="AVG_THROUGHPUT"
+          title="Average Payment"
           value={`₨ ${formatCurrency(avgPayment).replace("PKR", "")}`}
           icon={<TrendingUp className="w-5 h-5" />}
         />
@@ -118,9 +118,9 @@ export default function PaymentsPage() {
         <div className="flex flex-col sm:flex-row gap-8 items-end">
           <div className="flex-1 w-full sm:w-auto">
             <InputField
-              label="Search Subject Name"
+              label="Search Member"
               validateType="text"
-              placeholder="PROBING DATA..."
+              placeholder="Searching..."
               value={searchTerm || store.searchQuery}
               onChange={(val) => {
                 setSearchTerm(val)
@@ -129,7 +129,7 @@ export default function PaymentsPage() {
             />
           </div>
           <div className="w-full sm:w-auto">
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">TEMPORAL_PERIOD</label>
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Period</label>
             <Select
               value={filterPeriod}
               onValueChange={(value) => setFilterPeriod(value as "this-month" | "last-month" | "all")}
@@ -138,9 +138,9 @@ export default function PaymentsPage() {
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-white/10">
-                <SelectItem value="this-month" className="text-[10px] font-bold uppercase tracking-widest">THIS_CYCLE</SelectItem>
-                <SelectItem value="last-month" className="text-[10px] font-bold uppercase tracking-widest">PREV_CYCLE</SelectItem>
-                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">FULL_HISTORY</SelectItem>
+                <SelectItem value="this-month" className="text-[10px] font-bold uppercase tracking-widest">This Month</SelectItem>
+                <SelectItem value="last-month" className="text-[10px] font-bold uppercase tracking-widest">Last Month</SelectItem>
+                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Time</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -153,11 +153,11 @@ export default function PaymentsPage() {
           <table className="w-full text-[11px] font-bold tracking-widest uppercase">
             <thead>
               <tr className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]">
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">TRANSACTION_SUBJECT</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">CREDIT_AMOUNT</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">TIMELINE_STAMP</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">GATEWAY_METHOD</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">METADATA_DESC</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">MEMBER</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">AMOUNT</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">DATE</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">METHOD</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">DESCRIPTION</th>
               </tr>
             </thead>
             <tbody>
@@ -194,7 +194,7 @@ export default function PaymentsPage() {
                     <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
                       <DollarSign className="w-8 h-8 text-slate-700" />
                     </div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">NO_FINANCIAL_SIGNALS</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No payments found</p>
                   </td>
                 </tr>
               )}

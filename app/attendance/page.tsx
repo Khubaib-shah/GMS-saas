@@ -61,10 +61,10 @@ export default function AttendancePage() {
     return (
         <div className="container mx-auto space-y-8 animate-fade-in">
             <DashboardHeader
-                title="ATTENDANCE"
-                highlight="TRACKING"
-                subtitle="SYSTEM: ATTENDANCE_v1"
-                description="Manage daily check-ins and view reports."
+                title="GYM"
+                highlight="ATTENDANCE"
+                subtitle="Track member check-ins"
+                description="View who is currently in the gym."
                 descriptionIconColor="emerald"
             />
 

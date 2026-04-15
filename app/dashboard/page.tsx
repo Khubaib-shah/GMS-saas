@@ -84,10 +84,10 @@ export default function DashboardPage() {
   return (
     <div className="space-y-10 animate-fade-up">
       <DashboardHeader
-        title={isTrainer ? "TRAINER" : "ADMIN"}
-        highlight={isTrainer ? "DASHBOARD" : "CONSOLE"}
-        subtitle={isTrainer ? "ANALYTICS: PERFORMANCE_TRACKING" : "SYSTEM: OPERATIONAL_OVERVIEW"}
-        description={isTrainer ? `Managing ${totalMembers} members.` : 'Dashboard is active and monitoring.'}
+        title={isTrainer ? "Trainer" : "Admin"}
+        highlight="Dashboard"
+        subtitle={isTrainer ? "Track your performance" : "Overview of your gym"}
+        description={isTrainer ? `Managing ${totalMembers} members.` : 'See how your gym is doing today.'}
         descriptionIconColor={isTrainer ? "emerald" : "primary"}
       >
         {isTrainer && (
@@ -98,7 +98,7 @@ export default function DashboardPage() {
               className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
             >
               <Dumbbell className="mr-2 w-4 h-4" />
-              EXERCISES
+              Exercises
             </Button>
             <Button
               variant="outline"
@@ -106,14 +106,14 @@ export default function DashboardPage() {
               className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
             >
               <Plus className="mr-2 w-4 h-4" />
-              TEMPLATES
+              Templates
             </Button>
             <Button
               onClick={() => router.push('/trainer/deploy')}
               className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
             >
               <Send className="mr-2 w-4 h-4" />
-              ASSIGN_PLAN
+              Assign Plan
             </Button>
           </div>
         )}
@@ -190,10 +190,10 @@ export default function DashboardPage() {
         <div className="relative">
           <div className="flex items-center gap-4 mb-8">
             <h2 className="text-2xl font-black italic tracking-tighter text-red-500 uppercase">
-              Action Required: Expiring Soon
+              Expiring Memberships
             </h2>
             <div className="h-px flex-1 bg-black/5 dark:bg-white/5"></div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Retention List (Next 7 days)</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Expiring in the next 7 days</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

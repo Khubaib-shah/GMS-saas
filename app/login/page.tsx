@@ -56,7 +56,7 @@ function LoginForm() {
       } else {
         const res = await fetch("/api/auth/session");
         const session = await res.json();
-        toast.success("SYSTEM ACCESS GRANTED");
+        toast.success("Login successful");
         if (callbackUrl && callbackUrl !== "/dashboard") {
           router.push(callbackUrl);
         } else if (session?.user?.role === "super_admin") {
@@ -66,7 +66,7 @@ function LoginForm() {
         }
       }
     } catch (error) {
-      toast.error("Critical authentication error");
+      toast.error("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -75,35 +75,33 @@ function LoginForm() {
   return (
     <div className="w-full max-w-sm glass-card p-10 selection:bg-primary selection:text-black">
       <div className="mb-10 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6 neon-glow">
-          <Zap className="w-10 h-10 text-black" />
-        </div>
         <h2 className="text-3xl font-black italic text-white mb-2 uppercase tracking-tight">
-          System <span className="text-primary">Login</span>
+          Welcome <span className="text-primary">Back</span>
         </h2>
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Authorized Personnel Only</p>
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Sign in to access your dashboard</p>
       </div>
 
       <form onSubmit={handleLogin} className="space-y-6">
         <InputField
-          label="Identity Email"
+          label="Email"
+          className="gap-0"
           validateType="email"
-          placeholder="ACCESS@GYMFLOW.COM"
+          placeholder="your@email.com"
           value={email}
           onChange={(val) => setEmail(val)}
           required
         />
 
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              Security Key
+          <div className="flex items-center justify-between mb-1">
+            <span className="ml-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              Password
             </span>
             <a
               href="#"
               className="text-[10px] font-black text-primary hover:text-white transition-colors uppercase tracking-widest"
             >
-              Reset Key?
+              Reset Password?
             </a>
           </div>
           <div className="relative group/password">
@@ -119,7 +117,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors z-20"
+              className="absolute right-12 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors z-20"
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -131,7 +129,7 @@ function LoginForm() {
           disabled={loading}
           className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
         >
-          {loading ? "INITIALIZING..." : "INITIATE ACCESS"}
+          {loading ? "Logging in..." : "Login"}
           {!loading && <ArrowRight className="ml-2 w-5 h-5" />}
         </Button>
       </form>
@@ -144,9 +142,9 @@ function LoginForm() {
           </Link>
         </p>
         <p className="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest mt-4">
-          No Access?{" "}
+          Need Help?{" "}
           <a href="https://wa.me/923149784156" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-white transition-colors">
-            Contact High Command
+            Contact Support
           </a>
         </p>
       </div>
@@ -165,13 +163,13 @@ function LoginForm() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={() => setShowSuspendedModal(false)}
               className="bg-transparent border border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wider"
             >
               Close
             </AlertDialogAction>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={() => window.open("https://wa.me/923149784156?text=Hello%2C%20I%20am%20having%20issues%20with%20my%20suspended%20account.", "_blank")}
               className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider"
             >
@@ -195,13 +193,13 @@ function LoginForm() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={() => setShowExpiredModal(false)}
               className="bg-transparent border border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wider"
             >
               Close
             </AlertDialogAction>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={() => window.open("https://wa.me/923149784156?text=Hello%2C%20I%20would%20like%20to%20renew%20my%20gym%20subscription.", "_blank")}
               className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider"
             >
@@ -248,15 +246,13 @@ export default function LoginPage() {
             <span className="text-primary neon-text">Rep.</span>
           </h1>
 
-          <p className="text-xl text-slate-400 font-medium mb-12 max-w-md leading-relaxed">
-            The elite management suite for gyms that demand absolute precision and high-octane growth.
-          </p>
+            Powerful gym management for growth and precision.
 
           <div className="grid grid-cols-1 gap-6">
             {[
-              { icon: <Trophy className="w-5 h-5" />, text: "Ranked #1 for Scaling Systems" },
-              { icon: <Shield className="w-5 h-5" />, text: "Military-Grade Security" },
-              { icon: <Zap className="w-5 h-5" />, text: "Instantaneous Data Retrieval" }
+              { icon: <Trophy className="w-5 h-5" />, text: "Built for scaling businesses" },
+              { icon: <Shield className="w-5 h-5" />, text: "Secure and Reliable" },
+              { icon: <Zap className="w-5 h-5" />, text: "Fast and Responsive" }
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-white/70">
                 <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-primary">
@@ -271,7 +267,7 @@ export default function LoginPage() {
 
       {/* Right Side - Login Form area */}
       <div className="w-full lg:w-2/5 flex items-center justify-center p-8 relative z-10">
-        <Suspense fallback={<div className="text-primary font-black italic animate-pulse tracking-widest uppercase text-xs">Synchronizing System...</div>}>
+        <Suspense fallback={<div className="text-primary font-black italic animate-pulse tracking-widest uppercase text-xs">Loading application...</div>}>
           <LoginForm />
         </Suspense>
       </div>

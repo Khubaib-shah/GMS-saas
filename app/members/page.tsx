@@ -104,16 +104,16 @@ export default function MembersPage() {
   return (
     <div className="space-y-10 animate-fade-up">
       <DashboardHeader
-        title="MEMBER"
-        highlight="DIRECTORY"
-        subtitle="DIRECTORY: MEMBER_LIST_v4"
-        description="Member database and subscription management active."
+        title="GYM"
+        highlight="MEMBERS"
+        subtitle="View and manage your members"
+        description="Full list of your gym members."
       >
         {((session?.user as any)?.role !== 'trainer') && (
           <Link href="/members/add">
             <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
               <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-              ADD NEW MEMBER
+              Add Member
             </Button>
           </Link>
         )}
@@ -126,7 +126,7 @@ export default function MembersPage() {
             <InputField
               label="Search Members"
               validateType="text"
-              placeholder="BY NAME, EMAIL OR PHONE..."
+              placeholder="Search by name, email, or phone..."
               value={searchTerm || store.searchQuery}
               onChange={(val) => {
                 setSearchTerm(val);
@@ -137,7 +137,7 @@ export default function MembersPage() {
           </div>
           <div>
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
-              STATUS_FILTER
+              Filter by Status
             </label>
             <Select
               value={filterStatus}
@@ -149,9 +149,9 @@ export default function MembersPage() {
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-white/10">
-                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">ALL_MEMBERS</SelectItem>
-                <SelectItem value="active" className="text-[10px] font-bold uppercase tracking-widest">ACTIVE_MEMBERS</SelectItem>
-                <SelectItem value="expired" className="text-[10px] font-bold uppercase tracking-widest">EXPIRED_MEMBERS</SelectItem>
+                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Members</SelectItem>
+                <SelectItem value="active" className="text-[10px] font-bold uppercase tracking-widest">Active Members</SelectItem>
+                <SelectItem value="expired" className="text-[10px] font-bold uppercase tracking-widest">Expired Members</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -165,16 +165,16 @@ export default function MembersPage() {
             <thead>
               <tr className="border-b border-white/5 bg-white/[0.02]">
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  MEMBER_IDENTIFIER
+                  MEMBER
                 </th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  CONTACT_INFO
+                  CONTACT
                 </th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  SUBSCRIPTION_STATUS
+                  STATUS
                 </th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  JOIN_DATE
+                  JOINED
                 </th>
                 <th className="text-center py-6 px-6 font-black text-slate-500 italic">
                   ACTIONS
@@ -225,7 +225,7 @@ export default function MembersPage() {
                           <span className="text-foreground font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
                             {member.firstName} {member.lastName || ""}
                           </span>
-                          <span className="text-[9px] text-slate-500 font-mono tracking-widest mt-0.5 block">MEMBER_ID: {member.id.toUpperCase().slice(-8)}</span>
+                          <span className="text-[9px] text-slate-500 font-mono tracking-widest mt-0.5 block">ID: {member.id.toUpperCase().slice(-8)}</span>
                         </div>
                       </div>
                     </td>
@@ -247,7 +247,7 @@ export default function MembersPage() {
                             : "bg-red-500/10 border-red-500/20 text-red-500"
                       )}>
                         <div className={cn("w-1 h-1 rounded-full", isPaused ? "bg-amber-500" : isActive ? "bg-primary" : "bg-red-500")} />
-                        {isPaused ? "PAUSED" : isActive ? "ACTIVE" : "EXPIRED"}
+                        {isPaused ? "Paused" : isActive ? "Active" : "Expired"}
                       </div>
                     </td>
                     <td className="py-6 px-6 text-slate-500 font-mono text-[10px]">
@@ -261,7 +261,7 @@ export default function MembersPage() {
                           onClick={() => {
                             if (!isPremium) {
                               toast("PREMIUM_RESTRICTION", {
-                                description: "QR CRYPTOGRAPHIC PROTOCOLS REQUIRE PREMIUM ACCESS.",
+                                description: "QR scanning is a premium feature.",
                                 action: {
                                   label: "UPGRADE",
                                   onClick: () => { },
@@ -287,7 +287,7 @@ export default function MembersPage() {
                             size="sm"
                             className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all"
                           >
-                            VIEW PROFILE
+                            View Profile
                           </Button>
                         </Link>
 
@@ -314,7 +314,7 @@ export default function MembersPage() {
             <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
               <Users className="w-8 h-8 text-slate-700" />
             </div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">NO_MEMBERS_FOUND</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No members found</p>
           </div>
         )}
       </div>
