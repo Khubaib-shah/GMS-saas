@@ -12,10 +12,33 @@ import {
     Trash2,
     Check,
     DollarSign,
+    Square,
+    CheckSquare,
+    AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DashboardHeader } from "@/components/dashboard-header";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Layers } from "lucide-react";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
@@ -47,6 +70,7 @@ export default function PlansPage() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [form, setForm] = useState<any>({ ...emptyPlan });
     const [saving, setSaving] = useState(false);
+    const [toggleConfirm, setToggleConfirm] = useState<any>(null);
 
     const fetchPlans = async () => {
         try {
@@ -135,6 +159,13 @@ export default function PlansPage() {
         }));
     };
 
+    const handleSelectAll = (select: boolean) => {
+        setForm((prev: any) => ({
+            ...prev,
+            featureFlags: select ? [...FEATURE_OPTIONS] : []
+        }));
+    };
+
     return (
         <div className="space-y-6 animate-fade-in">
             <DashboardHeader
@@ -150,17 +181,18 @@ export default function PlansPage() {
                             setEditingId(null);
                             setShowForm(true);
                         }}
-                        className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2"
+                        className="h-[38px] flex justify-center items-center px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2"
                     >
                         <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                        CREATE NEW PLAN
+                        NEW PLAN
                     </button>
                 )}
             </DashboardHeader>
 
             {/* Create/Edit Form */}
             {showForm && (
-                <div className="rounded-xl border border-indigo-500/20 bg-[#0d0d14] p-6 space-y-5">
+                <div className="rounded-2xl border border-indigo-500/20 bg-[#0d0d14]/80 backdrop-blur-xl p-8 space-y-6 shadow-[0_0_50px_rgba(99,102,241,0.1)] relative overflow-hidden group/form">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/[0.05] to-transparent pointer-events-none" />
                     <div className="flex items-center justify-between">
                         <h3 className="text-sm font-semibold text-white">
                             {editingId ? "Edit Plan" : "Create New Plan"}
@@ -170,7 +202,7 @@ export default function PlansPage() {
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <FormField label="Plan Name" required>
                             <input
                                 value={form.name}
@@ -233,7 +265,60 @@ export default function PlansPage() {
                                 className="form-input"
                             />
                         </FormField>
-                        <div className="md:col-span-2">
+                        <FormField label="Feature Access">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="form-input flex items-center justify-between group">
+                                        <div className="flex items-center gap-2">
+                                            <Layers className="w-4 h-4 text-indigo-400" />
+                                            <span className="text-xs font-bold uppercase tracking-tight py-px">
+                                                {form.featureFlags.length === FEATURE_OPTIONS.length
+                                                    ? "ALL FEATURES ENABLED"
+                                                    : `${form.featureFlags.length} FEATURES ACTIVE`}
+                                            </span>
+                                        </div>
+                                        <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-white transition-colors" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-[300px] bg-[#0d0d14] border-white/[0.08] shadow-2xl rounded-xl p-2" align="start">
+                                    <DropdownMenuLabel className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 py-1">
+                                        System Capabilities
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuItem
+                                        onClick={() => handleSelectAll(form.featureFlags.length !== FEATURE_OPTIONS.length)}
+                                        className="text-xs font-bold text-indigo-400 focus:text-indigo-300 transition-colors flex items-center gap-2"
+                                    >
+                                        {form.featureFlags.length === FEATURE_OPTIONS.length ? (
+                                            <>
+                                                <Square className="w-3.5 h-3.5" />
+                                                DESELECT ALL
+                                            </>
+                                        ) : (
+                                            <>
+                                                <CheckSquare className="w-3.5 h-3.5" />
+                                                SELECT ALL CAPABILITIES
+                                            </>
+                                        )}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className="bg-white/[0.06]" />
+                                    <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                        {FEATURE_OPTIONS.map((f) => (
+                                            <DropdownMenuCheckboxItem
+                                                key={f}
+                                                checked={form.featureFlags.includes(f)}
+                                                onCheckedChange={() => toggleFeature(f)}
+                                                onSelect={(e) => e.preventDefault()}
+                                                className="text-xs capitalize py-2 focus:bg-white/[0.04]"
+                                            >
+                                                {f.replace(/([A-Z])/g, ' $1').trim()}
+                                            </DropdownMenuCheckboxItem>
+                                        ))}
+                                    </div>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </FormField>
+
+                        <div className="md:col-span-4">
                             <FormField label="Description">
                                 <textarea
                                     value={form.description}
@@ -246,27 +331,7 @@ export default function PlansPage() {
                         </div>
                     </div>
 
-                    {/* Feature Flags */}
-                    <div>
-                        <p className="text-xs text-slate-400 font-medium mb-2">Feature Access</p>
-                        <div className="flex flex-wrap gap-2">
-                            {FEATURE_OPTIONS.map((f) => (
-                                <button
-                                    key={f}
-                                    onClick={() => toggleFeature(f)}
-                                    className={cn(
-                                        "px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors",
-                                        form.featureFlags.includes(f)
-                                            ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/30"
-                                            : "bg-white/[0.02] text-slate-500 border-white/[0.06] hover:border-white/[0.12]"
-                                    )}
-                                >
-                                    {form.featureFlags.includes(f) && <Check className="w-3 h-3 inline mr-1" />}
-                                    {f}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+
 
                     <div className="flex justify-end gap-3">
                         <button
@@ -290,120 +355,181 @@ export default function PlansPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {plans.length === 0 && !loading
                     ? (
-                            <div className="col-span-full text-center py-16">
-                                <CreditCard className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                                <p className="text-slate-400">No plans created yet</p>
-                                <p className="text-xs text-slate-500 mt-1">Create your first platform plan above</p>
-                            </div>
-                        )
-                        : plans.map((plan) => (
-                            <div
-                                key={plan._id || plan.id}
-                                className={cn(
-                                    "rounded-xl border bg-[#0d0d14] p-5 space-y-4 transition-all",
-                                    plan.isActive
-                                        ? "border-white/[0.06] hover:border-indigo-500/30"
-                                        : "border-white/[0.04] opacity-60"
-                                )}
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div>
-                                        <h3 className="text-base font-bold text-white">{plan.name}</h3>
-                                        <p className="text-[11px] text-slate-500 mt-0.5">{plan.description || "No description"}</p>
-                                    </div>
-                                    <span
-                                        className={cn(
-                                            "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider",
-                                            plan.isActive
-                                                ? "bg-emerald-500/10 text-emerald-400"
-                                                : "bg-slate-500/10 text-slate-400"
-                                        )}
-                                    >
-                                        {plan.isActive ? "Active" : "Inactive"}
-                                    </span>
+                        <div className="col-span-full text-center py-16">
+                            <CreditCard className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                            <p className="text-slate-400">No plans created yet</p>
+                            <p className="text-xs text-slate-500 mt-1">Create your first platform plan above</p>
+                        </div>
+                    )
+                    : plans.map((plan) => (
+                        <div
+                            key={plan._id || plan.id}
+                            className={cn(
+                                "rounded-xl border bg-[#0d0d14] p-5 space-y-4 transition-all",
+                                plan.isActive
+                                    ? "border-white/[0.06] hover:border-indigo-500/30"
+                                    : "border-white/[0.04] opacity-60"
+                            )}
+                        >
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <h3 className="text-base font-bold text-white">{plan.name}</h3>
+                                    <p className="text-[11px] text-slate-500 mt-0.5">{plan.description || "No description"}</p>
                                 </div>
-
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-bold text-indigo-400">
-                                        {formatPKR(plan.monthlyPricePKR)}
-                                    </span>
-                                    <span className="text-xs text-slate-500">/month</span>
-                                </div>
-                                {plan.yearlyPricePKR && (
-                                    <p className="text-xs text-slate-400">
-                                        Yearly: {formatPKR(plan.yearlyPricePKR)}
-                                    </p>
-                                )}
-
-                                <div className="grid grid-cols-3 gap-2 text-center">
-                                    <div className="rounded-lg bg-white/[0.03] p-2">
-                                        <p className="text-sm font-bold text-white">{plan.branchLimit}</p>
-                                        <p className="text-[10px] text-slate-500">Branches</p>
-                                    </div>
-                                    <div className="rounded-lg bg-white/[0.03] p-2">
-                                        <p className="text-sm font-bold text-white">{plan.maxStaffAccounts}</p>
-                                        <p className="text-[10px] text-slate-500">Staff</p>
-                                    </div>
-                                    <div className="rounded-lg bg-white/[0.03] p-2">
-                                        <p className="text-sm font-bold text-white">{plan.trialDays}d</p>
-                                        <p className="text-[10px] text-slate-500">Trial</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-wrap gap-1.5">
-                                    {(plan.featureFlags || []).slice(0, 5).map((f: string) => (
-                                        <span key={f} className="px-2 py-0.5 rounded bg-white/[0.04] text-[10px] text-slate-400">
-                                            {f}
-                                        </span>
-                                    ))}
-                                    {(plan.featureFlags?.length || 0) > 5 && (
-                                        <span className="px-2 py-0.5 rounded bg-white/[0.04] text-[10px] text-slate-500">
-                                            +{plan.featureFlags.length - 5} more
-                                        </span>
+                                <span
+                                    className={cn(
+                                        "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider",
+                                        plan.isActive
+                                            ? "bg-emerald-500/10 text-emerald-400"
+                                            : "bg-slate-500/10 text-slate-400"
                                     )}
-                                </div>
+                                >
+                                    {plan.isActive ? "Active" : "Inactive"}
+                                </span>
+                            </div>
 
-                                <div className="flex items-center gap-2 pt-2 border-t border-white/[0.06]">
-                                    <button
-                                        onClick={() => startEdit(plan)}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] text-xs text-slate-400 hover:text-white transition-colors"
-                                    >
-                                        <Edit2 className="w-3 h-3" /> Edit
-                                    </button>
-                                    <button
-                                        onClick={() => togglePlan(plan._id || plan.id)}
-                                        className={cn(
-                                            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors",
-                                            plan.isActive
-                                                ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                                                : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                                        )}
-                                    >
-                                        {plan.isActive ? <ToggleRight className="w-3 h-3" /> : <ToggleLeft className="w-3 h-3" />}
-                                        {plan.isActive ? "Deactivate" : "Activate"}
-                                    </button>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-bold text-indigo-400">
+                                    {formatPKR(plan.monthlyPricePKR)}
+                                </span>
+                                <span className="text-xs text-slate-500">/month</span>
+                            </div>
+                            {plan.yearlyPricePKR && (
+                                <p className="text-xs text-slate-400">
+                                    Yearly: {formatPKR(plan.yearlyPricePKR)}
+                                </p>
+                            )}
+
+                            <div className="grid grid-cols-3 gap-2 text-center">
+                                <div className="rounded-lg bg-white/[0.03] p-2">
+                                    <p className="text-sm font-bold text-white">{plan.branchLimit}</p>
+                                    <p className="text-[10px] text-slate-500">Branches</p>
+                                </div>
+                                <div className="rounded-lg bg-white/[0.03] p-2">
+                                    <p className="text-sm font-bold text-white">{plan.maxStaffAccounts}</p>
+                                    <p className="text-[10px] text-slate-500">Staff</p>
+                                </div>
+                                <div className="rounded-lg bg-white/[0.03] p-2">
+                                    <p className="text-sm font-bold text-white">{plan.trialDays}d</p>
+                                    <p className="text-[10px] text-slate-500">Trial</p>
                                 </div>
                             </div>
-                        ))}
+
+                            <div className="flex flex-wrap gap-1.5">
+                                {(plan.featureFlags || []).slice(0, 4).map((f: string) => (
+                                    <span key={f} className="px-2 py-0.5 rounded bg-white/[0.04] text-[10px] text-slate-400">
+                                        {f}
+                                    </span>
+                                ))}
+                                {(plan.featureFlags?.length || 0) > 4 && (
+                                    <span className="px-2 py-0.5 rounded bg-white/[0.04] text-[10px] text-slate-500">
+                                        +{plan.featureFlags.length - 4} more
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-2 pt-2 border-t border-white/[0.06]">
+                                <button
+                                    onClick={() => startEdit(plan)}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] text-xs text-slate-400 hover:text-white transition-colors"
+                                >
+                                    <Edit2 className="w-3 h-3" /> Edit
+                                </button>
+                                <button
+                                    onClick={() => setToggleConfirm(plan)}
+                                    className={cn(
+                                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors",
+                                        plan.isActive
+                                            ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                            : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                                    )}
+                                >
+                                    {plan.isActive ? <ToggleRight className="w-3 h-3" /> : <ToggleLeft className="w-3 h-3" />}
+                                    {plan.isActive ? "Deactivate" : "Activate"}
+                                </button>
+                            </div>
+                        </div>
+                    ))}
             </div>
+
+            {/* Confirmation Dialog */}
+            <AlertDialog open={!!toggleConfirm} onOpenChange={() => setToggleConfirm(null)}>
+                <AlertDialogContent className="bg-[#0d0d14] border-white/[0.08] shadow-2xl rounded-2xl p-6">
+                    <AlertDialogHeader>
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className={cn(
+                                "p-2 rounded-lg",
+                                toggleConfirm?.isActive ? "bg-red-500/10 text-red-400" : "bg-emerald-500/10 text-emerald-400"
+                            )}>
+                                <AlertCircle className="w-5 h-5" />
+                            </div>
+                            <AlertDialogTitle className="text-white font-bold tracking-tight">
+                                {toggleConfirm?.isActive ? "Confirm Deactivation" : "Confirm Activation"}
+                            </AlertDialogTitle>
+                        </div>
+                        <AlertDialogDescription className="text-slate-400 text-sm">
+                            Are you sure you want to {toggleConfirm?.isActive ? "deactivate" : "activate"} the <span className="text-white font-bold">{toggleConfirm?.name}</span> plan?
+                            {toggleConfirm?.isActive
+                                ? " This will prevent new gyms from subscribing to this tier."
+                                : " This will make the plan available for new registrations."}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="gap-3">
+                        <AlertDialogCancel className="bg-white/[0.04] border-white/[0.08] text-slate-400 hover:text-white hover:bg-white/[0.08] rounded-xl transition-all">
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                togglePlan(toggleConfirm?._id || toggleConfirm?.id);
+                                setToggleConfirm(null);
+                            }}
+                            className={cn(
+                                "rounded-xl font-bold uppercase tracking-widest text-[10px] px-6 transition-all",
+                                toggleConfirm?.isActive
+                                    ? "bg-red-600 hover:bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.2)]"
+                                    : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                            )}
+                        >
+                            Confirm Action
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             <style jsx>{`
                 .form-input {
                     width: 100%;
-                    padding: 0.5rem 0.75rem;
-                    border-radius: 0.5rem;
+                    padding: 0.65rem 1rem;
+                    border-radius: 0.75rem;
                     background: rgba(255, 255, 255, 0.03);
                     border: 1px solid rgba(255, 255, 255, 0.08);
                     color: white;
                     font-size: 0.875rem;
+                    font-weight: 500;
                     outline: none;
-                    transition: border-color 0.2s;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                 }
                 .form-input:focus {
-                    border-color: rgba(99, 102, 241, 0.5);
+                    border-color: rgba(99, 102, 241, 0.6);
+                    background: rgba(99, 102, 241, 0.05);
+                    box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
                 }
                 .form-input::placeholder {
-                    color: rgba(148, 163, 184, 0.5);
+                    color: rgba(148, 163, 184, 0.4);
+                    font-weight: 400;
+                }
+                .custom-scrollbar::-webkit-scrollbar {
+                  width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                  background: rgba(255, 255, 255, 0.1);
+                  border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                  background: rgba(255, 255, 255, 0.2);
                 }
             `}</style>
         </div>

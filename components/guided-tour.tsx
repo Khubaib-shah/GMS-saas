@@ -126,7 +126,7 @@ function TourTrigger() {
             onClick={() => setIsOpen(true)}
             variant="ghost"
             size="icon"
-            className="fixed bottom-6 right-6 z-[9999] h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 neon-glow transition-all hover:scale-110 group"
+            className="fixed bottom-6 right-6 z-[9999] h-[38px] w-14 rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 neon-glow transition-all hover:scale-110 group"
             title="Start guided tour"
         >
             <HelpCircle className="w-7 h-7 group-hover:rotate-12 transition-transform" />

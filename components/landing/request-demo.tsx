@@ -214,7 +214,7 @@ export const RequestDemo = () => {
                                         type="button"
                                         onClick={submitForm}
                                         disabled={status === 'loading'}
-                                        className="w-full h-14 bg-primary text-black hover:bg-white transition-all text-base font-semibold group flex items-center justify-center gap-2 mt-4 disabled:opacity-60"
+                                        className="w-full h-[38px] bg-primary text-black hover:bg-white transition-all text-base font-semibold group flex items-center justify-center gap-2 mt-4 disabled:opacity-60"
                                     >
                                         {status === 'loading' ? (
                                             <>

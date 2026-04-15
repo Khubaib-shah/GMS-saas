@@ -13,6 +13,8 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const month = searchParams.get("month"); // "2026-02"
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
     const gymId = searchParams.get("gymId");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
@@ -21,7 +23,13 @@ export async function GET(req: Request) {
 
     const filter: any = {};
     if (gymId) filter.gymId = gymId;
-    if (month) {
+
+    if (from && to) {
+        filter.paymentDate = { 
+            $gte: new Date(from), 
+            $lte: new Date(new Date(to).setHours(23, 59, 59, 999)) 
+        };
+    } else if (month) {
         const [year, mon] = month.split("-").map(Number);
         const start = new Date(year, mon - 1, 1);
         const end = new Date(year, mon, 0, 23, 59, 59);

@@ -8,10 +8,12 @@ import {
     AlertTriangle,
     ChevronLeft,
     ChevronRight,
-    Calendar,
     Building2,
+    CalendarDays,
 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 
 function formatPKR(amount: number) {
@@ -21,14 +23,15 @@ function formatPKR(amount: number) {
 export default function BillingPage() {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [month, setMonth] = useState("");
+    const [dateRange, setDateRange] = useState<DateRange | undefined>();
     const [page, setPage] = useState(1);
 
     const fetchBilling = useCallback(async () => {
         setLoading(true);
         try {
             const params = new URLSearchParams();
-            if (month) params.set("month", month);
+            if (dateRange?.from) params.set("from", dateRange.from.toISOString());
+            if (dateRange?.to) params.set("to", dateRange.to.toISOString());
             params.set("page", page.toString());
             params.set("limit", "15");
 
@@ -40,7 +43,7 @@ export default function BillingPage() {
         } finally {
             setLoading(false);
         }
-    }, [month, page]);
+    }, [dateRange, page]);
 
     useEffect(() => {
         fetchBilling();
@@ -67,7 +70,7 @@ export default function BillingPage() {
                     </div>
                     <div>
                         <p className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
-                            {month ? "Filtered Revenue" : "Total Revenue"}
+                            {dateRange?.from ? "Filtered Revenue" : "Total Revenue"}
                         </p>
                         <p className="text-xl font-bold text-emerald-400">
                             {formatPKR(data?.totalRevenuePKR || 0)}
@@ -95,22 +98,23 @@ export default function BillingPage() {
             </div>
 
             {/* Filter */}
-            <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-slate-500" />
-                    <input
-                        type="month"
-                        value={month}
-                        onChange={(e) => { setMonth(e.target.value); setPage(1); }}
-                        className="px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white focus:outline-none focus:border-indigo-500/50"
+            <div className="flex items-center justify-end">
+                <div className="flex items-center  gap-4">
+                    <DateRangePicker
+                        date={dateRange}
+                        onDateChange={(range) => {
+                            setDateRange(range);
+                            setPage(1);
+                        }}
                     />
                 </div>
-                {month && (
+
+                {dateRange?.from && (
                     <button
-                        onClick={() => { setMonth(""); setPage(1); }}
-                        className="text-xs text-indigo-400 hover:text-indigo-300"
+                        onClick={() => { setDateRange(undefined); setPage(1); }}
+                        className="text-[10px] font-black tracking-widest text-indigo-400 hover:text-indigo-300 uppercase transition-colors"
                     >
-                        Clear filter
+                        RESET FILTERS
                     </button>
                 )}
             </div>
@@ -127,10 +131,26 @@ export default function BillingPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {payments.length === 0 && !loading ? (
+                            {loading ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <tr key={i} className="border-b border-white/[0.04]">
+                                        <td className="px-4 py-4"><div className="h-4 w-32 bg-white/5 animate-pulse rounded" /></td>
+                                        <td className="px-4 py-4"><div className="h-4 w-16 bg-white/5 animate-pulse rounded" /></td>
+                                        <td className="px-4 py-4"><div className="h-4 w-20 bg-white/5 animate-pulse rounded" /></td>
+                                        <td className="px-4 py-4"><div className="h-4 w-16 bg-white/5 animate-pulse rounded" /></td>
+                                        <td className="px-4 py-4"><div className="h-4 w-24 bg-white/5 animate-pulse rounded" /></td>
+                                        <td className="px-4 py-4"><div className="h-4 w-24 bg-white/5 animate-pulse rounded" /></td>
+                                        <td className="px-4 py-4"><div className="h-4 w-32 bg-white/5 animate-pulse rounded" /></td>
+                                        <td className="px-4 py-4"><div className="h-4 w-24 bg-white/5 animate-pulse rounded" /></td>
+                                    </tr>
+                                ))
+                            ) : payments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} className="px-4 py-12 text-center text-slate-500">
-                                        No billing records found
+                                    <td colSpan={8} className="px-4 py-12 text-center">
+                                        <div className="flex flex-col items-center gap-2 opacity-50 italic">
+                                            <Receipt className="w-8 h-8 text-slate-600 mb-2" />
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">No billing records found</p>
+                                        </div>
                                     </td>
                                 </tr>
                             ) : (

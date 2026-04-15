@@ -111,7 +111,7 @@ export default function MembersPage() {
       >
         {((session?.user as any)?.role !== 'trainer') && (
           <Link href="/members/add">
-            <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
+            <Button className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
               <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
               Add Member
             </Button>

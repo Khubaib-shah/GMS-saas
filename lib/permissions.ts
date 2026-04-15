@@ -118,13 +118,7 @@ export const LEGACY_ROLE_MAP: Record<string, Role> = {
 
 // Default permissions per role (used as template when seeding DB-backed Role objects)
 export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
-    super_admin: [
-        ...Object.values(PERMISSIONS).filter(p =>
-            p !== PERMISSIONS.PLANS_CREATE &&
-            p !== PERMISSIONS.PLANS_EDIT &&
-            p !== PERMISSIONS.PLANS_DELETE
-        ),
-    ],
+    super_admin: ALL_PERMISSIONS,
 
     owner: ALL_PERMISSIONS, // Owner always has all permissions
 

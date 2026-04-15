@@ -81,7 +81,7 @@ export function WorkoutTemplates() {
                     value={search}
                     onChange={(val) => setSearch(val)}
                     leadingIcon={<Search className="w-5 h-5" />}
-                    className="h-14 bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
+                    className="h-[38px] bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
                 />
             </div>
 
@@ -158,7 +158,7 @@ export function WorkoutTemplates() {
                                         </DropdownMenuContent>
                                     </DropdownMenu>
 
-                                    <Button size="icon" asChild className="h-14 w-14 rounded-2xl bg-white/5 border border-white/10 text-primary hover:bg-primary hover:text-black transition-all group/btn shadow-xl shadow-black/20">
+                                    <Button size="icon" asChild className="h-[38px] w-14 rounded-2xl bg-white/5 border border-white/10 text-primary hover:bg-primary hover:text-black transition-all group/btn shadow-xl shadow-black/20">
                                         <Link href={`/workout-plans/${template._id || template.id}`}>
                                             <ChevronRight className="w-6 h-6 group-hover/btn:translate-x-1 transition-transform" />
                                         </Link>

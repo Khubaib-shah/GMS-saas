@@ -141,9 +141,9 @@ export function ExerciseLibrary() {
                     value={search}
                     onChange={(val) => setSearch(val)}
                     leadingIcon={<Search className="w-5 h-5" />}
-                    className="h-14 bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
+                    className="h-[38px] bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
                 />
-                <Button variant="outline" className="h-14 px-6 rounded-2xl bg-slate-950/20 border-white/5 hover:border-primary/20 hover:bg-white/5 text-[11px] font-black italic uppercase tracking-widest gap-3">
+                <Button variant="outline" className="h-[38px] px-6 rounded-2xl bg-slate-950/20 border-white/5 hover:border-primary/20 hover:bg-white/5 text-[11px] font-black italic uppercase tracking-widest gap-3">
                     <Filter className="w-4 h-4" />
                     Filters
                 </Button>

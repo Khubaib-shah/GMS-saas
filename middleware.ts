@@ -59,13 +59,18 @@ export default async function proxy(req: NextRequest) {
         );
     }
 
-    // 4. Super admin visiting /dashboard -> Redirect to /super-admin
-    if (req.nextUrl.pathname.startsWith("/dashboard") && isAdmin) {
+    // 4. Super admin visiting /dashboard or legacy /admin -> Redirect to /super-admin
+    if ((req.nextUrl.pathname.startsWith("/dashboard") || req.nextUrl.pathname.startsWith("/admin")) && isAdmin) {
         return NextResponse.redirect(new URL("/super-admin", req.url));
     }
+    
+    // 5. Redirect any /admin request to /super-admin for platform admins or dashboard for others
+    if (req.nextUrl.pathname.startsWith("/admin")) {
+        return NextResponse.redirect(new URL(isAdmin ? "/super-admin" : "/dashboard", req.url));
+    }
 
-    // 5. Regular user visiting /admin or /super-admin -> Redirect to /dashboard
-    if ((req.nextUrl.pathname.startsWith("/admin") || req.nextUrl.pathname.startsWith("/super-admin")) && !isAdmin) {
+    // 5. Regular user visiting /super-admin -> Redirect to /dashboard
+    if (req.nextUrl.pathname.startsWith("/super-admin") && !isAdmin) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 

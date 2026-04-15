@@ -57,8 +57,62 @@ export function CreateGymModal({ isOpen, onClose, onSuccess }: CreateGymModalPro
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.planId) {
-            toast.error("Please select a platform plan");
+
+        // 1. Validation Logic Using Switch
+        const validate = () => {
+            const fields = [
+                "gymName",
+                "planId",
+                "ownerName",
+                "ownerEmail",
+                "ownerPassword",
+                "city",
+                "phone",
+                "address",
+            ];
+
+            for (const field of fields) {
+                const value = (formData as any)[field];
+                if (!value || (typeof value === "string" && !value.trim())) {
+                    switch (field) {
+                        case "gymName":
+                            return "A name for your gym is required.";
+                        case "planId":
+                            return "Please select a subscription plan.";
+                        case "ownerName":
+                            return "Owner's full name is required.";
+                        case "ownerEmail":
+                            return "Owner's email address is required.";
+                        case "ownerPassword":
+                            return "Please set an owner password.";
+                        case "city":
+                            return "Gym city location is required.";
+                        case "phone":
+                            return "A contact phone number is required.";
+                        case "address":
+                            return "Physical address of the gym is required.";
+                        default:
+                            return `Please fill in all required fields.`;
+                    }
+                }
+            }
+
+            // Specific Format Checks
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.ownerEmail)) {
+                return "The owner email address format is invalid.";
+            }
+
+            if (formData.ownerPassword.length < 6) {
+                return "Owner password must be at least 6 characters long.";
+            }
+
+            return null;
+        };
+
+        const error = validate();
+        if (error) {
+            toast.error(error);
             return;
         }
 

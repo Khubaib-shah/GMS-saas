@@ -14,6 +14,7 @@ import {
     Plus,
     Trash2,
     X,
+    BadgeCheck,
 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
@@ -131,7 +132,7 @@ export default function GymsPage() {
             >
                 <Button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2"
+                    className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2"
                 >
                     <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                     REGISTER NEW GYM
@@ -152,10 +153,23 @@ export default function GymsPage() {
                                 placeholder="Search by gym name, owner, or email..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full h-14 pl-12 pr-4 rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-sm text-foreground font-black italic tracking-tighter focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-600"
+                                className="w-full h-[38px] pl-12 pr-4 rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-sm text-foreground font-black italic tracking-tighter focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-600"
                             />
                         </div>
                     </div>
+                    <div className="min-w-[160px]">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
+                            City Location
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="e.g. Lahore"
+                            value={cityFilter}
+                            onChange={(e) => setCityFilter(e.target.value)}
+                            className="w-full h-[38px] px-6 rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-[10px] text-foreground font-black uppercase tracking-widest focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-600"
+                        />
+                    </div>
+
 
                     <div className="min-w-[180px]">
                         <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
@@ -168,7 +182,7 @@ export default function GymsPage() {
                                 setPage(1);
                             }}
                         >
-                            <SelectTrigger className="h-14 px-6 rounded-xl border-transparent bg-black/10 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                            <SelectTrigger className="w-full h-[38px] px-6 rounded-xl border-transparent bg-black/10 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                                 <SelectValue placeholder="All Statuses" />
                             </SelectTrigger>
                             <SelectContent className="bg-slate-900 border-white/10 text-white">
@@ -181,30 +195,19 @@ export default function GymsPage() {
                         </Select>
                     </div>
 
-                    <div className="min-w-[160px]">
-                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
-                            City Location
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="e.g. Lahore"
-                            value={cityFilter}
-                            onChange={(e) => setCityFilter(e.target.value)}
-                            className="w-full h-14 px-6 rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-[10px] text-foreground font-black uppercase tracking-widest focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-600"
-                        />
-                    </div>
 
                     <Button
                         variant="ghost"
                         className={cn(
-                            "h-14 px-6 rounded-xl border font-black italic tracking-tighter text-[10px] uppercase group transition-all",
+                            "h-[38px] px-6 rounded-xl border font-black italic tracking-tighter text-[10px] uppercase group transition-all",
                             !showDeleted
-                                ? "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
-                                : "bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20"
+                                ? "bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20"
+                                : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
                         )}
                         onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
                     >
-                        <Trash2 className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+
+                        {showDeleted ? <BadgeCheck className="w-4 h-4" /> : <Trash2 className="w-4 h-4" />}
                         {showDeleted ? "Back to Active" : "View Deleted"}
                     </Button>
                 </div>

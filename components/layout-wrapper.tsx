@@ -10,7 +10,7 @@ import { Navbar } from "./navbar"
 import { useAppStore } from "@/lib/store"
 import { localDb } from "@/lib/localDb"
 
-import { SessionProvider } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { GuidedTourProvider } from "./guided-tour"
 import { GymProvider } from "@/hooks/use-gym-settings"
 
@@ -18,7 +18,9 @@ interface LayoutWrapperProps {
   children: React.ReactNode
 }
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
+  const { data: session } = useSession()
   const pathname = usePathname()
+  const isAdmin = (session?.user as any)?.role === "super_admin"
   const loadMembers = useAppStore((state) => state.loadMembers)
   const loadPlans = useAppStore((state) => state.loadPlans)
   const loadSubscriptions = useAppStore((state) => state.loadSubscriptions)
@@ -50,32 +52,31 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const isLoginPage = pathname === "/login"
   const isMemberPortal = pathname?.match(/^\/member($|\/)/)
   const isSuperAdmin = pathname?.startsWith("/super-admin")
+  const isLegacyAdmin = pathname?.startsWith("/admin")
   const isSignupPage = pathname?.startsWith("/signup")
-  const isPublicPage = isLandingPage || isLoginPage || isMemberPortal || isSuperAdmin || isSignupPage
+  const isPublicPage = isLandingPage || isLoginPage || isMemberPortal || isSuperAdmin || isSignupPage || isLegacyAdmin || isAdmin
 
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
 
   return (
-    <SessionProvider>
-      <GymProvider>
-        {isPublicPage ? (
-          children
-        ) : (
-          <GuidedTourProvider>
-            <div className="min-h-screen bg-background">
-              <Sidebar />
-              <Navbar />
-              <main className={cn(
-                "mt-16 p-8 transition-all duration-300 ease-in-out",
-                sidebarCollapsed ? "ml-20" : "ml-64"
-              )}>
-                {children}
-              </main>
-            </div>
-          </GuidedTourProvider>
-        )}
-      </GymProvider>
-    </SessionProvider>
+    <GymProvider>
+      {isPublicPage ? (
+        children
+      ) : (
+        <GuidedTourProvider>
+          <div className="min-h-screen bg-background">
+            <Sidebar />
+            <Navbar />
+            <main className={cn(
+              "mt-16 p-8 transition-all duration-300 ease-in-out",
+              sidebarCollapsed ? "ml-20" : "ml-64"
+            )}>
+              {children}
+            </main>
+          </div>
+        </GuidedTourProvider>
+      )}
+    </GymProvider>
   )
 }
 

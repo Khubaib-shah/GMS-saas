@@ -68,7 +68,7 @@ export function CoreFeatures() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
           {features.map((feature, i) => (
             <div key={i} className="group p-8 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors flex flex-col items-start hover:-translate-y-1 duration-300">
-              <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center mb-6 border", feature.bgClass, feature.color)}>
+              <div className={cn("w-14 h-[38px] rounded-xl flex items-center justify-center mb-6 border", feature.bgClass, feature.color)}>
                 {feature.icon}
               </div>
               <h3 className="text-2xl font-semibold text-white mb-3 tracking-tight">{feature.title}</h3>

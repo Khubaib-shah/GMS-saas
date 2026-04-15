@@ -276,7 +276,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                             type="button"
                             variant="ghost"
                             onClick={() => onOpenChange(false)}
-                            className="h-14 px-8 rounded-xl text-[11px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white transition-all"
+                            className="h-[38px] px-8 rounded-xl text-[11px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white transition-all"
                         >
                             Cancel
                         </Button>
@@ -284,7 +284,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                             onClick={handleSubmit}
                             disabled={loading || isViewMode}
                             className={cn(
-                                "h-14 px-10 rounded-xl font-black italic tracking-tighter shadow-lg transition-all min-w-[160px]",
+                                "h-[38px] px-10 rounded-xl font-black italic tracking-tighter shadow-lg transition-all min-w-[160px]",
                                 isViewMode ? "hidden" : "bg-primary text-black hover:bg-white active:scale-95"
                             )}
                         >

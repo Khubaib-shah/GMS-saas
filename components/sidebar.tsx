@@ -20,31 +20,25 @@ export function Sidebar() {
   const gymName = useAppStore((state) => state.gymProfile.name)
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
   const setSidebarCollapsed = useAppStore((state) => state.setSidebarCollapsed)
-  const isAdmin = (session?.user as any)?.role === "super_admin"
+  const role = (session?.user as any)?.role
   const isPremium = (session?.user as any)?.isPremium
 
-  const navItems: NavItem[] = isAdmin
-    ? [
-      { label: "Gym Registry", href: "/admin", icon: <Building2 className="w-5 h-5" /> },
-      { label: "Plans", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> },
-      { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
-    ]
-    : [
-      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : [{ label: "My Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }]),
-      { label: "Members", href: "/members", icon: <Users className="w-5 h-5" /> },
-      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> }] : []),
-      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> }] : []),
-      ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> }] : []),
-      ...((session?.user as any)?.role === 'trainer' ? [
-        { label: "Exercises", href: "/trainer/exercises", icon: <Dumbbell className="w-5 h-5" /> },
-        { label: "Templates", href: "/trainer/templates", icon: <ClipboardList className="w-5 h-5" /> },
-        { label: "Plan Assignment", href: "/trainer/deploy", icon: <ClipboardList className="w-5 h-5" /> },
-        { label: "Reports", href: "/trainer/analytics", icon: <TrendingUp className="w-5 h-5" /> },
-      ] : []),
-      ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
-      ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [{ label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> }] : []),
-      { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
-    ]
+  const navItems: NavItem[] = [
+    ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : [{ label: "My Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }]),
+    { label: "Members", href: "/members", icon: <Users className="w-5 h-5" /> },
+    ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> }] : []),
+    ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> }] : []),
+    ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> }] : []),
+    ...((session?.user as any)?.role === 'trainer' ? [
+      { label: "Exercises", href: "/trainer/exercises", icon: <Dumbbell className="w-5 h-5" /> },
+      { label: "Templates", href: "/trainer/templates", icon: <ClipboardList className="w-5 h-5" /> },
+      { label: "Plan Assignment", href: "/trainer/deploy", icon: <ClipboardList className="w-5 h-5" /> },
+      { label: "Reports", href: "/trainer/analytics", icon: <TrendingUp className="w-5 h-5" /> },
+    ] : []),
+    ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
+    ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [{ label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> }] : []),
+    { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
+  ]
 
   return (
     <aside className={cn(
@@ -54,9 +48,9 @@ export function Sidebar() {
       {/* Logo Section */}
       <div data-tour="sidebar-logo" className={cn("h-16 flex items-center border-b border-sidebar-border", sidebarCollapsed ? "justify-center px-0" : "px-6")}>
         <div className="flex items-center gap-2 overflow-hidden">
-          <Link href={isAdmin ? "/admin" : "/dashboard"} className="flex items-center gap-2 group cursor-pointer">
+          <Link href="/dashboard" className="flex items-center gap-2 group cursor-pointer">
             <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg transition-all group-hover:scale-105">
-              {isAdmin ? <ShieldCheck className="w-6 h-6 text-black" /> : <Building2 className="w-6 h-6 text-black" />}
+              <Building2 className="w-6 h-6 text-black" />
             </div>
             {!sidebarCollapsed && (
               <span className="font-black text-xl tracking-tighter italic text-white animate-in fade-in slide-in-from-left-2 duration-300">
@@ -71,7 +65,7 @@ export function Sidebar() {
       <nav data-tour="sidebar-nav" className="flex-1 px-4 py-8 overflow-y-auto custom-scrollbar">
         {!sidebarCollapsed && (
           <p className="px-3 text-[10px] font-black text-slate-500 dark:text-slate-400 mb-6 uppercase tracking-[0.2em] animate-in fade-in duration-300">
-            {isAdmin ? "ADMIN CONTROL" : "MANAGEMENT CORE"}
+            MANAGEMENT CORE
           </p>
         )}
         <ul className="space-y-1.5">

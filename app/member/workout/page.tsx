@@ -53,7 +53,7 @@ export default function MemberWorkoutPage() {
             <main className="container mx-auto px-6 py-10 relative z-10">
                 <Tabs defaultValue="active" className="space-y-10">
                     <div className="flex justify-center">
-                        <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-14">
+                        <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-[38px]">
                             <TabsTrigger
                                 value="active"
                                 className="px-8 font-black italic text-[11px] uppercase tracking-widest rounded-xl data-[state=active]:bg-primary data-[state=active]:text-black transition-all"

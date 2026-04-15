@@ -40,7 +40,7 @@ export default function PlatformSettingsPage() {
     return (
         <div className="space-y-6 max-w-4xl animate-fade-in">
             <DashboardHeader
-                title="SYSTEM"
+                title="PLATFORM"
                 highlight="SETTINGS"
                 subtitle="ADMIN: CORE_CONFIG_v5"
                 description="Global configuration for the SaaS platform"
@@ -48,7 +48,7 @@ export default function PlatformSettingsPage() {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2 disabled:opacity-50"
+                    className="h-[38px] flex items-center justify-center px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2 disabled:opacity-50"
                 >
                     {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                     {saving ? "SAVING..." : "SAVE CHANGES"}
@@ -151,11 +151,11 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     );
 }
 
-function Toggle({ label, description, checked, onChange }: { 
-    label: string; 
-    description?: string; 
-    checked: boolean; 
-    onChange: (v: boolean) => void 
+function Toggle({ label, description, checked, onChange }: {
+    label: string;
+    description?: string;
+    checked: boolean;
+    onChange: (v: boolean) => void
 }) {
     return (
         <div className="flex items-center justify-between py-2">

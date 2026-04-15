@@ -77,7 +77,7 @@ export default function SuperAdminLayout({
                     {!collapsed && (
                         <div className="overflow-hidden">
                             <p className="text-sm font-bold tracking-wide text-white truncate">GymFlow</p>
-                            <p className="text-[10px] text-indigo-400 font-semibold tracking-widest uppercase">Platform Admin</p>
+                            <p className="text-[10px] text-indigo-400 font-semibold tracking-widest uppercase">Super Admin</p>
                         </div>
                     )}
                 </div>
@@ -132,7 +132,7 @@ export default function SuperAdminLayout({
                             <Menu className="w-5 h-5" />
                         </button>
                         <h2 className="text-sm font-semibold text-white tracking-wide">
-                            {NAV_ITEMS.find(i => pathname === i.href || (i.href !== "/super-admin" && pathname?.startsWith(i.href)))?.label || "Platform Admin"}
+                            {NAV_ITEMS.find(i => pathname === i.href || (i.href !== "/super-admin" && pathname?.startsWith(i.href)))?.label || "Super Admin"}
                         </h2>
                     </div>
                     <div className="flex items-center gap-3">

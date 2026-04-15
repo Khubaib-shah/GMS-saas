@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
 import { LayoutWrapper } from "@/components/layout-wrapper";
+import { Providers } from "@/components/providers";
 import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -70,7 +71,9 @@ export default function RootLayout({
           forcedTheme="dark"
           disableTransitionOnChange
         >
-          <LayoutWrapper>{children}</LayoutWrapper>
+          <Providers>
+            <LayoutWrapper>{children}</LayoutWrapper>
+          </Providers>
           <Toaster position="top-right" richColors />
           <Analytics />
         </ThemeProvider>

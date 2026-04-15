@@ -31,13 +31,13 @@ export function HeroSection() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="#request-demo" className="w-full sm:w-auto">
-            <Button size="lg" className="h-14 px-8 text-base font-semibold rounded-lg bg-primary text-black hover:bg-primary/90 transition-all w-full flex items-center justify-center group shadow-[0_0_30px_rgba(190,255,0,0.3)]">
+            <Button size="lg" className="h-[38px] px-8 text-base font-semibold rounded-lg bg-primary text-black hover:bg-primary/90 transition-all w-full flex items-center justify-center group shadow-[0_0_30px_rgba(190,255,0,0.3)]">
               Request Demo
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
           <Link href="#how-it-works" className="w-full sm:w-auto">
-            <Button variant="outline" size="lg" className="h-14 px-8 text-base font-medium rounded-lg border-white/10 hover:bg-white/5 text-white transition-all w-full flex items-center justify-center gap-2">
+            <Button variant="outline" size="lg" className="h-[38px] px-8 text-base font-medium rounded-lg border-white/10 hover:bg-white/5 text-white transition-all w-full flex items-center justify-center gap-2">
               <Play className="w-4 h-4 fill-current" />
               See How It Works
             </Button>

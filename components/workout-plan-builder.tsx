@@ -367,13 +367,13 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                             </p>
                         </div>
                         <div className="flex gap-4 w-full md:w-auto shrink-0">
-                            <Button variant="ghost" onClick={() => onOpenChange(false)} className="flex-1 md:flex-none h-14 px-10 rounded-xl text-[11px] font-black italic uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all bg-white/5 border border-white/5">
+                            <Button variant="ghost" onClick={() => onOpenChange(false)} className="flex-1 md:flex-none h-[38px] px-10 rounded-xl text-[11px] font-black italic uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all bg-white/5 border border-white/5">
                                 CANCEL
                             </Button>
                             <Button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="flex-1 md:flex-none h-14 px-12 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+                                className="flex-1 md:flex-none h-[38px] px-12 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
                             >
                                 {isSaving ? "SAVING..." : (initialData ? "UPDATE PLAN" : "SAVE PLAN")}
                                 <Save className="ml-3 w-5 h-5" />

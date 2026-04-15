@@ -113,7 +113,7 @@ export default function SubscriptionsPage() {
   // Fetch gyms for select if admin
   useEffect(() => {
     if (isAdmin) {
-      fetch("/api/admin/gyms")
+      fetch("/api/super-admin/gyms")
         .then((res) => res.json())
         .then((data) => {
           setGyms(data);
@@ -247,7 +247,7 @@ export default function SubscriptionsPage() {
         description="Create and update plans for your members"
       >
         {(canCreatePlans || status === "loading") && (
-          <Button onClick={() => setShowAddModal(true)} className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" disabled={status === "loading"}>
+          <Button onClick={() => setShowAddModal(true)} className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" disabled={status === "loading"}>
             <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
             {status === "loading" ? "Loading..." : "Add Plan"}
           </Button>

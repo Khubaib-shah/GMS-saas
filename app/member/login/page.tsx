@@ -109,7 +109,7 @@ export default function MemberLoginPage() {
 
                 <div className="glass-premium p-1">
                     <Tabs defaultValue="password" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 bg-white/5 border-b border-border rounded-t-xl overflow-hidden p-0 h-14">
+                        <TabsList className="grid w-full grid-cols-2 bg-white/5 border-b border-border rounded-t-xl overflow-hidden p-0 h-[38px]">
                             <TabsTrigger
                                 value="password"
                                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none font-black italic text-xs uppercase tracking-widest transition-all h-full"
@@ -188,7 +188,7 @@ export default function MemberLoginPage() {
                                             value={pin}
                                             onChange={(val) => setPin(val.replace(/\D/g, ""))}
                                             leadingIcon={<Hash className="h-4 w-4" />}
-                                            className="font-bold text-2xl tracking-[0.5em] h-14 text-center"
+                                            className="font-bold text-2xl tracking-[0.5em] h-[38px] text-center"
                                             required
                                         />
                                         <button

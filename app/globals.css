@@ -135,6 +135,9 @@
     @apply bg-background text-foreground selection:bg-primary selection:text-primary-foreground;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+  button{
+    cursor: pointer;
+  }
 }
 
 @layer components {

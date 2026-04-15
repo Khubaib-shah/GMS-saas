@@ -68,7 +68,7 @@ export default function WorkoutPlansPage() {
                 subtitle="MANAGEMENT: WORKOUT_PLANS"
                 description="Create and manage training programs for your clients."
             >
-                <Button className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" onClick={() => {
+                <Button className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" onClick={() => {
                     setEditingPlan(null);
                     setIsBuilderOpen(true);
                 }}>
@@ -86,7 +86,7 @@ export default function WorkoutPlansPage() {
                     value={searchQuery}
                     onChange={(val) => setSearchQuery(val)}
                     leadingIcon={<Search className="w-5 h-5" />}
-                    className="h-14 rounded-2xl bg-card border-none shadow-xl shadow-foreground/2 focus-visible:ring-primary"
+                    className="h-[38px] rounded-2xl bg-card border-none shadow-xl shadow-foreground/2 focus-visible:ring-primary"
                 />
             </div>
 

@@ -145,7 +145,7 @@ export function AssignWorkout() {
 
                     <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar overscroll-contain relative isolate">
                         {loading ? (
-                            [1, 2, 3].map(i => <div key={i} className="h-14 rounded-xl bg-white/2 animate-pulse" />)
+                            [1, 2, 3].map(i => <div key={i} className="h-[38px] rounded-xl bg-white/2 animate-pulse" />)
                         ) : filteredMembers.length > 0 ? (
                             filteredMembers.map(m => (
                                 <div

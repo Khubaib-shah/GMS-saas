@@ -65,7 +65,7 @@ export function TrainerDashboard() {
         fetchTrainerData();
     }, []);
 
-    const filteredMembers = members.filter(m => 
+    const filteredMembers = members.filter(m =>
         m.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         m.phone?.includes(searchTerm)
     );
@@ -140,7 +140,7 @@ export function TrainerDashboard() {
                             </h3>
                             <div className="relative w-full md:w-64">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                                <input 
+                                <input
                                     type="text"
                                     placeholder="Search by name or phone..."
                                     className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-xs font-bold text-white focus:outline-none focus:border-primary/40 transition-all"
@@ -231,7 +231,7 @@ export function TrainerDashboard() {
                             <div className="space-y-3">
                                 <Button
                                     onClick={() => router.push("/trainer/exercises")}
-                                    className="w-full h-14 bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 text-[11px] font-black italic uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all"
+                                    className="w-full h-[38px] bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 text-[11px] font-black italic uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all"
                                 >
                                     <span className="flex items-center gap-3">
                                         <Dumbbell className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
@@ -242,7 +242,7 @@ export function TrainerDashboard() {
 
                                 <Button
                                     onClick={() => router.push("/trainer/templates")}
-                                    className="w-full h-14 bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 text-[11px] font-black italic uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all"
+                                    className="w-full h-[38px] bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 text-[11px] font-black italic uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all"
                                 >
                                     <span className="flex items-center gap-3">
                                         <Plus className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
@@ -253,7 +253,7 @@ export function TrainerDashboard() {
 
                                 <Button
                                     onClick={() => router.push("/trainer/deploy")}
-                                    className="w-full h-14 bg-primary text-black hover:bg-white text-[11px] font-black italic uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all shadow-lg"
+                                    className="w-full h-[38px] bg-primary text-black hover:bg-white text-[11px] font-black italic uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all shadow-lg"
                                 >
                                     <span className="flex items-center gap-3">
                                         <Send className="w-4 h-4 group-hover:scale-110 transition-transform" />

@@ -331,7 +331,7 @@ export default function EditMemberPage({
               <Button
                 type="submit"
                 disabled={loading || !formData.firstName}
-                className="flex-1 h-14 bg-primary text-black hover:bg-white font-black italic tracking-tighter text-lg rounded-xl transition-all uppercase neon-glow z-20"
+                className="flex-1 h-[38px] bg-primary text-black hover:bg-white font-black italic tracking-tighter text-lg rounded-xl transition-all uppercase neon-glow z-20"
               >
                 {loading ? "Saving..." : "Save Changes"}
               </Button>
