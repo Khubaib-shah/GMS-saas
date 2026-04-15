@@ -174,11 +174,11 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-black italic tracking-tighter text-foreground uppercase">
             {isTrainer ? 'My Members' : 'Recent Members'}
           </h2>
-          <div className="h-px flex-1 bg-black/5 dark:bg-white/5"></div>
+          <div className="h-px flex-1 bg-black/5 dark:bg-white/5 shadow-[0_1px_0_rgba(255,255,255,0.05)]"></div>
           <div className="flex gap-1">
-            <div className="w-1 h-1 bg-primary"></div>
-            <div className="w-1 h-1 bg-primary/50"></div>
-            <div className="w-1 h-1 bg-primary/20"></div>
+            <div className="w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]"></div>
+            <div className="w-1.5 h-1.5 bg-primary/40 rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-primary/10 rounded-full"></div>
           </div>
         </div>
         <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
@@ -209,18 +209,18 @@ export default function DashboardPage() {
                 const days = daysUntilExpiry(sub.endDate);
                 
                 return (
-                  <div key={sub.id} className="glass-premium p-5 border-l-4 border-l-red-500 hover:scale-[1.02] transition-transform cursor-pointer" onClick={() => router.push(`/members/${member.id}`)}>
+                  <div key={sub.id} className="glass-premium p-6 border-l-4 border-l-red-500 hover:scale-[1.02] transition-all cursor-pointer group/card active:scale-[0.98]" onClick={() => router.push(`/members/${member.id}`)}>
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
-                          <AlertCircle className="w-5 h-5 text-red-500" />
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center border border-red-500/20 group-hover/card:bg-red-500/20 transition-colors">
+                          <AlertCircle className="w-6 h-6 text-red-500" />
                         </div>
                         <div>
-                          <p className="font-black uppercase italic text-sm">{member.firstName} {member.lastName}</p>
-                          <p className="text-[10px] font-black text-slate-500 tracking-widest uppercase">Expires in {days} Days</p>
+                          <p className="font-black uppercase italic text-base tracking-tighter group-hover/card:text-red-500 transition-colors">{member.firstName} {member.lastName}</p>
+                          <p className="text-[10px] font-black text-slate-500 tracking-widest uppercase italic mt-1">Expires in {days} Days</p>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-white/5">
                         <Plus className="w-4 h-4 rotate-45 text-slate-500" />
                       </Button>
                     </div>

@@ -6,6 +6,13 @@ import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Trash2, Plus, Clock, Calendar } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -79,15 +86,21 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Day of Week</Label>
-            <select
-              className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              value={newAvail.dayOfWeek}
-              onChange={(e) => setNewAvail({ ...newAvail, dayOfWeek: Number(e.target.value) })}
+            <Select
+              value={String(newAvail.dayOfWeek)}
+              onValueChange={(val) => setNewAvail({ ...newAvail, dayOfWeek: Number(val) })}
             >
-              {DAYS.map((day) => (
-                <option key={day} value={DAY_MAP[day]}>{day}</option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background text-sm focus:ring-2 focus:ring-primary">
+                <SelectValue placeholder="Select Day" />
+              </SelectTrigger>
+              <SelectContent>
+                {DAYS.map((day) => (
+                  <SelectItem key={day} value={String(DAY_MAP[day])}>
+                    {day}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <InputField

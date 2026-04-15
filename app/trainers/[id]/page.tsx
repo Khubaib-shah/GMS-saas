@@ -263,8 +263,8 @@ export default function TrainerDetailPage({
           {isEditing ? (
             <Card className="border-none shadow-xl">
               <CardHeader>
-                <CardTitle>Edit Trainer Profile</CardTitle>
-                <CardDescription>Configure professional details and scheduling parameters.</CardDescription>
+                <CardTitle>Edit Profile</CardTitle>
+                <CardDescription>Update your professional biography and scheduling details.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -341,7 +341,7 @@ export default function TrainerDetailPage({
               <TabsContent value="clients">
                 <Card className="border-none shadow-lg">
                     <CardHeader>
-                        <CardTitle>Assigned Clients</CardTitle>
+                        <CardTitle>My Clients</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {trainer.members?.length > 0 ? (
@@ -376,7 +376,7 @@ export default function TrainerDetailPage({
 
               <TabsContent value="bio">
                 <Card className="border-none shadow-lg">
-                    <CardHeader><CardTitle>Professional Biography</CardTitle></CardHeader>
+                    <CardHeader><CardTitle>Biography</CardTitle></CardHeader>
                     <CardContent className="prose prose-sm dark:prose-invert max-w-none">
                         {trainer.bio ? <p className="leading-relaxed text-muted-foreground">{trainer.bio}</p> : <p className="italic text-muted-foreground">No biography provided.</p>}
                     </CardContent>

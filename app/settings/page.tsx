@@ -245,10 +245,10 @@ export default function SettingsPage() {
   return (
     <div className="animate-fade-up space-y-10">
       <DashboardHeader
-        title="GYM"
+        title="ACCOUNT"
         highlight="SETTINGS"
-        subtitle="Manage your gym's profile and preferences"
-        description="Customize how your gym works."
+        subtitle="Manage your profile and preferences"
+        description="Update your information and settings."
       />
 
       {/* Tab Navigation */}

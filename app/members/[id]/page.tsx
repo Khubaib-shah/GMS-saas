@@ -51,6 +51,7 @@ import {
 import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { formatCurrency, formatDate, isSubscriptionActive } from "@/lib/utils/file-utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function MemberDetailPage({
   params,
@@ -313,13 +314,13 @@ export default function MemberDetailPage({
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-10 animate-fade-up">
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" asChild className="-ml-4 text-muted-foreground hover:text-foreground">
           <Link href="/members">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Registry
+            Back to Member List
           </Link>
         </Button>
         <div className="flex items-center gap-2">
@@ -439,29 +440,52 @@ export default function MemberDetailPage({
         <div className="lg:col-span-8 space-y-8">
           {/* Quick Stats / Action Card - Moved to Right Column */}
           {((session?.user as any)?.role !== 'trainer') && (
-            <Card className="p-6 border-none shadow-xl shadow-foreground/3 space-y-6">
-              <h3 className="font-bold flex items-center gap-2">
+            <Card className="glass-premium p-6 border-border dark:bg-slate-950/40 space-y-6">
+              <h3 className="text-xl font-black italic tracking-tighter text-foreground uppercase flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary" />
                 Manage Subscription
               </h3>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Target Plan</label>
-                    <select
-                      className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                    <Select
                       value={selectedPlan}
-                      onChange={(e) => setSelectedPlan(e.target.value)}
+                      onValueChange={(val) => setSelectedPlan(val)}
                     >
-                      <option value="">Choose a plan...</option>
-                      {plans.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name} — {formatCurrency(p.price)}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all">
+                        <SelectValue placeholder="Choose a plan..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {plans.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.name} — {formatCurrency(p.price)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Payment Method</label>
+                    <Select
+                      value={renewMethod}
+                      onValueChange={(val) => setRenewMethod(val as any)}
+                    >
+                      <SelectTrigger className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all">
+                        <SelectValue placeholder="Select method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cash">Cash</SelectItem>
+                        <SelectItem value="online">Online</SelectItem>
+                        <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                        <SelectItem value="card">Card</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
 
                   <InputField
                     label="Duration (Days)"
@@ -470,23 +494,8 @@ export default function MemberDetailPage({
                     value={String(renewDays)}
                     onChange={(val) => setRenewDays(Number(val))}
                     placeholder="Days"
-                    className="bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-12"
+                    className="bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Payment Method</label>
-                  <select
-                    className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                    value={renewMethod}
-                    onChange={(e) => setRenewMethod(e.target.value as any)}
-                  >
-                    <option value="cash">Cash</option>
-                    <option value="online">Online</option>
-                    <option value="bank_transfer">Bank Transfer</option>
-                    <option value="card">Card</option>
-                    <option value="other">Other</option>
-                  </select>
                 </div>
 
                 {renewMethod === "online" && (
@@ -605,7 +614,7 @@ export default function MemberDetailPage({
               </div>
               <div>
                 <h4 className="font-bold text-foreground">
-                  {activeSub ? "Currently Active" : "Membership Expired"}
+                  {activeSub ? "Membership Active" : "Membership Expired"}
                 </h4>
                 <p className="text-sm text-muted-foreground leading-none mt-1">
                   {activeSub
@@ -624,11 +633,14 @@ export default function MemberDetailPage({
           {((session?.user as any)?.role !== 'trainer') && (
             <>
               {/* Subscriptions History */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <History className="w-5 h-5 text-primary" />
-                  Membership Timeline
-                </h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-2xl font-black italic tracking-tighter text-foreground uppercase flex items-center gap-3">
+                    <History className="w-6 h-6 text-primary" />
+                    Membership History
+                  </h3>
+                  <div className="h-px flex-1 bg-black/5 dark:bg-white/5 shadow-[0_1px_0_rgba(255,255,255,0.05)]"></div>
+                </div>
 
                 <div className="space-y-3">
                   {memberSubs.length > 0 ? (
@@ -636,11 +648,11 @@ export default function MemberDetailPage({
                       const isActive = isSubscriptionActive(sub.endDate, sub.status);
                       const planName = plans.find(p => p.id === sub.planId)?.name || sub.planId;
                       return (
-                        <div key={sub.id} className="group relative flex items-start gap-4 p-4 rounded-2xl border bg-background hover:shadow-md transition-all">
+                        <div key={sub.id} className="glass-premium group relative flex items-start gap-6 p-6 border-border dark:bg-slate-950/40 hover:scale-[1.01] transition-all">
                           <div className={cn(
                             "mt-1 w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm transition-colors",
-                            isActive && sub.status !== "paused" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground",
-                            sub.status === "paused" && "bg-amber-100 text-amber-600"
+                            isActive && sub.status !== "paused" ? "bg-primary/10 text-primary border-primary/20" : "bg-muted text-muted-foreground border-border/20",
+                            sub.status === "paused" && "bg-amber-500/10 text-amber-500 border-amber-500/20"
                           )}>
                             {sub.status === "paused" ? <Pause className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
                           </div>
@@ -706,51 +718,54 @@ export default function MemberDetailPage({
               </div>
 
               {/* Payments History */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <div className="p-1 rounded-md bg-emerald-500/10 text-emerald-600">
-                    <CreditCard className="w-5 h-5" />
-                  </div>
-                  Payment Records
-                </h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-2xl font-black italic tracking-tighter text-foreground uppercase flex items-center gap-3">
+                    <div className="p-1 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                      <CreditCard className="w-6 h-6" />
+                    </div>
+                    Payment Records
+                  </h3>
+                  <div className="h-px flex-1 bg-black/5 dark:bg-white/5 shadow-[0_1px_0_rgba(255,255,255,0.05)]"></div>
+                </div>
 
-                <Card className="overflow-hidden border-none shadow-xl shadow-foreground/2">
+                <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
+                    <table className="w-full text-[11px] font-bold tracking-widest uppercase">
                       <thead>
-                        <tr className="bg-muted/50 border-b">
-                          <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Transaction ID</th>
-                          <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Date</th>
-                          <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">Method</th>
-                          <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground text-right relative min-w-[100px]">Amount</th>
+                        <tr className="border-b border-white/5 bg-white/[0.02]">
+                          <th className="px-6 py-6 font-black text-slate-500 italic text-left">Transaction ID</th>
+                          <th className="px-6 py-6 font-black text-slate-500 italic text-left">Date</th>
+                          <th className="px-6 py-6 font-black text-slate-500 italic text-left">Method</th>
+                          <th className="px-6 py-6 font-black text-slate-500 italic text-right relative min-w-[100px]">Amount</th>
                           {((session?.user as any)?.role !== 'trainer') && (
-                            <th className="px-6 py-4 font-bold uppercase tracking-widest text-[10px] text-muted-foreground text-right">Actions</th>
+                            <th className="px-6 py-6 font-black text-slate-500 italic text-right text-slate-500 uppercase tracking-widest">Actions</th>
                           )}
                         </tr>
                       </thead>
                       <tbody>
                         {memberPayments.length > 0 ? (
                           memberPayments.map((pay) => (
-                            <tr key={pay.id} className="border-b transition-colors hover:bg-muted/5 group">
-                              <td className="px-6 py-4 font-medium text-muted-foreground flex items-center gap-2">
+                            <tr key={pay.id} className="border-b border-white/5 transition-colors hover:bg-white/[0.02] group/row">
+                              <td className="px-6 py-6 font-mono text-[10px] text-slate-500 flex items-center gap-2">
                                 {pay.id.slice(-8).toUpperCase()}
                                 {pay.receiptUrl && (
                                   <button
                                     onClick={() => setPreviewReceiptUrl(pay.receiptUrl || null)}
-                                    className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+                                    className="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors cursor-pointer border border-emerald-500/20"
                                     title="View Receipt"
                                   >
                                     <Eye className="w-3 h-3" />
                                   </button>
                                 )}
                               </td>
-                              <td className="px-6 py-4 font-semibold">{formatDate(pay.date)}</td>
-                              <td className="px-6 py-4">
-                                <span className="px-2 py-0.5 rounded-full bg-secondary text-primary text-[10px] font-bold uppercase">
+                              <td className="px-6 py-6 font-black italic tracking-tighter text-sm uppercase">{formatDate(pay.date)}</td>
+                              <td className="px-6 py-6">
+                                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg border border-primary/20 bg-primary/10 text-primary text-[9px] font-black italic tracking-widest uppercase">
                                   {pay.method || "Cash"}
                                 </span>
                               </td>
-                              <td className="px-6 py-4 text-right font-bold text-foreground">
+                              <td className="px-6 py-6 text-right font-black italic tracking-tighter text-base text-foreground">
                                 {formatCurrency(pay.amount)}
                               </td>
                               {((session?.user as any)?.role !== 'trainer') && (
@@ -787,7 +802,7 @@ export default function MemberDetailPage({
                       </tbody>
                     </table>
                   </div>
-                </Card>
+                </div>
               </div>
             </>
           )}
@@ -819,11 +834,9 @@ export default function MemberDetailPage({
                   </div>
 
                   <div className="flex gap-2">
-                    <select
-                      className="h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all pr-8"
+                    <Select
                       value={member.workoutPlanId || ""}
-                      onChange={(e) => {
-                        const planId = e.target.value;
+                      onValueChange={(planId) => {
                         if (planId) {
                           toast.promise(assignWorkoutToMember(memberId, planId), {
                             loading: "Assigning plan...",
@@ -833,13 +846,17 @@ export default function MemberDetailPage({
                         }
                       }}
                     >
-                      <option value="">Select Plan...</option>
-                      {workoutPlans.map((wp) => (
-                        <option key={wp._id || wp.id} value={wp._id || wp.id}>
-                          {wp.name}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all min-w-[150px]">
+                        <SelectValue placeholder="Select Plan..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {workoutPlans.map((wp) => (
+                          <SelectItem key={wp._id || wp.id} value={wp._id || wp.id}>
+                            {wp.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </Card>
               </div>
@@ -924,18 +941,21 @@ export default function MemberDetailPage({
               />
               <div className="space-y-2">
                 <Label htmlFor="edit-method">Method</Label>
-                <select
-                  id="edit-method"
-                  className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                <Select
                   value={paymentEditData.method}
-                  onChange={(e) => setPaymentEditData({ ...paymentEditData, method: e.target.value as any })}
+                  onValueChange={(val) => setPaymentEditData({ ...paymentEditData, method: val as any })}
                 >
-                  <option value="cash">Cash</option>
-                  <option value="online">Online</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                  <option value="card">Card</option>
-                  <option value="other">Other</option>
-                </select>
+                  <SelectTrigger id="edit-method" className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background text-sm focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                    <SelectValue placeholder="Method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="online">Online</SelectItem>
+                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                    <SelectItem value="card">Card</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

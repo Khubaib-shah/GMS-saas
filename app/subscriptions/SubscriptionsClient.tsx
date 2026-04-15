@@ -45,6 +45,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function SubscriptionsPage() {
   const { data: session, status } = useSession();
@@ -592,20 +599,21 @@ export default function SubscriptionsPage() {
             {isAdmin && (
               <div className="space-y-2">
                 <Label htmlFor="gym-select">Assign to Gym</Label>
-                <select
-                  id="gym-select"
-                  className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                <Select
                   value={addFormData.gymId}
-                  onChange={(e) => setAddFormData({ ...addFormData, gymId: e.target.value })}
-                  required
+                  onValueChange={(val) => setAddFormData({ ...addFormData, gymId: val })}
                 >
-                  <option value="">Select a Gym</option>
-                  {gyms.map((gym) => (
-                    <option key={gym._id} value={gym._id}>
-                      {gym.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background text-sm focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                    <SelectValue placeholder="Select a Gym" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gyms.map((gym) => (
+                      <SelectItem key={gym._id} value={gym._id}>
+                        {gym.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
             <InputField

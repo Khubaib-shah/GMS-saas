@@ -358,19 +358,22 @@ export async function requireSuperAdmin(): Promise<{ session: AuthenticatedSessi
  * All database queries MUST use this to ensure tenant isolation.
  */
 export function buildGymQuery(session: AuthenticatedSession, additionalFilters: Record<string, any> = {}): Record<string, any> {
-    const query: Record<string, any> = {
-        gymId: session.user.gymId,
-        ...additionalFilters,
-    };
+    const query: Record<string, any> = { ...additionalFilters };
 
-    // If user is branch-scoped, add branch filter
-    // We allow records with the specific branchId OR missing branchId (legacy)
+    // 1. Gym Scoping
+    // Super admins without a specific gym context (gymId: null or PLATFORM) see everything.
+    // Others are strictly scoped to their assigned gymId.
+    if (session.user.gymId && session.user.gymId !== 'PLATFORM') {
+        query.gymId = session.user.gymId;
+    }
+
+    // 2. Branch Scoping
+    // If user is branch-scoped, we restrict results to that branch.
+    // We also allow records with no branch assigned (legacy or global records).
     if (session.user.branchId) {
-        query.$or = [
-            { branchId: session.user.branchId },
-            { branchId: { $exists: false } },
-            { branchId: null }
-        ];
+        // We use $in: [id, null] because in MongoDB, null matches both literal null and missing fields.
+        // This is more composable than a top-level $or, which often gets overwritten by search filters.
+        query.branchId = { $in: [session.user.branchId, null] };
     }
 
     return query;

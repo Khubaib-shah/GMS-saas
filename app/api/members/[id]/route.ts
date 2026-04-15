@@ -47,13 +47,15 @@ export async function GET(
 
         // Inject active subscription status for UI (confidentiality bypass)
         // This allows trainers to see the "Active" banner even if they can't fetch the full history
-        const activeSub = await Subscription.findOne({
+        const subscriptionQuery: any = {
             memberId: id,
-            gymId: session.user.gymId,
             status: { $in: ["active", "paused"] },
             endDate: { $gt: new Date().toISOString() },
             deletedAt: null
-        }).sort({ endDate: -1 }).lean();
+        };
+        if (session.user.gymId) subscriptionQuery.gymId = session.user.gymId;
+
+        const activeSub = await Subscription.findOne(subscriptionQuery).sort({ endDate: -1 }).lean();
 
         if (activeSub) {
             (member as any).activeSubscription = {

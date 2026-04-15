@@ -136,7 +136,7 @@ export default function AddMemberPage() {
         <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
         <div>
           <div className="flex items-center gap-4 mb-2">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">MEMBER REGISTRATION</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">NEW MEMBER REGISTRATION</span>
             <div className="h-px w-24 bg-black/5 dark:bg-white/5"></div>
           </div>
           <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
@@ -157,7 +157,7 @@ export default function AddMemberPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-        {/* LEFT: INITIALIZATION FORM */}
+        {/* LEFT: MEMBER DETAILS FORM */}
         <div className="glass-premium p-8 border-border dark:bg-slate-950/40 space-y-8">
           <div className="flex items-center gap-4 mb-2">
             <h2 className="text-xl font-black italic tracking-tighter text-foreground uppercase">Member Details</h2>
@@ -165,7 +165,7 @@ export default function AddMemberPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Photo Upload - High Tech Dropzone */}
+            {/* Photo Upload */}
             <div>
               <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
                 Profile Photo
@@ -192,7 +192,7 @@ export default function AddMemberPage() {
                       <div className="absolute inset-0 border-2 border-primary/20 rounded-2xl pointer-events-none group-hover:border-primary/50 transition-all"></div>
                     </div>
                     <p className="text-[10px] font-black text-primary uppercase tracking-widest italic animate-pulse">
-                      Change Photo
+                      Update Photo
                     </p>
                   </div>
                 ) : (
@@ -201,7 +201,7 @@ export default function AddMemberPage() {
                       <Upload className="w-6 h-6 text-slate-500 group-hover:text-primary transition-colors" />
                     </div>
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic group-hover:text-slate-300 transition-colors">
-                      Click or drag photo here
+                      Click or drag to upload photo
                     </p>
                   </div>
                 )}
@@ -358,7 +358,7 @@ export default function AddMemberPage() {
           </form>
         </div>
 
-        {/* RIGHT: SUBJECT PREVIEW HUD */}
+        {/* RIGHT: MEMBER PREVIEW */}
         <div className="space-y-8 sticky top-24">
           {/* Preview Card */}
           <div className="bento-item p-1 border-primary/20 relative overflow-hidden group">
@@ -368,7 +368,7 @@ export default function AddMemberPage() {
             <div className="relative p-8 space-y-8 glass-premium border-border dark:bg-slate-950/80 rounded-[calc(1.5rem-4px)]">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic mb-1 block">New Member</span>
+                  <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic mb-1 block">Quick Preview</span>
                   <h3 className="text-3xl font-black italic tracking-tighter text-foreground uppercase break-all">
                     {formData.firstName || "---"}_<span className="text-primary">{formData.lastName || "---"}</span>
                   </h3>
@@ -382,7 +382,7 @@ export default function AddMemberPage() {
                 </div>
               </div>
 
-              {/* Photo Preview HUD */}
+              {/* Photo Preview */}
               <div className="flex justify-center py-8">
                 <div className="relative">
                   <div className="absolute -inset-4 border border-primary/20 rounded-full animate-spin-slow"></div>
@@ -409,7 +409,7 @@ export default function AddMemberPage() {
                   <p className="text-xs font-bold text-slate-400 tracking-widest mt-1">{formData.phone || "---"}</p>
                 </div>
                 <div>
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic mb-2 block">Details</span>
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic mb-2 block">Membership Info</span>
                   <p className="text-xs font-bold text-foreground tracking-widest uppercase">{formData.gender || "---"}</p>
                   <p className="text-xs font-bold text-slate-400 tracking-widest mt-1 uppercase">PLAN: {(formData.planId && store.plans.find(p => p.id === formData.planId)?.name) || (store.plans.length > 0 ? "SELECT A PLAN" : "LOADING...")}</p>
                 </div>
@@ -418,8 +418,8 @@ export default function AddMemberPage() {
               {/* Status Bar */}
               <div className="bg-white/5 rounded-xl p-4 border border-white/5">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">ENCRYPTION_LAYER</span>
-                  <span className="text-[9px] font-black text-primary uppercase tracking-widest italic">VERIFIED</span>
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">DATA PROTECTION</span>
+                  <span className="text-[9px] font-black text-primary uppercase tracking-widest italic">SECURED</span>
                 </div>
                 <div className="h-1 w-full bg-slate-900 rounded-full overflow-hidden">
                   <div className="h-full bg-primary w-2/3 animate-pulse"></div>
@@ -428,12 +428,12 @@ export default function AddMemberPage() {
             </div>
           </div>
 
-          {/* Tactical Info Box */}
+          {/* Information Box */}
           <div className="bento-item p-6 bg-primary/5 border-primary/20 space-y-4">
             <div className="flex gap-4 items-start">
               <AlertCircle className="w-5 h-5 text-primary mt-1" />
               <div>
-                <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">Important Privacy Notice</h4>
+                <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">Privacy Notice</h4>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed mt-1">
                   Please ensure all member details are accurate before proceeding. Member information is stored securely according to privacy standards.
                 </p>

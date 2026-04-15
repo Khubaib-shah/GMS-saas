@@ -41,11 +41,22 @@ export async function GET(req: Request) {
 
         // Add search filter if present
         if (search) {
-            query.$or = [
-                { firstName: { $regex: search, $options: "i" } },
-                { lastName: { $regex: search, $options: "i" } },
-                { email: { $regex: search, $options: "i" } }
-            ];
+            const searchFilter = {
+                $or: [
+                    { firstName: { $regex: search, $options: "i" } },
+                    { lastName: { $regex: search, $options: "i" } },
+                    { email: { $regex: search, $options: "i" } }
+                ]
+            };
+
+            if (query.$or) {
+                // If query already has an $or (unlikely now with buildGymQuery fix, but good for safety),
+                // combine them using $and to avoid overwriting.
+                query.$and = [{ $or: query.$or }, searchFilter];
+                delete query.$or;
+            } else {
+                query.$or = searchFilter.$or;
+            }
         }
 
         const members = await Member.find(query)
@@ -55,12 +66,15 @@ export async function GET(req: Request) {
 
         // Bulk fetch active subscriptions for status injection
         const memberIds = members.map((m: any) => m._id.toString());
-        const activeSubs = await Subscription.find({
+        const subscriptionQuery: any = {
             memberId: { $in: memberIds },
-            gymId,
             status: { $in: ["active", "paused"] },
             deletedAt: null
-        }).lean();
+        };
+        // For non-super admins, restrict to their gym
+        if (gymId) subscriptionQuery.gymId = gymId;
+
+        const activeSubs = await Subscription.find(subscriptionQuery).lean();
 
         // Map members and inject status info
         const mappedMembers = members.map((m: any) => {

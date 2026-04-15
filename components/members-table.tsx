@@ -89,28 +89,30 @@ export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean })
   }, [relevantMembers, store.subscriptions, store.searchQuery]);
 
   return (
-    <Card className="p-6 bg-card">
-      <h3 className="text-lg font-semibold text-foreground mb-6">
-        Attention Needed ({expiringMembers.length})
-      </h3>
+    <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
+      <div className="p-8 pb-2">
+        <h3 className="text-2xl font-black italic tracking-tighter text-foreground uppercase">
+          Attention Needed ({expiringMembers.length})
+        </h3>
+      </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border">
-              <th className="text-left py-3 px-4 font-semibold text-muted-foreground">
+            <tr className="border-b border-white/5 bg-white/[0.02]">
+              <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
                 Member Name
               </th>
-              <th className="text-left py-3 px-4 font-semibold text-muted-foreground">
+              <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
                 Join Date
               </th>
-              <th className="text-left py-3 px-4 font-semibold text-muted-foreground">
+              <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
                 Renewal Date
               </th>
-              <th className="text-left py-3 px-4 font-semibold text-muted-foreground">
+              <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
                 Status
               </th>
-              <th className="text-center py-3 px-4 font-semibold text-muted-foreground">
+              <th className="text-center py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
                 Action
               </th>
             </tr>
@@ -120,42 +122,39 @@ export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean })
               expiringMembers.map((item) => (
                 <tr
                   key={item.member.id}
-                  className="border-b border-border hover:bg-muted/50 transition-colors"
+                  className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row"
                 >
-                  <td className="py-3 px-4 text-foreground font-medium">
-                    {item.member.firstName} {item.member.lastName || ""}
-                  </td>
-                  <td className="py-3 px-4 text-muted-foreground">
-                    {formatDate(item.member.joinDate)}
-                  </td>
-                  <td className="py-3 px-4 text-muted-foreground">
-                    {item.subscription
-                      ? formatDate(item.subscription.endDate)
-                      : "—"}
-                  </td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={cn(
-                        "px-3 py-1 w-full rounded-full text-xs font-medium",
-                        item.status === "active"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      )}
-                    >
-                      {item.status === "active"
-                        ? "Active"
-                        : item.status === "expiring"
-                          ? "ExpSoon"
-                          : "Expired"}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <Link href={`/members/${item.member.id}`}>
-                      <Button variant="outline" size="sm">
-                        {trainerOnly ? "View" : "Renew"}
-                      </Button>
-                    </Link>
-                  </td>
+                  <td className="py-6 px-6 font-black italic tracking-tighter text-base">
+                      {item.member.firstName} {item.member.lastName || ""}
+                    </td>
+                    <td className="py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
+                      {formatDate(item.member.joinDate)}
+                    </td>
+                    <td className="py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
+                      {item.subscription
+                        ? formatDate(item.subscription.endDate)
+                        : "—"}
+                    </td>
+                    <td className="py-6 px-6">
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
+                          item.status === "active"
+                            ? "bg-primary/10 border-primary/20 text-primary"
+                            : "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                        )}
+                      >
+                        <div className={cn("w-1 h-1 rounded-full", item.status === "active" ? "bg-primary" : "bg-amber-500")} />
+                        {item.status === "active" ? "Active" : "Exp Soon"}
+                      </span>
+                    </td>
+                    <td className="py-6 px-6 text-center">
+                      <Link href={`/members/${item.member.id}`}>
+                        <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all uppercase">
+                          {trainerOnly ? "View" : "Renew"}
+                        </Button>
+                      </Link>
+                    </td>
                 </tr>
               ))
             ) : (
@@ -171,6 +170,6 @@ export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean })
           </tbody>
         </table>
       </div>
-    </Card>
+    </div>
   );
 }

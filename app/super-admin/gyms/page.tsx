@@ -121,11 +121,11 @@ export default function GymsPage() {
     };
 
     return (
-        <div className="space-y-6 animate-fade-in">
+        <div className="space-y-10 animate-fade-up">
             <DashboardHeader
-                title="GYM"
-                highlight="NETWORK"
-                subtitle="ADMIN: GYM_REGISTRY_v3"
+                title="OUR"
+                highlight="GYMS"
+                subtitle="Gym Database"
                 description={`${pagination.total || 0} gyms registered on the platform`}
                 descriptionIconColor="emerald"
             >
@@ -134,71 +134,88 @@ export default function GymsPage() {
                     className="h-14 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2"
                 >
                     <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                    CREATE NEW GYM
+                    REGISTER NEW GYM
                 </Button>
             </DashboardHeader>
 
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
-                <div className="relative flex-1 min-w-[250px] max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                    <input
-                        type="text"
-                        placeholder="Search by gym name..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
-                    />
+            {/* Filters - Bento Style */}
+            <div className="glass-premium p-8 border-border bg-card dark:bg-slate-950/40">
+                <div className="flex gap-6 items-end flex-wrap">
+                    <div className="flex-1 min-w-[300px]">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
+                            Search Gym Registry
+                        </label>
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                            <input
+                                type="text"
+                                placeholder="Search by gym name, owner, or email..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-full h-14 pl-12 pr-4 rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-sm text-foreground font-black italic tracking-tighter focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-600"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="min-w-[180px]">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
+                            Filter by Status
+                        </label>
+                        <Select
+                            value={statusFilter || "all"}
+                            onValueChange={(value) => {
+                                setStatusFilter(value === "all" ? "" : value);
+                                setPage(1);
+                            }}
+                        >
+                            <SelectTrigger className="h-14 px-6 rounded-xl border-transparent bg-black/10 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                                <SelectValue placeholder="All Statuses" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Statuses</SelectItem>
+                                <SelectItem value="active" className="text-[10px] font-bold uppercase tracking-widest">Active</SelectItem>
+                                <SelectItem value="trial" className="text-[10px] font-bold uppercase tracking-widest">Trial</SelectItem>
+                                <SelectItem value="expired" className="text-[10px] font-bold uppercase tracking-widest">Expired</SelectItem>
+                                <SelectItem value="suspended" className="text-[10px] font-bold uppercase tracking-widest">Suspended</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="min-w-[160px]">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
+                            City Location
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="e.g. Lahore"
+                            value={cityFilter}
+                            onChange={(e) => setCityFilter(e.target.value)}
+                            className="w-full h-14 px-6 rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-[10px] text-foreground font-black uppercase tracking-widest focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-600"
+                        />
+                    </div>
+
+                    <Button
+                        variant="ghost"
+                        className={cn(
+                            "h-14 px-6 rounded-xl border font-black italic tracking-tighter text-[10px] uppercase group transition-all",
+                            !showDeleted
+                                ? "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                                : "bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20"
+                        )}
+                        onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
+                    >
+                        <Trash2 className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+                        {showDeleted ? "Back to Active" : "View Deleted"}
+                    </Button>
                 </div>
-
-                <Select
-                    value={statusFilter || "all"}
-                    onValueChange={(value) => {
-                        setStatusFilter(value === "all" ? "" : value);
-                        setPage(1);
-                    }}
-                >
-                    <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-sm text-slate-300 h-[42px] min-w-[140px]">
-                        <SelectValue placeholder="All Statuses" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1a1a24] border-white/[0.08] text-white">
-                        <SelectItem value="all">All Statuses</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="trial">Trial</SelectItem>
-                        <SelectItem value="expired">Expired</SelectItem>
-                        <SelectItem value="suspended">Suspended</SelectItem>
-                    </SelectContent>
-                </Select>
-
-                <input
-                    type="text"
-                    placeholder="Filter by city..."
-                    value={cityFilter}
-                    onChange={(e) => setCityFilter(e.target.value)}
-                    className="px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 min-w-[150px]"
-                />
-
-                <Button
-                    variant={showDeleted ? "default" : "outline"}
-                    className={cn(
-                        "h-[42px] px-4",
-                        !showDeleted
-                            ? "bg-transparent border-white/[0.08] text-slate-300 hover:text-white"
-                            : "bg-rose-500/20 text-rose-400 border-rose-500/50 hover:bg-rose-500/30 font-medium"
-                    )}
-                    onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
-                >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    {showDeleted ? "Showing Archive" : "Show Archive"}
-                </Button>
             </div>
 
-            {/* Table */}
-            <div className="rounded-xl border border-white/[0.06] bg-[#0d0d14] overflow-hidden">
+            {/* Table - Glass Style */}
+            <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full text-[11px] font-bold tracking-widest uppercase">
                         <thead>
-                            <tr className="border-b border-white/[0.06]">
+                            <tr className="border-b border-white/5 bg-white/[0.02]">
                                 {[
                                     "Gym Name",
                                     "Owner",
@@ -209,11 +226,11 @@ export default function GymsPage() {
                                     "Revenue",
                                     "Branches",
                                     "Expiry",
-                                    "",
+                                    "Actions",
                                 ].map((h) => (
                                     <th
                                         key={h}
-                                        className="px-4 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider"
+                                        className="px-6 py-6 text-left font-black text-slate-500 italic"
                                     >
                                         {h}
                                     </th>
@@ -221,9 +238,31 @@ export default function GymsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {gyms.length === 0 && !loading ? (
+                            {loading ? (
+                                Array.from({ length: 10 }).map((_, i) => (
+                                    <tr key={i} className="border-b border-black/5 dark:border-white/5 animate-pulse">
+                                        <td className="px-6 py-6" colSpan={2}>
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 rounded-xl bg-white/5" />
+                                                <div className="space-y-2">
+                                                    <div className="h-4 w-32 bg-white/5 rounded" />
+                                                    <div className="h-3 w-40 bg-white/5 rounded" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-6"><div className="h-3 w-16 bg-white/5 rounded" /></td>
+                                        <td className="px-6 py-6"><div className="h-3 w-12 bg-white/5 rounded" /></td>
+                                        <td className="px-6 py-6"><div className="h-6 w-20 bg-white/5 rounded-lg" /></td>
+                                        <td className="px-6 py-6"><div className="h-4 w-12 bg-white/5 rounded" /></td>
+                                        <td className="px-6 py-6"><div className="h-4 w-20 bg-white/5 rounded" /></td>
+                                        <td className="px-6 py-6"><div className="h-3 w-8 bg-white/5 rounded" /></td>
+                                        <td className="px-6 py-6"><div className="h-3 w-20 bg-white/5 rounded" /></td>
+                                        <td className="px-6 py-6"><div className="h-9 w-9 bg-white/5 rounded-xl ml-auto" /></td>
+                                    </tr>
+                                ))
+                            ) : gyms.length === 0 ? (
                                 <tr>
-                                    <td colSpan={10} className="px-4 py-12 text-center text-slate-500">
+                                    <td colSpan={10} className="px-4 py-12 text-center text-slate-500 font-black italic uppercase tracking-widest text-[10px]">
                                         No gyms found matching your criteria
                                     </td>
                                 </tr>
@@ -233,59 +272,62 @@ export default function GymsPage() {
                                     return (
                                         <tr
                                             key={gym.id}
-                                            className="border-b border-white/[0.04] hover:bg-white/[0.02] cursor-pointer transition-colors"
+                                            className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] cursor-pointer transition-colors group/row"
                                             onClick={() => router.push(`/super-admin/gyms/${gym.id}`)}
                                         >
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0">
-                                                        <Building2 className="w-4 h-4 text-indigo-400" />
+                                            <td className="px-6 py-6">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20 shadow-[0_0_15px_rgba(var(--indigo-500),0.1)] group-hover/row:bg-indigo-500/20 transition-colors">
+                                                        <Building2 className="w-5 h-5 text-indigo-400" />
                                                     </div>
-                                                    <span className="font-medium text-white truncate max-w-[160px]">
+                                                    <span className="text-foreground font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
                                                         {gym.name}
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3">
+                                            <td className="px-6 py-6">
                                                 <div>
-                                                    <p className="text-white text-xs font-medium">{gym.ownerName}</p>
-                                                    <p className="text-slate-500 text-[11px]">{gym.ownerEmail}</p>
+                                                    <p className="text-foreground font-black italic tracking-tighter text-sm mb-0.5">{gym.ownerName}</p>
+                                                    <p className="text-[9px] text-slate-500 font-mono tracking-widest lowercase">{gym.ownerEmail}</p>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 text-slate-400 text-xs">{gym.city || "—"}</td>
-                                            <td className="px-4 py-3">
-                                                <span className="text-xs font-medium text-indigo-400">{gym.planName}</span>
+                                            <td className="px-6 py-6 text-slate-500 font-black italic tracking-widest text-[10px]">{gym.city || "—"}</td>
+                                            <td className="px-6 py-6">
+                                                <span className="text-[10px] font-black italic tracking-widest text-indigo-400">{gym.planName}</span>
                                             </td>
-                                            <td className="px-4 py-3">
+                                            <td className="px-6 py-6">
                                                 <span
                                                     className={cn(
-                                                        "px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border",
+                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
                                                         badge.class
                                                     )}
                                                 >
+                                                    <div className={cn("w-1 h-1 rounded-full bg-current")} />
                                                     {badge.label}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-1.5 text-slate-300">
-                                                    <Users className="w-3.5 h-3.5 text-slate-500" />
-                                                    <span className="text-xs font-medium">{gym.totalMembers}</span>
+                                            <td className="px-6 py-6">
+                                                <div className="flex items-center gap-2 text-slate-300">
+                                                    <Users className="w-4 h-4 text-slate-500" />
+                                                    <span className="text-base font-black italic tracking-tighter">{gym.totalMembers}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 text-xs font-medium text-emerald-400">
+                                            <td className="px-6 py-6 text-base font-black italic tracking-tighter text-emerald-400">
                                                 {formatPKR(gym.totalRevenue)}
                                             </td>
-                                            <td className="px-4 py-3 text-xs text-slate-400">{gym.branchCount}</td>
-                                            <td className="px-4 py-3 text-xs text-slate-400">
+                                            <td className="px-6 py-6 text-slate-500 font-mono text-[10px]">{gym.branchCount}</td>
+                                            <td className="px-6 py-6 text-slate-500 font-mono text-[10px]">
                                                 {gym.expiryDate
-                                                    ? new Date(gym.expiryDate).toLocaleDateString("en-PK")
+                                                    ? new Date(gym.expiryDate).toLocaleDateString("en-PK").toUpperCase()
                                                     : "—"}
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center justify-end gap-2">
+                                            <td className="px-6 py-6">
+                                                <div className="flex items-center justify-end gap-3">
                                                     {gym.deletedAt && (
-                                                        <button
-                                                            className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-9 w-9 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"
                                                             title="Delete Permanently"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -293,9 +335,11 @@ export default function GymsPage() {
                                                             }}
                                                         >
                                                             <Trash2 className="w-4 h-4" />
-                                                        </button>
+                                                        </Button>
                                                     )}
-                                                    <ExternalLink className="w-4 h-4 text-slate-500" />
+                                                    <div className="h-9 w-9 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-slate-500 group-hover/row:text-primary transition-colors">
+                                                        <ExternalLink className="w-4 h-4" />
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -308,25 +352,29 @@ export default function GymsPage() {
 
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (
-                    <div className="flex items-center justify-between px-4 py-3 border-t border-white/[0.06]">
-                        <p className="text-xs text-slate-500">
-                            Page {page} of {pagination.totalPages} ({pagination.total} total)
+                    <div className="flex items-center justify-between px-6 py-6 border-t border-white/5 bg-white/[0.01]">
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic">
+                            Page {page} of {pagination.totalPages} <span className="mx-2 opacity-20">|</span> {pagination.total} ENTRIES FOUND
                         </p>
                         <div className="flex items-center gap-2">
-                            <button
+                            <Button
+                                variant="ghost"
+                                size="icon"
                                 onClick={() => setPage(Math.max(1, page - 1))}
                                 disabled={page <= 1}
-                                className="p-1.5 rounded-md bg-white/[0.04] text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                                className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-slate-400 hover:text-white disabled:opacity-20 transition-all"
                             >
                                 <ChevronLeft className="w-4 h-4" />
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="icon"
                                 onClick={() => setPage(Math.min(pagination.totalPages, page + 1))}
                                 disabled={page >= pagination.totalPages}
-                                className="p-1.5 rounded-md bg-white/[0.04] text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                                className="h-10 w-10 rounded-xl bg-white/5 border border-white/5 text-slate-400 hover:text-white disabled:opacity-20 transition-all"
                             >
                                 <ChevronRight className="w-4 h-4" />
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -348,9 +396,9 @@ export default function GymsPage() {
                         >
                             <X className="w-4 h-4" />
                         </button>
-                        <h3 className="text-sm font-semibold text-white mb-4 pr-6">Confirm Permanent Delete</h3>
+                        <h3 className="text-sm font-semibold text-white mb-4 pr-6">Permanently Delete Gym</h3>
                         <div className="space-y-4">
-                            <p className="text-sm font-bold text-red-500 uppercase tracking-wider">Warning: Irreversible Action</p>
+                            <p className="text-sm font-bold text-red-500 uppercase tracking-wider">Warning: This cannot be undone</p>
                             <p className="text-sm text-slate-300">This will completely delete the gym and <strong className="text-white">all</strong> of its associated user accounts, members, payments, and subscriptions from the database permanently.</p>
                             <div className="flex gap-3 justify-end mt-4">
                                 <button
