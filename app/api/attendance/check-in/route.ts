@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     const { session } = authResult;
 
     try {
-        const { memberId, branchId, method = "manual" } = await req.json();
+        const { memberId, branchId, method = "manual", date: providedDate } = await req.json();
 
         if (!memberId) {
             return NextResponse.json({ error: "Member ID is required" }, { status: 400 });
@@ -35,7 +35,10 @@ export async function POST(req: Request) {
         }
 
         const requiredFeature = method === "qr" ? "qrAttendance" : "manualAttendance";
-        if (!subPlan.enabledFeatures?.includes(requiredFeature)) {
+        const hasSpecificFeature = subPlan.enabledFeatures?.includes(requiredFeature);
+        const hasLegacyFeature = subPlan.enabledFeatures?.includes("attendance");
+
+        if (!hasSpecificFeature && !hasLegacyFeature) {
             return NextResponse.json({
                 error: `Feature not available on your plan: ${method === "qr" ? "QR Attendance" : "Manual Attendance"}`,
                 feature: requiredFeature
@@ -88,7 +91,7 @@ export async function POST(req: Request) {
         }
 
         // 3. Check for duplicate check-in today (if rule enabled)
-        const startOfDay = new Date();
+        const startOfDay = providedDate ? new Date(providedDate) : new Date();
         startOfDay.setHours(0, 0, 0, 0);
 
         const endOfDay = new Date();

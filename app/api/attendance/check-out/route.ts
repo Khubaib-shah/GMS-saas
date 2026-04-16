@@ -15,7 +15,7 @@ export async function POST(req: Request) {
         if ("error" in authResult) return authResult.error;
         const { session } = authResult;
 
-        const { memberId, gymId, method = "manual" } = await req.json();
+        const { memberId, gymId, method = "manual", date: providedDate } = await req.json();
 
         if (!memberId || !gymId) {
             return NextResponse.json(
@@ -33,14 +33,17 @@ export async function POST(req: Request) {
         }
 
         const requiredFeature = method === "qr" ? "qrAttendance" : "manualAttendance";
-        if (!subPlan.enabledFeatures?.includes(requiredFeature)) {
+        const hasSpecificFeature = subPlan.enabledFeatures?.includes(requiredFeature);
+        const hasLegacyFeature = subPlan.enabledFeatures?.includes("attendance");
+
+        if (!hasSpecificFeature && !hasLegacyFeature) {
             return NextResponse.json({
                 error: `Feature not available on your plan: ${method === "qr" ? "QR Attendance" : "Manual Attendance"}`,
                 feature: requiredFeature
             }, { status: 403 });
         }
 
-        const startOfDay = new Date();
+        const startOfDay = providedDate ? new Date(providedDate) : new Date();
         startOfDay.setHours(0, 0, 0, 0);
 
         const endOfDay = new Date();

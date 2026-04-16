@@ -72,6 +72,7 @@ export function AttendanceScanner() {
         body: JSON.stringify({
           memberId: memberId,
           gymId: store.gymProfile?._id,
+          date: new Date().toISOString().split('T')[0],
         }),
       });
 
@@ -211,10 +212,10 @@ export function AttendanceScanner() {
 
       {result && (
         <div className="mt-6">
-          <AttendanceResult 
-            data={result} 
-            isCheckout={isCheckout} 
-            onClose={() => setResult(null)} 
+          <AttendanceResult
+            data={result}
+            isCheckout={isCheckout}
+            onClose={() => setResult(null)}
           />
         </div>
       )}

@@ -17,6 +17,7 @@ export type AppState = {
     owner: string
     phone: string
     address: string
+    enabledFeatures?: string[]
   }
   loadGymProfile: () => Promise<void>
   updateGymProfile: (data: Partial<AppState["gymProfile"]>) => void
@@ -134,6 +135,7 @@ export const useAppStore = create<AppState>()(
                 owner: data.owner || "Owner", // Fallback, usually from session
                 phone: data.phone || "",
                 address: data.address || "",
+                enabledFeatures: data.enabledFeatures || [],
               },
             });
           }

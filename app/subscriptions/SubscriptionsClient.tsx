@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 import { Card } from "@/components/ui/card";
-import { Edit2, Plus, Trash2, PauseCircle, PlayCircle } from "lucide-react";
+import { Edit2, Plus, Trash2, PauseCircle, PlayCircle, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -52,6 +52,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
+import Link from "next/link";
+import { PlanSkeleton } from "@/components/plan-skeleton";
+import { div } from "three/src/nodes/math/OperatorNode.js";
 
 export default function SubscriptionsPage() {
   const { data: session, status } = useSession();
@@ -247,7 +251,7 @@ export default function SubscriptionsPage() {
     });
 
   return (
-    <div className="container mx-auto">
+    <div className="space-y-10 animate-fade-up">
       <DashboardHeader
         title="GYM"
         highlight="PLANS"
@@ -264,94 +268,100 @@ export default function SubscriptionsPage() {
 
       {/* Plans Section */}
       <div className="mb-12">
-        <h2 className="text-xl font-semibold text-foreground mb-6">
-          Available Plans
-        </h2>
+        <div className="flex items-center gap-4 mb-6">
+          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">AVAILABLE PLANS</h3>
+          <div className="h-px flex-1 bg-white/5"></div>
+        </div>
 
-        {isAdmin ? (
-          <Card className="overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Gym Name</TableHead>
-                  <TableHead>Plan Name</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead className="text-center">Active Members</TableHead>
-                  {(canEditPlans || canDeletePlans) && <TableHead className="text-right">Actions</TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPlans.length > 0 ? (
-                  filteredPlans.map((plan) => {
-                    const gym = gyms.find(g => g._id === plan.gymId);
-                    const memberCount = store.subscriptions.filter(
-                      (s) => s.planId === plan.id
-                    ).length;
+        {loading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{Array.from({ length: 2 }).map((_, i) => (
+          <PlanSkeleton key={i} />
+        ))}</div> : isAdmin ? (
+          <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
+            <div className="overflow-x-auto">
+              <table className="w-full text-[11px] font-bold tracking-widest uppercase">
+                <thead>
+                  <tr className="border-b border-white/5 bg-white/[0.02]">
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">GYM NAME</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">PLAN NAME</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">PRICE</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">DURATION</th>
+                    <th className="text-center py-6 px-6 font-black text-slate-500 italic">MEMBERS</th>
+                    {(canEditPlans || canDeletePlans) && <th className="text-right py-6 px-6 font-black text-slate-500 italic">ACTIONS</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPlans.length > 0 ? (
+                    filteredPlans.map((plan) => {
+                      const gym = gyms.find(g => g._id === plan.gymId);
+                      const memberCount = store.subscriptions.filter(
+                        (s) => s.planId === plan.id
+                      ).length;
 
-                    return (
-                      <TableRow key={plan.mongoId || `${plan.gymId}-${plan.id}`}>
-                        <TableCell className="font-medium">
-                          {gym?.name || "Unknown Gym"}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col">
-                            <span className="font-semibold">{plan.name}</span>
-                            <span className="text-xs text-muted-foreground">{plan.id}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{formatCurrency(plan.price)}</TableCell>
-                        <TableCell>{plan.duration} days</TableCell>
-                        <TableCell className="text-center">
-                          <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-bold">
-                            {memberCount}
-                          </span>
-                        </TableCell>
-                        {(canEditPlans || canDeletePlans) && (
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              {canEditPlans && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setSelectedPlan(plan);
-                                    setEditFormData({
-                                      ...plan,
-                                      price: plan.price,
-                                    });
-                                    setShowEditModal(true);
-                                  }}
-                                >
-                                  <Edit2 className="w-4 h-4" />
-                                </Button>
-                              )}
-                              {canDeletePlans && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  onClick={() => setPlanToDelete(plan.id)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              )}
+                      return (
+                        <tr key={plan.mongoId || `${plan.gymId}-${plan.id}`} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
+                          <td className="py-6 px-6 font-black italic text-foreground tracking-tighter">
+                            {gym?.name || "Unknown Gym"}
+                          </td>
+                          <td className="py-6 px-6">
+                            <div className="flex flex-col">
+                              <span className="font-black text-foreground">{plan.name}</span>
+                              <span className="text-[9px] font-mono text-slate-500">ID: {plan.id.slice(-8)}</span>
                             </div>
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    );
-                  })
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={(canEditPlans || canDeletePlans) ? 6 : 5} className="h-24 text-center text-muted-foreground">
-                      No plans created yet.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </Card>
+                          </td>
+                          <td className="py-6 px-6 font-mono text-primary">{formatCurrency(plan.price)}</td>
+                          <td className="py-6 px-6 font-mono text-slate-500">{plan.duration} DAYS</td>
+                          <td className="py-6 px-6 text-center">
+                            <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest border border-primary/20">
+                              {memberCount} ACTIVE
+                            </span>
+                          </td>
+                          {(canEditPlans || canDeletePlans) && (
+                            <td className="py-6 px-6 text-right">
+                              <div className="flex justify-end gap-2">
+                                {canEditPlans && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setSelectedPlan(plan);
+                                      setEditFormData({
+                                        ...plan,
+                                        price: plan.price,
+                                      });
+                                      setShowEditModal(true);
+                                    }}
+                                    className="h-8 w-8 rounded-xl border border-white/5 bg-white/5 text-slate-400 hover:text-primary hover:border-primary/50 transition-all opacity-0 group-hover/row:opacity-100"
+                                  >
+                                    <Edit2 className="w-4 h-4" />
+                                  </Button>
+                                )}
+                                {canDeletePlans && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/row:opacity-100"
+                                    onClick={() => setPlanToDelete(plan.id)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={(canEditPlans || canDeletePlans) ? 6 : 5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                        No plans created yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPlans.map((plan) => {
@@ -359,40 +369,41 @@ export default function SubscriptionsPage() {
                 (s) => s.planId === plan.id
               ).length;
               return (
-                <Card
+                <div
                   key={plan.mongoId || `${plan.gymId}-${plan.id}`}
-                  className="p-5 flex flex-col justify-between hover:shadow-md transition-all"
+                  className="glass-premium p-8 border-border flex flex-col justify-between"
                 >
                   <div>
                     {/* Title + Duration */}
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-lg font-semibold">{plan.name}</h3>
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
+                    <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/5">
+                      <h3 className="text-lg font-black italic tracking-tighter uppercase">{plan.name}</h3>
+                      <span className="text-[9px] bg-primary/10 text-primary px-2 py-1 rounded-md font-black tracking-widest uppercase border border-primary/20">
                         {plan.duration} days
                       </span>
                     </div>
 
                     {/* Price */}
-                    <div className="mb-4">
-                      <span className="text-3xl font-bold">
+                    <div className="mb-2 flex items-end gap-1">
+                      <span className="text-4xl font-black text-primary font-mono tracking-tighter">
                         {formatCurrency(plan.price)}
                       </span>
-                      <span className="text-muted-foreground text-sm ml-1">
-                        /month
+                      <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest pb-1.5">
+                        /mo
                       </span>
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[40px]">
+                    <p className="text-[11px] text-slate-400 mb-2 font-medium leading-relaxed min-h-[40px]">
                       {plan.description}
                     </p>
 
                     {/* Members */}
-                    <div className="bg-muted/50 rounded-xl p-3 mb-5 text-center">
-                      <p className="text-xl font-bold">{memberCount}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Active Members
-                      </p>
+                    <div className="p-4 mb-2 text-center flex gap-4 items-center justify-center border-t border-white/5">
+                      <p className="text-3xl font-black italic tracking-tighter text-foreground">{memberCount}</p>
+                      <div className="text-left">
+                        <p className="text-[9px] font-black tracking-widest uppercase text-slate-500">Active</p>
+                        <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Members</p>
+                      </div>
                     </div>
                   </div>
 
@@ -401,8 +412,7 @@ export default function SubscriptionsPage() {
                       {canEditPlans && (
                         <Button
                           variant="outline"
-                          size="sm"
-                          className="flex-1"
+                          className="flex-1 rounded-xl font-black italic tracking-tighter !h-[38px] border-white/10 bg-white/5 text-slate-400 hover:text-white transition-all text-xs uppercase"
                           onClick={() => {
                             setSelectedPlan(plan);
                             setEditFormData({
@@ -419,9 +429,8 @@ export default function SubscriptionsPage() {
 
                       {canDeletePlans && (
                         <Button
-                          variant="destructive"
-                          size="sm"
-                          className="flex-1"
+                          variant="ghost"
+                          className="flex-1 rounded-xl font-black italic tracking-tighter !h-[38px] border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-400 hover:text-white transition-all text-xs"
                           onClick={() => setPlanToDelete(plan.id)}
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -430,7 +439,7 @@ export default function SubscriptionsPage() {
                       )}
                     </div>
                   )}
-                </Card>
+                </div>
               );
             })}
           </div>
@@ -439,105 +448,136 @@ export default function SubscriptionsPage() {
 
       {/* Subscriptions Table */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground mb-6">
-          Member Subscriptions ({memberSubscriptions.length})
-        </h2>
-        <Card className="overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Member</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Start Date</TableHead>
-                <TableHead>Expiry Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {memberSubscriptions.length > 0 ? (
-                memberSubscriptions.map((sub) => (
-                  <TableRow key={sub.id || sub.mongoId}>
-                    <TableCell className="font-medium">
-                      {sub.member?.firstName} {sub.member?.lastName || ""}
-                    </TableCell>
-                    <TableCell>{sub.plan?.name}</TableCell>
-                    <TableCell>{formatDate(sub.startDate)}</TableCell>
-                    <TableCell>{
-                      sub.status === "paused"
-                        ? <div>
-                          <span className="line-through text-muted-foreground text-xs block">{formatDate(sub.originalEndDate || sub.endDate)}</span>
-                          <span>{formatDate(sub.endDate)}</span>
-                        </div>
-                        : formatDate(sub.endDate)
-                    }</TableCell>
-                    <TableCell>
-                      <span
-                        className={cn(
-                          "px-2.5 py-0.5 rounded-full text-xs font-medium",
-                          sub.status === "paused"
-                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                            : isSubscriptionActive(sub.endDate, sub.status)
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                        )}
-                      >
-                        {sub.status === "paused"
-                          ? "Paused"
-                          : isSubscriptionActive(sub.endDate, sub.status)
-                            ? "Active"
-                            : "Expired"}
-                      </span>
-                      {sub.totalPausedDays ? (
-                        <div className="text-[10px] text-muted-foreground mt-1">
-                          Paused: {sub.totalPausedDays}d
-                        </div>
-                      ) : null}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {sub.status === "paused" ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-100 dark:hover:bg-green-900/20"
-                          onClick={() => {
-                            setSelectedSubscription(sub);
-                            setShowResumeDialog(true);
-                          }}
-                          title="Resume Subscription"
-                        >
-                          <PlayCircle className="h-4 w-4" />
-                        </Button>
-                      ) : isSubscriptionActive(sub.endDate, sub.status) ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/20"
-                          onClick={() => {
-                            setSelectedSubscription(sub);
-                            setShowPauseDialog(true);
-                          }}
-                          title="Pause Subscription"
-                        >
-                          <PauseCircle className="h-4 w-4" />
-                        </Button>
-                      ) : null}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    No subscriptions yet.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Card>
+        <div className="flex items-center gap-4 mb-6">
+          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">MEMBER SUBSCRIPTIONS ({memberSubscriptions.length})</h3>
+          <div className="h-px flex-1 bg-white/5"></div>
+        </div>
+
+        <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
+          <div className="overflow-x-auto">
+            <table className="w-full text-[11px] font-bold tracking-widest uppercase">
+              <thead>
+                <tr className="border-b border-white/5 bg-white/[0.02]">
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">MEMBER</th>
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">PLAN</th>
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">START DATE</th>
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">EXPIRY DATE</th>
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">STATUS</th>
+                  <th className="text-right py-6 px-6 font-black text-slate-500 italic">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                      Loading subscriptions...
+                    </td>
+                  </tr>
+                ) : memberSubscriptions.length > 0 ? (
+                  memberSubscriptions.map((sub) => {
+                    const isActive = isSubscriptionActive(sub.endDate, sub.status);
+                    const isPaused = sub.status === "paused";
+
+                    return (
+                      <tr key={sub.id || sub.mongoId} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
+                        <td className="py-6 px-6">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="flex justify-center items-center w-8 h-8 rounded-xl border border-white/5 grayscale group-hover/row:grayscale-0 transition-all">
+                              <AvatarFallback className="bg-primary/10 text-primary font-black italic text-[10px]">
+                                {sub.member?.firstName?.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <span className="font-black italic text-foreground tracking-tighter block group-hover/row:text-primary transition-colors">
+                                {sub.member?.firstName} {sub.member?.lastName || ""}
+                              </span>
+                              <span className="text-[9px] font-mono text-slate-500">ID: {sub.memberId?.slice(-8)}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-6 px-6 font-black uppercase text-slate-300">{sub.plan?.name}</td>
+                        <td className="py-6 px-6 font-mono text-slate-500">{formatDate(sub.startDate)}</td>
+                        <td className="py-6 px-6 font-mono">
+                          {isPaused ? (
+                            <div>
+                              <span className="line-through text-muted-foreground text-xs block">{formatDate(sub.originalEndDate || sub.endDate)}</span>
+                              <span className="text-amber-500">{formatDate(sub.endDate)}</span>
+                            </div>
+                          ) : (
+                            <span className="text-slate-500">{formatDate(sub.endDate)}</span>
+                          )}
+                        </td>
+                        <td className="py-6 px-6">
+                          <div className={cn(
+                            "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
+                            isPaused
+                              ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                              : isActive
+                                ? "bg-primary/10 border-primary/20 text-primary"
+                                : "bg-red-500/10 border-red-500/20 text-red-500"
+                          )}>
+                            <div className={cn("w-1 h-1 rounded-full", isPaused ? "bg-amber-500" : isActive ? "bg-primary" : "bg-red-500")} />
+                            {isPaused ? "PAUSED" : isActive ? "ACTIVE" : "EXPIRED"}
+                          </div>
+                          {sub.totalPausedDays ? (
+                            <div className="text-[9px] font-mono font-black text-muted-foreground mt-2 uppercase">
+                              Paused: {sub.totalPausedDays}d
+                            </div>
+                          ) : null}
+                        </td>
+                        <td className="py-6 px-6 text-right space-x-2">
+                          {isPaused ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500 opacity-0 group-hover/row:opacity-100"
+                              onClick={() => {
+                                setSelectedSubscription(sub);
+                                setShowResumeDialog(true);
+                              }}
+                              title="Resume Subscription"
+                            >
+                              <PlayCircle className="h-4 w-4" />
+                            </Button>
+                          ) : isActive ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 rounded-xl border border-amber-500/10 bg-amber-500/5 transition-all text-amber-500 hover:text-white hover:bg-amber-500 row:opacity-100"
+                              onClick={() => {
+                                setSelectedSubscription(sub);
+                                setShowPauseDialog(true);
+                              }}
+                              title="Pause Subscription"
+                            >
+                              <PauseCircle className="h-4 w-4" />
+                            </Button>
+                          ) : null}
+                          <Link href={`/members/${sub.member?.id}`}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500 row:opacity-100"
+                              title="View Member"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        </td>
+                      </tr>
+                    )
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                      No subscriptions yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       {/* Edit Plan Dialog */}

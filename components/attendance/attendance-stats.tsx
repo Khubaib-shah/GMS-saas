@@ -14,32 +14,36 @@ export function AttendanceStats() {
   });
 
   const fetchStats = async () => {
-    // Ideally fetch from API, but for now we can calculate some if we have data loaded
-    // or fetch daily report
+
     if (!store.gymProfile?._id) return;
     try {
-        const today = new Date().toISOString().split('T')[0];
-        const res = await fetch(`/api/attendance/report?gymId=${store.gymProfile._id}&date=${today}`);
-        const data = await res.json();
-        
-        if (Array.isArray(data)) {
-            setStats({
-                present: data.filter(d => d.status === 'present').length, // or just length of array since it's today's records
-                activeMembers: store.members.length, // approximation
-                checkInsToday: data.length
-            });
-        }
+      const today = new Date().toISOString().split('T')[0];
+      const res = await fetch(`/api/attendance/report?gymId=${store.gymProfile._id}&date=${today}`);
+      const data = await res.json();
+      // im getting [] empty array even thou i have checked in 
+
+      if (Array.isArray(data)) {
+        setStats({
+          present: data.filter(d => d.status === 'present').length,
+          activeMembers: store.members.length,
+          checkInsToday: data.length
+        });
+      }
     } catch (e) {
-        console.error("Failed to fetch stats", e);
+      console.error("Failed to fetch stats", e);
     }
   };
 
   useEffect(() => {
-    fetchStats();
+    if (store.gymProfile?._id) {
+      fetchStats();
+    }
     // Poll every 30s to update live stats
-    const interval = setInterval(fetchStats, 30000);
+    const interval = setInterval(() => {
+      if (store.gymProfile?._id) fetchStats();
+    }, 30000);
     return () => clearInterval(interval);
-  }, [store.gymProfile?._id]);
+  }, [store.gymProfile?._id, store.members.length]);
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -51,7 +55,7 @@ export function AttendanceStats() {
         <CardContent>
           <div className="text-2xl font-bold">{stats.checkInsToday}</div>
           <p className="text-xs text-muted-foreground">
-             Members present now
+            Members present now
           </p>
         </CardContent>
       </Card>

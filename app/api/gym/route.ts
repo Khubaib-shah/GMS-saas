@@ -1,6 +1,7 @@
 import { requireAuth, buildGymQuery } from "@/lib/api-middleware";
 import connectDB from "@/lib/db";
 import Gym from "@/models/Gym";
+import SubscriptionPlan from "@/models/SubscriptionPlan";
 import { NextResponse } from "next/server";
 import { getCache, setCache, deleteCache } from "@/lib/redis";
 
@@ -31,16 +32,24 @@ export async function GET() {
             return NextResponse.json(cachedGym);
         }
 
-        const gym = await Gym.findById(gymId);
+        const [gym, subPlan] = await Promise.all([
+            Gym.findById(gymId),
+            SubscriptionPlan.findOne({ gymId, active: true }).lean()
+        ]);
 
         if (!gym) {
             return NextResponse.json({ message: "Gym not found" }, { status: 404 });
         }
 
-        // Cache for 24 hours (86400 seconds) since it rarely changes
-        await setCache(cacheKey, gym, 86400);
+        const responseData = {
+            ...gym.toObject(),
+            enabledFeatures: (subPlan as any)?.enabledFeatures || []
+        };
 
-        return NextResponse.json(gym);
+        // Cache for 24 hours (86400 seconds) since it rarely changes
+        await setCache(cacheKey, responseData, 86400);
+
+        return NextResponse.json(responseData);
     } catch (error) {
         return NextResponse.json({ message: "Error fetching gym" }, { status: 500 });
     }

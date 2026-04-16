@@ -25,6 +25,9 @@ import {
     Plus,
     Edit2,
     X,
+    ToggleLeft,
+    ToggleRight,
+    Search
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -326,6 +329,57 @@ export default function GymDetailPage() {
                             />
                         </>
                     )}
+                </div>
+            </div>
+
+            {/* Feature Management */}
+            <div className="glass-premium p-8 border-border bg-card dark:bg-slate-950/40 space-y-8 animate-fade-up">
+                <div className="flex items-center gap-4">
+                    <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Feature Management & Overrides</h3>
+                    <div className="h-px flex-1 bg-white/5"></div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[
+                        { key: "members", label: "Members Registry" },
+                        { key: "subscriptions", label: "Billing & Subscriptions" },
+                        { key: "payments", label: "Payment History" },
+                        { key: "attendance", label: "Attendance Core" },
+                        { key: "manualAttendance", label: "Manual Attendance" },
+                        { key: "qrAttendance", label: "QR Access Control" },
+                        { key: "workoutPlanner", label: "Workout Planner" },
+                        { key: "dietModule", label: "Diet & Nutrition" },
+                        { key: "advancedReports", label: "Advanced Analytics" },
+                        { key: "trainersModule", label: "Trainers/Staff" },
+                        { key: "branches", label: "Multi-Branch Support" },
+                        { key: "memberPortal", label: "Customer Portal" },
+                        { key: "api_access", label: "External API" },
+                    ].map((f) => {
+                        const isEnabled = (gym as any).enabledFeatures?.includes(f.key);
+                        return (
+                            <div 
+                                key={f.key} 
+                                className={cn(
+                                    "p-4 rounded-xl border transition-all flex items-center justify-between group/feat text-slate-300",
+                                    isEnabled 
+                                        ? "bg-emerald-500/10 border-emerald-500/20" 
+                                        : "bg-white/[0.02] border-white/5 text-slate-500"
+                                )}
+                            >
+                                <span className={cn("text-[10px] font-black uppercase tracking-widest italic", isEnabled && "text-emerald-400")}>{f.label}</span>
+                                <button
+                                    onClick={() => doAction("toggleFeature", { featureKey: f.key })}
+                                    disabled={actionLoading === "toggleFeature" || actionLoading !== ""}
+                                    className={cn(
+                                        "transition-all active:scale-90 outline-none",
+                                        isEnabled ? "text-emerald-400" : "text-slate-600 hover:text-slate-400"
+                                    )}
+                                >
+                                    {isEnabled ? <ToggleRight className="w-8 h-8" /> : <ToggleLeft className="w-8 h-8" />}
+                                </button>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 

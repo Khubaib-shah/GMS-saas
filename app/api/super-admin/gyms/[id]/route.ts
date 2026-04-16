@@ -29,7 +29,7 @@ export async function GET(
         return NextResponse.json({ message: "Gym not found" }, { status: 404 });
     }
 
-    const [owner, memberCount, activeMembers, trainersCount, revenueAgg, payments] =
+    const [owner, memberCount, activeMembers, trainersCount, revenueAgg, payments, subPlan] =
         await Promise.all([
             User.findOne({ gymId: id, role: { $in: ["gym_owner", "owner"] } })
                 .select("fullName email phone")
@@ -49,6 +49,7 @@ export async function GET(
                 .sort({ paymentDate: -1 })
                 .limit(10)
                 .lean(),
+            SubscriptionPlan.findOne({ gymId: id, active: true }).lean(),
         ]);
 
     return NextResponse.json({
@@ -68,6 +69,7 @@ export async function GET(
             suspensionReason: (gym as any).suspensionReason,
             outstandingAmount: (gym as any).outstandingAmount || 0,
             plan: (gym as any).platformPlanId || null,
+            enabledFeatures: (subPlan as any)?.enabledFeatures || [],
             createdAt: (gym as any).createdAt,
             deletedAt: (gym as any).deletedAt || null,
         },
@@ -279,6 +281,33 @@ export async function PATCH(
             ]);
             await deleteCache(`gym:profile:${id}`);
             return NextResponse.json({ message: "Gym permanently deleted" });
+        }
+
+        case "toggleFeature": {
+            const { featureKey } = body;
+            if (!featureKey) {
+                return NextResponse.json({ message: "featureKey required" }, { status: 400 });
+            }
+
+            const plan = await SubscriptionPlan.findOne({ gymId: id, active: true });
+            if (!plan) {
+                return NextResponse.json({ message: "Subscription plan not found" }, { status: 404 });
+            }
+
+            const features = plan.enabledFeatures || [];
+            const index = features.indexOf(featureKey);
+            
+            if (index > -1) {
+                features.splice(index, 1);
+            } else {
+                features.push(featureKey);
+            }
+
+            plan.enabledFeatures = features;
+            await plan.save();
+
+            await deleteCache(`gym:profile:${id}`);
+            return NextResponse.json({ message: `Feature ${index > -1 ? "disabled" : "enabled"}`, features });
         }
 
         default:

@@ -23,6 +23,8 @@ const PlatformPlanSchema = new mongoose.Schema(
                 "subscriptions",
                 "payments",
                 "attendance",
+                "manualAttendance",
+                "qrAttendance",
             ],
         },
         isActive: { type: Boolean, default: true },

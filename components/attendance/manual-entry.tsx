@@ -49,6 +49,7 @@ export function ManualEntry() {
         body: JSON.stringify({
           memberId: selectedMember.id,
           gymId: store.gymProfile._id, // Ensure gymProfile is loaded
+          date: new Date().toISOString().split('T')[0], // Anchor to current local date
         }),
       });
 

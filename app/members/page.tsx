@@ -34,6 +34,7 @@ export default function MembersPage() {
   const { data: session } = useSession();
   const isPremium = (session?.user as any)?.isPremium;
   const store = useAppStore();
+  const canScan = store.gymProfile?.enabledFeatures?.includes("qrAttendance") || store.gymProfile?.enabledFeatures?.includes("attendance") || isPremium;
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<
     "all" | "active" | "expired"
@@ -50,7 +51,8 @@ export default function MembersPage() {
       setLoading(true);
       await Promise.all([
         store.loadMembers({ showDeleted: showTrash }),
-        store.loadSubscriptions()
+        store.loadSubscriptions(),
+        store.loadGymProfile()
       ]);
       setLoading(false);
     };
@@ -325,12 +327,14 @@ export default function MembersPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => {
-                              if (!isPremium) {
-                                toast("PREMIUM_RESTRICTION", {
-                                  description: "QR scanning is a premium feature.",
+                              if (!canScan) {
+                                toast("Premium Feature", {
+                                  description: "QR Code scanning is a premium feature.",
                                   action: {
-                                    label: "UPGRADE",
-                                    onClick: () => { },
+                                    label: "Upgrade",
+                                    onClick: () => {
+                                      // router.push("/plans");
+                                    },
                                   },
                                 });
                                 return;
@@ -342,7 +346,7 @@ export default function MembersPage() {
                             }}
                             className={cn(
                               "h-9 w-9 rounded-xl border border-white/5 bg-white/5 transition-all text-slate-400 hover:text-primary hover:border-primary/50",
-                              !isPremium && "opacity-20 grayscale"
+                              !canScan && "opacity-20 grayscale"
                             )}
                           >
                             <QrCode className="w-4 h-4" />

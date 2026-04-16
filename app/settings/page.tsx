@@ -252,7 +252,7 @@ export default function SettingsPage() {
       />
 
       {/* Tab Navigation */}
-      <div className="flex gap-4 mb-8 border-b border-border flex-wrap">
+      <div className="flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto no-scrollbar">
         {(isAdmin || (!isAdmin && !isTrainer)) && (
           <button
             onClick={() => setActiveTab("gym")}
@@ -342,12 +342,12 @@ export default function SettingsPage() {
         {(isAdmin || (!isAdmin && !isTrainer && can('roles:view' as any))) && (
           <button
             onClick={() => setActiveTab("roles")}
-            className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "roles"
-              ? "text-primary border-primary"
-              : "text-muted-foreground border-transparent hover:text-foreground"
+            className={`px-4 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest italic transition-all whitespace-nowrap ${activeTab === "roles"
+              ? "bg-primary text-black neon-glow"
+              : "bg-white/5 text-slate-500 hover:text-white hover:bg-white/10"
               }`}
           >
-            <Shield className="w-4 h-4 inline-block mr-2" />
+            <Shield className="w-3.5 h-3.5 inline-block mr-2 -mt-0.5" />
             Roles
           </button>
         )}
@@ -355,10 +355,11 @@ export default function SettingsPage() {
 
       {/* Gym Profile Tab */}
       {activeTab === "gym" && (
-        <Card className="p-8 bg-card max-w-2xl border-border/60 shadow-sm">
-          <h2 className="text-2xl font-semibold text-foreground mb-6">
-            Gym Profile
-          </h2>
+        <Card className="glass-premium p-8 max-w-2xl border-border">
+          <div className="flex items-center gap-4 mb-6">
+            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">GYM PROFILE</h3>
+            <div className="h-px flex-1 bg-white/5"></div>
+          </div>
           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSaveGym(); }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
@@ -476,14 +477,14 @@ export default function SettingsPage() {
       {/* Staff Tab */}
       {activeTab === "staff" && (
         <div className="space-y-6 animate-fade-in">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-foreground">Staff Members</h2>
-              <p className="text-muted-foreground">Manage access for managers and receptionists.</p>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-4 flex-1">
+              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex-shrink-0">STAFF MEMBERS</h3>
+              <div className="h-px flex-1 bg-white/5"></div>
             </div>
             <Dialog open={isParamsOpen} onOpenChange={setIsParamsOpen}>
               <DialogTrigger asChild>
-                <Button className="gap-2"><Plus className="w-4 h-4" /> Add Staff</Button>
+                <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group ml-4"><Plus className="w-4 h-4 mr-2" /> ADD STAFF</Button>
               </DialogTrigger>
               <DialogContent>
                 <form onSubmit={handleAddStaff}>
@@ -542,77 +543,83 @@ export default function SettingsPage() {
             </Dialog>
           </div>
 
-          <Card className="overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Joined</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {staff.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">No staff members found.</TableCell>
-                  </TableRow>
-                ) : (
-                  staff.map((s) => (
-                    <TableRow key={s.id || s._id}>
-                      <TableCell className="font-medium">{s.fullName}</TableCell>
-                      <TableCell>{s.email}</TableCell>
-                      <TableCell>
-                        <span className="capitalize bg-muted px-2 py-1 rounded text-xs font-semibold">{s.role}</span>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteStaff(s._id || s.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </Card>
+          <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
+            <div className="overflow-x-auto">
+              <table className="w-full text-[11px] font-bold tracking-widest uppercase">
+                <thead>
+                  <tr className="border-b border-white/5 bg-white/[0.02]">
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">NAME</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">EMAIL</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">ROLE</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">JOINED</th>
+                    <th className="text-right py-6 px-6 font-black text-slate-500 italic">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {staff.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No staff members found.</td>
+                    </tr>
+                  ) : (
+                    staff.map((s) => (
+                      <tr key={s.id || s._id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
+                        <td className="py-6 px-6 font-black italic text-foreground tracking-tighter">{s.fullName}</td>
+                        <td className="py-6 px-6 font-mono text-slate-400 lowercase">{s.email}</td>
+                        <td className="py-6 px-6">
+                          <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest uppercase">{s.role}</span>
+                        </td>
+                        <td className="py-6 px-6 text-slate-500 font-mono text-[10px]">{new Date(s.createdAt).toLocaleDateString()}</td>
+                        <td className="py-6 px-6 text-right">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/row:opacity-100" onClick={() => handleDeleteStaff(s._id || s.id)}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Account Tab */}
       {activeTab === "account" && (
         <div className="space-y-6 animate-fade-in">
-          <Card className="p-8 bg-card max-w-2xl border-border/60 shadow-sm">
-            <h2 className="text-2xl font-semibold text-foreground mb-6">
-              Account Information
-            </h2>
+          <Card className="glass-premium p-8 max-w-2xl border-border">
+            <div className="flex items-center gap-4 mb-6">
+              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">ACCOUNT INFORMATION</h3>
+              <div className="h-px flex-1 bg-white/5"></div>
+            </div>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 p-4 rounded-lg bg-muted/50">
+              <div className="grid grid-cols-2 gap-4 p-6 rounded-xl bg-black/20 border border-white/5">
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Name</p>
-                  <p className="font-medium">{session?.user?.name}</p>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-1">NAME</p>
+                  <p className="font-medium font-black tracking-tighter">{session?.user?.name}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase font-semibold">Email</p>
-                  <p className="font-medium text-foreground">{session?.user?.email}</p>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-1">EMAIL</p>
+                  <p className="text-slate-400 font-mono text-[11px] mt-1">{session?.user?.email}</p>
                 </div>
               </div>
             </div>
           </Card>
 
-          <Card className="p-8 bg-card max-w-2xl border-border/60 shadow-sm border-destructive/20">
-            <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-              <LogOut className="w-5 h-5" />
-              Session
-            </h2>
-            <p className="text-muted-foreground mb-6 text-sm">
+          <Card className="glass-premium p-8 max-w-2xl border-destructive/20 bg-destructive/5">
+            <div className="flex items-center gap-4 mb-4">
+              <h3 className="text-sm font-black text-destructive uppercase tracking-widest italic flex items-center gap-2">
+                <LogOut className="w-4 h-4" />
+                SESSION
+              </h3>
+              <div className="h-px flex-1 bg-destructive/10"></div>
+            </div>
+            <p className="text-slate-400 mb-6 text-sm">
               Sign out from your current session and return to the login screen.
             </p>
             <Button
+              className="bg-destructive text-white hover:bg-destructive/90 font-black italic tracking-tighter uppercase px-8"
               onClick={() => signOut({ callbackUrl: "/login" })}
-              variant="destructive"
             >
               Logout Account
             </Button>

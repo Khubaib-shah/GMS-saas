@@ -701,11 +701,11 @@ export default function MemberDetailPage({
               {/* Subscriptions History */}
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-2xl font-black italic tracking-tighter text-foreground uppercase flex items-center gap-3">
-                    <History className="w-6 h-6 text-primary" />
-                    Membership History
+                  <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                    <History className="w-4 h-4 text-primary" />
+                    MEMBERSHIP HISTORY
                   </h3>
-                  <div className="h-px flex-1 bg-black/5 dark:bg-white/5 shadow-[0_1px_0_rgba(255,255,255,0.05)]"></div>
+                  <div className="h-px flex-1 bg-white/5"></div>
                 </div>
 
                 <div className="space-y-3">
@@ -784,15 +784,13 @@ export default function MemberDetailPage({
               </div>
 
               {/* Payments History */}
-              <div className="space-y-6">
+              <div className="space-y-6 mt-8">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-2xl font-black italic tracking-tighter text-foreground uppercase flex items-center gap-3">
-                    <div className="p-1 rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                      <CreditCard className="w-6 h-6" />
-                    </div>
-                    Payment Records
+                  <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-emerald-500" />
+                    PAYMENT RECORDS
                   </h3>
-                  <div className="h-px flex-1 bg-black/5 dark:bg-white/5 shadow-[0_1px_0_rgba(255,255,255,0.05)]"></div>
+                  <div className="h-px flex-1 bg-white/5"></div>
                 </div>
 
                 <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
@@ -812,7 +810,7 @@ export default function MemberDetailPage({
                       <tbody>
                         {memberPayments.length > 0 ? (
                           memberPayments.map((pay) => (
-                            <tr key={pay.id} className="border-b border-white/5 transition-colors hover:bg-white/[0.02] group/row">
+                            <tr key={pay.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
                               <td className="px-6 py-6 font-mono text-[10px] text-slate-500 flex items-center gap-2">
                                 {pay.id.slice(-8).toUpperCase()}
                                 {pay.receiptUrl && (
@@ -825,30 +823,30 @@ export default function MemberDetailPage({
                                   </button>
                                 )}
                               </td>
-                              <td className="px-6 py-6 font-black italic tracking-tighter text-sm uppercase">{formatDate(pay.date)}</td>
+                              <td className="px-6 py-6 font-mono text-slate-400 text-[11px]">{formatDate(pay.date)}</td>
                               <td className="px-6 py-6">
-                                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg border border-primary/20 bg-primary/10 text-primary text-[9px] font-black italic tracking-widest uppercase">
+                                <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest uppercase">
                                   {pay.method || "Cash"}
                                 </span>
                               </td>
-                              <td className="px-6 py-6 text-right font-black italic tracking-tighter text-base text-foreground">
+                              <td className="px-6 py-6 text-right font-black tracking-tighter text-base text-foreground font-mono">
                                 {formatCurrency(pay.amount)}
                               </td>
                               {((session?.user as any)?.role !== 'trainer') && (
-                                <td className="px-6 py-4 text-right">
-                                  <div className="flex justify-end gap-1 opacity-100 transition-opacity">
+                                <td className="px-6 py-6 text-right">
+                                  <div className="flex justify-end gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
                                     <Button
                                       variant="ghost"
-                                      size="icon"
-                                      className="h-7 w-7 rounded-md hover:bg-primary/10 hover:text-primary"
+                                      size="sm"
+                                      className="h-8 w-8 rounded-xl border border-white/5 bg-white/5 text-slate-400 hover:text-primary hover:border-primary/50 transition-all"
                                       onClick={() => handleOpenEditPayment(pay)}
                                     >
                                       <Edit className="w-3.5 h-3.5" />
                                     </Button>
                                     <Button
                                       variant="ghost"
-                                      size="icon"
-                                      className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive"
+                                      size="sm"
+                                      className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all"
                                       onClick={() => setDeletePaymentId(pay.id)}
                                     >
                                       <Trash2 className="w-3.5 h-3.5" />
@@ -860,7 +858,7 @@ export default function MemberDetailPage({
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground italic bg-muted/10">
+                            <td colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
                               No payment history recorded for this member.
                             </td>
                           </tr>
