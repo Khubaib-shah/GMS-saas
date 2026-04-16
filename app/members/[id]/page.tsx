@@ -24,7 +24,8 @@ import {
   Camera,
   Upload,
   Eye,
-  Dumbbell
+  Dumbbell,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -82,7 +83,8 @@ export default function MemberDetailPage({
     loadWorkoutPlans,
     assignWorkoutToMember,
     businessSettings,
-    loadBusinessSettings
+    loadBusinessSettings,
+    restoreMember
   } = useAppStore();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -93,6 +95,7 @@ export default function MemberDetailPage({
   const [previewReceiptUrl, setPreviewReceiptUrl] = useState<string | null>(null);
   const [isDeletingMember, setIsDeletingMember] = useState(false);
   const [deleteSubId, setDeleteSubId] = useState<string | null>(null);
+  const [isRenewing, setIsRenewing] = useState(false);
   const [fallbackMember, setFallbackMember] = useState<Member | null>(null);
 
   // Payment Edit/Delete State
@@ -221,9 +224,24 @@ export default function MemberDetailPage({
   }
 
   const handleDelete = async () => {
-    await deleteMember(memberId);
-    toast.success("Member record removed successfully");
-    router.push("/members");
+    try {
+      await deleteMember(memberId, { permanent: !!member.deletedAt });
+      toast.success(member.deletedAt ? "Member record permanently purged" : "Member moved to trash");
+      router.push("/members");
+    } catch (error) {
+      toast.error("Failed to remove member");
+    }
+  };
+
+  const handleRestore = async () => {
+    try {
+      await restoreMember(memberId);
+      toast.success("Member successfully restored");
+      // Reload member data to update UI
+      loadMembers();
+    } catch (error) {
+      toast.error("Failed to restore member");
+    }
   };
 
   const handleDeleteSubscription = async () => {
@@ -298,6 +316,7 @@ export default function MemberDetailPage({
     }
 
     try {
+      setIsRenewing(true);
       toast.loading("Processing renewal...", { id: "renewal" });
       const success = await renewSubscription(memberId, selectedPlan, renewDays, renewMethod, renewReceipt || undefined);
       if (success) {
@@ -310,6 +329,8 @@ export default function MemberDetailPage({
       }
     } catch (error) {
       toast.error("An error occurred during renewal", { id: "renewal" });
+    } finally {
+      setIsRenewing(false);
     }
   };
 
@@ -332,10 +353,23 @@ export default function MemberDetailPage({
               </Link>
             </Button>
           )}
+
+          {member.deletedAt && (
+             <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleRestore}
+                className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500 hover:text-white"
+             >
+               <RotateCcw className="w-4 h-4 mr-2" />
+               Restore Member
+             </Button>
+          )}
+
           {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
-            <Button variant="destructive" size="sm" onClick={() => setIsDeletingMember(true)} className="bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
+            <Button variant="destructive" size="sm" onClick={() => setIsDeletingMember(true)} className="bg-destructive/10 text-white hover:bg-destructive hover:text-destructive-foreground">
               <Trash2 className="w-4 h-4 mr-2" />
-              Delete
+              {member.deletedAt ? "Permanently Delete" : "Delete"}
             </Button>
           )}
         </div>
@@ -447,14 +481,14 @@ export default function MemberDetailPage({
               </h3>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 items-end gap-4">
                   <div className="space-y-2">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Target Plan</label>
                     <Select
                       value={selectedPlan}
                       onValueChange={(val) => setSelectedPlan(val)}
                     >
-                      <SelectTrigger className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all">
+                      <SelectTrigger className="w-full !h-[46px] px-3 py-2 rounded-md border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all">
                         <SelectValue placeholder="Choose a plan..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -473,7 +507,7 @@ export default function MemberDetailPage({
                       value={renewMethod}
                       onValueChange={(val) => setRenewMethod(val as any)}
                     >
-                      <SelectTrigger className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all">
+                      <SelectTrigger className="w-full !h-[46px] px-3 py-2 rounded-md border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all">
                         <SelectValue placeholder="Select method" />
                       </SelectTrigger>
                       <SelectContent>
@@ -486,16 +520,35 @@ export default function MemberDetailPage({
                     </Select>
                   </div>
 
+                  <div>
+                    <InputField
+                      label="Duration (Days)"
+                      type="number"
+                      validateType="number"
+                      value={String(renewDays)}
+                      onChange={(val) => setRenewDays(Number(val))}
+                      placeholder="Days"
+                      className="bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                    />
+                  </div>
 
-                  <InputField
-                    label="Duration (Days)"
-                    type="number"
-                    validateType="number"
-                    value={String(renewDays)}
-                    onChange={(val) => setRenewDays(Number(val))}
-                    placeholder="Days"
-                    className="bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                  />
+                  <Button
+                    className="w-full h-[46px] shadow-lg shadow-primary/20"
+                    onClick={handleRenew}
+                    disabled={isRenewing}
+                  >
+                    {isRenewing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mr-2" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Extend Membership
+                      </>
+                    )}
+                  </Button>
                 </div>
 
                 {renewMethod === "online" && (
@@ -556,10 +609,6 @@ export default function MemberDetailPage({
                     </div>
                   </div>
                 )}
-                <Button className="w-full shadow-lg shadow-primary/20" onClick={handleRenew}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Extend Membership
-                </Button>
 
                 {activeSub && (
                   <p className="text-[11px] text-center text-muted-foreground italic">
@@ -598,6 +647,23 @@ export default function MemberDetailPage({
                   </div>
                 )}
               </div>
+            </Card>
+          )}
+
+          {member.deletedAt && (
+            <Card className="p-6 border-l-4 border-l-destructive bg-destructive/10 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-destructive/20 text-destructive flex items-center justify-center">
+                  <Trash2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-destructive">Member in Trash</h4>
+                  <p className="text-sm text-muted-foreground leading-none mt-1">
+                    This account was deleted on {formatDate(member.deletedAt)}. Actions are restricted.
+                  </p>
+                </div>
+              </div>
+              <Button size="sm" variant="outline" onClick={handleRestore}>Restore Now</Button>
             </Card>
           )}
           {/* Active Status Banner - Visible to all roles */}
@@ -846,7 +912,7 @@ export default function MemberDetailPage({
                         }
                       }}
                     >
-                      <SelectTrigger className="h-10 px-3 py-2 rounded-lg border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all min-w-[150px]">
+                      <SelectTrigger className="h-10 px-3 py-2 rounded-md border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all min-w-[150px]">
                         <SelectValue placeholder="Select Plan..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -868,15 +934,17 @@ export default function MemberDetailPage({
       <AlertDialog open={isDeletingMember} onOpenChange={setIsDeletingMember}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Member Profile?</AlertDialogTitle>
+            <AlertDialogTitle>{member.deletedAt ? "Permanently Purge Member?" : "Delete Member Profile?"}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete <strong>{member?.firstName} {member?.lastName}</strong> and all their associated records.
+              {member.deletedAt 
+                ? "This is a final action. This member's entire history, billing, and attendance will be purged from the system forever."
+                : "The member will be moved to the trash and hidden from active lists."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-              Permanently Delete
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-white">
+              {member.deletedAt ? "Permanently Purge" : "Move to Trash"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -893,7 +961,7 @@ export default function MemberDetailPage({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteSubscription} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction onClick={handleDeleteSubscription} className="bg-destructive hover:bg-destructive/90 text-white">
               Delete Record
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -911,7 +979,7 @@ export default function MemberDetailPage({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeletePayment} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction onClick={handleDeletePayment} className="bg-destructive hover:bg-destructive/90 text-white">
               Delete Record
             </AlertDialogAction>
           </AlertDialogFooter>

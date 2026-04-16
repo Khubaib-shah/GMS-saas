@@ -132,6 +132,7 @@ export default function SubscriptionsPage() {
       return;
     }
     try {
+      setLoading(true);
       await store.addPlan({
         ...addFormData,
         price: Number(addFormData.price),
@@ -149,28 +150,35 @@ export default function SubscriptionsPage() {
       toast.success("Plan added successfully");
     } catch (error: any) {
       toast.error(error.message || "Failed to add plan");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handlePlanUpdate = async () => {
     if (!editFormData || !selectedPlan) return;
     try {
+      setLoading(true);
       await store.updatePlan(selectedPlan.id, editFormData);
       setShowEditModal(false);
       toast.success("Plan updated successfully");
     } catch (error) {
       toast.error("Failed to update plan");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeletePlan = async () => {
     if (!planToDelete) return;
     try {
+      setLoading(true);
       await store.deletePlan(planToDelete);
       toast.success("Plan deleted");
     } catch (e) {
       toast.error("Failed to delete plan");
     } finally {
+      setLoading(false);
       setPlanToDelete(null);
     }
   };
@@ -581,7 +589,9 @@ export default function SubscriptionsPage() {
             <Button variant="outline" onClick={() => setShowEditModal(false)}>
               Cancel
             </Button>
-            <Button onClick={handlePlanUpdate}>Save Changes</Button>
+            <Button onClick={handlePlanUpdate} disabled={loading}>
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -677,10 +687,12 @@ export default function SubscriptionsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddModal(false)}>
+            <Button variant="outline" onClick={() => setShowAddModal(false)} disabled={loading}>
               Cancel
             </Button>
-            <Button onClick={handlePlanAdd}>Create Plan</Button>
+            <Button onClick={handlePlanAdd} disabled={loading}>
+              {loading ? "Creating..." : "Create Plan"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

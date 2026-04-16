@@ -358,7 +358,10 @@ export async function requireSuperAdmin(): Promise<{ session: AuthenticatedSessi
  * All database queries MUST use this to ensure tenant isolation.
  */
 export function buildGymQuery(session: AuthenticatedSession, additionalFilters: Record<string, any> = {}): Record<string, any> {
-    const query: Record<string, any> = { ...additionalFilters };
+    const query: Record<string, any> = { 
+        deletedAt: null, // Default: hide soft-deleted items
+        ...additionalFilters 
+    };
 
     // 1. Gym Scoping
     // Super admins without a specific gym context (gymId: null or PLATFORM) see everything.

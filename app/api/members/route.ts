@@ -37,7 +37,8 @@ export async function GET(req: Request) {
         await connectDB();
 
         // Build query using helper for legacy/branch support
-        const query = buildGymQuery(session);
+        const showDeleted = searchParams.get("showDeleted") === "true";
+        const query = buildGymQuery(session, showDeleted ? { deletedAt: { $ne: null } } : {});
 
         // Add search filter if present
         if (search) {

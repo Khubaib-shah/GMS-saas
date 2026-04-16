@@ -38,7 +38,13 @@ export async function GET(
         await connectDB();
 
         const objectId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : id;
-        const query = buildGymQuery(session, { _id: objectId, deletedAt: null });
+
+        // Profiles should be viewable even if they are in the trash (so they can be restored)
+        // We override the default 'deletedAt: null' filter from buildGymQuery.
+        const query = buildGymQuery(session, {
+            _id: objectId,
+            deletedAt: { $ne: undefined } // Matches any value, including null and dates
+        });
         const member = await Member.findOne(query).populate("trainerId", "firstName lastName photo").lean();
 
         if (!member) {
@@ -156,15 +162,29 @@ export async function DELETE(
     try {
         await connectDB();
 
+        const { searchParams } = new URL(req.url);
+        const permanent = searchParams.get("permanent") === "true";
         const objectId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : id;
-        const query = buildGymQuery(session, { _id: objectId, deletedAt: null });
 
-        // Soft delete instead of hard delete
-        const member = await Member.findOneAndUpdate(
-            query,
-            { deletedAt: new Date() },
-            { new: true }
-        );
+        // Final Purge: If permanent delete, we override the default 'deletedAt: null' filter
+        // to find the record even if it's already in the trash ($ne: undefined matches any value).
+        const query = buildGymQuery(session, {
+            _id: objectId,
+            ...(permanent ? { deletedAt: { $ne: undefined } } : { deletedAt: null })
+        });
+
+        let member;
+
+        if (permanent) {
+            member = await Member.findOneAndDelete(query);
+        } else {
+            // Soft delete
+            member = await Member.findOneAndUpdate(
+                query,
+                { deletedAt: new Date() },
+                { new: true }
+            );
+        }
 
         if (!member) {
             return NextResponse.json({ message: "Member not found" }, { status: 404 });
@@ -178,28 +198,33 @@ export async function DELETE(
                 "member",
                 id,
                 `${member.firstName} ${member.lastName || ""}`.trim(),
-                { softDelete: true },
+                { softDelete: !permanent, permanentDelete: permanent },
                 req.headers
             )
         );
 
-        // Cascading soft delete for subscriptions and payments
-        // Using models directly ensuring they are loaded
-        await Subscription.updateMany(
-            { memberId: id, gymId: session.user.gymId },
-            { deletedAt: new Date() }
-        );
+        if (!permanent) {
+            // Cascading soft delete for subscriptions and payments only if soft-deleting
+            await Subscription.updateMany(
+                { memberId: id, gymId: session.user.gymId },
+                { deletedAt: new Date() }
+            );
 
-        await Payment.updateMany(
-            { memberId: id, gymId: session.user.gymId },
-            { deletedAt: new Date() }
-        );
+            await Payment.updateMany(
+                { memberId: id, gymId: session.user.gymId },
+                { deletedAt: new Date() }
+            );
+        } else {
+            // Hard delete associated records if permanent
+            await Subscription.deleteMany({ memberId: id, gymId: session.user.gymId });
+            await Payment.deleteMany({ memberId: id, gymId: session.user.gymId });
+        }
 
         // Invalidate profile cache and all list caches for this gym
         await deleteCache(`member:profile:${id}`);
         await invalidatePattern(`members:list:gym:${session.user.gymId}:*`);
 
-        return NextResponse.json({ message: "Member and associated data deleted" });
+        return NextResponse.json({ message: permanent ? "Member permanently deleted" : "Member and associated data deleted" });
     } catch (error) {
         console.error("Delete member error:", error);
         return NextResponse.json({ message: "Error deleting member" }, { status: 500 });

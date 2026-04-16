@@ -25,10 +25,11 @@ export type AppState = {
 
   // Members
   members: Member[]
-  loadMembers: () => Promise<void>
+  loadMembers: (options?: { showDeleted?: boolean }) => Promise<void>
   addMember: (data: Omit<Member, "id">) => Promise<Member>
   updateMember: (id: string, data: Partial<Member>) => Promise<void>
-  deleteMember: (id: string) => Promise<void>
+  deleteMember: (id: string, options?: { permanent?: boolean }) => Promise<void>
+  restoreMember: (id: string) => Promise<void>
 
   // Plans
   plans: Plan[]
@@ -146,9 +147,10 @@ export const useAppStore = create<AppState>()(
       // -------------------------
       members: [],
 
-      loadMembers: async () => {
+      loadMembers: async (options) => {
         try {
-          const res = await fetch("/api/members");
+          const url = options?.showDeleted ? "/api/members?showDeleted=true" : "/api/members";
+          const res = await fetch(url);
           const data = await res.json();
           if (Array.isArray(data)) {
             set({ members: data });
@@ -201,9 +203,18 @@ export const useAppStore = create<AppState>()(
         }));
       },
 
-      deleteMember: async (id) => {
-        const res = await fetch(`/api/members/${id}`, { method: "DELETE" });
+      deleteMember: async (id, options) => {
+        const url = options?.permanent ? `/api/members/${id}?permanent=true` : `/api/members/${id}`;
+        const res = await fetch(url, { method: "DELETE" });
         if (!res.ok) throw new Error("Failed to delete member");
+        set((state) => ({
+          members: state.members.filter((m) => m.id !== id),
+        }));
+      },
+
+      restoreMember: async (id) => {
+        const res = await fetch(`/api/members/${id}/restore`, { method: "POST" });
+        if (!res.ok) throw new Error("Failed to restore member");
         set((state) => ({
           members: state.members.filter((m) => m.id !== id),
         }));

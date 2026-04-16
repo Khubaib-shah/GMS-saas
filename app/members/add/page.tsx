@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,20 @@ export default function AddMemberPage() {
     trainerId: "",
   });
   const [trainers, setTrainers] = useState<any[]>([]);
+
+  const progress = useMemo(() => {
+    const fields = [
+      formData.firstName,
+      formData.lastName,
+      formData.email,
+      formData.phone,
+      formData.planId,
+      formData.trainerId,
+      photoBase64,
+    ];
+    const filled = fields.filter((f) => !!f).length;
+    return (filled / fields.length) * 100;
+  }, [formData, photoBase64]);
 
   useEffect(() => {
     store.loadPlans();
@@ -164,7 +178,7 @@ export default function AddMemberPage() {
             <div className="h-px flex-1 bg-white/5"></div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-8">
             {/* Photo Upload */}
             <div>
               <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
@@ -255,10 +269,11 @@ export default function AddMemberPage() {
               />
             </div>
 
-            {/* Gender & Plan */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Gender Plan & Assign Trainner */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
               <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
                   Gender
                 </label>
                 <Select
@@ -270,7 +285,7 @@ export default function AddMemberPage() {
                     })
                   }
                 >
-                  <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                  <SelectTrigger className="w-full !h-12 px-6 rounded-md border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-white/10">
@@ -280,8 +295,9 @@ export default function AddMemberPage() {
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
                   Membership Plan *
                 </label>
                 <Select
@@ -290,7 +306,7 @@ export default function AddMemberPage() {
                     setFormData({ ...formData, planId: value })
                   }
                 >
-                  <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                  <SelectTrigger className="w-full !h-12 px-6 rounded-md border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                     <SelectValue placeholder="Select plan" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-white/10">
@@ -302,11 +318,9 @@ export default function AddMemberPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 gap-8">
               <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
                   Assign Trainer
                 </label>
                 <Select
@@ -315,7 +329,7 @@ export default function AddMemberPage() {
                     setFormData({ ...formData, trainerId: value === "__none__" ? "" : value })
                   }
                 >
-                  <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                  <SelectTrigger className="w-full !h-12 px-6 rounded-md border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                     <SelectValue placeholder="Select trainer" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-white/10">
@@ -328,6 +342,7 @@ export default function AddMemberPage() {
                   </SelectContent>
                 </Select>
               </div>
+
             </div>
 
             {/* Notes */}
@@ -422,7 +437,10 @@ export default function AddMemberPage() {
                   <span className="text-[9px] font-black text-primary uppercase tracking-widest italic">SECURED</span>
                 </div>
                 <div className="h-1 w-full bg-slate-900 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-2/3 animate-pulse"></div>
+                  <div
+                    className="h-full bg-primary transition-all duration-500 ease-out animate-pulse"
+                    style={{ width: `${progress}%` }}
+                  ></div>
                 </div>
               </div>
             </div>

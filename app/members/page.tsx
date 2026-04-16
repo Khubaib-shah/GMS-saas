@@ -43,18 +43,19 @@ export default function MembersPage() {
     null
   );
   const [loading, setLoading] = useState(true);
+  const [showTrash, setShowTrash] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       await Promise.all([
-        store.loadMembers(),
+        store.loadMembers({ showDeleted: showTrash }),
         store.loadSubscriptions()
       ]);
       setLoading(false);
     };
     loadData();
-  }, []);
+  }, [showTrash]);
 
   const filtered = useMemo(() => {
     let result = store.members;
@@ -96,9 +97,22 @@ export default function MembersPage() {
   }, [store.members, store.subscriptions, store.searchQuery, searchTerm, filterStatus, session]);
 
   const handleDelete = async (id: string) => {
-    await store.deleteMember(id);
-    setDeleteId(null);
-    toast.success("Member deleted successfully");
+    try {
+      await store.deleteMember(id, { permanent: showTrash });
+      setDeleteId(null);
+      toast.success(showTrash ? "Member permanently deleted" : "Member moved to trash");
+    } catch (error) {
+      toast.error("Action failed");
+    }
+  };
+
+  const handleRestore = async (id: string) => {
+    try {
+      await store.restoreMember(id);
+      toast.success("Member successfully restored");
+    } catch (error) {
+      toast.error("Failed to restore member");
+    }
   };
 
   return (
@@ -109,14 +123,31 @@ export default function MembersPage() {
         subtitle="View and manage your members"
         description="See all your gym members in one place."
       >
-        {((session?.user as any)?.role !== 'trainer') && (
-          <Link href="/members/add">
-            <Button className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
-              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-              Add Member
-            </Button>
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          <Button
+            variant={showTrash ? "destructive" : "outline"}
+            size="sm"
+            onClick={() => setShowTrash(!showTrash)}
+            className={cn(
+              "!h-[38px] px-8 rounded-xl font-black italic tracking-tighter transition-all",
+              showTrash
+                ? "bg-destructive text-white shadow-lg shadow-destructive/20"
+                : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
+            )}
+          >
+            <Trash2 className="w-5 h-5 mr-2" />
+            {showTrash ? "Exit Trash" : "View Trash"}
+          </Button>
+
+          {((session?.user as any)?.role !== 'trainer') && !showTrash && (
+            <Link href="/members/add">
+              <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
+                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                Add Member
+              </Button>
+            </Link>
+          )}
+        </div>
       </DashboardHeader>
 
       {/* Search & Filter - Bento Style */}
@@ -316,22 +347,41 @@ export default function MembersPage() {
                           >
                             <QrCode className="w-4 h-4" />
                           </Button>
-                          <Link href={`/members/${member.id}`}>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all"
-                            >
-                              View Profile
-                            </Button>
-                          </Link>
 
+                          {showTrash && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRestore(member.id)}
+                              className="h-9 px-4 rounded-xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all font-black italic text-[10px] tracking-tighter"
+                            >
+                              Restore
+                            </Button>
+                          )}
+
+                          {!showTrash && (
+                            <Link href={`/members/${member.id}`}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all"
+                              >
+                                View Profile
+                              </Button>
+                            </Link>
+                          )}
                           {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => setDeleteId(member.id)}
-                              className="h-9 w-9 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                              className={cn(
+                                "h-9 w-9 rounded-xl border transition-all",
+                                showTrash
+                                  ? "border-destructive bg-destructive/10 text-destructive hover:bg-destructive hover:text-white"
+                                  : "border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white"
+                              )}
+                              title={showTrash ? "Permanently Delete" : "Move to Trash"}
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
@@ -372,10 +422,11 @@ export default function MembersPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Member?</AlertDialogTitle>
+            <AlertDialogTitle>{showTrash ? "Permanently Purge Member?" : "Delete Member?"}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The member will be permanently
-              deleted.
+              {showTrash
+                ? "This is a destructive action and cannot be undone. All membership history, payments, and personal data will be wiped forever."
+                : "The member record and their history will be moved to the trash and hidden from the registry."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex gap-4 justify-end">
