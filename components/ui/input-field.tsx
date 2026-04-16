@@ -14,6 +14,7 @@ import { type ValidationType } from "@/lib/utils/validators"
 
 interface InputFieldProps extends Omit<React.ComponentProps<typeof Input>, "onChange" | "value"> {
   label?: string
+  containerClassName?: string
   validateType?: ValidationType
   description?: string
   required?: boolean
@@ -32,6 +33,7 @@ interface InputFieldProps extends Omit<React.ComponentProps<typeof Input>, "onCh
 const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
   ({
     label,
+    containerClassName,
     validateType = "text",
     description,
     required,
@@ -64,7 +66,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
 
 
     return (
-      <Field className={cn("w-full", className)}>
+      <Field className={cn("w-full", containerClassName)}>
         {label && !hideLabel && (
           <FieldLabel className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
             {label} {required && <span className="text-primary">*</span>}

@@ -36,6 +36,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
@@ -659,11 +660,11 @@ function StatCard({ label, value, icon: Icon }: any) {
 
 function ActionButton({ icon: Icon, label, color, loading, onClick }: any) {
     const colors: Record<string, string> = {
-        emerald: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500 hover:text-black",
+        emerald: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500 hover:text-white",
         red: "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500 hover:text-white",
-        amber: "bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500 hover:text-black",
-        blue: "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500 hover:text-black",
-        green: "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500 hover:text-black",
+        amber: "bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500 hover:text-white",
+        blue: "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500 hover:text-white",
+        green: "bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500 hover:text-white",
         rose: "bg-rose-500/10 text-rose-400 border-rose-500/20 hover:bg-rose-500 hover:text-white",
     };
 

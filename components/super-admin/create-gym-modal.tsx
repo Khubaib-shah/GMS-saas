@@ -175,7 +175,7 @@ export function CreateGymModal({ isOpen, onClose, onSuccess }: CreateGymModalPro
                                 onValueChange={(value) => setFormData({ ...formData, planId: value })}
 
                             >
-                                <SelectTrigger className="bg-white/4 border-white/8 w-full">
+                                <SelectTrigger className="bg-white/4 border-white/8 w-full py-5">
                                     <SelectValue placeholder="Select plan" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-[#1a1a24] border-white/8 text-white">

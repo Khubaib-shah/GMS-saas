@@ -20,6 +20,7 @@ import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CreateGymModal } from "@/components/super-admin/create-gym-modal";
+import { InputField } from "@/components/ui/input-field";
 import { toast } from "sonner";
 import {
     Select,
@@ -141,34 +142,24 @@ export default function GymsPage() {
 
             {/* Filters - Bento Style */}
             <div className="glass-premium p-8 border-border bg-card dark:bg-slate-950/40">
-                <div className="flex gap-6 items-end flex-wrap">
-                    <div className="flex-1 min-w-[300px]">
-                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
-                            Search Gym Registry
-                        </label>
-                        <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                            <input
-                                type="text"
-                                placeholder="Search by gym name, owner, or email..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full h-[38px] pl-12 pr-4 rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-sm text-foreground font-black italic tracking-tighter focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-600"
-                            />
-                        </div>
-                    </div>
-                    <div className="min-w-[160px]">
-                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
-                            City Location
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="e.g. Lahore"
-                            value={cityFilter}
-                            onChange={(e) => setCityFilter(e.target.value)}
-                            className="w-full h-[38px] px-6 rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-[10px] text-foreground font-black uppercase tracking-widest focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-600"
-                        />
-                    </div>
+                <div className="flex justify-center items-end gap-6">
+                    <InputField
+                        label="Search Gym Registry"
+                        placeholder="Search by gym name, owner, or email..."
+                        value={search}
+                        onChange={(val) => setSearch(val)}
+                        leadingIcon={<Search className="w-4 h-4" />}
+                        containerClassName="flex-1 min-w-[300px]"
+                        className="h-[38px] rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-sm font-black italic tracking-tighter"
+                    />
+                    <InputField
+                        label="City Location"
+                        placeholder="e.g. Lahore"
+                        value={cityFilter}
+                        onChange={(val) => setCityFilter(val)}
+                        containerClassName="min-w-[160px]"
+                        className="h-[38px] rounded-xl bg-black/10 dark:bg-white/5 border-transparent text-[10px] font-black uppercase tracking-widest"
+                    />
 
 
                     <div className="min-w-[180px]">
@@ -194,7 +185,6 @@ export default function GymsPage() {
                             </SelectContent>
                         </Select>
                     </div>
-
 
                     <Button
                         variant="ghost"
@@ -242,7 +232,7 @@ export default function GymsPage() {
                         </thead>
                         <tbody>
                             {loading ? (
-                                Array.from({ length: 10 }).map((_, i) => (
+                                Array.from({ length: 3 }).map((_, i) => (
                                     <tr key={i} className="border-b border-black/5 dark:border-white/5 animate-pulse">
                                         <td className="px-6 py-6" colSpan={2}>
                                             <div className="flex items-center gap-4">
