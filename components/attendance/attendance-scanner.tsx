@@ -8,7 +8,7 @@ import { Scan, RotateCcw, Camera, Keyboard } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useZxing } from "react-zxing";
+import { BrowserMultiFormatReader } from "@zxing/browser";
 import { AttendanceResult } from "./attendance-result";
 
 export function AttendanceScanner() {
@@ -20,38 +20,78 @@ export function AttendanceScanner() {
   const [useCamera, setUseCamera] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [isWindowVisible, setIsWindowVisible] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const controlsRef = useRef<any>(null);
+  const loadingRef = useRef(loading);
 
-  // react-zxing hook
-  const { ref } = useZxing({
-    paused: !useCamera,
-    onResult(result) {
-      if (result && !loading) {
-        processAttendance(result.getText());
-      }
-    },
-    onError(error) {
-      // Suppress common errors
-      if (error.name !== "NotFoundException" && error.name !== "IndexSizeError") {
-        console.error(error);
-        toast.error(`Camera Error: ${error.name} - ${error.message}`);
-      }
-    },
-    constraints: {
-      video: {
-        facingMode: facingMode,
-      },
-      audio: false,
-    },
-  });
-
-  // Auto-focus the input on mount if using keyboard
   useEffect(() => {
-    if (!useCamera) {
-      inputRef.current?.focus();
+    loadingRef.current = loading;
+  }, [loading]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsWindowVisible(!document.hidden);
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!useCamera || !isWindowVisible) {
+      if (controlsRef.current) {
+        controlsRef.current.stop();
+        controlsRef.current = null;
+      }
       setIsVideoReady(false);
+      
+      if (!useCamera) {
+        inputRef.current?.focus();
+      }
+      return;
     }
-  }, [useCamera]);
+
+    let isMounted = true;
+    const codeReader = new BrowserMultiFormatReader();
+
+    if (videoRef.current) {
+      codeReader.decodeFromConstraints(
+        { video: { facingMode: facingMode } },
+        videoRef.current,
+        (result, err, controls) => {
+          if (!isMounted) return;
+          if (controls && !controlsRef.current) {
+            controlsRef.current = controls;
+          }
+          if (result) {
+            if (!loadingRef.current) {
+              processAttendance(result.getText());
+            }
+          }
+        }
+      ).then((controls) => {
+          if (!isMounted) {
+            controls.stop();
+          } else {
+            controlsRef.current = controls;
+          }
+      }).catch(err => {
+        console.error(err);
+        toast.error(`Camera Error: ${err.message || err}`);
+      });
+    }
+
+    return () => {
+      isMounted = false;
+      if (controlsRef.current) {
+        controlsRef.current.stop();
+        controlsRef.current = null;
+      }
+    };
+  }, [useCamera, facingMode, isWindowVisible]);
 
   const processAttendance = async (member: string) => {
     if (!member) return;
@@ -144,7 +184,7 @@ export function AttendanceScanner() {
       {useCamera ? (
         <div className="relative bg-black rounded-lg overflow-hidden flex items-center justify-center min-h-[300px]">
           <video
-            ref={ref}
+            ref={videoRef}
             autoPlay
             playsInline
             muted
