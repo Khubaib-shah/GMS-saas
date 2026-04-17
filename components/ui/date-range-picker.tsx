@@ -16,6 +16,7 @@ import {
 
 interface DateRangePickerProps {
   className?: string
+  btnClass?: string,
   date: DateRange | undefined
   onDateChange: (date: DateRange | undefined) => void
   placeholder?: string
@@ -25,6 +26,7 @@ export function DateRangePicker({
   className,
   date,
   onDateChange,
+  btnClass,
   placeholder = "Select date range",
 }: DateRangePickerProps) {
   return (
@@ -37,7 +39,8 @@ export function DateRangePicker({
             className={cn(
               "h-10 justify-start text-left font-normal bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.12] transition-all rounded-xl gap-3 min-w-[260px]",
               !date && "text-slate-500",
-              date && "text-white border-indigo-500/30 bg-indigo-500/5 shadow-[0_0_15px_rgba(99,102,241,0.1)]"
+              date && "text-white border-indigo-500/30 bg-indigo-500/5 shadow-[0_0_15px_rgba(99,102,241,0.1)]",
+              btnClass
             )}
           >
             <CalendarIcon className="w-4 h-4 text-indigo-400" />
@@ -58,15 +61,15 @@ export function DateRangePicker({
               </span>
             )}
             {date && (
-                <button 
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDateChange(undefined);
-                    }}
-                    className="ml-auto p-1 rounded-full hover:bg-white/10 transition-colors"
-                >
-                    <X className="w-3 h-3 text-slate-500" />
-                </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDateChange(undefined);
+                }}
+                className="ml-auto p-1 rounded-full hover:bg-white/10 transition-colors"
+              >
+                <X className="w-3 h-3 text-slate-500" />
+              </button>
             )}
           </Button>
         </PopoverTrigger>

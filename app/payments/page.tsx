@@ -23,11 +23,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { TableTdSkeleton } from "@/components/table-td-skeleton"
+import { DateRangePicker } from "@/components/ui/date-range-picker"
+import { DateRange } from "react-day-picker"
 
 export default function PaymentsPage() {
   const store = useAppStore()
   const [searchTerm, setSearchTerm] = useState("")
   const [filterPeriod, setFilterPeriod] = useState<"this-month" | "last-month" | "all">("this-month")
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -48,7 +52,17 @@ export default function PaymentsPage() {
     let result = store.payments
     const currentSearch = store.searchQuery || searchTerm
 
-    if (filterPeriod !== "all") {
+    if (dateRange?.from) {
+      const from = new Date(dateRange.from)
+      from.setHours(0, 0, 0, 0)
+      const to = dateRange.to ? new Date(dateRange.to) : new Date(dateRange.from)
+      to.setHours(23, 59, 59, 999)
+
+      result = result.filter((p) => {
+        const date = new Date(p.date)
+        return date >= from && date <= to
+      })
+    } else if (filterPeriod !== "all") {
       const now = new Date()
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
@@ -78,7 +92,7 @@ export default function PaymentsPage() {
     }
 
     return result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  }, [store.payments, store.members, store.searchQuery, searchTerm, filterPeriod])
+  }, [store.payments, store.members, store.searchQuery, searchTerm, filterPeriod, dateRange])
 
   const totalRevenue = filtered.reduce((sum, p) => sum + p.amount, 0)
   const paidCount = filtered.length
@@ -98,7 +112,7 @@ export default function PaymentsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard
           title="Total Revenue"
-          value={`₨ ${formatCurrency(totalRevenue).replace("PKR", "")}`}
+          value={formatCurrency(totalRevenue)}
           icon={<DollarSign className="w-5 h-5" />}
         />
         <StatsCard
@@ -108,14 +122,16 @@ export default function PaymentsPage() {
         />
         <StatsCard
           title="Average Payment"
-          value={`₨ ${formatCurrency(avgPayment).replace("PKR", "")}`}
+          value={formatCurrency(avgPayment)}
           icon={<TrendingUp className="w-5 h-5" />}
         />
       </div>
 
+      {/* add some charts */}
+
       {/* Filter - Bento Style */}
       <div className="glass-premium p-8 border-border">
-        <div className="flex flex-col sm:flex-row gap-8 items-end">
+        <div className="flex flex-col sm:flex-row gap-6 items-end">
           <div className="flex-1 w-full sm:w-auto">
             <InputField
               label="Search Member"
@@ -129,12 +145,26 @@ export default function PaymentsPage() {
             />
           </div>
           <div className="w-full sm:w-auto">
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Custom Range</label>
+            <DateRangePicker
+              btnClass="!h-12 rounded-md"
+              date={dateRange}
+              onDateChange={(range) => {
+                setDateRange(range);
+                if (range) setFilterPeriod("all");
+              }}
+            />
+          </div>
+          <div className="w-full sm:w-auto">
             <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Period</label>
             <Select
               value={filterPeriod}
-              onValueChange={(value) => setFilterPeriod(value as "this-month" | "last-month" | "all")}
+              onValueChange={(value) => {
+                setFilterPeriod(value as "this-month" | "last-month" | "all");
+                if (value !== "all") setDateRange(undefined);
+              }}
             >
-              <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+              <SelectTrigger className="!h-12 px-6 rounded-md border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-white/10">
@@ -161,7 +191,7 @@ export default function PaymentsPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.length > 0 ? (
+              {loading ? Array.from({ length: 3 }).map((_, i) => <TableTdSkeleton key={i} />) : filtered.length > 0 ? (
                 filtered.map((payment) => {
                   const member = store.members.find((m) => m.id === payment.memberId)
                   return (
@@ -172,7 +202,7 @@ export default function PaymentsPage() {
                         </span>
                       </td>
                       <td className="py-6 px-6 font-black text-primary text-base">
-                        ₨ {formatCurrency(payment.amount).replace("PKR", "")}
+                        {formatCurrency(payment.amount)}
                       </td>
                       <td className="py-6 px-6 text-slate-500 font-mono text-[10px] whitespace-nowrap">
                         {formatDate(payment.date).toUpperCase()}
