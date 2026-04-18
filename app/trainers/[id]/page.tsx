@@ -413,7 +413,7 @@ export default function TrainerDetailPage({
                                 <Skeleton className="h-10 w-full" />
                                 <Skeleton className="h-10 w-full" />
                             </div>
-                        ) : trainer?.members?.length > 0 ? (
+                        ) : (trainer?.members?.length || 0) > 0 ? (
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -423,7 +423,7 @@ export default function TrainerDetailPage({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {trainer.members.map((m: { _id: string; firstName: string; lastName: string }) => (
+                                    {trainer?.members?.map((m: { _id: string; firstName: string; lastName: string }) => (
                                         <TableRow key={m._id}>
                                             <TableCell className="font-medium underline decoration-primary/20">
                                                 <Link href={`/members/${m._id}`}>{m.firstName} {m.lastName}</Link>

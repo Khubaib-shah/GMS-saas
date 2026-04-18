@@ -53,6 +53,7 @@ import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { formatCurrency, formatDate, isSubscriptionActive } from "@/lib/utils/file-utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MemberDetailPage({
   params,
@@ -192,18 +193,7 @@ export default function MemberDetailPage({
     return null;
   }, [memberSubs, member]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground animate-pulse">Loading member profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!member) {
+  if (!isLoading && !member) {
     return (
       <div className="container max-w-2xl mx-auto">
         <Card className="p-12 text-center rounded-none bg-transparent border-none ">
@@ -224,6 +214,7 @@ export default function MemberDetailPage({
   }
 
   const handleDelete = async () => {
+    if (!member) return;
     try {
       await deleteMember(memberId, { permanent: !!member.deletedAt });
       toast.success(member.deletedAt ? "Member record permanently purged" : "Member moved to trash");
@@ -354,7 +345,7 @@ export default function MemberDetailPage({
             </Button>
           )}
 
-          {member.deletedAt && (
+          {member?.deletedAt && (
             <Button
               variant="outline"
               size="sm"
@@ -367,14 +358,14 @@ export default function MemberDetailPage({
           )}
 
           {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              onClick={() => setIsDeletingMember(true)} 
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setIsDeletingMember(true)}
               className="h-10 px-5 rounded-xl border border-red-500/20 bg-red-500/10 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-[0_0_20px_rgba(239,68,68,0.1)] hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]"
             >
               <Trash2 className="w-3.5 h-3.5 mr-2" />
-              {member.deletedAt ? "Purge Data" : "Delete Member"}
+              {isLoading ? <Skeleton className="w-16 h-3 bg-white/20" /> : (member?.deletedAt ? "Purge Data" : "Delete Member")}
             </Button>
           )}
         </div>
@@ -385,12 +376,13 @@ export default function MemberDetailPage({
         <div className="lg:col-span-4 space-y-6">
           <Card className="glass-premium overflow-hidden border-border dark:bg-slate-950/40">
             <div className="relative h-32 bg-gradient-to-br from-primary/80 to-primary">
-              {/* Pattern Overlay */}
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '16px 16px' }} />
             </div>
             <div className="px-6 pb-8">
               <div className="relative flex justify-center -mt-16 mb-4">
-                {member.photoBase64 ? (
+                {isLoading ? (
+                  <Skeleton className="w-32 h-32 rounded-2xl mx-auto border-4 border-background shadow-2xl" />
+                ) : member?.photoBase64 ? (
                   <img
                     src={member.photoBase64}
                     alt="Profile"
@@ -398,21 +390,21 @@ export default function MemberDetailPage({
                   />
                 ) : (
                   <div className="w-32 h-32 rounded-2xl bg-secondary border-4 border-background shadow-2xl flex items-center justify-center text-muted-foreground font-bold text-3xl">
-                    {member.firstName[0]}{member.lastName?.[0]}
+                    {member?.firstName?.[0]}{member?.lastName?.[0]}
                   </div>
                 )}
                 <div className={cn(
                   "absolute -bottom-1 -right-1 w-8 h-8 rounded-full border-4 border-background flex items-center justify-center shadow-lg transform translate-x-1/4",
-                  activeSub ? "bg-emerald-500" : "bg-destructive"
+                  (isLoading || activeSub) ? "bg-emerald-500" : "bg-destructive"
                 )}>
-                  <ShieldCheck className="w-4 h-4 text-white" />
+                  {isLoading ? <Skeleton className="w-4 h-4 rounded-full bg-white/20" /> : <ShieldCheck className="w-4 h-4 text-white" />}
                 </div>
               </div>
 
               <div className="text-center space-y-1">
-                <h1 className="text-2xl font-bold tracking-tight">{member.firstName} {member.lastName}</h1>
+                <h1 className="text-2xl font-bold tracking-tight">{isLoading ? <Skeleton className="w-48 h-8 mx-auto" /> : `${member?.firstName} ${member?.lastName}`}</h1>
                 <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest px-2 py-0.5 rounded-full bg-muted/50 inline-block">
-                  {(member.planId || "No Plan").replace("plan_", "").toUpperCase()}
+                  {isLoading ? <Skeleton className="w-20 h-4" /> : (member?.planId || "No Plan").replace("plan_", "").toUpperCase()}
                 </p>
               </div>
 
@@ -423,7 +415,7 @@ export default function MemberDetailPage({
                   </div>
                   <div className="flex-1 truncate">
                     <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Email</p>
-                    <p className="font-medium truncate font-mono text-[11px] font-bold">{member.email}</p>
+                    <p className="font-medium truncate font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-32 h-3" /> : member?.email}</p>
                   </div>
                 </div>
 
@@ -433,7 +425,7 @@ export default function MemberDetailPage({
                   </div>
                   <div className="flex-1">
                     <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Phone</p>
-                    <p className="font-medium font-mono text-[11px] font-bold">{member.phone}</p>
+                    <p className="font-medium font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-24 h-3" /> : member?.phone}</p>
                   </div>
                 </div>
 
@@ -443,31 +435,33 @@ export default function MemberDetailPage({
                   </div>
                   <div className="flex-1">
                     <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Joined</p>
-                    <p className="font-medium font-mono text-[11px] font-bold">{formatDate(member.joinDate)}</p>
+                    <p className="font-medium font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-24 h-3" /> : (member?.joinDate ? formatDate(member.joinDate) : "N/A")}</p>
                   </div>
                 </div>
               </div>
 
               {/* Assigned Coach Section */}
-              {(member as any).trainerId && (
+              {(isLoading || (member as any)?.trainerId) && (
                 <div className="mt-6 pt-6 border-t border-white/5">
                   <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2 mb-4">
                     <ShieldCheck className="w-3.5 h-3.5 text-primary" />
                     ASSIGNED COACH
                   </h3>
-                  <Link href={`/trainers/${(member as any).trainerId._id || (member as any).trainerId.id}`} className="flex items-center gap-3 p-3 rounded-xl bg-black/20 dark:bg-white/5 border border-white/5 hover:border-primary/30 transition-all group">
-                    {(member as any).trainerId.photo ? (
+                  <Link href={`/trainers/${(member as any)?.trainerId?._id || (member as any)?.trainerId?.id || ''}`} className={cn("flex items-center gap-3 p-3 rounded-xl bg-black/20 dark:bg-white/5 border border-white/5 transition-all group", !isLoading && "hover:border-primary/30")}>
+                    {isLoading ? (
+                      <Skeleton className="w-10 h-10 rounded-full" />
+                    ) : (member as any)?.trainerId?.photo ? (
                       <img src={(member as any).trainerId.photo} className="w-10 h-10 rounded-full object-cover" alt="Trainer" />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                        {(member as any).trainerId.firstName?.[0]}
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold uppercase">
+                        {((member as any)?.trainerId?.fullName?.[0]) || ((member as any)?.trainerId?.firstName?.[0]) || "?"}
                       </div>
                     )}
                     <div className="flex-1">
                       <p className="font-semibold text-sm group-hover:text-primary transition-colors">
-                        {(member as any).trainerId.firstName} {(member as any).trainerId.lastName}
+                        {isLoading ? <Skeleton className="w-24 h-4" /> : ((member as any)?.trainerId?.fullName || `${(member as any)?.trainerId?.firstName || ""} ${(member as any)?.trainerId?.lastName || ""}`.trim() || "Unknown Coach")}
                       </p>
-                      <p className="text-xs text-muted-foreground">Personal Trainer</p>
+                      <p className="text-xs text-muted-foreground">{isLoading ? <Skeleton className="w-16 h-3 mt-1" /> : "Personal Trainer"}</p>
                     </div>
                   </Link>
                 </div>
@@ -661,7 +655,7 @@ export default function MemberDetailPage({
             </Card>
           )}
 
-          {member.deletedAt && (
+          {member?.deletedAt && (
             <Card className="glass-premium p-6 border-border border-l-4 border-l-destructive bg-destructive/5 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-destructive/20 text-destructive flex items-center justify-center">
@@ -679,28 +673,28 @@ export default function MemberDetailPage({
           )}
           {/* Active Status Banner - Visible to all roles */}
           <Card className={cn(
-            "glass-premium p-6 border-y-border border-r-border border-l-4 flex items-center justify-between shadow-2xl transition-all",
-            activeSub ? "border-l-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/5" : "border-l-destructive bg-destructive/5"
+            "glass-premium gap-1 p-6 border-y-border border-r-border border-l-4 flex items-center justify-between shadow-2xl transition-all",
+            isLoading ? "border-l-border" : (activeSub ? "border-l-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/5" : "border-l-destructive bg-destructive/5")
           )}>
             <div className="flex items-center gap-4">
               <div className={cn(
                 "w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner",
-                activeSub ? "bg-emerald-100 text-emerald-600" : "bg-destructive/10 text-destructive"
+                isLoading ? "bg-muted text-muted-foreground" : (activeSub ? "bg-emerald-100 text-emerald-600" : "bg-destructive/10 text-destructive")
               )}>
-                {activeSub ? <CreditCard className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
+                {isLoading ? <Skeleton className="w-6 h-6 rounded-full" /> : (activeSub ? <CreditCard className="w-6 h-6" /> : <Clock className="w-6 h-6" />)}
               </div>
               <div>
                 <h4 className="font-bold text-foreground">
-                  {activeSub ? "Membership Active" : "Membership Expired"}
+                  {isLoading ? <Skeleton className="w-32 h-5" /> : (activeSub ? "Membership Active" : "Membership Expired")}
                 </h4>
-                <p className="text-sm text-muted-foreground leading-none mt-1">
-                  {activeSub
+                <p className="text-sm text-muted-foreground leading-none mt-1 text-emerald-500">
+                  {isLoading ? <Skeleton className="w-48 h-4 mt-1" /> : (activeSub
                     ? `Expiring on ${formatDate(activeSub.endDate)}`
-                    : `Last active on ${memberSubs[0] ? formatDate(memberSubs[0].endDate) : 'never'}`}
+                    : `Last active on ${memberSubs[0] ? formatDate(memberSubs[0].endDate) : 'never'}`)}
                 </p>
               </div>
             </div>
-            {!activeSub && (
+            {!isLoading && !activeSub && (
               <span className="animate-pulse flex items-center gap-1 text-xs font-bold text-destructive uppercase tracking-widest bg-destructive/10 px-3 py-1 rounded-full">
                 Renewal Needed
               </span>
@@ -720,7 +714,12 @@ export default function MemberDetailPage({
                 </div>
 
                 <div className="space-y-3">
-                  {memberSubs.length > 0 ? (
+                  {isLoading ? (
+                    <div className="space-y-4">
+                      <Skeleton className="w-full h-24 rounded-2xl" />
+                      <Skeleton className="w-full h-24 rounded-2xl" />
+                    </div>
+                  ) : memberSubs.length > 0 ? (
                     memberSubs.map((sub, idx) => {
                       const isActive = isSubscriptionActive(sub.endDate, sub.status);
                       const planName = plans.find(p => p.id === sub.planId)?.name || sub.planId;
@@ -819,7 +818,11 @@ export default function MemberDetailPage({
                         </tr>
                       </thead>
                       <tbody>
-                        {memberPayments.length > 0 ? (
+                        {isLoading ? (
+                          <tr>
+                            <td colSpan={5} className="py-6 px-6"><Skeleton className="w-full h-8" /></td>
+                          </tr>
+                        ) : memberPayments.length > 0 ? (
                           memberPayments.map((pay) => (
                             <tr key={pay.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
                               <td className="px-6 py-6 font-mono text-[10px] text-slate-500 flex items-center gap-2">
@@ -901,17 +904,17 @@ export default function MemberDetailPage({
                     </div>
                     <div>
                       <h4 className="font-bold text-foreground">
-                        {workoutPlans.find(wp => wp._id === member.workoutPlanId || wp.id === member.workoutPlanId)?.name || "No Plan Assigned"}
+                        {isLoading ? <Skeleton className="w-48 h-5" /> : (workoutPlans.find(wp => wp._id === member?.workoutPlanId || wp.id === member?.workoutPlanId)?.name || "No Plan Assigned")}
                       </h4>
                       <p className="text-sm text-muted-foreground leading-none mt-1">
-                        {member.workoutPlanId ? "Active Workout Plan" : "No plan assigned"}
+                        {isLoading ? <Skeleton className="w-32 h-4 mt-1" /> : (member?.workoutPlanId ? "Active Workout Plan" : "No plan assigned")}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex gap-2">
                     <Select
-                      value={member.workoutPlanId || ""}
+                      value={member?.workoutPlanId || ""}
                       onValueChange={(planId) => {
                         if (planId) {
                           toast.promise(assignWorkoutToMember(memberId, planId), {
@@ -921,6 +924,7 @@ export default function MemberDetailPage({
                           });
                         }
                       }}
+                      disabled={isLoading}
                     >
                       <SelectTrigger className="h-10 px-3 py-2 rounded-md border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all min-w-[150px]">
                         <SelectValue placeholder="Select Plan..." />
@@ -944,9 +948,9 @@ export default function MemberDetailPage({
       <AlertDialog open={isDeletingMember} onOpenChange={setIsDeletingMember}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{member.deletedAt ? "Permanently Purge Member?" : "Delete Member Profile?"}</AlertDialogTitle>
+            <AlertDialogTitle>{member?.deletedAt ? "Permanently Purge Member?" : "Delete Member Profile?"}</AlertDialogTitle>
             <AlertDialogDescription>
-              {member.deletedAt
+              {member?.deletedAt
                 ? "This is a final action. This member's entire history, billing, and attendance will be purged from the system forever."
                 : "The member will be moved to the trash and hidden from active lists."}
             </AlertDialogDescription>
@@ -954,7 +958,7 @@ export default function MemberDetailPage({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-white">
-              {member.deletedAt ? "Permanently Purge" : "Move to Trash"}
+              {member?.deletedAt ? "Permanently Purge" : "Move to Trash"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

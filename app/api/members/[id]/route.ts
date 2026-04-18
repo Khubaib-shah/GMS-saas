@@ -45,7 +45,7 @@ export async function GET(
             _id: objectId,
             deletedAt: { $ne: undefined } // Matches any value, including null and dates
         });
-        const member = await Member.findOne(query).populate("trainerId", "firstName lastName photo").lean();
+        const member = await Member.findOne(query).populate("trainerId", "fullName firstName lastName photo").lean();
 
         if (!member) {
             return NextResponse.json({ message: "Member not found" }, { status: 404 });

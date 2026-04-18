@@ -70,7 +70,9 @@ export default function EditMemberPage({
         gender: member.gender || ("male" as const),
         planId: member.planId || "plan_basic",
         notes: member.notes || "",
-        trainerId: member.trainerId || "",
+        trainerId: (typeof member.trainerId === 'object' && member.trainerId !== null) 
+          ? String((member.trainerId as any)._id || (member.trainerId as any).id || "") 
+          : String((member.trainerId as any) || ""),
       });
       if (member.photoBase64) {
         setPhotoPreview(member.photoBase64);
@@ -294,7 +296,7 @@ export default function EditMemberPage({
                 Assigned Trainer
               </Label>
               <Select
-                value={formData.trainerId || "__none__"}
+                value={formData.trainerId ? String(formData.trainerId) : "__none__"}
                 onValueChange={(val) => setFormData({ ...formData, trainerId: val === "__none__" ? "" : val })}
               >
                 <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
@@ -302,11 +304,14 @@ export default function EditMemberPage({
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-white/10">
                   <SelectItem value="__none__" className="text-[10px] font-bold uppercase tracking-widest">NO TRAINER ASSIGNED</SelectItem>
-                  {trainers.map((trainer) => (
-                    <SelectItem key={trainer._id || trainer.id} value={trainer._id || trainer.id} className="text-[10px] font-bold uppercase tracking-widest">
-                      {trainer.fullName.toUpperCase()}
-                    </SelectItem>
-                  ))}
+                  {trainers.map((trainer) => {
+                    const trainerValueId = String(trainer._id || trainer.id);
+                    return (
+                      <SelectItem key={trainerValueId} value={trainerValueId} className="text-[10px] font-bold uppercase tracking-widest">
+                        {trainer.fullName?.toUpperCase() || trainer.firstName?.toUpperCase() || "UNKNOWN"}
+                      </SelectItem>
+                    )
+                  })}
                 </SelectContent>
               </Select>
             </div>

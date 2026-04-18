@@ -62,7 +62,7 @@ export async function GET(req: Request) {
 
         const members = await Member.find(query)
             .sort({ createdAt: -1 })
-            .populate("trainerId", "firstName lastName photo")
+            .populate("trainerId", "fullName photo")
             .lean();
 
         // Bulk fetch active subscriptions for status injection
