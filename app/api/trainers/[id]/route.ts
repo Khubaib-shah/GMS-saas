@@ -8,6 +8,7 @@ import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS, hasPermission } from "@/lib/permissions";
 import mongoose from "mongoose";
 import { logAudit, extractRequestInfo } from "@/lib/audit";
+import bcrypt from "bcryptjs";
 
 // GET /api/trainers/[id] - Get Details + Member List
 export async function GET(
@@ -61,19 +62,21 @@ export async function PUT(
 ) {
     const authResult = await requirePermission(PERMISSIONS.TRAINERS_MANAGE);
     // Allow self-edit if management permission is missing
-    let session = authResult as any;
+    let sessionData: any;
     if ("error" in authResult) {
         // Direct session check for self-edit
         const directSession = await getServerSession(authOptions);
         if (!directSession || (directSession.user as any).id !== (await params).id) {
             return authResult.error;
         }
-        session = directSession;
+        sessionData = directSession;
+    } else {
+        sessionData = authResult.session;
     }
 
     const { id } = await params;
-    const userId = (session.user as any).id;
-    const gymId = (session.user as any).gymId;
+    const userId = (sessionData.user as any).id;
+    const gymId = (sessionData.user as any).gymId;
 
     const body = await req.json();
 
@@ -82,6 +85,11 @@ export async function PUT(
 
         // Construct update object
         const updateData: any = {};
+        if (body.fullName !== undefined) updateData.fullName = body.fullName;
+        if (body.email !== undefined) updateData.email = body.email;
+        if (body.password) {
+            updateData.password = await bcrypt.hash(body.password, 12);
+        }
         if (body.bio !== undefined) updateData.bio = body.bio;
         if (body.specialties !== undefined) updateData.specialties = body.specialties;
         if (body.photo !== undefined) updateData.photo = body.photo;
@@ -115,7 +123,7 @@ export async function PUT(
         await logAudit({
             gymId,
             userId,
-            userName: session.user?.name || undefined,
+            userName: sessionData.user?.name || undefined,
             action: "update",
             resource: "trainer_profile",
             resourceId: id,

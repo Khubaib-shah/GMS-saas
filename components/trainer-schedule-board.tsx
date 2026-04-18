@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Plus, User, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { SessionLogModal } from "./session-log-modal";
 
 interface Slot {
   _id: string;
@@ -29,6 +30,8 @@ export function TrainerScheduleBoard({ trainerId, canManage, onBookSlot }: Train
   const [currentDate, setCurrentDate] = useState(new Date());
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBookingSlot, setSelectedBookingSlot] = useState<any>(null);
+  const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 6 }, (_, i) => addDays(weekStart, i));
@@ -58,6 +61,31 @@ export function TrainerScheduleBoard({ trainerId, canManage, onBookSlot }: Train
   const getSlotsForDay = (day: Date) => {
     const formattedDay = format(day, "yyyy-MM-dd");
     return slots.filter((s) => format(new Date(s.date), "yyyy-MM-dd") === formattedDay);
+  };
+
+  const handleSlotClick = async (slot: Slot) => {
+      if (canManage) {
+         if (slot.status === "available") onBookSlot?.(slot);
+      } else {
+         if (slot.bookedCount > 0) {
+              try {
+                  const res = await fetch(`/api/trainers/bookings?trainerId=${trainerId}`);
+                  const bookings = await res.json();
+                  // Find booking for this slot
+                  const bookingForSlot = bookings.find((b: any) => b.slotId?._id === slot._id || b.slotId === slot._id);
+                  if (bookingForSlot) {
+                      setSelectedBookingSlot(bookingForSlot);
+                      setIsLogModalOpen(true);
+                  } else {
+                      toast.info("No active booking found for this slot.");
+                  }
+              } catch(e) {
+                  toast.error("Failed to fetch booking details");
+              }
+         } else {
+             toast.info("This slot is not booked yet.");
+         }
+      }
   };
 
   const statusColors = {
@@ -110,8 +138,8 @@ export function TrainerScheduleBoard({ trainerId, canManage, onBookSlot }: Train
                   daySlots.map((slot) => (
                     <button
                       key={slot._id}
-                      disabled={slot.status === "full" || slot.status === "blocked"}
-                      onClick={() => onBookSlot?.(slot)}
+                      disabled={slot.status === "blocked" || (slot.status === "full" && canManage)}
+                      onClick={() => handleSlotClick(slot)}
                       className={cn(
                         "w-full p-2 rounded-lg border text-left transition-all text-xs space-y-1 group",
                         statusColors[slot.status]
@@ -139,6 +167,16 @@ export function TrainerScheduleBoard({ trainerId, canManage, onBookSlot }: Train
           );
         })}
       </div>
+
+      <SessionLogModal 
+         isOpen={isLogModalOpen} 
+         onClose={() => setIsLogModalOpen(false)} 
+         booking={selectedBookingSlot} 
+         onSuccess={() => {
+             // Refresh if needed
+             fetchSlots();
+         }} 
+      />
     </div>
   );
 }

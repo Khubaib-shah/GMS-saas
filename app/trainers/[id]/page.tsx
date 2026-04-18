@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Save, Mail, Edit2, Users, Calendar, Award, DollarSign, Clock, BarChart3, Settings2 } from "lucide-react";
 import { toast } from "sonner";
@@ -64,8 +66,12 @@ export default function TrainerDetailPage({
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
     bio: "",
     specialties: "",
     certifications: "",
@@ -94,6 +100,9 @@ export default function TrainerDetailPage({
       const data = await res.json();
       setTrainer(data);
       setFormData({
+        fullName: data.fullName || "",
+        email: data.email || "",
+        password: "",
         bio: data.bio || "",
         specialties: data.specialties?.join(", ") || "",
         certifications: data.certifications?.join(", ") || "",
@@ -148,8 +157,24 @@ export default function TrainerDetailPage({
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Loading profile...</div>;
-  if (!trainer) return <div className="p-8 text-center">Trainer not found</div>;
+  const executePasswordReset = async () => {
+    try {
+      const res = await fetch(`/api/trainers/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: "password123" }),
+      });
+      if (!res.ok) throw new Error("Failed to reset password");
+      toast.success("Password has been reset to 'password123'");
+      // Clear the local state if it was typed
+      setFormData(prev => ({ ...prev, password: "" }));
+      setIsResetModalOpen(false);
+    } catch (error) {
+      toast.error("Failed to reset password");
+    }
+  };
+
+  if (!loading && !trainer) return <div className="p-8 text-center">Trainer not found</div>;
 
   return (
     <div className="container mx-auto p-6 space-y-8 animate-in fade-in duration-500">
@@ -158,12 +183,19 @@ export default function TrainerDetailPage({
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Trainers
         </Button>
-        {canEdit && !isEditing && (
-          <Button onClick={() => setIsEditing(true)}>
-            <Edit2 className="w-4 h-4 mr-2" />
-            Edit Profile
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {canManage && (
+            <Button variant="outline" className="border-red-500/20 text-red-500 hover:bg-red-500/10" onClick={() => setIsResetModalOpen(true)}>
+              Reset Password
+            </Button>
+          )}
+          {canEdit && !isEditing && (
+            <Button onClick={() => setIsEditing(true)}>
+              <Edit2 className="w-4 h-4 mr-2" />
+              Edit Profile
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
@@ -171,39 +203,43 @@ export default function TrainerDetailPage({
           <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm">
             <CardHeader className="text-center pb-2">
                <div className="mx-auto mb-4 relative">
-                  <Avatar className="w-32 h-32 border-4 border-background shadow-md">
-                      <AvatarImage src={trainer.photo} alt={trainer.fullName} className="object-cover" />
-                      <AvatarFallback className="text-3xl bg-primary/10 text-primary">
-                      {trainer.fullName.split(" ").map((n) => n[0]).join("").toUpperCase()}
-                      </AvatarFallback>
-                  </Avatar>
-                  <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4" variant={trainer.trainerStatus === 'active' ? 'default' : 'secondary'}>
-                    {trainer.trainerStatus || 'active'}
+                  {loading ? (
+                      <Skeleton className="w-32 h-32 rounded-full mx-auto" />
+                  ) : (
+                      <Avatar className="w-32 h-32 border-4 border-background shadow-md">
+                          <AvatarImage src={trainer?.photo} alt={trainer?.fullName} className="object-cover" />
+                          <AvatarFallback className="text-3xl bg-primary/10 text-primary">
+                          {trainer?.fullName?.split(" ").map((n) => n[0]).join("").toUpperCase()}
+                          </AvatarFallback>
+                      </Avatar>
+                  )}
+                  <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4" variant={trainer?.trainerStatus === 'active' ? 'default' : 'secondary'}>
+                    {loading ? <Skeleton className="w-10 h-3 bg-white/20" /> : (trainer?.trainerStatus || 'active')}
                   </Badge>
               </div>
-              <CardTitle className="text-2xl">{trainer.fullName}</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">{trainer.email}</p>
+              <CardTitle className="text-2xl">{loading ? <Skeleton className="h-6 w-40 mx-auto" /> : trainer?.fullName}</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">{loading ? <Skeleton className="h-4 w-32 mx-auto" /> : trainer?.email}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-2">
                   <div className="p-3 bg-muted/50 rounded-xl text-center">
                     <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Experience</p>
-                    <p className="font-bold">{trainer.experienceYears || 0} Years</p>
+                    <p className="font-bold">{loading ? <Skeleton className="h-5 w-12 mx-auto mt-1.5" /> : `${trainer?.experienceYears || 0} Years`}</p>
                   </div>
                   <div className="p-3 bg-muted/50 rounded-xl text-center">
                     <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Hourly Rate</p>
-                    <p className="font-bold text-primary">${trainer.hourlyRate || 0}</p>
+                    <p className="font-bold text-primary">{loading ? <Skeleton className="h-5 w-12 mx-auto mt-1.5" /> : `$${trainer?.hourlyRate || 0}`}</p>
                   </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground flex items-center gap-2"><Users className="w-4 h-4" /> Active Clients</span>
-                    <span className="font-bold">{trainer.members?.length || 0}</span>
+                    <span className="font-bold">{loading ? <Skeleton className="h-4 w-6" /> : (trainer?.members?.length || 0)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground flex items-center gap-2"><Clock className="w-4 h-4" /> Max Per Slot</span>
-                    <span className="font-bold">{trainer.maxMembersPerSlot || 1}</span>
+                    <span className="font-bold">{loading ? <Skeleton className="h-4 w-6" /> : (trainer?.maxMembersPerSlot || 1)}</span>
                 </div>
               </div>
 
@@ -213,16 +249,24 @@ export default function TrainerDetailPage({
                       <Award className="w-3 h-3 text-primary" /> Specialties
                   </h4>
                   <div className="flex flex-wrap gap-1">
-                    {trainer.specialties?.map((s, i) => <Badge key={i} variant="secondary" className="text-[10px]">{s}</Badge>)}
+                    {loading ? (
+                        Array(3).fill(0).map((_, i) => <Skeleton key={i} className="h-5 w-16" />)
+                    ) : (
+                        trainer?.specialties?.map((s, i) => <Badge key={i} variant="secondary" className="text-[10px]">{s}</Badge>)
+                    )}
                   </div>
                 </div>
-                {trainer.certifications?.length ? (
+                {(loading || trainer?.certifications?.length) ? (
                   <div>
                     <h4 className="text-xs font-bold uppercase text-muted-foreground mb-2 flex items-center gap-2">
                         <Award className="w-3 h-3 text-amber-500" /> Certifications
                     </h4>
                     <div className="flex flex-wrap gap-1">
-                      {trainer.certifications.map((c, i) => <Badge key={i} variant="outline" className="text-[10px] border-amber-200 text-amber-700 bg-amber-50">{c}</Badge>)}
+                      {loading ? (
+                          Array(2).fill(0).map((_, i) => <Skeleton key={i} className="h-5 w-20" />)
+                      ) : (
+                          trainer?.certifications?.map((c, i) => <Badge key={i} variant="outline" className="text-[10px] border-amber-200 text-amber-700 bg-amber-50">{c}</Badge>)
+                      )}
                     </div>
                   </div>
                 ) : null}
@@ -268,6 +312,25 @@ export default function TrainerDetailPage({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InputField
+                    label="Full Name"
+                    validateType="text"
+                    value={formData.fullName}
+                    onChange={(val) => setFormData({ ...formData, fullName: val })}
+                  />
+                  <InputField
+                    label="Email Address"
+                    validateType="email"
+                    value={formData.email}
+                    onChange={(val) => setFormData({ ...formData, email: val })}
+                  />
+                  <InputField
+                    label="New Password (optional)"
+                    type="password"
+                    validateType="password"
+                    value={formData.password}
+                    onChange={(val) => setFormData({ ...formData, password: val })}
+                  />
                   <InputField
                     label="Years of Experience"
                     validateType="number"
@@ -344,7 +407,13 @@ export default function TrainerDetailPage({
                         <CardTitle>My Clients</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {trainer.members?.length > 0 ? (
+                        {loading ? (
+                            <div className="space-y-2">
+                                <Skeleton className="h-10 w-full" />
+                                <Skeleton className="h-10 w-full" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        ) : trainer?.members?.length > 0 ? (
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -354,7 +423,7 @@ export default function TrainerDetailPage({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {trainer.members.map((m: any) => (
+                                    {trainer.members.map((m: { _id: string; firstName: string; lastName: string }) => (
                                         <TableRow key={m._id}>
                                             <TableCell className="font-medium underline decoration-primary/20">
                                                 <Link href={`/members/${m._id}`}>{m.firstName} {m.lastName}</Link>
@@ -378,7 +447,13 @@ export default function TrainerDetailPage({
                 <Card className="border-none shadow-lg">
                     <CardHeader><CardTitle>Biography</CardTitle></CardHeader>
                     <CardContent className="prose prose-sm dark:prose-invert max-w-none">
-                        {trainer.bio ? <p className="leading-relaxed text-muted-foreground">{trainer.bio}</p> : <p className="italic text-muted-foreground">No biography provided.</p>}
+                        {loading ? (
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-[90%]" />
+                                <Skeleton className="h-4 w-[80%]" />
+                            </div>
+                        ) : trainer?.bio ? <p className="leading-relaxed text-muted-foreground">{trainer.bio}</p> : <p className="italic text-muted-foreground">No biography provided.</p>}
                     </CardContent>
                 </Card>
               </TabsContent>
@@ -395,6 +470,15 @@ export default function TrainerDetailPage({
             fetchMetrics();
             fetchTrainer(); // To refresh client list/slots if needed
         }} 
+      />
+
+      <ConfirmationModal
+        isOpen={isResetModalOpen}
+        onClose={() => setIsResetModalOpen(false)}
+        onConfirm={executePasswordReset}
+        title="Reset Trainer Password"
+        description={<>Are you sure you want to reset this trainer's password? The new password will be hardcoded to <span className="font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">password123</span>.</>}
+        confirmText="Confirm Reset"
       />
     </div>
   );

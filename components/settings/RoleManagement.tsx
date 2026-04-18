@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, Trash2, Edit2, Shield, Loader2, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 
 interface RoleData {
     id: string;
@@ -43,6 +44,7 @@ export function RoleManagement() {
     const [editingRole, setEditingRole] = useState<RoleData | null>(null);
     const [formData, setFormData] = useState({ name: "", description: "", permissions: [] as string[] });
     const [saving, setSaving] = useState(false);
+    const [roleToDelete, setRoleToDelete] = useState<RoleData | null>(null);
 
     const fetchRoles = useCallback(async () => {
         try {
@@ -105,14 +107,18 @@ export function RoleManagement() {
         }
     };
 
-    const handleDelete = async (role: RoleData) => {
+    const handleDelete = (role: RoleData) => {
         if (role.isSystemRole) {
             toast.error("System roles cannot be deleted");
             return;
         }
-        if (!confirm(`Delete role "${role.name}"? This cannot be undone.`)) return;
+        setRoleToDelete(role);
+    };
+
+    const confirmDelete = async () => {
+        if (!roleToDelete) return;
         try {
-            const res = await fetch(`/api/roles/${role.id}`, { method: "DELETE" });
+            const res = await fetch(`/api/roles/${roleToDelete.id}`, { method: "DELETE" });
             if (!res.ok) {
                 const err = await res.json();
                 throw new Error(err.message || "Failed to delete");
@@ -121,6 +127,8 @@ export function RoleManagement() {
             fetchRoles();
         } catch (err: any) {
             toast.error(err.message);
+        } finally {
+            setRoleToDelete(null);
         }
     };
 
@@ -270,6 +278,15 @@ export function RoleManagement() {
                     </TableBody>
                 </Table>
             </Card>
+
+            <ConfirmationModal
+                isOpen={!!roleToDelete}
+                onClose={() => setRoleToDelete(null)}
+                onConfirm={confirmDelete}
+                title="Delete Custom Role"
+                description={`Are you sure you want to delete the role "${roleToDelete?.name}"? This action cannot be undone and may affect users assigned to this role.`}
+                confirmText="Delete Role"
+            />
         </div>
     );
 }

@@ -41,6 +41,7 @@ import { NotificationSettings } from "@/components/settings/NotificationSettings
 import { RoleManagement } from "@/components/settings/RoleManagement";
 import { usePermissions } from "@/hooks/use-permissions";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -63,6 +64,7 @@ export default function SettingsPage() {
   const [staff, setStaff] = useState<any[]>([]);
   const [isStaffLoading, setIsStaffLoading] = useState(false);
   const [isParamsOpen, setIsParamsOpen] = useState(false);
+  const [staffToDelete, setStaffToDelete] = useState<string | null>(null);
   const [staffFormData, setStaffFormData] = useState({
     fullName: "",
     email: "",
@@ -143,10 +145,14 @@ export default function SettingsPage() {
     }
   };
 
-  const handleDeleteStaff = async (id: string) => {
-    if (!confirm("Are you sure you want to remove this staff member?")) return;
+  const handleDeleteStaff = (id: string) => {
+    setStaffToDelete(id);
+  };
+
+  const confirmDeleteStaff = async () => {
+    if (!staffToDelete) return;
     try {
-      const res = await fetch(`/api/staff?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/staff?id=${staffToDelete}`, { method: "DELETE" });
       if (res.ok) {
         toast.success("Staff removed");
         fetchStaff();
@@ -155,6 +161,8 @@ export default function SettingsPage() {
       }
     } catch (e) {
       toast.error("Error removing staff");
+    } finally {
+      setStaffToDelete(null);
     }
   };
 
@@ -632,6 +640,15 @@ export default function SettingsPage() {
       {activeTab === "business_settings" && <BusinessSettings />}
       {activeTab === "notifications" && <NotificationSettings />}
       {activeTab === "roles" && <RoleManagement />}
+
+      <ConfirmationModal
+        isOpen={!!staffToDelete}
+        onClose={() => setStaffToDelete(null)}
+        onConfirm={confirmDeleteStaff}
+        title="Remove Staff Member"
+        description="Are you sure you want to completely remove this staff member from your gym? Their access will be permanently revoked."
+        confirmText="Remove Access"
+      />
     </div>
   );
 }
