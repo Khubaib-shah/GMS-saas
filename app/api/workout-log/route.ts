@@ -99,7 +99,9 @@ export async function GET(req: Request) {
         const logs = await WorkoutLog.find({
             gymId: session.user.gymId,
             memberId
-        }).sort({ date: -1 }).populate("exercises.exerciseId", "name muscleGroup");
+        }).sort({ date: -1 })
+        .populate("exercises.exerciseId", "name muscleGroup")
+        .populate("planId", "name");
 
         return NextResponse.json(logs);
     } catch (error: any) {
