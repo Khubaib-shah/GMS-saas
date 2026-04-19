@@ -21,6 +21,8 @@ import {
     Mail,
     Phone
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { StatsCard } from "@/components/stats-card";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -80,18 +82,15 @@ export function TrainerDashboard() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+        <div className="space-y-10 animate-fade-up pb-20">
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic leading-none">Trainer Profile</span>
-                        <div className="h-px w-20 bg-primary/20"></div>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none">
-                        Analytics <span className="text-primary/40">Dashboard</span>
-                    </h1>
-                </div>
+            <DashboardHeader
+                title="TRAINER"
+                highlight="DASHBOARD"
+                subtitle="Trainer Profile"
+                description="Manage your assigned members and monitor compliance."
+                descriptionIconColor="primary"
+            >
                 <div className="flex items-center gap-3">
                     <Button
                         onClick={() => router.push("/trainer/deploy")}
@@ -101,39 +100,48 @@ export function TrainerDashboard() {
                         Assign Workout
                     </Button>
                 </div>
-            </div>
+            </DashboardHeader>
 
             {/* KPI Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    { label: "Total Members", val: stats?.totalMembers || 0, icon: Users, color: "primary" },
-                    { label: "Active Plans", val: stats?.activePlans || 0, icon: Activity, color: "blue" },
-                    { label: "Pending Assignments", val: stats?.membersWithoutPlans || 0, icon: AlertCircle, color: "red", alert: (stats?.membersWithoutPlans || 0) > 0 },
-                    { label: "Plan Compliance", val: `${stats?.complianceRate || 0}%`, icon: TrendingUp, color: "green" }
-                ].map((kpi, i) => (
-                    <Card key={i} className="relative overflow-hidden group bg-slate-950/20 border-white/5 p-6 hover:border-primary/20 transition-all duration-500">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -skew-x-12 translate-x-8 -translate-y-8 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="relative flex items-start justify-between">
-                            <div>
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-1">{kpi.label}</p>
-                                <h3 className="text-3xl font-black italic tracking-tighter group-hover:text-primary transition-colors">{kpi.val}</h3>
-                            </div>
-                            <div className={cn(
-                                "p-3 rounded-xl bg-white/5",
-                                kpi.alert && "bg-red-500/10 text-red-500 animate-pulse"
-                            )}>
-                                <kpi.icon className="w-5 h-5" />
-                            </div>
-                        </div>
-                    </Card>
-                ))}
+                <StatsCard
+                    title="Total Members"
+                    value={stats?.totalMembers || 0}
+                    icon={<Users className="w-5 h-5" />}
+                />
+                <StatsCard
+                    title="Active Plans"
+                    value={stats?.activePlans || 0}
+                    icon={<Activity className="w-5 h-5" />}
+                />
+                <StatsCard
+                    title="Pending Assignments"
+                    value={stats?.membersWithoutPlans || 0}
+                    icon={<AlertCircle className="w-5 h-5" />}
+                />
+                <StatsCard
+                    title="Plan Compliance"
+                    value={`${stats?.complianceRate || 0}%`}
+                    icon={<TrendingUp className="w-5 h-5" />}
+                />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Assigned Members List */}
                 <div className="lg:col-span-2 space-y-6">
-                    <Card className="bg-slate-950/20 border-white/5 overflow-hidden">
-                        <div className="p-6 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 mb-2">
+                        <h2 className="text-2xl font-black italic tracking-tighter text-foreground uppercase">
+                            Assigned Members
+                        </h2>
+                        <div className="h-px flex-1 bg-black/5 dark:bg-white/5 shadow-[0_1px_0_rgba(255,255,255,0.05)]"></div>
+                        <div className="flex gap-1">
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]"></div>
+                            <div className="w-1.5 h-1.5 bg-primary/40 rounded-full"></div>
+                            <div className="w-1.5 h-1.5 bg-primary/10 rounded-full"></div>
+                        </div>
+                    </div>
+                    <Card className="glass-premium p-0 border-border overflow-hidden bg-card dark:bg-slate-950/40">
+                        <div className="p-6 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <h3 className="text-sm font-black italic uppercase tracking-widest flex items-center gap-3">
                                 <Users className="w-4 h-4 text-primary" />
                                 Assigned <span className="text-primary/40">Members</span>
@@ -143,7 +151,7 @@ export function TrainerDashboard() {
                                 <input
                                     type="text"
                                     placeholder="Search by name or phone..."
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-xs font-bold text-white focus:outline-none focus:border-primary/40 transition-all"
+                                    className="w-full bg-black/5 dark:bg-white/5 border border-border rounded-lg pl-9 pr-4 py-2 text-xs font-bold focus:outline-none focus:border-primary/40 transition-all"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -152,7 +160,7 @@ export function TrainerDashboard() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
-                                    <tr className="bg-white/[0.02] border-b border-white/5">
+                                    <tr className="bg-black/5 dark:bg-white/[0.02] border-b border-border">
                                         <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Member</th>
                                         <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">Plan Status</th>
                                         <th className="px-6 py-4 text-[9px] font-black text-slate-500 uppercase tracking-widest text-right">Activity</th>
@@ -167,7 +175,7 @@ export function TrainerDashboard() {
                                         </tr>
                                     ) : (
                                         filteredMembers.map((m) => (
-                                            <tr key={m.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer group" onClick={() => router.push(`/members/${m.id}`)}>
+                                            <tr key={m.id} className="border-b border-border hover:bg-black/5 dark:hover:bg-white/[0.02] transition-colors cursor-pointer group" onClick={() => router.push(`/members/${m.id}`)}>
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
@@ -216,7 +224,7 @@ export function TrainerDashboard() {
 
                 {/* Sidebar area */}
                 <div className="space-y-6">
-                    <Card className="bg-primary/5 border-primary/20 overflow-hidden relative selection:bg-primary/20">
+                    <Card className="glass-premium p-0 border-border bg-card dark:bg-slate-950/40 relative selection:bg-primary/20 overflow-hidden">
                         <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
                             <Terminal className="w-24 h-24" />
                         </div>
@@ -265,7 +273,7 @@ export function TrainerDashboard() {
                         </div>
                     </Card>
 
-                    <Card className="bg-slate-950/20 border-white/5 p-6">
+                    <Card className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40">
                         <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-4">Quick Alerts</h3>
                         <div className="space-y-4">
                             {(stats?.membersWithoutPlans || 0) > 0 && (

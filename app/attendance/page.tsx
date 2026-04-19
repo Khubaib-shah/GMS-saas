@@ -146,11 +146,27 @@ export default function AttendancePage() {
                                 </thead>
                                 <tbody>
                                     {loadingReports ? (
-                                        <tr>
-                                            <td colSpan={5} className="py-12 text-center text-muted-foreground animate-pulse">
-                                                Loading reports...
-                                            </td>
-                                        </tr>
+                                        Array.from({ length: 8 }).map((_, i) => (
+                                            <tr key={i} className="border-b border-white/5 animate-pulse">
+                                                <td className="py-6 px-6">
+                                                    <div className="h-4 w-32 bg-white/5 rounded" />
+                                                </td>
+                                                <td className="py-6 px-6">
+                                                    <div className="h-4 w-24 bg-white/5 rounded" />
+                                                </td>
+                                                <td className="py-6 px-6">
+                                                    <div className="h-4 w-24 bg-white/5 rounded" />
+                                                </td>
+                                                <td className="py-6 px-6">
+                                                    <div className="h-6 w-16 bg-white/5 rounded-lg" />
+                                                </td>
+                                                <td className="py-6 px-6">
+                                                    <div className="flex justify-end">
+                                                        <div className="h-8 w-8 bg-white/5 rounded-xl" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
                                     ) : reports.length > 0 ? (
                                         reports.map((record: any) => {
                                             return (

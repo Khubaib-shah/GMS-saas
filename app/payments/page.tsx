@@ -8,6 +8,7 @@ import { useAppStore } from "@/lib/store"
 import { formatDate, formatCurrency } from "@/lib/utils/file-utils"
 import { StatsCard } from "@/components/stats-card"
 import { DashboardHeader } from "@/components/dashboard-header"
+import { ChartSkeleton } from "@/components/ui/skeleton-components"
 import {
   Table,
   TableBody,
@@ -250,16 +251,19 @@ export default function PaymentsPage() {
           title="Total Revenue"
           value={formatCurrency(totalRevenue)}
           icon={<DollarSign className="w-5 h-5" />}
+          isLoading={loading}
         />
         <StatsCard
           title="Total Transactions"
           value={paidCount.toString()}
           icon={<AlertCircle className="w-5 h-5" />}
+          isLoading={loading}
         />
         <StatsCard
           title="Average Payment"
           value={formatCurrency(avgPayment)}
           icon={<TrendingUp className="w-5 h-5" />}
+          isLoading={loading}
         />
       </div>
 
@@ -276,7 +280,11 @@ export default function PaymentsPage() {
             <div className="h-px w-full bg-white/5 mt-2"></div>
           </div>
           
-          {chartData.length > 0 ? (
+          {loading ? (
+            <div className="h-[250px] w-full">
+              <ChartSkeleton className="h-full border-none bg-transparent p-0" />
+            </div>
+          ) : chartData.length > 0 ? (
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
               <AreaChart
                 accessibilityLayer
@@ -336,7 +344,11 @@ export default function PaymentsPage() {
             <div className="h-px w-full bg-white/5 mt-2"></div>
           </div>
 
-          {methodData.length > 0 ? (
+          {loading ? (
+            <div className="h-[250px] w-full">
+              <ChartSkeleton className="h-full border-none bg-transparent p-0" />
+            </div>
+          ) : methodData.length > 0 ? (
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
                <ResponsiveContainer width="100%" height="100%">
                  <PieChart>
@@ -393,7 +405,11 @@ export default function PaymentsPage() {
             <div className="h-px w-full bg-white/5 mt-2"></div>
           </div>
 
-          {topMembersData.length > 0 ? (
+          {loading ? (
+            <div className="h-[250px] w-full">
+              <ChartSkeleton className="h-full border-none bg-transparent p-0" />
+            </div>
+          ) : topMembersData.length > 0 ? (
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
               <BarChart
                 accessibilityLayer
@@ -498,7 +514,7 @@ export default function PaymentsPage() {
               </tr>
             </thead>
             <tbody>
-              {loading ? Array.from({ length: 3 }).map((_, i) => <TableTdSkeleton key={i} />) : filtered.length > 0 ? (
+              {loading ? Array.from({ length: 8 }).map((_, i) => <TableTdSkeleton key={i} />) : filtered.length > 0 ? (
                 filtered.map((payment) => {
                   const member = store.members.find((m) => m.id === payment.memberId)
                   return (

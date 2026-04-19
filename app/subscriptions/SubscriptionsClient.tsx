@@ -24,16 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -468,11 +459,37 @@ export default function SubscriptionsPage() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td colSpan={7} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
-                      Loading subscriptions...
-                    </td>
-                  </tr>
+                  Array.from({ length: 8 }).map((_, i) => (
+                    <tr key={i} className="border-b border-white/5 animate-pulse">
+                      <td className="py-6 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-white/5" />
+                          <div className="space-y-2">
+                            <div className="h-4 w-32 bg-white/5 rounded" />
+                            <div className="h-3 w-20 bg-white/5 rounded" />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-6 px-6">
+                        <div className="h-4 w-24 bg-white/5 rounded" />
+                      </td>
+                      <td className="py-6 px-6">
+                        <div className="h-4 w-20 bg-white/5 rounded" />
+                      </td>
+                      <td className="py-6 px-6">
+                        <div className="h-4 w-20 bg-white/5 rounded" />
+                      </td>
+                      <td className="py-6 px-6">
+                        <div className="h-6 w-20 bg-white/5 rounded-lg" />
+                      </td>
+                      <td className="py-6 px-6">
+                        <div className="flex justify-end gap-2">
+                          <div className="h-8 w-8 bg-white/5 rounded-xl" />
+                          <div className="h-8 w-8 bg-white/5 rounded-xl" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 ) : memberSubscriptions.length > 0 ? (
                   memberSubscriptions.map((sub) => {
                     const isActive = isSubscriptionActive(sub.endDate, sub.status);
@@ -738,29 +755,16 @@ export default function SubscriptionsPage() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog
+      <ConfirmModal
         open={!!planToDelete}
         onOpenChange={(open) => !open && setPlanToDelete(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              subscription plan.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-[#fcfcfc] hover:bg-destructive/90"
-              onClick={handleDeletePlan}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        title="Delete"
+        highlight="Plan?"
+        description="This action cannot be undone. This will permanently delete the subscription plan."
+        onConfirm={handleDeletePlan}
+        confirmText="Delete"
+        variant="destructive"
+      />
 
       {/* Pause Subscription Dialog */}
       <Dialog open={showPauseDialog} onOpenChange={setShowPauseDialog}>
@@ -794,22 +798,17 @@ export default function SubscriptionsPage() {
       </Dialog>
 
       {/* Resume Subscription Dialog */}
-      <AlertDialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Resume Subscription</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to resume this subscription? The end date will be extended based on how long it was paused.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleResumeSubscription} disabled={isProcessing}>
-              {isProcessing ? "Resuming..." : "Resume Subscription"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmModal
+        open={showResumeDialog}
+        onOpenChange={setShowResumeDialog}
+        title="Resume"
+        highlight="Subscription"
+        description="Are you sure you want to resume this subscription? The end date will be extended based on how long it was paused."
+        onConfirm={handleResumeSubscription}
+        loading={isProcessing}
+        confirmText="Resume Subscription"
+        variant="primary"
+      />
     </div>
   );
 }

@@ -126,18 +126,21 @@ export default function DashboardPage() {
           value={totalMembers.toString()}
           icon={<Users className="w-5 h-5" />}
           trend={isTrainer ? undefined : { value: 5, isPositive: true }}
+          isLoading={loading}
         />
         <StatsCard
           title={isTrainer ? "Daily Check-ins" : "Daily Check-ins"}
           value={todayCheckins.toString()}
           icon={<CheckCircle className="w-5 h-5" />}
           trend={isTrainer ? undefined : { value: 2, isPositive: true }}
+          isLoading={loading}
         />
         <StatsCard
           title="Expiring Plans"
           value={expiringSoon.toString()}
           icon={<AlertCircle className="w-5 h-5" />}
           trend={expiringSoon > 0 ? { value: 8, isPositive: false } : undefined}
+          isLoading={loading}
         />
         {!isTrainer && (
           <StatsCard
@@ -145,6 +148,7 @@ export default function DashboardPage() {
             value={`₨ ${formatCurrency(monthlyRevenue).replace("PKR", "")}`}
             icon={<DollarSign className="w-5 h-5" />}
             trend={{ value: 12, isPositive: true }}
+            isLoading={loading}
           />
         )}
         {isTrainer && (
@@ -152,6 +156,7 @@ export default function DashboardPage() {
             title="Active Clients"
             value={activeSubscriptions.toString()}
             icon={<TrendingUp className="w-5 h-5" />}
+            isLoading={loading}
           />
         )}
       </div>
@@ -160,10 +165,10 @@ export default function DashboardPage() {
       {!isTrainer && (
         <div data-tour="dashboard-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <RevenueChart />
+            <RevenueChart isLoading={loading} />
           </div>
           <div className="">
-            <SubscriptionChart />
+            <SubscriptionChart isLoading={loading} />
           </div>
         </div>
       )}

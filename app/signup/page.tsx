@@ -8,16 +8,7 @@ import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { Zap, Shield, ArrowRight, Trophy, Building2, Mail, Lock, User as UserIcon, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 function SignupForm() {
   const [formData, setFormData] = useState({
@@ -164,31 +155,24 @@ function SignupForm() {
         </div>
       </div>
 
-      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent className="bg-slate-900 border-white/10">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-white flex items-center gap-2 uppercase tracking-tighter italic font-black text-2xl">
-              <AlertCircle className="text-primary w-6 h-6" /> Confirm Identifier
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400 font-medium">
-              You are about to register with <span className="text-white font-bold">{formData.email}</span>. 
-              <br /><br />
-              <span className="text-primary/80 font-bold uppercase text-[10px] tracking-widest">Crucial Note:</span> You will <span className="text-white underline underline-offset-4 font-black italic">NOT</span> be able to change this email address later.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wider">
-              Revise
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleSignup}
-              className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider"
-            >
-              Confirm & Pay
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmModal
+        open={showConfirm}
+        onOpenChange={setShowConfirm}
+        title="Confirm"
+        highlight="Identifier"
+        icon={AlertCircle}
+        variant="primary"
+        description={
+          <>
+            You are about to register with <span className="text-white font-bold">{formData.email}</span>. 
+            <br /><br />
+            <span className="text-primary/80 font-bold uppercase text-[10px] tracking-widest">Crucial Note:</span> You will <span className="text-white underline underline-offset-4 font-black italic">NOT</span> be able to change this email address later.
+          </>
+        }
+        cancelText="Revise"
+        confirmText="Confirm & Pay"
+        onConfirm={handleSignup}
+      />
     </>
   );
 }

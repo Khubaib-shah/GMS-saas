@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InputField } from "@/components/ui/input-field";
 import { Progress } from "@/components/ui/progress";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { StatsCard } from "@/components/stats-card";
 import { cn } from "@/lib/utils";
 
 interface Log {
@@ -43,29 +45,25 @@ export function ProgressTracking() {
     }, [selectedMemberId]);
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-10 animate-fade-up">
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic leading-none">Analytics Overview</span>
-                        <div className="h-px w-20 bg-primary/20"></div>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none">
-                        MEMBER <span className="text-primary/40">PERFORMANCE</span>
-                    </h1>
-                </div>
-            </div>
+            <DashboardHeader
+                title="MEMBER"
+                highlight="PERFORMANCE"
+                subtitle="Analytics Overview"
+                description="Track strength progression and monitor training compliance."
+                descriptionIconColor="primary"
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Member Sidebar */}
-                <Card className="lg:col-span-1 bg-slate-950/20 border-white/5 p-6 h-fit space-y-6">
+                <Card className="lg:col-span-1 glass-premium border-border bg-card dark:bg-slate-950/40 p-6 h-fit space-y-6">
                     <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">Active Members</h3>
                     <InputField
                         hideLabel
                         validateType="text"
                         placeholder="Search members..."
-                        className="bg-white/5 border-white/5 text-xs font-bold rounded-xl"
+                        className="glass-premium p-0 bg-transparent border-border text-xs font-bold rounded-xl"
                         leadingIcon={<Search className="w-4 h-4" />}
                     />
 
@@ -106,24 +104,13 @@ export function ProgressTracking() {
                         <>
                             {/* KPI Summary */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {[
-                                    { label: "Compliance Rate", val: "92%", color: "primary", icon: CheckCircle2 },
-                                    { label: "Total Volume", val: "42,800 KG", color: "blue", icon: Activity },
-                                    { label: "Training Consistency", val: "4.5/WK", color: "green", icon: Clock }
-                                ].map((kpi, idx) => (
-                                    <Card key={idx} className="bg-slate-950/20 border-white/5 p-6 relative overflow-hidden group">
-                                        <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 -skew-x-12 translate-x-10 -translate-y-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">{kpi.label}</p>
-                                        <div className="flex items-center justify-between">
-                                            <h4 className="text-2xl font-black italic tracking-tighter text-foreground group-hover:text-primary transition-colors">{kpi.val}</h4>
-                                            <kpi.icon className="w-5 h-5 text-slate-700" />
-                                        </div>
-                                    </Card>
-                                ))}
+                                <StatsCard title="Compliance Rate" value="92%" icon={<CheckCircle2 className="w-5 h-5 text-primary" />} />
+                                <StatsCard title="Total Volume" value="42,800 KG" icon={<Activity className="w-5 h-5 text-primary" />} />
+                                <StatsCard title="Training Consistency" value="4.5/WK" icon={<Clock className="w-5 h-5 text-primary" />} />
                             </div>
 
                             {/* Performance Chart Placeholder */}
-                            <Card className="bg-slate-950/20 border-white/5 p-8 relative overflow-hidden group">
+                            <Card className="glass-premium border-border bg-card dark:bg-slate-950/40 p-8 relative overflow-hidden group">
                                 <div className="flex items-center justify-between mb-10">
                                     <h3 className="text-sm font-black italic uppercase tracking-widest flex items-center gap-3">
                                         <TrendingUp className="w-4 h-4 text-primary" />
@@ -153,7 +140,7 @@ export function ProgressTracking() {
                             <div className="space-y-4">
                                 <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 pl-2">Training Logs</h3>
                                 {[1, 2, 3].map(i => (
-                                    <Card key={i} className="bg-slate-950/20 border-white/5 p-6 hover:bg-white/2 transition-colors group cursor-pointer">
+                                    <Card key={i} className="glass-premium border-border bg-card dark:bg-slate-950/40 p-6 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group cursor-pointer">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-6">
                                                 <div className="flex flex-col">

@@ -16,6 +16,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
+import { DashboardHeader } from "@/components/dashboard-header";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,16 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ExerciseForm, Exercise } from "@/components/exercise-form";
 import { toast } from "sonner";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 // Interface moved to @/components/exercise-form.tsx
 
@@ -106,18 +98,15 @@ export function ExerciseLibrary() {
     );
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-10 animate-fade-up">
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">EXERCISE MANAGEMENT</span>
-                        <div className="h-px w-20 bg-primary/20"></div>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none">
-                        EXERCISE <span className="text-primary/40">LIBRARY</span>
-                    </h1>
-                </div>
+            <DashboardHeader
+                title="EXERCISE"
+                highlight="LIBRARY"
+                subtitle="Exercise Management"
+                description="Manage your custom exercises and standard library."
+                descriptionIconColor="primary"
+            >
                 <div className="flex items-center gap-3">
                     <Button
                         onClick={() => {
@@ -131,7 +120,7 @@ export function ExerciseLibrary() {
                         Add Exercise
                     </Button>
                 </div>
-            </div>
+            </DashboardHeader>
 
             <div className="flex flex-col md:flex-row gap-4">
                 <InputField
@@ -141,9 +130,9 @@ export function ExerciseLibrary() {
                     value={search}
                     onChange={(val) => setSearch(val)}
                     leadingIcon={<Search className="w-5 h-5" />}
-                    className="h-[38px] bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
+                    className="h-[38px] glass-premium p-0 border-border bg-card dark:bg-slate-950/40 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
                 />
-                <Button variant="outline" className="h-[38px] px-6 rounded-2xl bg-slate-950/20 border-white/5 hover:border-primary/20 hover:bg-white/5 text-[11px] font-black italic uppercase tracking-widest gap-3">
+                <Button variant="outline" className="h-[38px] px-6 rounded-2xl glass-premium p-0 border-border bg-card dark:bg-slate-950/40 hover:border-primary/20 hover:bg-white/5 text-[11px] font-black italic uppercase tracking-widest gap-3">
                     <Filter className="w-4 h-4" />
                     Filters
                 </Button>
@@ -157,7 +146,7 @@ export function ExerciseLibrary() {
                     ))
                 ) : filtered.length > 0 ? (
                     filtered.map((ex) => (
-                        <Card key={ex.id} className="group relative overflow-hidden bg-slate-950/20 border-white/5 p-6 hover:border-primary/20 transition-all duration-500 hover:translate-y-[-4px]">
+                        <Card key={ex.id} className="group relative overflow-hidden glass-premium bg-card dark:bg-slate-950/40 border-border p-6 hover:border-primary/20 transition-all duration-500 hover:translate-y-[-4px]">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 -skew-x-12 translate-x-10 -translate-y-10 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                             <div className="flex items-start justify-between relative">
@@ -236,29 +225,16 @@ export function ExerciseLibrary() {
                 mode={mode}
             />
 
-            <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-                <AlertDialogContent className="bg-background border-white/5 shadow-2xl">
-                    <AlertDialogHeader>
-                        <AlertTriangle className="w-12 h-12 text-destructive mb-4 mx-auto drop-shadow-[0_0_10px_rgba(255,0,0,0.3)]" />
-                        <AlertDialogTitle className="text-2xl font-black italic uppercase tracking-tighter text-white text-center">
-                            Delete <span className="text-destructive">Exercise?</span>
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-slate-400 text-center font-medium italic">
-                            This action cannot be undone. This exercise will be removed from your gym's library.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="mt-6">
-                        <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={confirmDelete}
-                            disabled={deleting}
-                            className="bg-destructive text-white hover:bg-destructive/80 rounded-xl font-black italic uppercase tracking-widest"
-                        >
-                            {deleting ? "Deleting..." : "Confirm Delete"}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <ConfirmModal
+                open={deleteConfirmOpen}
+                onOpenChange={setDeleteConfirmOpen}
+                title="Delete"
+                highlight="Exercise?"
+                description="This action cannot be undone. This exercise will be removed from your gym's library."
+                onConfirm={confirmDelete}
+                loading={deleting}
+                confirmText="Confirm Delete"
+            />
         </div>
     );
 }

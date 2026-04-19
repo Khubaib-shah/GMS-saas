@@ -4,8 +4,11 @@ import { Card } from "@/components/ui/card"
 import { useAppStore } from "@/lib/store"
 import { useMemo } from "react"
 import { formatCurrency } from "@/lib/utils/file-utils"
+import { ChartSkeleton } from "@/components/ui/skeleton-components"
 
-export function RevenueChart() {
+export function RevenueChart({ isLoading }: { isLoading?: boolean }) {
+  if (isLoading) return <ChartSkeleton />
+
   const store = useAppStore()
 
   const data = useMemo(() => {
@@ -61,7 +64,9 @@ export function RevenueChart() {
   )
 }
 
-export function SubscriptionChart() {
+export function SubscriptionChart({ isLoading }: { isLoading?: boolean }) {
+  if (isLoading) return <ChartSkeleton />
+
   const store = useAppStore()
 
   const stats = useMemo(() => {

@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InputField } from "@/components/ui/input-field";
+import { DashboardHeader } from "@/components/dashboard-header";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -50,18 +51,15 @@ export function WorkoutTemplates() {
     );
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-10 animate-fade-up">
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">TEMPLATE_REPOSITORY_ACTIVE</span>
-                        <div className="h-px w-20 bg-primary/20"></div>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none">
-                        WORKOUT <span className="text-primary">TEMPLATES</span>
-                    </h1>
-                </div>
+            <DashboardHeader
+                title="WORKOUT"
+                highlight="TEMPLATES"
+                subtitle="Template Repository"
+                description="Manage and create standard workout templates."
+                descriptionIconColor="primary"
+            >
                 <div className="flex items-center gap-3">
                     <Button
                         onClick={() => setBuilderOpen(true)}
@@ -71,7 +69,7 @@ export function WorkoutTemplates() {
                         CREATE_NEW_TEMPLATE
                     </Button>
                 </div>
-            </div>
+            </DashboardHeader>
 
             <div className="flex flex-col md:flex-row gap-4">
                 <InputField
@@ -81,7 +79,7 @@ export function WorkoutTemplates() {
                     value={search}
                     onChange={(val) => setSearch(val)}
                     leadingIcon={<Search className="w-5 h-5" />}
-                    className="h-[38px] bg-slate-950/20 border-white/5 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
+                    className="h-[38px] glass-premium p-0 border-border bg-card dark:bg-slate-950/40 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
                 />
             </div>
 
@@ -93,7 +91,7 @@ export function WorkoutTemplates() {
                     ))
                 ) : filtered.length > 0 ? (
                     filtered.map((template) => (
-                        <Card key={template._id || template.id} className="group relative overflow-hidden bg-slate-950/20 border-white/5 p-8 hover:border-primary/20 transition-all duration-500">
+                        <Card key={template._id || template.id} className="group relative overflow-hidden glass-premium bg-card dark:bg-slate-950/40 border-border p-8 hover:border-primary/20 transition-all duration-500">
                             <div className="absolute top-0 right-0 w-48 h-full bg-primary/5 -skew-x-12 translate-x-12 opacity-50 group-hover:bg-primary/10 transition-colors" />
 
                             <div className="flex items-start justify-between relative">

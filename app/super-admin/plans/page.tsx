@@ -19,16 +19,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DashboardHeader } from "@/components/dashboard-header";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -453,48 +444,26 @@ export default function PlansPage() {
             </div>
 
             {/* Confirmation Dialog */}
-            <AlertDialog open={!!toggleConfirm} onOpenChange={() => setToggleConfirm(null)}>
-                <AlertDialogContent className="bg-[#0d0d14] border-white/[0.08] shadow-2xl rounded-2xl p-6">
-                    <AlertDialogHeader>
-                        <div className="flex items-center gap-2 mb-1">
-                            <div className={cn(
-                                "p-2 rounded-lg",
-                                toggleConfirm?.isActive ? "bg-red-500/10 text-red-400" : "bg-emerald-500/10 text-emerald-400"
-                            )}>
-                                <AlertCircle className="w-5 h-5" />
-                            </div>
-                            <AlertDialogTitle className="text-white font-bold tracking-tight">
-                                {toggleConfirm?.isActive ? "Confirm Deactivation" : "Confirm Activation"}
-                            </AlertDialogTitle>
-                        </div>
-                        <AlertDialogDescription className="text-slate-400 text-sm">
-                            Are you sure you want to {toggleConfirm?.isActive ? "deactivate" : "activate"} the <span className="text-white font-bold">{toggleConfirm?.name}</span> plan?
-                            {toggleConfirm?.isActive
-                                ? " This will prevent new gyms from subscribing to this tier."
-                                : " This will make the plan available for new registrations."}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="gap-3">
-                        <AlertDialogCancel className="bg-white/[0.04] border-white/[0.08] text-slate-400 hover:text-white hover:bg-white/[0.08] rounded-xl transition-all">
-                            Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => {
-                                togglePlan(toggleConfirm?._id || toggleConfirm?.id);
-                                setToggleConfirm(null);
-                            }}
-                            className={cn(
-                                "rounded-xl font-bold uppercase tracking-widest text-[10px] px-6 transition-all",
-                                toggleConfirm?.isActive
-                                    ? "bg-red-600 hover:bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.2)]"
-                                    : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-                            )}
-                        >
-                            Confirm Action
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <ConfirmModal
+                open={!!toggleConfirm}
+                onOpenChange={(open) => !open && setToggleConfirm(null)}
+                title={toggleConfirm?.isActive ? "Deactivate" : "Activate"}
+                highlight="Plan?"
+                description={
+                    <>
+                        Are you sure you want to {toggleConfirm?.isActive ? "deactivate" : "activate"} the <span className="text-white font-bold">{toggleConfirm?.name}</span> plan?
+                        {toggleConfirm?.isActive
+                            ? " This will prevent new gyms from subscribing to this tier."
+                            : " This will make the plan available for new registrations."}
+                    </>
+                }
+                onConfirm={() => {
+                    togglePlan(toggleConfirm?._id || toggleConfirm?.id);
+                    setToggleConfirm(null);
+                }}
+                confirmText={toggleConfirm?.isActive ? "Deactivate" : "Activate"}
+                variant={toggleConfirm?.isActive ? "destructive" : "primary"}
+            />
 
             <style jsx>{`
                 .form-input {

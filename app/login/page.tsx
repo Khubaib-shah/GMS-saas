@@ -9,15 +9,7 @@ import { InputField } from "@/components/ui/input-field";
 import { Zap, Shield, ArrowRight, Trophy, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -149,65 +141,73 @@ function LoginForm() {
         </p>
       </div>
 
-      <AlertDialog open={showSuspendedModal} onOpenChange={setShowSuspendedModal}>
-        <AlertDialogContent className="bg-slate-900 border-white/10">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-white flex items-center gap-2 uppercase tracking-tighter italic font-black text-2xl">
-              <AlertCircle className="text-red-500 w-6 h-6" /> Account Suspended
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400 font-medium">
-              Your gym account has been suspended by the administration.
-              <br /><br />
-              <span className="text-red-500/80 font-bold uppercase text-[10px] tracking-widest">Reason:</span>{" "}
-              <span className="text-white font-bold">{suspensionReason}</span>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction
+      <ConfirmModal
+        open={showSuspendedModal}
+        onOpenChange={setShowSuspendedModal}
+        title="Account"
+        highlight="Suspended"
+        icon={AlertCircle}
+        variant="destructive"
+        description={
+          <>
+            Your gym account has been suspended by the administration.
+            <br /><br />
+            <span className="text-red-500/80 font-bold uppercase text-[10px] tracking-widest">Reason:</span>{" "}
+            <span className="text-white font-bold">{suspensionReason}</span>
+          </>
+        }
+        customActions={
+          <>
+            <Button
+              variant="outline"
               onClick={() => setShowSuspendedModal(false)}
-              className="bg-transparent border border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wider"
+              className="bg-transparent border border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wider rounded-xl"
             >
               Close
-            </AlertDialogAction>
-            <AlertDialogAction
+            </Button>
+            <Button
               onClick={() => window.open("https://wa.me/923149784156?text=Hello%2C%20I%20am%20having%20issues%20with%20my%20suspended%20account.", "_blank")}
-              className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider"
+              className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider rounded-xl"
             >
               Contact Support
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </>
+        }
+      />
 
-      <AlertDialog open={showExpiredModal} onOpenChange={setShowExpiredModal}>
-        <AlertDialogContent className="bg-slate-900 border-white/10">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-white flex items-center gap-2 uppercase tracking-tighter italic font-black text-2xl">
-              <AlertCircle className="text-orange-500 w-6 h-6" /> Account Expired
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400 font-medium">
-              {expiredReason}
-              <br /><br />
-              <span className="text-orange-500/80 font-bold uppercase text-[10px] tracking-widest">Notice:</span>{" "}
-              <span className="text-white font-bold">Please renew to continue accessing GymFlow.</span>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction
+      <ConfirmModal
+        open={showExpiredModal}
+        onOpenChange={setShowExpiredModal}
+        title="Account"
+        highlight="Expired"
+        icon={AlertCircle}
+        variant="warning"
+        description={
+          <>
+            {expiredReason}
+            <br /><br />
+            <span className="text-orange-500/80 font-bold uppercase text-[10px] tracking-widest">Notice:</span>{" "}
+            <span className="text-white font-bold">Please renew to continue accessing GymFlow.</span>
+          </>
+        }
+        customActions={
+          <>
+            <Button
+              variant="outline"
               onClick={() => setShowExpiredModal(false)}
-              className="bg-transparent border border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wider"
+              className="bg-transparent border border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-wider rounded-xl"
             >
               Close
-            </AlertDialogAction>
-            <AlertDialogAction
+            </Button>
+            <Button
               onClick={() => window.open("https://wa.me/923149784156?text=Hello%2C%20I%20would%20like%20to%20renew%20my%20gym%20subscription.", "_blank")}
-              className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider"
+              className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider rounded-xl"
             >
               Renew Subscription
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </>
+        }
+      />
     </div>
   );
 }

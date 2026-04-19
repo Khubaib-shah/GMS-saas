@@ -89,7 +89,7 @@ export default function TrainersPage() {
           {trainers.map((trainer) => (
             <div key={trainer._id} className="glass-premium p-8 border-border dark:bg-slate-950/40 hover:scale-[1.02] transition-all group flex flex-col items-center text-center">
               <div className="relative mb-6">
-                <Avatar className="w-24 h-24 rounded-2xl border-4 border-background shadow-2xl transition-transform group-hover:scale-110 duration-500">
+                <Avatar className="w-24 h-24 transition-transform group-hover:scale-110 duration-500">
                   <AvatarImage src={trainer.photo} alt={trainer.fullName} className="object-cover" />
                   <AvatarFallback className="text-2xl font-black italic bg-primary/10 text-primary">
                     {trainer.fullName
@@ -107,7 +107,7 @@ export default function TrainersPage() {
               <h3 className="text-xl font-black italic tracking-tighter text-foreground uppercase mb-1">
                 {trainer.fullName}
               </h3>
-              
+
               <div className="flex items-center gap-2 text-[10px] font-black tracking-widest text-slate-500 uppercase italic mb-6">
                 <Mail className="w-3 h-3 text-primary/50" />
                 {trainer.email}

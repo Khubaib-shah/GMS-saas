@@ -268,12 +268,26 @@ export default function AuditLogsClient() {
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
-                    <span className="sr-only">Loading...</span>
-                  </TableCell>
-                </TableRow>
+                Array.from({ length: 15 }).map((_, i) => (
+                  <TableRow key={i} className="border-white/5 animate-pulse">
+                    <TableCell className="py-4"><div className="h-3 w-28 bg-white/5 rounded" /></TableCell>
+                    <TableCell className="py-4">
+                      <div className="space-y-2">
+                        <div className="h-3 w-24 bg-white/5 rounded" />
+                        <div className="h-2 w-16 bg-white/5 rounded" />
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4"><div className="h-5 w-20 bg-white/5 rounded" /></TableCell>
+                    <TableCell className="py-4">
+                      <div className="space-y-2">
+                        <div className="h-3 w-20 bg-white/5 rounded" />
+                        <div className="h-2 w-28 bg-white/5 rounded" />
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4"><div className="h-3 w-32 bg-white/5 rounded" /></TableCell>
+                    <TableCell className="py-4 text-right"><div className="h-7 w-7 bg-white/5 rounded-md ml-auto" /></TableCell>
+                  </TableRow>
+                ))
               ) : logs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">

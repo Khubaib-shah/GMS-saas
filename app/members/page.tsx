@@ -16,15 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import { isSubscriptionActive, formatDate } from "@/lib/utils/file-utils";
@@ -218,7 +210,7 @@ export default function MembersPage() {
 
             <tbody>
               {loading ? (
-                Array.from({ length: 2 }).map((_, i) => (
+                Array.from({ length: 8 }).map((_, i) => (
                   <tr key={i} className="border-b border-white/5 animate-pulse">
                     <td className="py-6 px-6">
                       <div className="flex items-center gap-4">
@@ -420,30 +412,19 @@ export default function MembersPage() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog
+      <ConfirmModal
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{showTrash ? "Permanently Purge Member?" : "Delete Member?"}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {showTrash
-                ? "This is a destructive action and cannot be undone. All membership history, payments, and personal data will be wiped forever."
-                : "The member record and their history will be moved to the trash and hidden from the registry."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="flex gap-4 justify-end">
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteId && handleDelete(deleteId)}
-              className="bg-destructive hover:bg-destructive/90 text-white"
-            >
-              Delete
-            </AlertDialogAction>
-          </div>
-        </AlertDialogContent>
-      </AlertDialog>
+        title={showTrash ? "Permanently Purge" : "Delete"}
+        highlight="Member?"
+        description={showTrash
+            ? "This is a destructive action and cannot be undone. All membership history, payments, and personal data will be wiped forever."
+            : "The member record and their history will be moved to the trash and hidden from the registry."
+        }
+        onConfirm={() => deleteId && handleDelete(deleteId)}
+        confirmText={showTrash ? "Delete" : "Move to Trash"}
+        variant="destructive"
+      />
     </div>
   );
 }

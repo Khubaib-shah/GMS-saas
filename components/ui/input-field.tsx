@@ -90,7 +90,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             aria-invalid={isInvalid}
             className={cn(
               "h-12 bg-white/5 border-transparent focus:bg-white/10 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-md",
-              leadingIcon && "pl-12",
+              leadingIcon && "!pl-12",
               isInvalid
                 ? "border-destructive/50 focus:border-destructive ring-destructive/20"
                 : "focus:border-primary/50",

@@ -29,16 +29,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -945,60 +936,47 @@ export default function MemberDetailPage({
       </div>
 
       {/* Delete Member Confirmation */}
-      <AlertDialog open={isDeletingMember} onOpenChange={setIsDeletingMember}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{member?.deletedAt ? "Permanently Purge Member?" : "Delete Member Profile?"}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {member?.deletedAt
-                ? "This is a final action. This member's entire history, billing, and attendance will be purged from the system forever."
-                : "The member will be moved to the trash and hidden from active lists."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-white">
-              {member?.deletedAt ? "Permanently Purge" : "Move to Trash"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmModal
+        open={isDeletingMember}
+        onOpenChange={setIsDeletingMember}
+        title={member?.deletedAt ? "Permanently Purge" : "Delete"}
+        highlight="Member Profile?"
+        description={member?.deletedAt
+            ? "This is a final action. This member's entire history, billing, and attendance will be purged from the system forever."
+            : "The member will be moved to the trash and hidden from active lists."
+        }
+        onConfirm={handleDelete}
+        confirmText={member?.deletedAt ? "Permanently Purge" : "Move to Trash"}
+        variant="destructive"
+      />
 
       {/* Delete Subscription Confirmation */}
-      <AlertDialog open={deleteSubId !== null} onOpenChange={(open) => !open && setDeleteSubId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Subscription Record?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will remove this specific membership period and its <strong>associated payment record</strong>. This may affect the member's current status.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteSubscription} className="bg-destructive hover:bg-destructive/90 text-white">
-              Delete Record
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmModal
+        open={deleteSubId !== null}
+        onOpenChange={(open) => !open && setDeleteSubId(null)}
+        title="Delete"
+        highlight="Subscription Record?"
+        description={
+            <>This will remove this specific membership period and its <strong>associated payment record</strong>. This may affect the member's current status.</>
+        }
+        onConfirm={handleDeleteSubscription}
+        confirmText="Delete Record"
+        variant="destructive"
+      />
 
       {/* Delete Payment Confirmation */}
-      <AlertDialog open={deletePaymentId !== null} onOpenChange={(open) => !open && setDeletePaymentId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Payment Record?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this payment record? This will <strong>NOT</strong> affect the member's subscription status, but it will be removed from all financial totals.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeletePayment} className="bg-destructive hover:bg-destructive/90 text-white">
-              Delete Record
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmModal
+        open={deletePaymentId !== null}
+        onOpenChange={(open) => !open && setDeletePaymentId(null)}
+        title="Delete"
+        highlight="Payment Record?"
+        description={
+            <>Are you sure you want to delete this payment record? This will <strong>NOT</strong> affect the member's subscription status, but it will be removed from all financial totals.</>
+        }
+        onConfirm={handleDeletePayment}
+        confirmText="Delete Record"
+        variant="destructive"
+      />
 
       {/* Edit Payment Modal */}
       <Dialog open={isEditPaymentModalOpen} onOpenChange={setIsEditPaymentModalOpen}>

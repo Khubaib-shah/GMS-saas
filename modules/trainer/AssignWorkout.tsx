@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAppStore } from "@/lib/store";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 interface Member {
     id: string;
@@ -101,23 +102,19 @@ export function AssignWorkout() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-10 animate-fade-up">
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">Plan Assignment</span>
-                        <div className="h-px w-20 bg-primary/20"></div>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none">
-                        PLAN <span className="text-primary/40">ASSIGNMENT</span>
-                    </h1>
-                </div>
-            </div>
+            <DashboardHeader
+                title="PLAN"
+                highlight="ASSIGNMENT"
+                subtitle="Assign Workout"
+                description="Assign plans and templates to your members."
+                descriptionIconColor="primary"
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* Step 1: Select Members */}
-                <Card className="bg-slate-950/20 border-white/5 p-8 space-y-6 ">
+                <Card className="glass-premium border-border bg-card dark:bg-slate-950/40 p-8 space-y-6">
                     <div className="flex items-center justify-between border-b border-white/5 pb-6">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -185,7 +182,7 @@ export function AssignWorkout() {
 
                 {/* Step 2: Select Template */}
                 <div className="space-y-8">
-                    <Card className="bg-slate-950/20 border-white/5 p-8 space-y-6">
+                    <Card className="glass-premium border-border bg-card dark:bg-slate-950/40 p-8 space-y-6">
                         <div className="flex items-center gap-3 border-b border-white/5 pb-6">
                             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                                 <Layout className="w-5 h-5" />
@@ -226,7 +223,7 @@ export function AssignWorkout() {
                     </Card>
 
                     {/* Step 3: Deploy */}
-                    <Card className="bg-primary/5 border-primary/10 p-8 space-y-6">
+                    <Card className="glass-premium border-border bg-card dark:bg-slate-950/40 p-8 space-y-6">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
                                 <Send className="w-6 h-6" />

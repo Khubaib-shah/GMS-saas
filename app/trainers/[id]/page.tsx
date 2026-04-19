@@ -61,7 +61,7 @@ export default function TrainerDetailPage({
   const [isEditing, setIsEditing] = useState(false);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [availabilities, setAvailabilities] = useState([]);
-  
+
   // Booking state
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
@@ -123,7 +123,7 @@ export default function TrainerDetailPage({
     try {
       const res = await fetch(`/api/trainers/metrics?trainerId=${id}`);
       if (res.ok) setMetrics(await res.json());
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const fetchAvailability = async () => {
@@ -133,7 +133,7 @@ export default function TrainerDetailPage({
         setAvailabilities(await res.json());
         setRefreshKey(prev => prev + 1); // Trigger schedule board refresh
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const handleUpdate = async () => {
@@ -202,70 +202,70 @@ export default function TrainerDetailPage({
         <div className="lg:col-span-1 space-y-6">
           <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm">
             <CardHeader className="text-center pb-2">
-               <div className="mx-auto mb-4 relative">
-                  {loading ? (
-                      <Skeleton className="w-32 h-32 rounded-full mx-auto" />
-                  ) : (
-                      <Avatar className="w-32 h-32 border-4 border-background shadow-md">
-                          <AvatarImage src={trainer?.photo} alt={trainer?.fullName} className="object-cover" />
-                          <AvatarFallback className="text-3xl bg-primary/10 text-primary">
-                          {trainer?.fullName?.split(" ").map((n) => n[0]).join("").toUpperCase()}
-                          </AvatarFallback>
-                      </Avatar>
-                  )}
-                  <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4" variant={trainer?.trainerStatus === 'active' ? 'default' : 'secondary'}>
-                    {loading ? <Skeleton className="w-10 h-3 bg-white/20" /> : (trainer?.trainerStatus || 'active')}
-                  </Badge>
+              <div className="mx-auto mb-4 relative">
+                {loading ? (
+                  <Skeleton className="w-32 h-32 rounded-full mx-auto" />
+                ) : (
+                  <Avatar className="w-32 h-32 border-4 border-background shadow-md">
+                    <AvatarImage src={trainer?.photo} alt={trainer?.fullName} className="object-cover" />
+                    <AvatarFallback className="text-3xl bg-primary/10 text-primary">
+                      {trainer?.fullName?.split(" ").map((n) => n[0]).join("").toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+                <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4" variant={trainer?.trainerStatus === 'active' ? 'default' : 'secondary'}>
+                  {loading ? <Skeleton className="w-10 h-3 bg-white/20" /> : (trainer?.trainerStatus || 'active')}
+                </Badge>
               </div>
               <CardTitle className="text-2xl">{loading ? <Skeleton className="h-6 w-40 mx-auto" /> : trainer?.fullName}</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">{loading ? <Skeleton className="h-4 w-32 mx-auto" /> : trainer?.email}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-2">
-                  <div className="p-3 bg-muted/50 rounded-xl text-center">
-                    <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Experience</p>
-                    <p className="font-bold">{loading ? <Skeleton className="h-5 w-12 mx-auto mt-1.5" /> : `${trainer?.experienceYears || 0} Years`}</p>
-                  </div>
-                  <div className="p-3 bg-muted/50 rounded-xl text-center">
-                    <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Hourly Rate</p>
-                    <p className="font-bold text-primary">{loading ? <Skeleton className="h-5 w-12 mx-auto mt-1.5" /> : `$${trainer?.hourlyRate || 0}`}</p>
-                  </div>
+                <div className="p-3 bg-muted/50 rounded-xl text-center">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Experience</p>
+                  <p className="font-bold">{loading ? <Skeleton className="h-5 w-12 mx-auto mt-1.5" /> : `${trainer?.experienceYears || 0} Years`}</p>
+                </div>
+                <div className="p-3 bg-muted/50 rounded-xl text-center">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Hourly Rate</p>
+                  <p className="font-bold text-primary">{loading ? <Skeleton className="h-5 w-12 mx-auto mt-1.5" /> : `$${trainer?.hourlyRate || 0}`}</p>
+                </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground flex items-center gap-2"><Users className="w-4 h-4" /> Active Clients</span>
-                    <span className="font-bold">{loading ? <Skeleton className="h-4 w-6" /> : (trainer?.members?.length || 0)}</span>
+                  <span className="text-muted-foreground flex items-center gap-2"><Users className="w-4 h-4" /> Active Clients</span>
+                  <span className="font-bold">{loading ? <Skeleton className="h-4 w-6" /> : (trainer?.members?.length || 0)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground flex items-center gap-2"><Clock className="w-4 h-4" /> Max Per Slot</span>
-                    <span className="font-bold">{loading ? <Skeleton className="h-4 w-6" /> : (trainer?.maxMembersPerSlot || 1)}</span>
+                  <span className="text-muted-foreground flex items-center gap-2"><Clock className="w-4 h-4" /> Max Per Slot</span>
+                  <span className="font-bold">{loading ? <Skeleton className="h-4 w-6" /> : (trainer?.maxMembersPerSlot || 1)}</span>
                 </div>
               </div>
 
               <div className="pt-4 border-t space-y-4">
                 <div>
                   <h4 className="text-xs font-bold uppercase text-muted-foreground mb-2 flex items-center gap-2">
-                      <Award className="w-3 h-3 text-primary" /> Specialties
+                    <Award className="w-3 h-3 text-primary" /> Specialties
                   </h4>
                   <div className="flex flex-wrap gap-1">
                     {loading ? (
-                        Array(3).fill(0).map((_, i) => <Skeleton key={i} className="h-5 w-16" />)
+                      Array(3).fill(0).map((_, i) => <Skeleton key={i} className="h-5 w-16" />)
                     ) : (
-                        trainer?.specialties?.map((s, i) => <Badge key={i} variant="secondary" className="text-[10px]">{s}</Badge>)
+                      trainer?.specialties?.map((s, i) => <Badge key={i} variant="secondary" className="text-[10px]">{s}</Badge>)
                     )}
                   </div>
                 </div>
                 {(loading || trainer?.certifications?.length) ? (
                   <div>
                     <h4 className="text-xs font-bold uppercase text-muted-foreground mb-2 flex items-center gap-2">
-                        <Award className="w-3 h-3 text-amber-500" /> Certifications
+                      <Award className="w-3 h-3 text-amber-500" /> Certifications
                     </h4>
                     <div className="flex flex-wrap gap-1">
                       {loading ? (
-                          Array(2).fill(0).map((_, i) => <Skeleton key={i} className="h-5 w-20" />)
+                        Array(2).fill(0).map((_, i) => <Skeleton key={i} className="h-5 w-20" />)
                       ) : (
-                          trainer?.certifications?.map((c, i) => <Badge key={i} variant="outline" className="text-[10px] border-amber-200 text-amber-700 bg-amber-50">{c}</Badge>)
+                        trainer?.certifications?.map((c, i) => <Badge key={i} variant="outline" className="text-[10px] border-amber-200 text-amber-700 bg-amber-50">{c}</Badge>)
                       )}
                     </div>
                   </div>
@@ -275,31 +275,31 @@ export default function TrainerDetailPage({
           </Card>
 
           {metrics && (
-              <Card className="border-none shadow-lg">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2"><BarChart3 className="w-4 h-4" /> Performance</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                   <div className="space-y-1">
-                      <div className="flex justify-between text-xs font-medium">
-                        <span>Attendance Rate</span>
-                        <span>{metrics.attendanceRate}%</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                        <div className="bg-emerald-500 h-full transition-all" style={{ width: `${metrics.attendanceRate}%` }} />
-                      </div>
-                   </div>
-                   <div className="space-y-1">
-                      <div className="flex justify-between text-xs font-medium">
-                        <span>Utilization</span>
-                        <span>{metrics.utilizationRate}%</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                        <div className="bg-primary h-full transition-all" style={{ width: `${metrics.utilizationRate}%` }} />
-                      </div>
-                   </div>
-                </CardContent>
-              </Card>
+            <Card className="border-none shadow-lg">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2"><BarChart3 className="w-4 h-4" /> Performance</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span>Attendance Rate</span>
+                    <span>{metrics.attendanceRate}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                    <div className="bg-emerald-500 h-full transition-all" style={{ width: `${metrics.attendanceRate}%` }} />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span>Utilization</span>
+                    <span>{metrics.utilizationRate}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                    <div className="bg-primary h-full transition-all" style={{ width: `${metrics.utilizationRate}%` }} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ) || null}
         </div>
 
@@ -380,81 +380,81 @@ export default function TrainerDetailPage({
                 <TabsTrigger value="clients" className="flex items-center gap-2"><Users className="w-4 h-4" /> Clients</TabsTrigger>
                 <TabsTrigger value="bio">About</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="schedule" className="space-y-4">
-                <TrainerScheduleBoard 
-                    key={refreshKey}
-                    trainerId={id} 
-                    canManage={canManage} 
-                    onBookSlot={(slot) => {
-                        setSelectedSlot(slot);
-                        setIsBookingOpen(true);
-                    }}
+                <TrainerScheduleBoard
+                  key={refreshKey}
+                  trainerId={id}
+                  canManage={canManage}
+                  onBookSlot={(slot) => {
+                    setSelectedSlot(slot);
+                    setIsBookingOpen(true);
+                  }}
                 />
               </TabsContent>
 
               <TabsContent value="availability">
-                <AvailabilityManager 
-                    trainerId={id} 
-                    availabilities={availabilities} 
-                    onRefresh={fetchAvailability} 
+                <AvailabilityManager
+                  trainerId={id}
+                  availabilities={availabilities}
+                  onRefresh={fetchAvailability}
                 />
               </TabsContent>
 
               <TabsContent value="clients">
                 <Card className="border-none shadow-lg">
-                    <CardHeader>
-                        <CardTitle>My Clients</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {loading ? (
-                            <div className="space-y-2">
-                                <Skeleton className="h-10 w-full" />
-                                <Skeleton className="h-10 w-full" />
-                                <Skeleton className="h-10 w-full" />
-                            </div>
-                        ) : (trainer?.members?.length || 0) > 0 ? (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Member</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Action</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {trainer?.members?.map((m: { _id: string; firstName: string; lastName: string }) => (
-                                        <TableRow key={m._id}>
-                                            <TableCell className="font-medium underline decoration-primary/20">
-                                                <Link href={`/members/${m._id}`}>{m.firstName} {m.lastName}</Link>
-                                            </TableCell>
-                                            <TableCell><Badge variant="outline">Active</Badge></TableCell>
-                                            <TableCell className="text-right">
-                                                <Button variant="ghost" size="sm" asChild><Link href={`/members/${m._id}`}>Profile</Link></Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        ) : (
-                            <div className="text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-dashed">No clients assigned yet.</div>
-                        )}
-                    </CardContent>
+                  <CardHeader>
+                    <CardTitle>My Clients</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <div className="space-y-2">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                      </div>
+                    ) : (trainer?.members?.length || 0) > 0 ? (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Member</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead className="text-right">Action</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {trainer?.members?.map((m: { _id: string; firstName: string; lastName: string }) => (
+                            <TableRow key={m._id}>
+                              <TableCell className="font-medium underline decoration-primary/20">
+                                <Link href={`/members/${m._id}`}>{m.firstName} {m.lastName}</Link>
+                              </TableCell>
+                              <TableCell><Badge variant="outline">Active</Badge></TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm" asChild><Link href={`/members/${m._id}`}>Profile</Link></Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ) : (
+                      <div className="text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-dashed">No clients assigned yet.</div>
+                    )}
+                  </CardContent>
                 </Card>
               </TabsContent>
 
               <TabsContent value="bio">
                 <Card className="border-none shadow-lg">
-                    <CardHeader><CardTitle>Biography</CardTitle></CardHeader>
-                    <CardContent className="prose prose-sm dark:prose-invert max-w-none">
-                        {loading ? (
-                            <div className="space-y-2">
-                                <Skeleton className="h-4 w-full" />
-                                <Skeleton className="h-4 w-[90%]" />
-                                <Skeleton className="h-4 w-[80%]" />
-                            </div>
-                        ) : trainer?.bio ? <p className="leading-relaxed text-muted-foreground">{trainer.bio}</p> : <p className="italic text-muted-foreground">No biography provided.</p>}
-                    </CardContent>
+                  <CardHeader><CardTitle>Biography</CardTitle></CardHeader>
+                  <CardContent className="prose prose-sm dark:prose-invert max-w-none">
+                    {loading ? (
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-[90%]" />
+                        <Skeleton className="h-4 w-[80%]" />
+                      </div>
+                    ) : trainer?.bio ? <p className="leading-relaxed text-muted-foreground">{trainer.bio}</p> : <p className="italic text-muted-foreground">No biography provided.</p>}
+                  </CardContent>
                 </Card>
               </TabsContent>
             </Tabs>
@@ -462,14 +462,15 @@ export default function TrainerDetailPage({
         </div>
       </div>
 
-      <BookingModal 
-        isOpen={isBookingOpen} 
-        onClose={() => setIsBookingOpen(false)} 
-        slot={selectedSlot} 
+      <BookingModal
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+        slot={selectedSlot}
         onSuccess={() => {
-            fetchMetrics();
-            fetchTrainer(); // To refresh client list/slots if needed
-        }} 
+          fetchMetrics();
+          fetchTrainer();
+          setRefreshKey(prev => prev + 1);
+        }}
       />
 
       <ConfirmationModal

@@ -70,8 +70,8 @@ export default function EditMemberPage({
         gender: member.gender || ("male" as const),
         planId: member.planId || "plan_basic",
         notes: member.notes || "",
-        trainerId: (typeof member.trainerId === 'object' && member.trainerId !== null) 
-          ? String((member.trainerId as any)._id || (member.trainerId as any).id || "") 
+        trainerId: (typeof member.trainerId === 'object' && member.trainerId !== null)
+          ? String((member.trainerId as any)._id || (member.trainerId as any).id || "")
           : String((member.trainerId as any) || ""),
       });
       if (member.photoBase64) {
@@ -297,6 +297,7 @@ export default function EditMemberPage({
               </Label>
               <Select
                 value={formData.trainerId ? String(formData.trainerId) : "__none__"}
+
                 onValueChange={(val) => setFormData({ ...formData, trainerId: val === "__none__" ? "" : val })}
               >
                 <SelectTrigger className="h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
