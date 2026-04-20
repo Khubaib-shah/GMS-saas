@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "seed": "npx ts-node --project tsconfig.seed.json scripts/seed-pakistani.ts"
   },
   "dependencies": {
     "@babel/runtime": "^7.29.2",

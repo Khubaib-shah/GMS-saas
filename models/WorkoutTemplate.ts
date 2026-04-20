@@ -26,11 +26,10 @@ const WorkoutTemplateSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Validating days list matches daysPerWeek
-WorkoutTemplateSchema.pre('save', function (next) {
+WorkoutTemplateSchema.pre('save', function () {
     if (this.days.length > this.daysPerWeek) {
-        return next(new Error('Number of days in template exceeds daysPerWeek limitation.'));
+        throw new Error('Number of days in template exceeds daysPerWeek limitation.');
     }
-    next();
 });
 
 // Indexing
