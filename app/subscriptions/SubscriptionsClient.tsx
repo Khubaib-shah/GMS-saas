@@ -264,7 +264,7 @@ export default function SubscriptionsPage() {
           <div className="h-px flex-1 bg-white/5"></div>
         </div>
 
-        {loading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{Array.from({ length: 2 }).map((_, i) => (
+        {loading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{Array.from({ length: 3 }).map((_, i) => (
           <PlanSkeleton key={i} />
         ))}</div> : isAdmin ? (
           <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">

@@ -187,7 +187,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                             <div className="h-px w-24 bg-primary/20"></div>
                         </div>
                         <DialogTitle className="text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none flex items-baseline gap-3">
-                            WORKOUT <span className="text-primary/40">PLANNER</span>
+                            WORKOUT <span className="text-primary">PLANNER</span>
                         </DialogTitle>
                     </div>
                 </DialogHeader>
@@ -289,8 +289,8 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                 <Card key={`${day.id}-${idx}`} className="p-4 bg-white/2 border-white/5 hover:border-primary/20 transition-all group overflow-hidden relative">
                                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary transform -translate-x-full group-hover:translate-x-0 transition-transform"></div>
 
-                                                    <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-                                                        <div className="flex-1">
+                                                    <div className="flex flex-col lg:flex-row lg:items-end gap-6">
+                                                        <div className="flex-1 min-w-[200px]">
                                                             <div className="flex items-center gap-3 mb-1">
                                                                 <span className="text-xs font-black italic text-slate-500 font-mono">#{String(idx + 1).padStart(2, '0')}</span>
                                                                 <h5 className="text-base font-black italic uppercase tracking-tighter text-foreground group-hover:text-primary transition-colors">{ex.name}</h5>
@@ -303,32 +303,35 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                             />
                                                         </div>
 
-                                                        <div className="flex items-center gap-4 flex-wrap">
+                                                        <div className="flex items-end gap-3 flex-wrap lg:flex-nowrap">
                                                             <InputField
                                                                 label="SETS"
                                                                 validateType="number"
-                                                                className="w-16 h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
+                                                                containerClassName="w-16"
+                                                                className="h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
                                                                 value={ex.sets.toString()}
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { sets: val })}
                                                             />
                                                             <InputField
                                                                 label="REPS"
                                                                 validateType="text"
-                                                                className="w-20 h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg uppercase"
+                                                                containerClassName="w-20"
+                                                                className="h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg uppercase"
                                                                 value={ex.reps}
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { reps: val })}
                                                             />
                                                             <InputField
                                                                 label="REST (S)"
                                                                 validateType="number"
-                                                                className="w-24 h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
+                                                                containerClassName="w-28    "
+                                                                className="h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
                                                                 value={ex.restSeconds.toString()}
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { restSeconds: val })}
                                                             />
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-10 w-10 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl mt-4"
+                                                                className="h-10 w-10 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl mb-1"
                                                                 onClick={() => handleRemoveExercise(day.id, idx)}
                                                             >
                                                                 <Trash2 className="w-4 h-4" />

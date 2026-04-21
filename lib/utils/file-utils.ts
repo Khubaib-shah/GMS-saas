@@ -16,7 +16,6 @@ export function daysUntilExpiry(endDate: string): number {
   const now = new Date()
   const end = new Date(endDate)
   const diff = end.getTime() - now.getTime()
-  console.log(Math.ceil(diff / (1000 * 60 * 60 * 24)))
   return Math.ceil(diff / (1000 * 60 * 60 * 24))
 
 }

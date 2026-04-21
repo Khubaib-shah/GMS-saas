@@ -28,6 +28,7 @@ interface InputFieldProps extends Omit<React.ComponentProps<typeof Input>, "onCh
     errorMessage: string
     restrictPattern?: RegExp
   }
+  showSuccessIndicator?: boolean
 }
 
 const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
@@ -45,6 +46,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     customRule,
     className,
     placeholder,
+    showSuccessIndicator = false,
     ...props
   }, ref) => {
     const {
@@ -66,7 +68,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
 
 
     return (
-      <Field className={cn("w-full", containerClassName)}>
+      <Field className={cn("w-full relative", containerClassName)}>
         {label && !hideLabel && (
           <FieldLabel className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
             {label} {required && <span className="text-primary">*</span>}
@@ -100,7 +102,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
           />
 
           {/* Tactical status indicator (bottom right) */}
-          {value && !isInvalid && validateType !== "text" && (
+          {showSuccessIndicator && value && !isInvalid && validateType !== "text" && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-50 group-focus-within/input-field:opacity-100 transition-opacity">
               <div className="w-1 h-1 rounded-full bg-primary animate-pulse"></div>
               <span className="text-[8px] font-black text-primary uppercase italic">Valid</span>
@@ -111,7 +113,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
         {description && <FieldDescription className="text-[9px] text-slate-500 font-bold uppercase">{description}</FieldDescription>}
 
         {error && !hideLabel && (
-          <FieldError className="text-[10px] font-bold italic tracking-wider mt-1 text-destructive animate-fade-in">
+          <FieldError className="text-[10px] font-bold italic tracking-wider mt-1 text-destructive animate-fade-in absolute top-full left-1">
             {error}
           </FieldError>
         )}

@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAppStore } from "@/lib/store";
 import { DashboardHeader } from "@/components/dashboard-header";
+import Link from "next/link";
 
 interface Member {
     id: string;
@@ -196,29 +197,43 @@ export function AssignWorkout() {
                         <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                             {loading ? (
                                 [1, 2].map(i => <div key={i} className="h-20 rounded-xl bg-white/2 animate-pulse" />)
-                            ) : workoutPlans.map((t: any) => (
-                                <div
-                                    key={t._id || t.id}
-                                    onClick={() => setSelectedTemplate(t._id || t.id)}
-                                    className={cn(
-                                        "p-6 rounded-2xl border transition-all cursor-pointer group flex items-center justify-between",
-                                        selectedTemplate === (t._id || t.id)
-                                            ? "bg-primary text-black border-primary shadow-lg"
-                                            : "bg-white/2 border-white/5 hover:bg-white/5"
-                                    )}
-                                >
-                                    <div>
-                                        <h4 className="font-black italic uppercase tracking-tighter text-lg leading-none mb-1">{t.name}</h4>
-                                        <p className={cn(
-                                            "text-[10px] font-bold uppercase tracking-[0.2em]",
-                                            selectedTemplate === (t._id || t.id) ? "text-black/60" : "text-slate-500"
-                                        )}>
-                                            {t.schedule?.length || 0} Training Days
-                                        </p>
+                            ) : workoutPlans.length > 0 ? (
+                                workoutPlans.map((t: any) => (
+                                    <div
+                                        key={t._id || t.id}
+                                        onClick={() => setSelectedTemplate(t._id || t.id)}
+                                        className={cn(
+                                            "p-6 rounded-2xl border transition-all cursor-pointer group flex items-center justify-between",
+                                            selectedTemplate === (t._id || t.id)
+                                                ? "bg-primary text-black border-primary shadow-lg"
+                                                : "bg-white/2 border-white/5 hover:bg-white/5"
+                                        )}
+                                    >
+                                        <div>
+                                            <h4 className="font-black italic uppercase tracking-tighter text-lg leading-none mb-1">{t.name}</h4>
+                                            <p className={cn(
+                                                "text-[10px] font-bold uppercase tracking-[0.2em]",
+                                                selectedTemplate === (t._id || t.id) ? "text-black/60" : "text-slate-500"
+                                            )}>
+                                                {t.schedule?.length || 0} Training Days
+                                            </p>
+                                        </div>
+                                        <ChevronRight className={cn("w-5 h-5", selectedTemplate === (t._id || t.id) ? "text-black" : "text-slate-700")} />
                                     </div>
-                                    <ChevronRight className={cn("w-5 h-5", selectedTemplate === (t._id || t.id) ? "text-black" : "text-slate-700")} />
+                                ))
+                            ) : (
+                                <div className="p-8 text-center border-2 border-dashed border-white/5 rounded-2xl space-y-4">
+                                    <p className="text-[10px] font-black italic text-slate-500 uppercase tracking-widest leading-relaxed">
+                                        No workout templates found for your gym.
+                                    </p>
+                                    <Button asChild className="h-10 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all group gap-2">
+                                        <Link href="/workout-plans?create=true">
+                                            <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+                                            CREATE TEMPLATE
+                                        </Link>
+                                    </Button>
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </Card>
 
