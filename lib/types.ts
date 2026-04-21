@@ -93,6 +93,7 @@ export type AuditLogEntry = {
   gymId: string
   userId: string
   userName?: string
+  userRole?: string
   action: string
   resource: string
   resourceId?: string

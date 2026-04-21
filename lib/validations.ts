@@ -16,6 +16,7 @@ export const GeneralSettingsSchema = z.object({
     name: z.string().min(1).max(100).optional(),
     logo: z.string().max(500).optional(),
     address: z.string().max(300).optional(),
+    phone: z.string().max(20).optional(),
     timezone: z.string().max(50).optional(),
     currency: z.string().max(10).optional(),
 }).strict(); // .strict() blocks unknown keys

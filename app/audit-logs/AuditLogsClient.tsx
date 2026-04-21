@@ -37,6 +37,14 @@ import {
   ChevronRight,
   Eye,
   RefreshCw,
+  Clock,
+  Globe,
+  User,
+  Box,
+  Activity,
+  Terminal,
+  Calendar,
+  Layers,
 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
@@ -458,77 +466,133 @@ export default function AuditlogsClient() {
         open={!!selectedLog}
         onOpenChange={(open) => !open && setSelectedLog(null)}
       >
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Audit Log Details</DialogTitle>
-            <DialogDescription>Action ID: {selectedLog?.id}</DialogDescription>
-          </DialogHeader>
-
-          {selectedLog && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                    Timestamp
-                  </h4>
-                  <p className="text-sm">
-                    {format(new Date(selectedLog.createdAt), "PPP pp")}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                    IP Address
-                  </h4>
-                  <p className="font-mono text-sm">
-                    {selectedLog.ipAddress || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                    User
-                  </h4>
-                  <p className="text-sm">
-                    {selectedLog.userName}{" "}
-                    <span className="text-xs text-muted-foreground">
-                      ({selectedLog.userId})
-                    </span>
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                    Resource
-                  </h4>
-                  <p className="capitalize text-sm">
-                    {selectedLog.resource}{" "}
-                    <span className="text-xs text-muted-foreground">
-                      ({selectedLog.resourceId})
-                    </span>
-                  </p>
-                </div>
-                {selectedLog.userAgent && (
-                  <div className="col-span-2">
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                      User Agent
-                    </h4>
-                    <p className="text-xs text-muted-foreground break-all">
-                      {selectedLog.userAgent}
-                    </p>
+        <DialogContent className="max-w-2xl max-h-[95vh] flex flex-col p-0 gap-0 overflow-hidden glass-premium border-white/10 bg-slate-950/95 shadow-2xl focus:ring-0 outline-none">
+          {/* Header */}
+          <div className="flex-none p-6 border-b border-white/10 bg-white/[0.02]">
+            <DialogHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <DialogTitle className="text-xl font-black italic uppercase tracking-tighter text-white leading-none mb-1.5">
+                      AUDIT <span className="text-primary">TRACE</span>
+                    </DialogTitle>
+                    <DialogDescription className="font-mono text-[9px] text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                      ID: {selectedLog?.id}
+                    </DialogDescription>
                   </div>
+                </div>
+                {selectedLog && (
+                  <Badge variant="outline" className={cn(
+                    "h-6 px-3 text-[10px] font-black italic uppercase tracking-widest border-primary/20 bg-primary/5 text-primary",
+                    getActionColor(selectedLog.action)
+                  )}>
+                    {selectedLog.action.replace("_", ":")}
+                  </Badge>
                 )}
               </div>
+            </DialogHeader>
+          </div>
 
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground mb-2">
-                  Change Details (JSON)
-                </h4>
-                <div className="bg-slate-950 text-slate-50 p-4 rounded-md overflow-x-auto">
-                  <pre className="text-xs font-mono">
-                    {JSON.stringify(selectedLog.details, null, 2)}
-                  </pre>
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+            {selectedLog && (
+              <>
+                {/* Unified Info Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/10overflow-hidden">
+                  <div className="p-4 bg-slate-950/40 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
+                    <Calendar className="w-4 h-4 text-primary/60 mt-1" />
+                    <div>
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">OCCURRED AT</h4>
+                      <p className="font-mono text-xs text-slate-200">{format(new Date(selectedLog.createdAt), "MMM d, yyyy // HH:mm:ss")}</p>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-slate-950/60 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
+                    <Globe className="w-4 h-4 text-primary/60 mt-1" />
+                    <div>
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">NETWORK ORIGIN</h4>
+                      <p className="font-mono text-xs text-slate-200">{selectedLog.ipAddress || "SYSTEM_INTERNAL"}</p>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-slate-950/60 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
+                    <User className="w-4 h-4 text-primary/60 mt-1" />
+                    <div>
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">INITIATOR</h4>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="font-black italic uppercase text-xs text-slate-200">{selectedLog.userName}</p>
+                        {(selectedLog as any).userRole && (
+                          <Badge variant="outline" className="text-[8px] h-4 px-1 border-primary/20 text-primary/80 font-black italic uppercase tracking-tighter">
+                            {(selectedLog as any).userRole}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="font-mono text-[9px] text-slate-500">ID: {selectedLog.userId}</p>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-slate-950/40 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
+                    <Layers className="w-4 h-4 text-primary/60 mt-1" />
+                    <div>
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">TARGET RESOURCE</h4>
+                      <p className="font-black italic uppercase text-xs text-slate-200 mb-0.5">{selectedLog.resource}</p>
+                      <p className="font-mono text-[9px] text-slate-500 truncate max-w-[150px]">ID: {selectedLog.resourceId}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+
+                {/* User Agent - Compact */}
+                {selectedLog.userAgent && (
+                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 relative overflow-hidden group">
+                    <div className="flex items-center gap-2 mb-2 relative z-10">
+                      <Terminal className="w-3.5 h-3.5 text-primary/50" />
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">ENVIRONMENT</h4>
+                    </div>
+                    <p className="text-[10px] font-mono text-slate-400 break-all leading-relaxed relative z-10 opacity-70 group-hover:opacity-100 transition-opacity">
+                      {selectedLog.userAgent}
+                    </p>
+                    <div className="absolute top-0 right-0 p-8 bg-primary/5 blur-3xl rounded-full -mr-4 -mt-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                )}
+
+                {/* Data Payload Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center gap-2">
+                      <Box className="w-4 h-4 text-primary" />
+                      <h4 className="text-[12px] font-black italic uppercase tracking-tighter text-white">
+                        DATA <span className="text-primary">PAYLOAD</span>
+                      </h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-px w-8 bg-white/10" />
+                      <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">application/json</span>
+                    </div>
+                  </div>
+
+                  <div className="relative group">
+                    <div className="absolute -inset-0.5 bg-gradient-to-b from-primary/20 to-transparent rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity" />
+                    <div className="relative bg-black/60 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+                      <div className="max-h-[300px] overflow-auto custom-scrollbar p-5">
+                        <pre className="text-[11px] font-mono leading-relaxed text-primary/90 whitespace-pre-wrap break-all">
+                          {JSON.stringify(selectedLog.details, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Footer - Optional */}
+          <div className="flex-none p-4 border-t border-white/10 bg-white/[0.01] flex justify-end">
+            <Button
+              variant="ghost"
+              onClick={() => setSelectedLog(null)}
+              className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white"
+            >
+              Close Trace
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

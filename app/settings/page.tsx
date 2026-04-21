@@ -50,13 +50,13 @@ export default function SettingsPage() {
   const isAdmin = userRole === "super_admin";
   const isTrainer = userRole === "trainer";
 
-  // Default tab logic: Trainer -> profile, Super Admin/Owner -> gym
+  // Default tab logic: Trainer -> profile, Super Admin/Owner -> general_settings
   const getDefaultTab = () => {
     if (isTrainer) return "profile";
-    return "gym"; // Default for all other roles including Super Admin
+    return "general_settings"; // Default for all other roles
   };
 
-  const [activeTab, setActiveTab] = useState<"gym" | "account" | "staff" | "profile" | "general_settings" | "business_settings" | "notifications" | "roles">(getDefaultTab());
+  const [activeTab, setActiveTab] = useState<"staff" | "profile" | "general_settings" | "business_settings" | "notifications" | "roles">(getDefaultTab());
   const { can } = usePermissions();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -71,11 +71,6 @@ export default function SettingsPage() {
     password: "",
     role: "receptionist",
   });
-  const [gymData, setGymData] = useState({
-    name: "",
-    address: "",
-    phone: "",
-  });
 
   // Trainer Profile State
   const [trainerData, setTrainerData] = useState({
@@ -85,9 +80,7 @@ export default function SettingsPage() {
   });
 
   useEffect(() => {
-    if (activeTab === "gym" && !isAdmin && !isTrainer) {
-      fetchGymData();
-    } else if (activeTab === "staff") {
+    if (activeTab === "staff") {
       fetchStaff();
     } else if (activeTab === "profile" && isTrainer) {
       fetchTrainerProfile();
@@ -100,7 +93,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab") as any;
-    const validTabs = ["gym", "account", "staff", "profile", "general_settings", "business_settings", "notifications", "roles"];
+    const validTabs = ["staff", "profile", "general_settings", "business_settings", "notifications", "roles"];
 
     if (tab && validTabs.includes(tab)) {
       setActiveTab(tab);
@@ -166,40 +159,7 @@ export default function SettingsPage() {
     }
   };
 
-  const fetchGymData = async () => {
-    try {
-      const res = await fetch("/api/gym");
-      if (res.ok) {
-        const data = await res.json();
-        setGymData({
-          name: data.name || "",
-          address: data.address || "",
-          phone: data.phone || "",
-        });
-      }
-    } catch (error) {
-      toast.error("Failed to load gym profile");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const handleSaveGym = async () => {
-    try {
-      const res = await fetch("/api/gym", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(gymData),
-      });
-      if (res.ok) {
-        toast.success("Gym profile updated successfully!");
-      } else {
-        throw new Error("Failed to update");
-      }
-    } catch (error) {
-      toast.error("Error saving changes");
-    }
-  };
 
   const fetchTrainerProfile = async () => {
     try {
@@ -261,18 +221,7 @@ export default function SettingsPage() {
 
       {/* Tab Navigation */}
       <div className="flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto no-scrollbar">
-        {(isAdmin || (!isAdmin && !isTrainer)) && (
-          <button
-            onClick={() => setActiveTab("gym")}
-            className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "gym"
-              ? "text-primary border-primary"
-              : "text-muted-foreground border-transparent hover:text-foreground"
-              }`}
-          >
-            <Building2 className="w-4 h-4 inline-block mr-2" />
-            Gym Profile
-          </button>
-        )}
+
 
         {isTrainer && (
           <button
@@ -287,16 +236,7 @@ export default function SettingsPage() {
           </button>
         )}
 
-        <button
-          onClick={() => setActiveTab("account")}
-          className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "account"
-            ? "text-primary border-primary"
-            : "text-muted-foreground border-transparent hover:text-foreground"
-            }`}
-        >
-          <User className="w-4 h-4 inline-block mr-2" />
-          Account Details
-        </button>
+
 
         {(isAdmin || (!isAdmin && !isTrainer)) && (
           <button
@@ -361,58 +301,7 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* Gym Profile Tab */}
-      {activeTab === "gym" && (
-        <Card className="glass-premium p-8 max-w-2xl border-border">
-          <div className="flex items-center gap-4 mb-6">
-            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Gym Profile</h3>
-            <div className="h-px flex-1 bg-white/5"></div>
-          </div>
-          <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSaveGym(); }}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                label="Gym Name"
-                validateType="text"
-                value={gymData.name}
-                onChange={(val) =>
-                  setGymData({ ...gymData, name: val })
-                }
-                placeholder="Your Gym Name"
-                required
-              />
-              <InputField
-                label="Phone Number"
-                validateType="phone"
-                value={gymData.phone}
-                onChange={(val) =>
-                  setGymData({ ...gymData, phone: val })
-                }
-                placeholder="Phone Number"
-              />
-            </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Address
-              </label>
-              <textarea
-                value={gymData.address}
-                onChange={(e) =>
-                  setGymData({ ...gymData, address: e.target.value })
-                }
-                className="w-full px-3 py-2 rounded-md border border-input bg-transparent text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 min-h-[100px]"
-                placeholder="Gym physical address"
-              />
-            </div>
-
-            <div className="pt-6 border-t border-border">
-              <Button type="submit">
-                Save Changes
-              </Button>
-            </div>
-          </form>
-        </Card>
-      )}
 
       {/* Trainer Profile Tab */}
       {activeTab === "profile" && (
@@ -621,48 +510,7 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Account Tab */}
-      {activeTab === "account" && (
-        <div className="space-y-6 animate-fade-in">
-          <Card className="glass-premium p-8 max-w-2xl border-border">
-            <div className="flex items-center gap-4 mb-6">
-              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">ACCOUNT INFORMATION</h3>
-              <div className="h-px flex-1 bg-white/5"></div>
-            </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 p-6 rounded-xl bg-black/20 border border-white/5">
-                <div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-1">NAME</p>
-                  <p className="font-medium font-black tracking-tighter">{session?.user?.name}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-1">EMAIL</p>
-                  <p className="text-slate-400 font-mono text-[11px] mt-1">{session?.user?.email}</p>
-                </div>
-              </div>
-            </div>
-          </Card>
 
-          <Card className="glass-premium p-8 max-w-2xl border-destructive/20 bg-destructive/5">
-            <div className="flex items-center gap-4 mb-4">
-              <h3 className="text-sm font-black text-destructive uppercase tracking-widest italic flex items-center gap-2">
-                <LogOut className="w-4 h-4" />
-                SESSION
-              </h3>
-              <div className="h-px flex-1 bg-destructive/10"></div>
-            </div>
-            <p className="text-slate-400 mb-6 text-sm">
-              Sign out from your current session and return to the login screen.
-            </p>
-            <Button
-              className="bg-destructive text-white hover:bg-destructive/90 font-black italic tracking-tighter uppercase px-8"
-              onClick={() => signOut({ callbackUrl: "/login" })}
-            >
-              Logout Account
-            </Button>
-          </Card>
-        </div>
-      )}
 
       {/* New Settings Tabs */}
       {activeTab === "general_settings" && <GeneralSettings />}

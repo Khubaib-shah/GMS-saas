@@ -16,6 +16,7 @@ const GymSettingsSchema = new mongoose.Schema(
             name: { type: String, default: "" },
             logo: { type: String, default: "" },
             address: { type: String, default: "" },
+            phone: { type: String, default: "" },
             timezone: { type: String, default: "UTC" },
             currency: { type: String, default: "USD" },
         },

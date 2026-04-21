@@ -4,6 +4,7 @@ const AuditLogSchema = new mongoose.Schema({
     gymId: { type: mongoose.Schema.Types.ObjectId, ref: "Gym", required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     userName: { type: String },
+    userRole: { type: String },
     action: { type: String, required: true }, // e.g., "create", "update", "login"
     resource: { type: String, required: true }, // e.g., "member", "payment"
     resourceId: { type: String },

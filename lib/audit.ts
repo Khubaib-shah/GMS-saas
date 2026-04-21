@@ -47,6 +47,7 @@ export interface AuditLogEntry {
     gymId: string;
     userId: string;
     userName?: string;
+    userRole?: string;
     action: AuditAction;
     resource: AuditResource;
     resourceId?: string;
@@ -125,6 +126,7 @@ export function createCrudAuditEntry(
         gymId: session.user.gymId,
         userId: session.user.id,
         userName: session.user.name,
+        userRole: session.user.role,
         action,
         resource,
         resourceId,
