@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { Card } from "@/components/ui/card"
 import { InputField } from "@/components/ui/input-field"
-import { TrendingUp, DollarSign, AlertCircle, Download } from "lucide-react"
+import { TrendingUp, DollarSign, AlertCircle, Download, Filter, Search } from "lucide-react"
 import { useAppStore } from "@/lib/store"
 import { formatDate, formatCurrency } from "@/lib/utils/file-utils"
 import { StatsCard } from "@/components/stats-card"
@@ -234,7 +234,6 @@ export default function PaymentsPage() {
         highlight="HISTORY"
         subtitle="Track your gym's income"
         description="View all payments received from members."
-        descriptionIconColor="emerald"
       >
         <Button 
           onClick={handleExportPDF} 
@@ -275,7 +274,7 @@ export default function PaymentsPage() {
           <div className="flex flex-col gap-2 mb-6">
             <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-primary" />
-              REVENUE TIMELINE
+              Revenue Timeline
             </h3>
             <div className="h-px w-full bg-white/5 mt-2"></div>
           </div>
@@ -339,7 +338,7 @@ export default function PaymentsPage() {
           <div className="flex flex-col gap-2 mb-6">
             <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-emerald-500" />
-              METHODS
+              Methods
             </h3>
             <div className="h-px w-full bg-white/5 mt-2"></div>
           </div>
@@ -400,7 +399,7 @@ export default function PaymentsPage() {
           <div className="flex flex-col gap-2 mb-6">
             <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-amber-500" />
-              TOP 5 CONTRIBUTORS
+              Top 5 Contributors
             </h3>
             <div className="h-px w-full bg-white/5 mt-2"></div>
           </div>
@@ -452,34 +451,44 @@ export default function PaymentsPage() {
         </div>
       </div>
 
-      {/* Filter - Bento Style */}
-      <div className="glass-premium p-8 border-border">
-        <div className="flex flex-col sm:flex-row gap-6 items-end">
-          <div className="flex-1 w-full sm:w-auto">
-            <InputField
-              label="Search Member"
-              validateType="text"
-              placeholder="Searching..."
-              value={searchTerm || store.searchQuery}
-              onChange={(val) => {
-                setSearchTerm(val)
-                store.setSearchQuery(val)
-              }}
-            />
-          </div>
-          <div className="w-full sm:w-auto">
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Custom Range</label>
+      {/* Search & Filter HUD */}
+      <div className="flex flex-col md:flex-row items-center gap-4 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-md">
+        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
+          <Filter className="w-3.5 h-3.5 text-primary/50" />
+          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+            Filter
+          </span>
+        </div>
+
+        <div className="flex-1 w-full flex flex-col md:flex-row gap-4">
+          <InputField
+            hideLabel
+            validateType="text"
+            placeholder="Search Member..."
+            value={searchTerm || store.searchQuery}
+            onChange={(val) => {
+              setSearchTerm(val)
+              store.setSearchQuery(val)
+            }}
+            leadingIcon={<Search className="w-4 h-4" />}
+            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+            containerClassName="flex-1"
+          />
+
+          <div className="h-6 w-px bg-white/5 hidden md:block self-center" />
+
+          <div className="flex items-center gap-4">
             <DateRangePicker
-              btnClass="!h-12 rounded-md"
+              btnClass="!h-10 border-none bg-transparent hover:bg-white/5 text-[10px] font-black uppercase tracking-widest italic rounded-lg"
               date={dateRange}
               onDateChange={(range) => {
                 setDateRange(range);
                 if (range) setFilterPeriod("all");
               }}
             />
-          </div>
-          <div className="w-full sm:w-auto">
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Period</label>
+
+            <div className="h-6 w-px bg-white/5 hidden md:block" />
+
             <Select
               value={filterPeriod}
               onValueChange={(value) => {
@@ -487,10 +496,11 @@ export default function PaymentsPage() {
                 if (value !== "all") setDateRange(undefined);
               }}
             >
-              <SelectTrigger className="!h-12 px-6 rounded-md border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+              <SelectTrigger className="h-10 w-full md:w-48 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+                <span className="text-slate-500 mr-2">Period:</span>
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-white/10">
+              <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
                 <SelectItem value="this-month" className="text-[10px] font-bold uppercase tracking-widest">This Month</SelectItem>
                 <SelectItem value="last-month" className="text-[10px] font-bold uppercase tracking-widest">Last Month</SelectItem>
                 <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Time</SelectItem>
@@ -506,11 +516,11 @@ export default function PaymentsPage() {
           <table className="w-full text-[11px] font-bold tracking-widest uppercase">
             <thead>
               <tr className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]">
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">MEMBER</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">AMOUNT</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">DATE</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">METHOD</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">DESCRIPTION</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Member</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Amount</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Date</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Method</th>
+                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Description</th>
               </tr>
             </thead>
             <tbody>

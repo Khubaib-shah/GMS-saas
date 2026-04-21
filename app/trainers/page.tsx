@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Users, User, Mail, Award, ArrowRight, ShieldAlert } from "lucide-react";
+import { Users, User, Mail, Award, ArrowRight, ShieldAlert, Filter, Search } from "lucide-react";
+import { InputField } from "@/components/ui/input-field";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardHeader } from "@/components/dashboard-header";
@@ -23,6 +24,13 @@ interface Trainer {
 export default function TrainersPage() {
   const [trainers, setTrainers] = useState<Trainer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  const filteredTrainers = trainers.filter(t => 
+    t.fullName.toLowerCase().includes(search.toLowerCase()) || 
+    t.email.toLowerCase().includes(search.toLowerCase()) ||
+    t.specialties?.some(s => s.toLowerCase().includes(search.toLowerCase()))
+  );
 
   useEffect(() => {
     async function fetchTrainers() {
@@ -46,12 +54,34 @@ export default function TrainersPage() {
   return (
     <div className="space-y-10 animate-fade-up">
       <DashboardHeader
-        title="OUR"
-        highlight="TRAINERS"
+        title="Our"
+        highlight="Trainers"
         subtitle="Trainer Directory"
         description="Meet our team of professional fitness experts."
-        descriptionIconColor="emerald"
       />
+
+      {/* Search & Filter HUD */}
+      <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-10 backdrop-blur-md">
+        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
+          <Filter className="w-3.5 h-3.5 text-primary/50" />
+          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+            Filter
+          </span>
+        </div>
+
+        <div className="flex-1 w-full">
+          <InputField
+            hideLabel
+            validateType="text"
+            placeholder="Search trainers by name, email, or specialty..."
+            value={search}
+            onChange={(val) => setSearch(val)}
+            leadingIcon={<Search className="w-4 h-4" />}
+            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+            containerClassName="w-full"
+          />
+        </div>
+      </div>
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -86,7 +116,7 @@ export default function TrainersPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {trainers.map((trainer) => (
+          {filteredTrainers.map((trainer) => (
             <div key={trainer._id} className="glass-premium p-8 border-border dark:bg-slate-950/40 hover:scale-[1.02] transition-all group flex flex-col items-center text-center">
               <div className="relative mb-6">
                 <Avatar className="w-24 h-24 transition-transform group-hover:scale-110 duration-500">

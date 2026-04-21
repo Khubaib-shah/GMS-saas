@@ -9,7 +9,8 @@ import { DashboardHeader } from "@/components/dashboard-header";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Lock, Sparkles } from "lucide-react";
+import { Eye, Lock, Sparkles, Filter, Search } from "lucide-react";
+import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
 import {
     Table,
@@ -29,6 +30,7 @@ export default function AttendancePage() {
     const [reports, setReports] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingReports, setLoadingReports] = useState(false);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         const loadData = async () => {
@@ -74,11 +76,10 @@ export default function AttendancePage() {
     return (
         <div className="space-y-10 animate-fade-up">
             <DashboardHeader
-                title="GYM"
-                highlight="ATTENDANCE"
+                title="Gym"
+                highlight="Attendance"
                 subtitle="Track member check-ins"
                 description="View who is currently in the gym."
-                descriptionIconColor="emerald"
             />
 
             <AttendanceStats />
@@ -128,8 +129,31 @@ export default function AttendancePage() {
 
                 <TabsContent value="reports" className="mt-0">
                     <div className="flex items-center gap-4 mb-6">
-                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">TODAY'S ACTIVITY</h3>
+                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Today's Activity</h3>
                         <div className="h-px flex-1 bg-white/5"></div>
+                    </div>
+
+                    {/* Search & Filter HUD */}
+                    <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-md">
+                        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
+                            <Search className="w-3.5 h-3.5 text-primary/50" />
+                            <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+                                Search
+                            </span>
+                        </div>
+
+                        <div className="flex-1 w-full">
+                            <InputField
+                                hideLabel
+                                validateType="text"
+                                placeholder="Search check-ins by member name..."
+                                value={search}
+                                onChange={(val) => setSearch(val)}
+                                leadingIcon={<Search className="w-4 h-4" />}
+                                className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+                                containerClassName="w-full"
+                            />
+                        </div>
                     </div>
                 
                     <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
@@ -137,11 +161,11 @@ export default function AttendancePage() {
                             <table className="w-full text-[11px] font-bold tracking-widest uppercase">
                                 <thead>
                                     <tr className="border-b border-white/5 bg-white/[0.02]">
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">MEMBER</th>
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">CHECK IN</th>
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">CHECK OUT</th>
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">STATUS</th>
-                                        <th className="text-right py-6 px-6 font-black text-slate-500 italic">VIEW</th>
+                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Member</th>
+                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Check In</th>
+                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Check Out</th>
+                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Status</th>
+                                        <th className="text-right py-6 px-6 font-black text-slate-500 italic">View</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -167,8 +191,8 @@ export default function AttendancePage() {
                                                 </td>
                                             </tr>
                                         ))
-                                    ) : reports.length > 0 ? (
-                                        reports.map((record: any) => {
+                                    ) : reports.filter(r => `${r.memberId?.firstName || ""} ${r.memberId?.lastName || ""}`.toLowerCase().includes(search.toLowerCase())).length > 0 ? (
+                                        reports.filter(r => `${r.memberId?.firstName || ""} ${r.memberId?.lastName || ""}`.toLowerCase().includes(search.toLowerCase())).map((record: any) => {
                                             return (
                                                 <tr key={record.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
                                                     <td className="py-6 px-6 font-black italic text-foreground tracking-tighter">

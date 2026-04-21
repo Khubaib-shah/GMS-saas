@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 import { Card } from "@/components/ui/card";
-import { Edit2, Plus, Trash2, PauseCircle, PlayCircle, Eye } from "lucide-react";
+import { Edit2, Plus, Trash2, PauseCircle, PlayCircle, Eye, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -257,10 +257,32 @@ export default function SubscriptionsPage() {
         )}
       </DashboardHeader>
 
+      {/* Search & Filter HUD */}
+      <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-12 backdrop-blur-md">
+        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
+          <Search className="w-3.5 h-3.5 text-primary/50" />
+          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+            Search
+          </span>
+        </div>
+
+        <div className="flex-1 w-full">
+          <InputField
+            hideLabel
+            validateType="text"
+            placeholder="Search plans, members, or gyms..."
+            value={store.searchQuery}
+            onChange={(val) => store.setSearchQuery(val)}
+            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+            containerClassName="w-full"
+          />
+        </div>
+      </div>
+
       {/* Plans Section */}
       <div className="mb-12">
         <div className="flex items-center gap-4 mb-6">
-          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">AVAILABLE PLANS</h3>
+          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Available Plans</h3>
           <div className="h-px flex-1 bg-white/5"></div>
         </div>
 
@@ -272,12 +294,12 @@ export default function SubscriptionsPage() {
               <table className="w-full text-[11px] font-bold tracking-widest uppercase">
                 <thead>
                   <tr className="border-b border-white/5 bg-white/[0.02]">
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">GYM NAME</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">PLAN NAME</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">PRICE</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">DURATION</th>
-                    <th className="text-center py-6 px-6 font-black text-slate-500 italic">MEMBERS</th>
-                    {(canEditPlans || canDeletePlans) && <th className="text-right py-6 px-6 font-black text-slate-500 italic">ACTIONS</th>}
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Gym Name</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Plan Name</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Price</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Duration</th>
+                    <th className="text-center py-6 px-6 font-black text-slate-500 italic">Members</th>
+                    {(canEditPlans || canDeletePlans) && <th className="text-right py-6 px-6 font-black text-slate-500 italic">Actions</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -440,7 +462,7 @@ export default function SubscriptionsPage() {
       {/* Subscriptions Table */}
       <div>
         <div className="flex items-center gap-4 mb-6">
-          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">MEMBER SUBSCRIPTIONS ({memberSubscriptions.length})</h3>
+          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Member Subscriptions ({memberSubscriptions.length})</h3>
           <div className="h-px flex-1 bg-white/5"></div>
         </div>
 
@@ -449,12 +471,12 @@ export default function SubscriptionsPage() {
             <table className="w-full text-[11px] font-bold tracking-widest uppercase">
               <thead>
                 <tr className="border-b border-white/5 bg-white/[0.02]">
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">MEMBER</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">PLAN</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">START DATE</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">EXPIRY DATE</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">STATUS</th>
-                  <th className="text-right py-6 px-6 font-black text-slate-500 italic">ACTIONS</th>
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Member</th>
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Plan</th>
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Start Date</th>
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Expiry Date</th>
+                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Status</th>
+                  <th className="text-right py-6 px-6 font-black text-slate-500 italic">Actions</th>
                 </tr>
               </thead>
               <tbody>

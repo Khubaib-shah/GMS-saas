@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Search, Plus, Trash2, QrCode, Sparkles, Users } from "lucide-react";
+import { Search, Plus, Trash2, QrCode, Sparkles, Users, Filter } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { MemberQrDialog } from "@/components/member-qr-dialog";
 import { Button } from "@/components/ui/button";
@@ -144,43 +144,48 @@ export default function MembersPage() {
         </div>
       </DashboardHeader>
 
-      {/* Search & Filter - Bento Style */}
-      <div className="glass-premium p-8 mb-8 border-border">
-        <div className="flex gap-8 items-end flex-wrap">
-          <div className="flex-1 min-w-64">
-            <InputField
-              label="Search Members"
-              className="gap-0"
-              validateType="text"
-              placeholder="Search by name, email, or phone..."
-              value={searchTerm || store.searchQuery}
-              onChange={(val) => {
-                setSearchTerm(val);
-                store.setSearchQuery(val);
-              }}
-              leadingIcon={<Search className="w-4 h-4" />}
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
-              Filter by Status
-            </label>
-            <Select
-              value={filterStatus}
-              onValueChange={(value) =>
-                setFilterStatus(value as "all" | "active" | "expired")
-              }
-            >
-              <SelectTrigger className="h-16 p-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
-                <SelectValue placeholder="Filter status" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-white/10">
-                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Members</SelectItem>
-                <SelectItem value="active" className="text-[10px] font-bold uppercase tracking-widest">Active Members</SelectItem>
-                <SelectItem value="expired" className="text-[10px] font-bold uppercase tracking-widest">Expired Members</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Search & Filter HUD */}
+      <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-md">
+        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
+          <Filter className="w-3.5 h-3.5 text-primary/50" />
+          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+            Filter
+          </span>
+        </div>
+
+        <div className="flex-1 w-full flex flex-col md:flex-row gap-2">
+          <InputField
+            hideLabel
+            validateType="text"
+            placeholder="Search by name, email, or phone..."
+            value={searchTerm || store.searchQuery}
+            onChange={(val) => {
+              setSearchTerm(val);
+              store.setSearchQuery(val);
+            }}
+            leadingIcon={<Search className="w-4 h-4" />}
+            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+            containerClassName="flex-1"
+          />
+
+          <div className="h-6 w-px bg-white/5 hidden md:block self-center" />
+
+          <Select
+            value={filterStatus}
+            onValueChange={(value) =>
+              setFilterStatus(value as "all" | "active" | "expired")
+            }
+          >
+            <SelectTrigger className="h-10 w-full md:w-56 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+              <span className="text-slate-500 mr-2">Status:</span>
+              <SelectValue placeholder="All Members" />
+            </SelectTrigger>
+            <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
+              <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">All Members</SelectItem>
+              <SelectItem value="active" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Active Members</SelectItem>
+              <SelectItem value="expired" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Expired Members</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
