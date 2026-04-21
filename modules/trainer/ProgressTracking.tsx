@@ -59,10 +59,24 @@ export function ProgressTracking() {
         }
     }, [selectedMemberId]);
 
-    const filteredMembers = store.members.filter(m => {
-        const fullName = `${m.firstName} ${m.lastName || ""}`.toLowerCase();
-        return fullName.includes(searchTerm.toLowerCase());
-    });
+    const filteredMembers = useMemo(() => {
+        const userRole = (session?.user as any)?.role;
+        const userId = (session?.user as any)?.id;
+
+        return store.members.filter(m => {
+            // 1. Basic search filter
+            const fullName = `${m.firstName} ${m.lastName || ""}`.toLowerCase();
+            const matchesSearch = fullName.includes(searchTerm.toLowerCase());
+            
+            // 2. Role based visibility filter
+            if (userRole === 'trainer' && userId) {
+                const mTrainerId = (m as any).trainerId?._id || (m as any).trainerId;
+                return matchesSearch && mTrainerId === userId;
+            }
+            
+            return matchesSearch;
+        });
+    }, [store.members, searchTerm, session]);
 
     const selectedMember = store.members.find(m => m.id === selectedMemberId);
 

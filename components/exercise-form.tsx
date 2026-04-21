@@ -143,7 +143,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                             <div className="h-px w-20 bg-primary/20"></div>
                         </div>
                         <DialogTitle className="text-4xl font-black italic tracking-tighter uppercase text-white leading-none">
-                            {isViewMode ? "Exercise" : isEditMode ? "Edit" : "Add"} <span className="text-primary/40">{isViewMode ? "Details" : "Exercise"}</span>
+                            {isViewMode ? "Exercise" : isEditMode ? "Edit" : "Add"} <span className="text-primary">{isViewMode ? "Details" : "Exercise"}</span>
                         </DialogTitle>
                     </div>
                 </DialogHeader>
