@@ -142,8 +142,8 @@ export function ProgressTracking() {
         <div className="space-y-10 animate-fade-up">
             {/* Header section */}
             <DashboardHeader
-                title="MEMBER"
-                highlight="PERFORMANCE"
+                title="Member"
+                highlight="Performance"
                 subtitle="Analytics Overview"
                 description="Track strength progression and monitor training compliance."
                 descriptionIconColor="primary"

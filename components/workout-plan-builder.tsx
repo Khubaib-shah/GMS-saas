@@ -178,84 +178,83 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[80vw] w-[80vw] flex flex-col p-0 bg-card border-none shadow-2xl overflow-y-auto">
-                <DialogHeader className="p-8 pb-6 border-b border-white/5 bg-slate-950/20 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-full bg-primary/5 -skew-x-12 translate-x-12 opacity-50" />
+            <DialogContent className="sm:max-w-[1100px] w-[95vw] h-[85vh] flex flex-col p-0 bg-card border-none shadow-2xl overflow-hidden">
+                <DialogHeader className="p-6 pb-4 border-b border-white/5 bg-slate-950/20 relative shrink-0">
+                    <div className="absolute top-0 right-0 w-48 h-full bg-primary/5 -skew-x-12 translate-x-10 opacity-50" />
                     <div className="relative">
-                        <div className="flex items-center gap-4 mb-3">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">Plan Builder Active</span>
-                            <div className="h-px w-24 bg-primary/20"></div>
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">Plan Builder</span>
+                            <div className="h-px w-16 bg-primary/20"></div>
                         </div>
-                        <DialogTitle className="text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none flex items-baseline gap-3">
+                        <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase text-foreground leading-none flex items-baseline gap-2">
                             Workout <span className="text-primary">Planner</span>
                         </DialogTitle>
                     </div>
                 </DialogHeader>
 
-                <div className="flex-1 flex flex-col md:flex-row min-h-0">
+                <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
                     {/* Left Panel: Plan Meta & Exercise Browser */}
-                    <div className="w-full md:w-[380px] shrink-0 border-r border-white/5 bg-slate-950/10 p-8 space-y-10 overflow-y-auto custom-scrollbar">
-                        <div className="space-y-6">
+                    <div className="w-full md:w-[280px] shrink-0 border-r border-white/5 bg-slate-950/10 p-5 space-y-8 overflow-y-auto custom-scrollbar">
+                        <div className="space-y-4">
                             <InputField
                                 label="Plan Name"
                                 validateType="text"
-                                placeholder="e.g., Strength Training (Core)"
+                                placeholder="e.g., Strength Training"
                                 value={name}
                                 onChange={(val) => setName(val)}
+                                className="h-9 rounded-lg"
                             />
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic block">Plan Objective</label>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic block">Objective</label>
                                 <Textarea
-                                    placeholder="Describe the plan objective..."
+                                    placeholder="Plan objective..."
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="bg-white/5 max-h-32 border-transparent focus:border-primary/50 font-medium italic min-h-[80px] rounded-xl text-xs"
+                                    className="bg-white/5 max-h-24 border-transparent focus:border-primary/50 font-medium italic min-h-[60px] rounded-lg text-xs py-2"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-4 pt-4 border-t border-white/5">
+                        <div className="space-y-3 pt-4 border-t border-white/5">
                             <InputField
                                 label="Exercise Library"
                                 validateType="text"
-                                placeholder="Search exercises..."
+                                placeholder="Search..."
                                 value={exerciseSearch}
                                 onChange={(val) => setExerciseSearch(val)}
-                                leadingIcon={<Search className="w-4 h-4" />}
-                                className="h-10 bg-white/5 border-transparent focus:border-primary/50 text-[10px] font-bold rounded-lg"
+                                leadingIcon={<Search className="w-3.5 h-3.5" />}
+                                className="h-9 bg-white/5 border-transparent focus:border-primary/50 text-[10px] font-bold rounded-lg"
                             />
 
-                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="space-y-1.5 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
                                 {filteredExercises.map(ex => (
-                                    <Card
+                                    <div
                                         key={ex.id || ex._id}
-                                        className="p-3 bg-white/3 border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer group"
+                                        className="p-2.5 rounded-lg bg-white/3 border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer group flex items-center justify-between"
                                         onClick={() => handleAddExercise(activeTab, ex)}
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <span className="text-[10px] font-black italic block truncate group-hover:text-primary transition-colors uppercase">{ex.name}</span>
-                                                <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">{ex.muscleGroup}</span>
-                                            </div>
-                                            <Plus className="w-3 h-3 text-slate-500 group-hover:text-primary transition-colors" />
+                                        <div className="min-w-0">
+                                            <span className="text-[10px] font-black italic block truncate group-hover:text-primary transition-colors">{ex.name}</span>
+                                            <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none">{ex.muscleGroup}</span>
                                         </div>
-                                    </Card>
+                                        <Plus className="w-3 h-3 text-slate-500 group-hover:text-primary transition-colors shrink-0 ml-2" />
+                                    </div>
                                 ))}
                             </div>
                         </div>
                     </div>
 
                     {/* Right Panel: Schedule Builder */}
-                    <div className="flex-1 min-w-0 flex flex-col bg-slate-950/5 relative overflow-y-auto custom-scrollbar">
+                    <div className="flex-1 min-w-0 flex flex-col bg-slate-950/5 relative overflow-hidden">
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-w-0">
-                            <div className="p-4 bg-slate-950/20 border-b border-white/5">
-                                <TabsList className="flex flex-wrap items-center gap-2 bg-transparent h-auto p-0">
+                            <div className="px-4 py-3 bg-slate-950/20 border-b border-white/5 shrink-0">
+                                <TabsList className="flex flex-wrap items-center gap-1.5 bg-transparent h-auto p-0">
                                     {DAYS.map(day => (
                                         <TabsTrigger
                                             key={day.id}
                                             value={day.id}
                                             className={cn(
-                                                "h-10 px-6 rounded-xl text-[10px] font-black italic transition-all border border-white/10 shrink-0",
+                                                "h-8 px-4 rounded-lg text-[9px] font-black italic transition-all border border-white/10 shrink-0",
                                                 "data-[state=active]:bg-primary data-[state=active]:text-black data-[state=active]:shadow-lg data-[state=active]:border-primary",
                                                 "data-[state=inactive]:hover:bg-white/5 data-[state=inactive]:text-slate-500"
                                             )}
@@ -266,75 +265,75 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                 </TabsList>
                             </div>
 
-                            <div className="flex-1 overflow-y-scroll p-8">
+                            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
                                 {DAYS.map(day => (
-                                    <TabsContent key={day.id} value={day.id} className="mt-0 space-y-6 focus-visible:outline-none">
-                                        <div className="flex items-center justify-between mb-8">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                                                    <Calendar className="w-5 h-5" />
+                                    <TabsContent key={day.id} value={day.id} className="mt-0 space-y-4 focus-visible:outline-none">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                                    <Calendar className="w-4 h-4" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-xl font-black italic uppercase tracking-tighter text-foreground leading-none">{day.label} Plan</h4>
-                                                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Exercise Sequence</span>
+                                                    <h4 className="text-lg font-black italic uppercase tracking-tighter text-foreground leading-none">{day.label} Session</h4>
+                                                    <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest italic">Sequence Builder</span>
                                                 </div>
                                             </div>
-                                            <div className="px-4 py-1.5 rounded-full bg-slate-950/50 border border-white/5 text-[10px] font-black italic tracking-widest text-slate-400">
+                                            <div className="px-3 py-1 rounded-full bg-slate-950/50 border border-white/5 text-[9px] font-black italic tracking-widest text-slate-400">
                                                 {schedule.find(d => d.day === day.id)?.exercises.length || 0} Exercises
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4 overflow-y-auto">
+                                        <div className="space-y-3">
                                             {schedule.find(d => d.day === day.id)?.exercises.map((ex: any, idx: number) => (
-                                                <Card key={`${day.id}-${idx}`} className="p-4 bg-white/2 border-white/5 hover:border-primary/20 transition-all group overflow-hidden relative">
-                                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary transform -translate-x-full group-hover:translate-x-0 transition-transform"></div>
+                                                <Card key={`${day.id}-${idx}`} className="p-3 bg-white/2 border-white/5 hover:border-primary/20 transition-all group overflow-hidden relative">
+                                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top"></div>
 
-                                                    <div className="flex flex-col lg:flex-row lg:items-end gap-6">
-                                                        <div className="flex-1 min-w-[200px]">
-                                                            <div className="flex items-center gap-3 mb-1">
-                                                                <span className="text-xs font-black italic text-slate-500 font-mono">#{String(idx + 1).padStart(2, '0')}</span>
-                                                                <h5 className="text-base font-black italic uppercase tracking-tighter text-foreground group-hover:text-primary transition-colors">{ex.name}</h5>
+                                                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center gap-2 mb-0.5">
+                                                                <span className="text-[10px] font-black italic text-slate-500 font-mono">#{String(idx + 1).padStart(2, '0')}</span>
+                                                                <h5 className="text-sm font-black italic uppercase tracking-tighter text-foreground group-hover:text-primary transition-colors truncate">{ex.name}</h5>
                                                             </div>
                                                             <input
                                                                 className="w-full bg-transparent border-none text-[10px] text-slate-500 focus:outline-none font-medium italic"
-                                                                placeholder="Add training notes..."
+                                                                placeholder="Notes..."
                                                                 value={ex.notes}
                                                                 onChange={(e) => handleUpdateExercise(day.id, idx, { notes: e.target.value })}
                                                             />
                                                         </div>
 
-                                                        <div className="flex items-end gap-3 flex-wrap lg:flex-nowrap">
+                                                        <div className="flex items-center gap-2 shrink-0">
                                                             <InputField
                                                                 label="Sets"
                                                                 validateType="number"
-                                                                containerClassName="w-16"
-                                                                className="h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
+                                                                containerClassName="w-12"
+                                                                className="h-8 bg-white/5 border-white/5 font-black text-center italic rounded-lg text-xs"
                                                                 value={ex.sets.toString()}
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { sets: val })}
                                                             />
                                                             <InputField
                                                                 label="Reps"
                                                                 validateType="text"
-                                                                containerClassName="w-20"
-                                                                className="h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg uppercase"
+                                                                containerClassName="w-16"
+                                                                className="h-8 bg-white/5 border-white/5 font-black text-center italic rounded-lg text-xs"
                                                                 value={ex.reps}
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { reps: val })}
                                                             />
                                                             <InputField
-                                                                label="Rest (s)"
+                                                                label="Rest"
                                                                 validateType="number"
-                                                                containerClassName="w-28    "
-                                                                className="h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
+                                                                containerClassName="w-16    "
+                                                                className="h-8 bg-white/5 border-white/5 font-black text-center italic rounded-lg text-xs"
                                                                 value={ex.restSeconds.toString()}
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { restSeconds: val })}
                                                             />
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-10 w-10 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl mb-1"
+                                                                className="h-8 w-8 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg shrink-0"
                                                                 onClick={() => handleRemoveExercise(day.id, idx)}
                                                             >
-                                                                <Trash2 className="w-4 h-4" />
+                                                                <Trash2 className="w-3.5 h-3.5" />
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -342,12 +341,12 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                             ))}
 
                                             {(!schedule.find(d => d.day === day.id)?.exercises.length) && (
-                                                <div className="py-20 flex flex-col items-center border border-dashed border-white/10 rounded-3xl bg-white/1">
-                                                    <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
-                                                        <Dumbbell className="w-8 h-8 text-slate-700" />
+                                                <div className="py-12 flex flex-col items-center border border-dashed border-white/10 rounded-2xl bg-white/1">
+                                                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-3">
+                                                        <Dumbbell className="w-6 h-6 text-slate-700" />
                                                     </div>
-                                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">No exercises added</p>
-                                                    <p className="text-[9px] text-slate-500 mt-2 font-medium italic">Use the left panel to assign exercises</p>
+                                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">No exercises</p>
+                                                    <p className="text-[9px] text-slate-500 mt-1 font-medium italic">Assign exercises from the left panel</p>
                                                 </div>
                                             )}
                                         </div>
@@ -358,33 +357,30 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                     </div>
                 </div>
 
-                <DialogFooter className="p-8 bg-slate-950/60 border-t border-white/5">
-                    <div className="w-full flex flex-col md:flex-row gap-6 items-center justify-between">
-                        <div className="flex items-center gap-5 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 group">
-                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                <Info className="w-5 h-5 font-black" />
-                            </div>
-                            <p className="text-[11px] text-slate-400 font-bold italic leading-relaxed tracking-wide">
-                                Plans sync in real-time. <br />
-                                <span className="text-slate-200 uppercase font-black tracking-tighter">Ensure proper rest.</span>
+                <DialogFooter className="p-5 py-4 bg-slate-950/60 border-t border-white/5 shrink-0">
+                    <div className="w-full flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div className="flex items-center gap-4 px-4 py-2.5 rounded-xl bg-white/5 border border-white/5 group">
+                            <Info className="w-4 h-4 text-primary shrink-0" />
+                            <p className="text-[10px] text-slate-400 font-bold italic leading-tight">
+                                Plans sync in real-time. Ensure proper rest between sets.
                             </p>
                         </div>
-                        <div className="flex gap-4 w-full md:w-auto shrink-0">
-                            <Button variant="ghost" onClick={() => onOpenChange(false)} className="flex-1 md:flex-none h-[38px] px-10 rounded-xl text-[11px] font-black italic uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all bg-white/5 border border-white/5">
+                        <div className="flex gap-3 w-full md:w-auto shrink-0">
+                            <Button variant="ghost" onClick={() => onOpenChange(false)} className="flex-1 md:flex-none h-9 px-8 rounded-lg text-[10px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white transition-all bg-white/5">
                                 Cancel
                             </Button>
                             <Button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="flex-1 md:flex-none h-[38px] px-12 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+                                className="flex-1 md:flex-none h-9 px-10 rounded-lg bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
                             >
-                                {isSaving ? "Saving..." : (initialData ? "Update Plan" : "Save Plan")}
-                                <Save className="ml-3 w-5 h-5" />
+                                {isSaving ? "Saving..." : (initialData ? "Update" : "Save")}
+                                <Save className="ml-2 w-4 h-4" />
                             </Button>
                         </div>
                     </div>
                 </DialogFooter>
-            </DialogContent>
+ Riverside           </DialogContent>
         </Dialog>
     );
 }
