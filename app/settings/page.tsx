@@ -416,66 +416,95 @@ export default function SettingsPage() {
 
       {/* Trainer Profile Tab */}
       {activeTab === "profile" && (
-        <Card className="p-8 bg-card max-w-2xl border-border/60 shadow-sm">
-          <h2 className="text-2xl font-semibold text-foreground mb-6">Edit Profile</h2>
-          <div className="space-y-6">
-            {/* Photo Upload */}
-            <div className="space-y-2">
-              <Label>Profile Picture</Label>
-              <div className="flex items-center gap-4">
-                {trainerData.photo && (
-                  <Avatar className="w-16 h-16">
-                    <AvatarImage src={trainerData.photo} />
-                    <AvatarFallback>IMG</AvatarFallback>
-                  </Avatar>
-                )}
-                <InputField
-                  hideLabel
-                  type="file"
-                  validateType="text"
-                  accept="image/*"
-                  onChange={(val: string, e: any) => {
-                    const file = (e?.target as HTMLInputElement).files?.[0];
-                    if (file) {
-                      if (file.size > 4 * 1024 * 1024) { // 4MB limit
-                        toast.error("Image size too large (max 4MB)");
-                        return;
-                      }
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setTrainerData(prev => ({ ...prev, photo: reader.result as string }));
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                  className="cursor-pointer"
-                />
+        <Card className="glass-premium p-8 max-w-2xl border-border">
+          <div className="flex items-center gap-4 mb-8">
+            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">MY PROFILE</h3>
+            <div className="h-px flex-1 bg-white/5"></div>
+          </div>
+
+          <div className="space-y-8">
+            {/* Photo Upload Section */}
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-primary rounded-full"></div>
+                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">PROFILE_IDENTITY</Label>
               </div>
-              <p className="text-xs text-muted-foreground">Recommended: Square image, max 4MB.</p>
+              
+              <div className="flex items-center gap-6">
+                <label htmlFor="trainer-photo-upload" className="relative group/avatar cursor-pointer">
+                  <Avatar className="w-24 h-24 overflow-hidden">
+                    <AvatarImage src={trainerData.photo} className="object-cover" />
+                    <AvatarFallback className="bg-slate-900 font-black italic text-slate-500">TRAINER</AvatarFallback>
+                  </Avatar>
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center pointer-events-none rounded-full">
+                    <Plus className="w-6 h-6 text-primary animate-pulse" />
+                  </div>
+                </label>
+
+                <div className="flex-1 space-y-3">
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-loose">
+                    Update your public presence. <br/>
+                    <span className="text-primary/60 italic font-black">Recommended: Square PNG/JPG</span>
+                  </p>
+                  <label className="group inline-flex items-center h-10 px-6 rounded-xl bg-white/5 border border-white/10 text-[11px] font-black italic uppercase tracking-widest text-white hover:bg-primary hover:text-black cursor-pointer transition-all active:scale-95">
+                    <Plus className="w-4 h-4 mr-2 transition-transform duration-500 group-hover:rotate-180" />
+                    UPLOAD NEW PHOTO
+                    <input
+                    id="trainer-photo-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e: any) => {
+                        const file = (e?.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          if (file.size > 4 * 1024 * 1024) { 
+                            toast.error("Image size too large (max 4MB)");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setTrainerData(prev => ({ ...prev, photo: reader.result as string }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Bio</Label>
+            {/* Bio Section */}
+            <div className="space-y-3">
+              <Label className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                PERSONAL_MEMO / BIO
+              </Label>
               <Textarea
                 value={trainerData.bio}
                 onChange={(e) => setTrainerData({ ...trainerData, bio: e.target.value })}
-                rows={5}
-                placeholder="Tell us about yourself..."
+                rows={4}
+                placeholder="Share your experience, philosophy, and background with members..."
+                className="bg-white/5 border-white/5 focus:border-primary/50 text-white font-medium italic rounded-2xl p-6 transition-all min-h-[140px]"
               />
             </div>
 
+            {/* Specialties Section */}
             <InputField
-              label="Specialties (comma separated)"
+              label="SPECIALTIES_DOMAIN"
               validateType="text"
               value={trainerData.specialties}
               onChange={(val) => setTrainerData({ ...trainerData, specialties: val })}
-              placeholder="Yoga, HIIT, Nutrition"
+              placeholder="e.g. Hypertrophy, Yoga, Powerlifting, Nutrition"
+              className="h-12 bg-white/5 border-white/5 font-bold uppercase tracking-tight rounded-xl italic"
             />
 
-            <div className="pt-6 border-t border-border">
-              <Button onClick={handleUpdateProfile}>
-                <Save className="w-4 h-4 mr-2" />
-                Save Profile
+            <div className="pt-6 border-t border-white/5">
+              <Button 
+                onClick={handleUpdateProfile}
+                className="h-12 px-10 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95 group"
+              >
+                <Save className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
+                UPDATE_PROFILE_CHANGES
               </Button>
             </div>
           </div>

@@ -25,6 +25,14 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Filter } from "lucide-react";
 import { WorkoutPlanBuilder } from "@/components/workout-plan-builder";
 import { useAppStore } from "@/lib/store";
 import Link from "next/link";
@@ -35,6 +43,7 @@ export function WorkoutTemplates() {
     const [search, setSearch] = useState("");
     const [builderOpen, setBuilderOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState<any>(null);
+    const [frequencyFilter, setFrequencyFilter] = useState("all");
 
     useEffect(() => {
         const fetchTemplates = async () => {
@@ -45,10 +54,12 @@ export function WorkoutTemplates() {
         fetchTemplates();
     }, [loadWorkoutPlans]);
 
-    const filtered = workoutPlans.filter(t =>
-        t.name?.toLowerCase().includes(search.toLowerCase()) ||
-        t.description?.toLowerCase().includes(search.toLowerCase())
-    );
+    const filtered = workoutPlans.filter(t => {
+        const matchesSearch = t.name?.toLowerCase().includes(search.toLowerCase()) ||
+            t.description?.toLowerCase().includes(search.toLowerCase());
+        const matchesFrequency = frequencyFilter === "all" || t.schedule?.length.toString() === frequencyFilter;
+        return matchesSearch && matchesFrequency;
+    });
 
     return (
         <div className="space-y-10 animate-fade-up">
@@ -71,16 +82,44 @@ export function WorkoutTemplates() {
                 </div>
             </DashboardHeader>
 
-            <div className="flex flex-col md:flex-row gap-4">
-                <InputField
-                    hideLabel
-                    validateType="text"
-                    placeholder="SEARCH_TEMPLATES..."
-                    value={search}
-                    onChange={(val) => setSearch(val)}
-                    leadingIcon={<Search className="w-5 h-5" />}
-                    className="h-[38px] glass-premium p-0 border-border bg-card dark:bg-slate-950/40 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
-                />
+            {/* Search & Filter HUD */}
+            <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-6 backdrop-blur-md">
+                <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
+                    <Filter className="w-3.5 h-3.5 text-primary/50" />
+                    <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+                        FILTER
+                    </span>
+                </div>
+
+                <div className="flex-1 w-full flex flex-col md:flex-row gap-2">
+                    <InputField
+                        hideLabel
+                        validateType="text"
+                        placeholder="SEARCH_TEMPLATES..."
+                        value={search}
+                        onChange={(val) => setSearch(val)}
+                        leadingIcon={<Search className="w-4 h-4" />}
+                        className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+                        containerClassName="flex-1"
+                    />
+
+                    <div className="h-6 w-px bg-white/5 hidden md:block self-center" />
+
+                    <Select value={frequencyFilter} onValueChange={setFrequencyFilter}>
+                        <SelectTrigger className="h-10 w-full md:w-48 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+                            <span className="text-slate-500 mr-2">DAYS:</span>
+                            <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
+                            <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">ALL_FREQUENCIES</SelectItem>
+                            {[1, 2, 3, 4, 5, 6, 7].map((days) => (
+                                <SelectItem key={days} value={days.toString()} className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">
+                                    {days} {days === 1 ? 'DAY' : 'DAYS'}_PER_WEEK
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             {/* Templates List */}

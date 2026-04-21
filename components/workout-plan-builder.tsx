@@ -209,7 +209,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                     placeholder="Describe the plan objective..."
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="bg-white/5 border-transparent focus:border-primary/50 font-medium italic min-h-[80px] rounded-xl text-xs"
+                                    className="bg-white/5 max-h-32 border-transparent focus:border-primary/50 font-medium italic min-h-[80px] rounded-xl text-xs"
                                 />
                             </div>
                         </div>

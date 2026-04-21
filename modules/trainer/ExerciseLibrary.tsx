@@ -28,6 +28,17 @@ import { cn } from "@/lib/utils";
 import { ExerciseForm, Exercise } from "@/components/exercise-form";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+
+const MUSCLE_GROUPS = [
+    "Chest", "Back", "Legs", "Shoulders", "Arms", "Core", "Cardio", "Full Body"
+];
 
 // Interface moved to @/components/exercise-form.tsx
 
@@ -40,6 +51,7 @@ export function ExerciseLibrary() {
     const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
     const [mode, setMode] = useState<"add" | "edit" | "view">("add");
     const [deleting, setDeleting] = useState(false);
+    const [muscleFilter, setMuscleFilter] = useState("all");
 
     const fetchExercises = async () => {
         setLoading(true);
@@ -92,10 +104,12 @@ export function ExerciseLibrary() {
         fetchExercises();
     }, []);
 
-    const filtered = exercises.filter(ex =>
-        ex.name.toLowerCase().includes(search.toLowerCase()) ||
-        ex.muscleGroup.toLowerCase().includes(search.toLowerCase())
-    );
+    const filtered = exercises.filter(ex => {
+        const matchesSearch = ex.name.toLowerCase().includes(search.toLowerCase()) ||
+            ex.muscleGroup.toLowerCase().includes(search.toLowerCase());
+        const matchesMuscle = muscleFilter === "all" || ex.muscleGroup.toLowerCase() === muscleFilter.toLowerCase();
+        return matchesSearch && matchesMuscle;
+    });
 
     return (
         <div className="space-y-10 animate-fade-up">
@@ -122,20 +136,44 @@ export function ExerciseLibrary() {
                 </div>
             </DashboardHeader>
 
-            <div className="flex flex-col md:flex-row gap-4">
-                <InputField
-                    hideLabel
-                    validateType="text"
-                    placeholder="Search exercises by name or muscle group..."
-                    value={search}
-                    onChange={(val) => setSearch(val)}
-                    leadingIcon={<Search className="w-5 h-5" />}
-                    className="h-[38px] glass-premium p-0 border-border bg-card dark:bg-slate-950/40 focus:border-primary/50 text-sm font-bold rounded-2xl transition-all"
-                />
-                <Button variant="outline" className="h-[38px] px-6 rounded-2xl glass-premium p-0 border-border bg-card dark:bg-slate-950/40 hover:border-primary/20 hover:bg-white/5 text-[11px] font-black italic uppercase tracking-widest gap-3">
-                    <Filter className="w-4 h-4" />
-                    Filters
-                </Button>
+            {/* Search & Filter HUD */}
+            <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-6 backdrop-blur-md">
+                <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
+                    <Filter className="w-3.5 h-3.5 text-primary/50" />
+                    <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+                        FILTER
+                    </span>
+                </div>
+
+                <div className="flex-1 w-full flex flex-col md:flex-row gap-2">
+                    <InputField
+                        hideLabel
+                        validateType="text"
+                        placeholder="SEARCH_EXERCISES..."
+                        value={search}
+                        onChange={(val) => setSearch(val)}
+                        leadingIcon={<Search className="w-4 h-4" />}
+                        className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+                        containerClassName="flex-1"
+                    />
+
+                    <div className="h-6 w-px bg-white/5 hidden md:block self-center" />
+
+                    <Select value={muscleFilter} onValueChange={setMuscleFilter}>
+                        <SelectTrigger className="h-10 w-full md:w-48 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+                            <span className="text-slate-500 mr-2">MUSCLE:</span>
+                            <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
+                            <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">ALL_MUSCLES</SelectItem>
+                            {MUSCLE_GROUPS.map((group) => (
+                                <SelectItem key={group} value={group.toLowerCase()} className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">
+                                    {group.toUpperCase()}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             {/* Library Grid */}
