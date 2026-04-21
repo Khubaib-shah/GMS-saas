@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
 import AuditLogsClient from "@/app/audit-logs/AuditLogsClient";
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Audit Logs | GMS SaaS',
@@ -23,5 +24,9 @@ export default async function AuditLogsPage() {
      redirect("/dashboard");
   }
 
-  return <AuditLogsClient />;
+  return (
+    <Suspense fallback={<div className="text-primary font-black italic animate-pulse tracking-widest uppercase text-xs">Loading Audit Logs...</div>}>
+      <AuditLogsClient />
+    </Suspense>
+  );
 }

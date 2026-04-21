@@ -1,5 +1,10 @@
+import { Suspense } from "react";
 import SubscriptionsClient from "./SubscriptionsClient";
 
 export default function Page() {
-  return <SubscriptionsClient />;
+  return (
+    <Suspense fallback={<div className="text-primary font-black italic animate-pulse tracking-widest uppercase text-xs">Loading Subscriptions...</div>}>
+      <SubscriptionsClient />
+    </Suspense>
+  );
 }
