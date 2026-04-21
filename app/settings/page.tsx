@@ -365,7 +365,7 @@ export default function SettingsPage() {
       {activeTab === "gym" && (
         <Card className="glass-premium p-8 max-w-2xl border-border">
           <div className="flex items-center gap-4 mb-6">
-            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">GYM PROFILE</h3>
+            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Gym Profile</h3>
             <div className="h-px flex-1 bg-white/5"></div>
           </div>
           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSaveGym(); }}>
@@ -418,7 +418,7 @@ export default function SettingsPage() {
       {activeTab === "profile" && (
         <Card className="glass-premium p-8 max-w-2xl border-border">
           <div className="flex items-center gap-4 mb-8">
-            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">MY PROFILE</h3>
+            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">My Profile</h3>
             <div className="h-px flex-1 bg-white/5"></div>
           </div>
 
@@ -427,7 +427,7 @@ export default function SettingsPage() {
             <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4">
               <div className="flex items-center gap-2">
                 <div className="w-1 h-4 bg-primary rounded-full"></div>
-                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">PROFILE_IDENTITY</Label>
+                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Profile Identity</Label>
               </div>
               
               <div className="flex items-center gap-6">
@@ -448,7 +448,7 @@ export default function SettingsPage() {
                   </p>
                   <label className="group inline-flex items-center h-10 px-6 rounded-xl bg-white/5 border border-white/10 text-[11px] font-black italic uppercase tracking-widest text-white hover:bg-primary hover:text-black cursor-pointer transition-all active:scale-95">
                     <Plus className="w-4 h-4 mr-2 transition-transform duration-500 group-hover:rotate-180" />
-                    UPLOAD NEW PHOTO
+                    Upload New Photo
                     <input
                     id="trainer-photo-upload"
                       type="file"
@@ -477,7 +477,7 @@ export default function SettingsPage() {
             {/* Bio Section */}
             <div className="space-y-3">
               <Label className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
-                PERSONAL_MEMO / BIO
+                Personal Bio
               </Label>
               <Textarea
                 value={trainerData.bio}
@@ -490,7 +490,7 @@ export default function SettingsPage() {
 
             {/* Specialties Section */}
             <InputField
-              label="SPECIALTIES_DOMAIN"
+              label="Areas of Expertise"
               validateType="text"
               value={trainerData.specialties}
               onChange={(val) => setTrainerData({ ...trainerData, specialties: val })}
@@ -504,7 +504,7 @@ export default function SettingsPage() {
                 className="h-12 px-10 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95 group"
               >
                 <Save className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
-                UPDATE_PROFILE_CHANGES
+                Save Profile Changes
               </Button>
             </div>
           </div>
@@ -516,12 +516,12 @@ export default function SettingsPage() {
         <div className="space-y-6 animate-fade-in">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-4 flex-1">
-              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex-shrink-0">STAFF MEMBERS</h3>
+              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex-shrink-0">Staff Members</h3>
               <div className="h-px flex-1 bg-white/5"></div>
             </div>
             <Dialog open={isParamsOpen} onOpenChange={setIsParamsOpen}>
               <DialogTrigger asChild>
-                <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group ml-4"><Plus className="w-4 h-4 mr-2" /> ADD STAFF</Button>
+                <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group ml-4"><Plus className="w-4 h-4 mr-2" /> Add Staff</Button>
               </DialogTrigger>
               <DialogContent>
                 <form onSubmit={handleAddStaff}>
@@ -585,11 +585,11 @@ export default function SettingsPage() {
               <table className="w-full text-[11px] font-bold tracking-widest uppercase">
                 <thead>
                   <tr className="border-b border-white/5 bg-white/[0.02]">
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">NAME</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">EMAIL</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">ROLE</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">JOINED</th>
-                    <th className="text-right py-6 px-6 font-black text-slate-500 italic">ACTIONS</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Name</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Email</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Role</th>
+                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Joined</th>
+                    <th className="text-right py-6 px-6 font-black text-slate-500 italic">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

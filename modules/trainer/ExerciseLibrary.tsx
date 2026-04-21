@@ -149,7 +149,7 @@ export function ExerciseLibrary() {
                     <InputField
                         hideLabel
                         validateType="text"
-                        placeholder="SEARCH_EXERCISES..."
+                        placeholder="Search exercises..."
                         value={search}
                         onChange={(val) => setSearch(val)}
                         leadingIcon={<Search className="w-4 h-4" />}
@@ -161,11 +161,11 @@ export function ExerciseLibrary() {
 
                     <Select value={muscleFilter} onValueChange={setMuscleFilter}>
                         <SelectTrigger className="h-10 w-full md:w-48 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
-                            <span className="text-slate-500 mr-2">MUSCLE:</span>
+                            <span className="text-slate-500 mr-2">Target Muscle:</span>
                             <SelectValue placeholder="All" />
                         </SelectTrigger>
                         <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-                            <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">ALL_MUSCLES</SelectItem>
+                            <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">All Muscles</SelectItem>
                             {MUSCLE_GROUPS.map((group) => (
                                 <SelectItem key={group} value={group.toLowerCase()} className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">
                                     {group.toUpperCase()}
@@ -199,7 +199,7 @@ export function ExerciseLibrary() {
                                         <h3 className="text-xl font-black italic tracking-tighter text-foreground group-hover:text-primary transition-colors uppercase truncate max-w-[200px]">
                                             {ex.name}
                                         </h3>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">{ex.equipment || "STANDARD_EQ"}</p>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">{ex.equipment || "Standard Equipment"}</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">

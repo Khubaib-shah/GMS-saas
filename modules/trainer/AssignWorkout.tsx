@@ -106,8 +106,8 @@ export function AssignWorkout() {
         <div className="space-y-10 animate-fade-up">
             {/* Header section */}
             <DashboardHeader
-                title="PLAN"
-                highlight="ASSIGNMENT"
+                title="Plan"
+                highlight="Assignment"
                 subtitle="Assign Workout"
                 description="Assign plans and templates to your members."
                 descriptionIconColor="primary"
@@ -229,7 +229,7 @@ export function AssignWorkout() {
                                     <Button asChild className="h-10 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all group gap-2">
                                         <Link href="/workout-plans?create=true">
                                             <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-                                            CREATE TEMPLATE
+                                            Create Template
                                         </Link>
                                     </Button>
                                 </div>
@@ -259,11 +259,11 @@ export function AssignWorkout() {
                             {submitting ? (
                                 <>
                                     <Loader2 className="mr-3 w-6 h-6 animate-spin" />
-                                    ASSIGNING...
+                                    Assigning...
                                 </>
                             ) : (
                                 <>
-                                    CONFIRM ASSIGNMENT
+                                    Confirm Assignment
                                     <Check className="ml-3 w-6 h-6" />
                                 </>
                             )}

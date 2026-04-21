@@ -243,7 +243,7 @@ export function TrainerDashboard() {
                                 >
                                     <span className="flex items-center gap-3">
                                         <Dumbbell className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                                        EXERCISE LIBRARY
+                                        Exercise Library
                                     </span>
                                     <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-primary transition-all" />
                                 </Button>
@@ -254,7 +254,7 @@ export function TrainerDashboard() {
                                 >
                                     <span className="flex items-center gap-3">
                                         <Plus className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-                                        CREATE TEMPLATE
+                                        Create Template
                                     </span>
                                     <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-primary transition-all" />
                                 </Button>
@@ -265,7 +265,7 @@ export function TrainerDashboard() {
                                 >
                                     <span className="flex items-center gap-3">
                                         <Send className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                        QUICK ASSIGNMENT
+                                        Quick Assignment
                                     </span>
                                     <ChevronRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-all" />
                                 </Button>

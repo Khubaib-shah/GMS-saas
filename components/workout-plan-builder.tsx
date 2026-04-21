@@ -183,11 +183,11 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                     <div className="absolute top-0 right-0 w-64 h-full bg-primary/5 -skew-x-12 translate-x-12 opacity-50" />
                     <div className="relative">
                         <div className="flex items-center gap-4 mb-3">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">PLAN BUILDER ACTIVE</span>
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">Plan Builder Active</span>
                             <div className="h-px w-24 bg-primary/20"></div>
                         </div>
                         <DialogTitle className="text-5xl font-black italic tracking-tighter uppercase text-foreground leading-none flex items-baseline gap-3">
-                            WORKOUT <span className="text-primary">PLANNER</span>
+                            Workout <span className="text-primary">Planner</span>
                         </DialogTitle>
                     </div>
                 </DialogHeader>
@@ -204,7 +204,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                 onChange={(val) => setName(val)}
                             />
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic block">PLAN OBJECTIVE</label>
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic block">Plan Objective</label>
                                 <Textarea
                                     placeholder="Describe the plan objective..."
                                     value={description}
@@ -218,7 +218,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                             <InputField
                                 label="Exercise Library"
                                 validateType="text"
-                                placeholder="SEARCH EXERCISES..."
+                                placeholder="Search exercises..."
                                 value={exerciseSearch}
                                 onChange={(val) => setExerciseSearch(val)}
                                 leadingIcon={<Search className="w-4 h-4" />}
@@ -275,12 +275,12 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                     <Calendar className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-xl font-black italic uppercase tracking-tighter text-foreground leading-none">{day.label}_PLAN</h4>
-                                                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">EXERCISE SEQUENCE</span>
+                                                    <h4 className="text-xl font-black italic uppercase tracking-tighter text-foreground leading-none">{day.label} Plan</h4>
+                                                    <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Exercise Sequence</span>
                                                 </div>
                                             </div>
                                             <div className="px-4 py-1.5 rounded-full bg-slate-950/50 border border-white/5 text-[10px] font-black italic tracking-widest text-slate-400">
-                                                {schedule.find(d => d.day === day.id)?.exercises.length || 0} EXERCISES
+                                                {schedule.find(d => d.day === day.id)?.exercises.length || 0} Exercises
                                             </div>
                                         </div>
 
@@ -305,7 +305,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
 
                                                         <div className="flex items-end gap-3 flex-wrap lg:flex-nowrap">
                                                             <InputField
-                                                                label="SETS"
+                                                                label="Sets"
                                                                 validateType="number"
                                                                 containerClassName="w-16"
                                                                 className="h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
@@ -313,7 +313,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { sets: val })}
                                                             />
                                                             <InputField
-                                                                label="REPS"
+                                                                label="Reps"
                                                                 validateType="text"
                                                                 containerClassName="w-20"
                                                                 className="h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg uppercase"
@@ -321,7 +321,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { reps: val })}
                                                             />
                                                             <InputField
-                                                                label="REST (S)"
+                                                                label="Rest (s)"
                                                                 validateType="number"
                                                                 containerClassName="w-28    "
                                                                 className="h-10 bg-white/5 border-white/5 font-black text-center italic rounded-lg"
@@ -346,7 +346,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                     <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
                                                         <Dumbbell className="w-8 h-8 text-slate-700" />
                                                     </div>
-                                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">NO EXERCISES ADDED</p>
+                                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">No exercises added</p>
                                                     <p className="text-[9px] text-slate-500 mt-2 font-medium italic">Use the left panel to assign exercises</p>
                                                 </div>
                                             )}
@@ -365,20 +365,20 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                 <Info className="w-5 h-5 font-black" />
                             </div>
                             <p className="text-[11px] text-slate-400 font-bold italic leading-relaxed tracking-wide">
-                                PLANS SYNC IN REAL-TIME. <br />
-                                <span className="text-slate-200 uppercase font-black tracking-tighter">ENSURE PROPER REST.</span>
+                                Plans sync in real-time. <br />
+                                <span className="text-slate-200 uppercase font-black tracking-tighter">Ensure proper rest.</span>
                             </p>
                         </div>
                         <div className="flex gap-4 w-full md:w-auto shrink-0">
                             <Button variant="ghost" onClick={() => onOpenChange(false)} className="flex-1 md:flex-none h-[38px] px-10 rounded-xl text-[11px] font-black italic uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all bg-white/5 border border-white/5">
-                                CANCEL
+                                Cancel
                             </Button>
                             <Button
                                 onClick={handleSave}
                                 disabled={isSaving}
                                 className="flex-1 md:flex-none h-[38px] px-12 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
                             >
-                                {isSaving ? "SAVING..." : (initialData ? "UPDATE PLAN" : "SAVE PLAN")}
+                                {isSaving ? "Saving..." : (initialData ? "Update Plan" : "Save Plan")}
                                 <Save className="ml-3 w-5 h-5" />
                             </Button>
                         </div>

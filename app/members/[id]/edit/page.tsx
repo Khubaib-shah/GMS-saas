@@ -135,15 +135,15 @@ export default function EditMemberPage({
         <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
         <div>
           <div className="flex items-center gap-4 mb-2">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">EDIT MEMBER DETAILS</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">Edit Member Details</span>
             <div className="h-px w-24 bg-black/5 dark:bg-white/5"></div>
           </div>
           <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
-            EDIT <span className="text-primary neon-text">MEMBER</span>
+            Edit <span className="text-primary neon-text">Member</span>
           </h1>
           <div className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
-            Editing Profile for Member ID: {memberId.toUpperCase().slice(-8)}
+            Editing profile for Member ID: {memberId.toUpperCase().slice(-8)}
           </div>
         </div>
         <Link
@@ -304,7 +304,7 @@ export default function EditMemberPage({
                   <SelectValue placeholder="Select trainer" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-white/10">
-                  <SelectItem value="__none__" className="text-[10px] font-bold uppercase tracking-widest">NO TRAINER ASSIGNED</SelectItem>
+                  <SelectItem value="__none__" className="text-[10px] font-bold uppercase tracking-widest">No Trainer Assigned</SelectItem>
                   {trainers.map((trainer) => {
                     const trainerValueId = String(trainer._id || trainer.id);
                     return (
@@ -356,7 +356,7 @@ export default function EditMemberPage({
                 <div>
                   <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic mb-1 block">Member Preview</span>
                   <h3 className="text-3xl font-black italic tracking-tighter text-foreground uppercase break-all">
-                    {formData.firstName || "---"}_<span className="text-primary">{formData.lastName || "---"}</span>
+                    {formData.firstName || "---"} <span className="text-primary">{formData.lastName || "---"}</span>
                   </h3>
                 </div>
                 <div className="text-right">
@@ -394,7 +394,7 @@ export default function EditMemberPage({
                 <div>
                   <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic mb-2 block">Membership Info</span>
                   <p className="text-xs font-bold text-foreground tracking-widest uppercase">{formData.gender || "---"}</p>
-                  <p className="text-xs font-bold text-slate-400 tracking-widest mt-1 uppercase">PLAN: {(formData.planId && store.plans.find(p => p.id === formData.planId)?.name) || "NO_PLAN"}</p>
+                  <p className="text-xs font-bold text-slate-400 tracking-widest mt-1 uppercase">Plan: {(formData.planId && store.plans.find(p => p.id === formData.planId)?.name) || "No Plan"}</p>
                 </div>
               </div>
             </div>

@@ -139,11 +139,11 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                     <div className="absolute top-0 right-0 w-32 h-full bg-primary/5 -skew-x-12 translate-x-10 opacity-50" />
                     <div className="relative">
                         <div className="flex items-center gap-3 mb-3">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">EXERCISE CONFIGURATION</span>
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">Exercise Configuration</span>
                             <div className="h-px w-20 bg-primary/20"></div>
                         </div>
                         <DialogTitle className="text-4xl font-black italic tracking-tighter uppercase text-white leading-none">
-                            {isViewMode ? "EXERCISE" : isEditMode ? "EDIT" : "ADD"} <span className="text-primary/40">{isViewMode ? "DETAILS" : "EXERCISE"}</span>
+                            {isViewMode ? "Exercise" : isEditMode ? "Edit" : "Add"} <span className="text-primary/40">{isViewMode ? "Details" : "Exercise"}</span>
                         </DialogTitle>
                     </div>
                 </DialogHeader>

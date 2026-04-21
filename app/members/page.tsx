@@ -112,8 +112,8 @@ export default function MembersPage() {
   return (
     <div className="space-y-10 animate-fade-up">
       <DashboardHeader
-        title="MEMBER"
-        highlight="LIST"
+        title="Member"
+        highlight="List"
         subtitle="View and manage your members"
         description="See all your gym members in one place."
       >
@@ -191,19 +191,19 @@ export default function MembersPage() {
             <thead>
               <tr className="border-b border-white/5 bg-white/[0.02]">
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  NAME
+                  Name
                 </th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  CONTACT INFO
+                  Contact Info
                 </th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  SUBSCRIPTION
+                  Subscription
                 </th>
                 <th className="text-left py-6 px-6 font-black text-slate-500 italic">
-                  JOIN DATE
+                  Join Date
                 </th>
                 <th className="text-center py-6 px-6 font-black text-slate-500 italic">
-                  MANAGE
+                  Manage
                 </th>
               </tr>
             </thead>

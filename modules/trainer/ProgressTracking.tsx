@@ -203,8 +203,8 @@ export function ProgressTracking() {
                                         Strength <span className="text-primary/40">Progression</span> Curve
                                     </h3>
                                     <div className="flex items-center gap-2">
-                                        <Badge className="bg-primary/20 text-primary border-none text-[8px] font-black italic">COMPOUND_VOLUME</Badge>
-                                        <Badge className="bg-white/5 text-slate-500 border-none text-[8px] font-black italic">LAST_10_SESSIONS</Badge>
+                                        <Badge className="bg-primary/20 text-primary border-none text-[8px] font-black italic">Compound Volume</Badge>
+                                        <Badge className="bg-white/5 text-slate-500 border-none text-[8px] font-black italic">Last 10 Sessions</Badge>
                                     </div>
                                 </div>
 
