@@ -32,8 +32,12 @@ const GymSettingsSchema = new mongoose.Schema(
             sendSMS: { type: Boolean, default: false },
         },
         modules: {
-            trainersEnabled: { type: Boolean, default: true },
-            attendanceEnabled: { type: Boolean, default: true },
+            trainers: { type: Boolean, default: true },
+            attendance: { type: Boolean, default: true },
+            workoutPlans: { type: Boolean, default: true },
+            payments: { type: Boolean, default: true },
+            auditLogs: { type: Boolean, default: true },
+            multiBranch: { type: Boolean, default: false },
         },
     },
     { timestamps: true }

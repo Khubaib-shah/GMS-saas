@@ -98,6 +98,11 @@ export const authOptions: NextAuthOptions = {
                     if (gym?.subscriptionStatus === "expired" && user.role !== "super_admin") {
                         throw new Error(`EXPIRED:Your subscription or trial package has expired. Please contact support to renew.`);
                     }
+
+                    // Fetch feature profile
+                    const featureProfile = await subscriptionService.getGymFeatureProfile(user.gymId.toString());
+                    (user as any).featureFlags = featureProfile?.planFlags || [];
+                    (user as any).modules = featureProfile?.modules || {};
                 }
 
                 return {
@@ -108,7 +113,9 @@ export const authOptions: NextAuthOptions = {
                     gymId: user.gymId ? user.gymId.toString() : null,
                     branchId: user.branchId ? user.branchId.toString() : null,
                     customPermissions: user.customPermissions || [],
-                    isPremium
+                    isPremium,
+                    featureFlags: (user as any).featureFlags || [],
+                    modules: (user as any).modules || {}
                 };
             },
         }),
@@ -122,6 +129,8 @@ export const authOptions: NextAuthOptions = {
                 token.branchId = (user as any).branchId;
                 token.customPermissions = (user as any).customPermissions;
                 token.isPremium = (user as any).isPremium;
+                token.featureFlags = (user as any).featureFlags;
+                token.modules = (user as any).modules;
             }
             return token;
         },
@@ -133,6 +142,8 @@ export const authOptions: NextAuthOptions = {
                 (session.user as any).branchId = token.branchId;
                 (session.user as any).customPermissions = token.customPermissions;
                 (session.user as any).isPremium = token.isPremium;
+                (session.user as any).featureFlags = token.featureFlags;
+                (session.user as any).modules = token.modules;
             }
             return session;
         },

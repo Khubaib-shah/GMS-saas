@@ -13,30 +13,39 @@ interface NavItem {
 }
 
 import { useAppStore } from "@/lib/store"
+import { useFeature, FeatureKey } from "@/hooks/use-feature"
 
 export function Sidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
   const gymName = useAppStore((state) => state.gymProfile.name)
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
-  const setSidebarCollapsed = useAppStore((state) => state.setSidebarCollapsed)
   const role = (session?.user as any)?.role
-  const isPremium = (session?.user as any)?.isPremium
+
+  // Feature checks
+  const { status: attendanceStatus } = useFeature("attendance")
+  const { status: paymentsStatus } = useFeature("payments")
+  const { status: trainersStatus } = useFeature("trainers")
+  const { status: workoutStatus } = useFeature("workoutPlans")
+  const { status: auditStatus } = useFeature("auditLogs")
 
   const navItems: NavItem[] = [
-    ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : [{ label: "My Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }]),
+    { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: "Members", href: "/members", icon: <Users className="w-5 h-5" /> },
-    ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> }] : []),
-    ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> }] : []),
-    ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> }] : []),
-    ...((session?.user as any)?.role === 'trainer' ? [
+    ...(attendanceStatus !== "hidden" && role !== 'trainer' ? [{ label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> }] : []),
+    ...(paymentsStatus !== "hidden" && role !== 'trainer' ? [{ label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> }] : []),
+    ...(paymentsStatus !== "hidden" && role !== 'trainer' ? [{ label: "Payments", href: "/payments", icon: <CreditCard className="w-5 h-5" /> }] : []),
+    ...(workoutStatus !== "hidden" && role === 'trainer' ? [
       { label: "Exercises", href: "/trainer/exercises", icon: <Dumbbell className="w-5 h-5" /> },
       { label: "Templates", href: "/trainer/templates", icon: <ClipboardList className="w-5 h-5" /> },
       { label: "Plan Assignment", href: "/trainer/deploy", icon: <ClipboardList className="w-5 h-5" /> },
-      { label: "Reports", href: "/trainer/analytics", icon: <TrendingUp className="w-5 h-5" /> },
     ] : []),
-    ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
-    ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [{ label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> }] : []),
+    ...(trainersStatus !== "hidden" ? (
+      role === 'trainer' 
+        ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] 
+        : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]
+    ) : []),
+    ...(auditStatus !== "hidden" && (role === 'owner' || role === 'gym_owner') ? [{ label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> }] : []),
     { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
   ]
 

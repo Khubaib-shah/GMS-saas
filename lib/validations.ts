@@ -26,6 +26,14 @@ export const BusinessSettingsSchema = z.object({
     joiningFee: z.number().min(0).optional(),
     autoExpireDays: z.number().min(0).max(365).optional(),
     gracePeriodDays: z.number().min(0).max(90).optional(),
+    modules: z.object({
+        trainers: z.boolean().optional(),
+        attendance: z.boolean().optional(),
+        workoutPlans: z.boolean().optional(),
+        payments: z.boolean().optional(),
+        auditLogs: z.boolean().optional(),
+        multiBranch: z.boolean().optional(),
+    }).optional(),
 }).strict();
 
 export const NotificationSettingsSchema = z.object({
@@ -35,8 +43,12 @@ export const NotificationSettingsSchema = z.object({
 }).strict();
 
 export const ModuleSettingsSchema = z.object({
-    trainersEnabled: z.boolean().optional(),
-    attendanceEnabled: z.boolean().optional(),
+    trainers: z.boolean().optional(),
+    attendance: z.boolean().optional(),
+    workoutPlans: z.boolean().optional(),
+    payments: z.boolean().optional(),
+    auditLogs: z.boolean().optional(),
+    multiBranch: z.boolean().optional(),
 }).strict();
 
 // ─────────────────────────────────────────────────
@@ -99,7 +111,14 @@ export function buildSetObject(section: string, data: Record<string, any>): Reco
     const $set: Record<string, any> = {};
     for (const [key, value] of Object.entries(data)) {
         if (value !== undefined) {
-            $set[`${section}.${key}`] = value;
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                // Handle nested objects like modules
+                for (const [subKey, subValue] of Object.entries(value)) {
+                    $set[`${section}.${key}.${subKey}`] = subValue;
+                }
+            } else {
+                $set[`${section}.${key}`] = value;
+            }
         }
     }
     return $set;

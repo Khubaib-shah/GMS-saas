@@ -36,10 +36,8 @@ function formatPKR(amount: number) {
 }
 
 const FEATURE_OPTIONS = [
-    "members", "subscriptions", "payments", "attendance",
-    "trainersModule", "advancedReports", "dietModule",
-    "branches", "multipleTrainers", "workoutPlanner",
-    "memberPortal", "api_access",
+    "attendance", "trainers", "workoutPlans", "payments",
+    "auditLogs", "multiBranch", "members", "subscriptions"
 ];
 
 const emptyPlan = {
