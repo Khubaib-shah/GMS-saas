@@ -110,7 +110,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
           )}
         </div>
 
-        {description && <FieldDescription className="text-[9px] text-slate-500 font-bold uppercase">{description}</FieldDescription>}
+        {description && <FieldDescription className="text-[9px] text-slate-500 font-bold uppercase pl-[5px] !mt-px">{description}</FieldDescription>}
 
         {error && !hideLabel && (
           <FieldError className="text-[10px] font-bold italic tracking-wider mt-1 text-destructive animate-fade-in absolute top-full left-1">
