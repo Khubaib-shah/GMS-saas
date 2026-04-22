@@ -34,7 +34,10 @@ export async function GET() {
         settings = settings.toJSON();
     }
 
-    return NextResponse.json({ business: (settings as any).business });
+    return NextResponse.json({ 
+        business: (settings as any).business,
+        modules: (settings as any).modules 
+    });
 }
 
 /**
@@ -95,5 +98,8 @@ export async function PUT(req: Request) {
         action: "settings_update",
     });
 
-    return NextResponse.json({ business: (updated as any).business });
+    return NextResponse.json({ 
+        business: (updated as any).business,
+        modules: (updated as any).modules 
+    });
 }

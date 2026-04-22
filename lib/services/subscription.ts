@@ -1,5 +1,7 @@
 import connectDB from "@/lib/db";
 import Gym from "@/models/Gym";
+import GymSettings from "@/models/GymSettings";
+import PlatformPlan from "@/models/PlatformPlan";
 
 export const subscriptionService = {
     /**
@@ -58,6 +60,26 @@ export const subscriptionService = {
         return {
             expiredTrials: trialResult.modifiedCount,
             expiredActive: activeResult.modifiedCount
+        };
+    },
+
+    /**
+     * Fetches the feature profile for a gym, combining plan-level 
+     * allowed features and gym-level enabled modules.
+     */
+    async getGymFeatureProfile(gymId: string) {
+        await connectDB();
+        const gym = await Gym.findById(gymId).populate("platformPlanId");
+        if (!gym) return null;
+
+        const settings = await GymSettings.findOne({ gymId });
+        
+        const planFlags = (gym.platformPlanId as any)?.featureFlags || [];
+        const modules = settings?.modules || {};
+
+        return {
+            planFlags,
+            modules
         };
     }
 };

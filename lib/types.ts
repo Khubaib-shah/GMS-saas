@@ -109,4 +109,12 @@ export type BusinessSettings = {
   joiningFee: number
   autoExpireDays: number
   gracePeriodDays: number
+  modules?: {
+    trainers: boolean
+    attendance: boolean
+    workoutPlans: boolean
+    payments: boolean
+    auditLogs: boolean
+    multiBranch: boolean
+  }
 }

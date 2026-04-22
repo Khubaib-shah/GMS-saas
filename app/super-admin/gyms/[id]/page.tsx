@@ -341,21 +341,14 @@ export default function GymDetailPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                        { key: "members", label: "Members Registry" },
-                        { key: "subscriptions", label: "Billing & Subscriptions" },
-                        { key: "payments", label: "Payment History" },
                         { key: "attendance", label: "Attendance Core" },
-                        { key: "manualAttendance", label: "Manual Attendance" },
-                        { key: "qrAttendance", label: "QR Access Control" },
-                        { key: "workoutPlanner", label: "Workout Planner" },
-                        { key: "dietModule", label: "Diet & Nutrition" },
-                        { key: "advancedReports", label: "Advanced Analytics" },
-                        { key: "trainersModule", label: "Trainers/Staff" },
-                        { key: "branches", label: "Multi-Branch Support" },
-                        { key: "memberPortal", label: "Customer Portal" },
-                        { key: "api_access", label: "External API" },
+                        { key: "trainers", label: "Trainers/Staff" },
+                        { key: "workoutPlans", label: "Workout Plans" },
+                        { key: "payments", label: "Payments Registry" },
+                        { key: "auditLogs", label: "Security Logs" },
+                        { key: "multiBranch", label: "Multi-Branch Support" },
                     ].map((f) => {
-                        const isEnabled = (gym as any).enabledFeatures?.includes(f.key);
+                        const isEnabled = gym.modules?.[f.key] ?? true;
                         return (
                             <div 
                                 key={f.key} 
