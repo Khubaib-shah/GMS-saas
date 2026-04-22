@@ -474,7 +474,7 @@ export default function AuditlogsClient() {
                 <div className="flex items-center gap-4">
                   <div>
                     <DialogTitle className="text-xl font-black italic uppercase tracking-tighter text-white leading-none mb-1.5">
-                      AUDIT <span className="text-primary">TRACE</span>
+                      LOG <span className="text-primary">DETAILS</span>
                     </DialogTitle>
                     <DialogDescription className="font-mono text-[9px] text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
@@ -503,21 +503,21 @@ export default function AuditlogsClient() {
                   <div className="p-4 bg-slate-950/40 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
                     <Calendar className="w-4 h-4 text-primary/60 mt-1" />
                     <div>
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">OCCURRED AT</h4>
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">TIME</h4>
                       <p className="font-mono text-xs text-slate-200">{format(new Date(selectedLog.createdAt), "MMM d, yyyy // HH:mm:ss")}</p>
                     </div>
                   </div>
                   <div className="p-4 bg-slate-950/60 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
                     <Globe className="w-4 h-4 text-primary/60 mt-1" />
                     <div>
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">NETWORK ORIGIN</h4>
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">IP ADDRESS</h4>
                       <p className="font-mono text-xs text-slate-200">{selectedLog.ipAddress || "SYSTEM_INTERNAL"}</p>
                     </div>
                   </div>
                   <div className="p-4 bg-slate-950/60 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
                     <User className="w-4 h-4 text-primary/60 mt-1" />
                     <div>
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">INITIATOR</h4>
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">USER</h4>
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="font-black italic uppercase text-xs text-slate-200">{selectedLog.userName}</p>
                         {(selectedLog as any).userRole && (
@@ -532,7 +532,7 @@ export default function AuditlogsClient() {
                   <div className="p-4 bg-slate-950/40 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
                     <Layers className="w-4 h-4 text-primary/60 mt-1" />
                     <div>
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">TARGET RESOURCE</h4>
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">RESOURCE</h4>
                       <p className="font-black italic uppercase text-xs text-slate-200 mb-0.5">{selectedLog.resource}</p>
                       <p className="font-mono text-[9px] text-slate-500 truncate max-w-[150px]">ID: {selectedLog.resourceId}</p>
                     </div>
@@ -544,7 +544,7 @@ export default function AuditlogsClient() {
                   <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 relative overflow-hidden group">
                     <div className="flex items-center gap-2 mb-2 relative z-10">
                       <Terminal className="w-3.5 h-3.5 text-primary/50" />
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">ENVIRONMENT</h4>
+                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">DETAILS</h4>
                     </div>
                     <p className="text-[10px] font-mono text-slate-400 break-all leading-relaxed relative z-10 opacity-70 group-hover:opacity-100 transition-opacity">
                       {selectedLog.userAgent}
@@ -559,7 +559,7 @@ export default function AuditlogsClient() {
                     <div className="flex items-center gap-2">
                       <Box className="w-4 h-4 text-primary" />
                       <h4 className="text-[12px] font-black italic uppercase tracking-tighter text-white">
-                        DATA <span className="text-primary">PAYLOAD</span>
+                        DATA <span className="text-primary">CHANGES</span>
                       </h4>
                     </div>
                     <div className="flex items-center gap-2">
@@ -590,7 +590,7 @@ export default function AuditlogsClient() {
               onClick={() => setSelectedLog(null)}
               className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white"
             >
-              Close Trace
+              Close Log
             </Button>
           </div>
         </DialogContent>

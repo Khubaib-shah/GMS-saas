@@ -85,7 +85,7 @@ export function BusinessSettings() {
                     "px-2 py-1 rounded-md text-[8px] font-black italic uppercase tracking-widest border transition-all duration-500",
                     loading ? "border-amber-500/20 bg-amber-500/5 text-amber-500 animate-pulse" : "border-emerald-500/20 bg-emerald-500/5 text-emerald-500"
                 )}>
-                    {loading ? "Syncing..." : "Synchronized"}
+                    {loading ? "Loading..." : "Saved"}
                 </div>
             </div>
 
@@ -164,7 +164,7 @@ export function BusinessSettings() {
                         className="h-11 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-xs rounded-lg neon-glow flex items-center gap-2"
                     >
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                        UPDATE POLICIES
+                        SAVE CHANGES
                     </Button>
                 </div>
             </div>

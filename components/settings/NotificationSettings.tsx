@@ -75,17 +75,17 @@ export function NotificationSettings() {
             <div className="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
                 <div>
                     <h3 className="text-xl font-black italic uppercase tracking-tighter text-white flex items-center gap-2">
-                        NOTIFICATION <span className="text-primary">ENGINE</span>
+                        NOTIFICATION <span className="text-primary">SETTINGS</span>
                     </h3>
                     <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">
-                        System alerts and member communication
+                        Configure alerts and communications
                     </p>
                 </div>
                 <div className={cn(
                     "px-2 py-1 rounded-md text-[8px] font-black italic uppercase tracking-widest border transition-all duration-500",
                     loading ? "border-amber-500/20 bg-amber-500/5 text-amber-500 animate-pulse" : "border-emerald-500/20 bg-emerald-500/5 text-emerald-500"
                 )}>
-                    {loading ? "Syncing..." : "Synchronized"}
+                    {loading ? "Loading..." : "Saved"}
                 </div>
             </div>
 
@@ -156,7 +156,7 @@ export function NotificationSettings() {
                 <div className="pt-6 border-t border-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-[9px] font-mono text-slate-500 uppercase tracking-widest">
                         <Zap className="w-3 h-3 text-primary animate-pulse" />
-                        Relay System: Active
+                        Status: Ready
                     </div>
                     <Button 
                         onClick={handleSave} 
@@ -164,7 +164,7 @@ export function NotificationSettings() {
                         className="h-11 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-xs rounded-lg neon-glow flex items-center gap-2"
                     >
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                        SAVE PREFERENCES
+                        SAVE CHANGES
                     </Button>
                 </div>
             </div>

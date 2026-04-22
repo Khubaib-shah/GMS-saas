@@ -238,7 +238,7 @@ export default function SettingsPage() {
 
 
 
-        {(isAdmin || (!isAdmin && !isTrainer)) && (
+        {session && (isAdmin || (!isAdmin && !isTrainer)) && (
           <button
             onClick={() => setActiveTab("staff")}
             className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "staff"
@@ -252,7 +252,7 @@ export default function SettingsPage() {
         )}
 
         {/* New: Settings Modules */}
-        {(isAdmin || (!isAdmin && !isTrainer && can('settings:view' as any))) && (
+        {session && (isAdmin || (!isAdmin && !isTrainer && can('settings:view' as any))) && (
           <>
             <button
               onClick={() => setActiveTab("general_settings")}
@@ -287,12 +287,12 @@ export default function SettingsPage() {
           </>
         )}
 
-        {(isAdmin || (!isAdmin && !isTrainer && can('roles:view' as any))) && (
+        {session && (isAdmin || (!isAdmin && !isTrainer && can('roles:view' as any))) && (
           <button
             onClick={() => setActiveTab("roles")}
-            className={`px-4 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest italic transition-all whitespace-nowrap ${activeTab === "roles"
-              ? "bg-primary text-black neon-glow"
-              : "bg-white/5 text-slate-500 hover:text-white hover:bg-white/10"
+            className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "roles"
+              ? "text-primary border-primary"
+              : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
           >
             <Shield className="w-3.5 h-3.5 inline-block mr-2 -mt-0.5" />
@@ -318,7 +318,7 @@ export default function SettingsPage() {
                 <div className="w-1 h-4 bg-primary rounded-full"></div>
                 <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Profile Identity</Label>
               </div>
-              
+
               <div className="flex items-center gap-6">
                 <label htmlFor="trainer-photo-upload" className="relative group/avatar cursor-pointer">
                   <Avatar className="w-24 h-24 overflow-hidden">
@@ -332,21 +332,21 @@ export default function SettingsPage() {
 
                 <div className="flex-1 space-y-3">
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-loose">
-                    Update your public presence. <br/>
+                    Update your public presence. <br />
                     <span className="text-primary/60 italic font-black">Recommended: Square PNG/JPG</span>
                   </p>
                   <label className="group inline-flex items-center h-10 px-6 rounded-xl bg-white/5 border border-white/10 text-[11px] font-black italic uppercase tracking-widest text-white hover:bg-primary hover:text-black cursor-pointer transition-all active:scale-95">
                     <Plus className="w-4 h-4 mr-2 transition-transform duration-500 group-hover:rotate-180" />
                     Upload New Photo
                     <input
-                    id="trainer-photo-upload"
+                      id="trainer-photo-upload"
                       type="file"
                       accept="image/*"
                       className="hidden"
                       onChange={(e: any) => {
                         const file = (e?.target as HTMLInputElement).files?.[0];
                         if (file) {
-                          if (file.size > 4 * 1024 * 1024) { 
+                          if (file.size > 4 * 1024 * 1024) {
                             toast.error("Image size too large (max 4MB)");
                             return;
                           }
@@ -388,7 +388,7 @@ export default function SettingsPage() {
             />
 
             <div className="pt-6 border-t border-white/5">
-              <Button 
+              <Button
                 onClick={handleUpdateProfile}
                 className="h-12 px-10 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95 group"
               >

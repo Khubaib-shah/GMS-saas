@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
     Dialog,
@@ -54,14 +53,23 @@ export function RoleManagement() {
     const fetchRoles = useCallback(async () => {
         try {
             const res = await fetch("/api/roles");
-            if (!res.ok) throw new Error("Failed to fetch roles");
-            const data = await res.json();
-            setRoles(data.roles || []);
+            if (!res.ok) throw new Error("Failed to load roles");
+
+            const text = await res.text();
+            if (!text) return;
+            const data = JSON.parse(text);
+
+            const rolesWithId = (data.roles || []).map((r: any) => ({
+                ...r,
+                id: r.id || r._id
+            }));
+
+            setRoles(rolesWithId);
             setAllPermissions(data.allPermissions || []);
-            
+
             // Update cache
             localStorage.setItem(CACHE_KEY, JSON.stringify({
-                roles: data.roles || [],
+                roles: rolesWithId,
                 allPermissions: data.allPermissions || []
             }));
         } catch {
@@ -77,7 +85,11 @@ export function RoleManagement() {
         if (cached) {
             try {
                 const parsed = JSON.parse(cached);
-                setRoles(parsed.roles || []);
+                const rolesWithId = (parsed.roles || []).map((r: any) => ({
+                    ...r,
+                    id: r.id || r._id
+                }));
+                setRoles(rolesWithId);
                 setAllPermissions(parsed.allPermissions || []);
                 setLoading(false);
             } catch (e) {
@@ -121,8 +133,12 @@ export function RoleManagement() {
                 body: JSON.stringify(formData),
             });
             if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || "Failed to save role");
+                let errorMsg = "Failed to save role";
+                try {
+                    const err = await res.json();
+                    errorMsg = err.message || errorMsg;
+                } catch (e) { }
+                throw new Error(errorMsg);
             }
             toast.success(editingRole ? "Role updated" : "Role created");
             setDialogOpen(false);
@@ -147,8 +163,12 @@ export function RoleManagement() {
         try {
             const res = await fetch(`/api/roles/${roleToDelete.id}`, { method: "DELETE" });
             if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || "Failed to delete");
+                let errorMsg = "Failed to delete";
+                try {
+                    const err = await res.json();
+                    errorMsg = err.message || errorMsg;
+                } catch (e) { }
+                throw new Error(errorMsg);
             }
             toast.success("Role deleted");
             fetchRoles();
@@ -174,44 +194,39 @@ export function RoleManagement() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h3 className="text-xl font-black italic uppercase tracking-tighter text-white flex items-center gap-2">
-                        AUTH <span className="text-primary">MATRICES</span>
+                        ROLE <span className="text-primary">MANAGEMENT</span>
                     </h3>
                     <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">
-                        Granular permission control and role hierarchy
+                        Manage user permissions and access levels
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className={cn(
-                        "px-2 py-1 rounded-md text-[8px] font-black italic uppercase tracking-widest border transition-all duration-500",
-                        loading ? "border-amber-500/20 bg-amber-500/5 text-amber-500 animate-pulse" : "border-emerald-500/20 bg-emerald-500/5 text-emerald-500"
-                    )}>
-                        {loading ? "Syncing..." : "Synchronized"}
-                    </div>
+
                     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button 
-                                onClick={openCreate} 
+                            <Button
+                                onClick={openCreate}
                                 className="h-10 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-xs rounded-lg neon-glow flex items-center gap-2"
                             >
-                                <Plus className="w-4 h-4" /> NEW AUTHORITY
+                                <Plus className="w-4 h-4" /> NEW ROLE
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl max-h-[90vh] glass-premium border-white/10 bg-slate-950/90 backdrop-blur-2xl p-0 overflow-hidden">
                             <DialogHeader className="p-6 border-b border-white/5 bg-white/[0.02]">
                                 <DialogTitle className="text-xl font-black italic uppercase tracking-tighter text-white">
-                                    {editingRole ? "RESTRICT" : "INITIALIZE"} <span className="text-primary">AUTHORITY</span>
+                                    {editingRole ? "EDIT" : "CREATE"} <span className="text-primary">ROLE</span>
                                 </DialogTitle>
                                 <DialogDescription className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">
                                     {editingRole?.isSystemRole
-                                        ? "System-Locked Matrix: Modify permissions only"
-                                        : "Custom Authority: Define name and access matrix"}
+                                        ? "System Role: You can only change permissions"
+                                        : "Custom Role: Set name and permissions"}
                                 </DialogDescription>
                             </DialogHeader>
 
                             <div className="p-6 space-y-6 overflow-y-auto max-h-[60vh] custom-scrollbar">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <InputField
-                                        label="Authority Identifier"
+                                        label="Role Name"
                                         validateType="text"
                                         value={formData.name}
                                         onChange={val => setFormData({ ...formData, name: val })}
@@ -221,11 +236,11 @@ export function RoleManagement() {
                                         className="bg-white/5 border-white/5"
                                     />
                                     <InputField
-                                        label="Security Description"
+                                        label="Description"
                                         validateType="text"
                                         value={formData.description}
                                         onChange={val => setFormData({ ...formData, description: val })}
-                                        placeholder="Purpose of this access level"
+                                        placeholder="Purpose of this role"
                                         className="bg-white/5 border-white/5"
                                     />
                                 </div>
@@ -234,22 +249,22 @@ export function RoleManagement() {
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2">
                                         <div className="w-1 h-4 bg-primary rounded-full"></div>
-                                        <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Permission Access Matrix</Label>
+                                        <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Permissions</Label>
                                     </div>
-                                    
+
                                     {editingRole?.name === "owner" ? (
                                         <div className="p-6 rounded-2xl bg-primary/5 border border-primary/20 flex items-center gap-4">
                                             <Lock className="w-8 h-8 text-primary animate-pulse" />
                                             <div>
-                                                <p className="text-[11px] font-black italic text-white uppercase tracking-tighter">UNRESTRICTED OVERRIDE</p>
-                                                <p className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-1">The Owner role has hard-coded access to all system modules.</p>
+                                                <p className="text-[11px] font-black italic text-white uppercase tracking-tighter">FULL ACCESS</p>
+                                                <p className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-1">The Owner role has full access to all system modules.</p>
                                             </div>
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
                                             {Object.entries(groupedPermissions).map(([category, perms]) => (
                                                 <div key={category} className="space-y-3 p-4 rounded-2xl bg-white/[0.02] border border-white/5 group/cat hover:border-white/10 transition-colors">
-                                                    <p className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 group-hover/cat:text-primary transition-colors">{category} Module</p>
+                                                    <p className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 group-hover/cat:text-primary transition-colors">{category}</p>
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                         {perms.map(perm => (
                                                             <label key={perm} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] cursor-pointer transition-all active:scale-95 group/perm">
@@ -272,20 +287,20 @@ export function RoleManagement() {
                             </div>
 
                             <DialogFooter className="p-6 border-t border-white/5 bg-white/[0.01]">
-                                <Button 
-                                    variant="ghost" 
+                                <Button
+                                    variant="ghost"
                                     onClick={() => setDialogOpen(false)}
                                     className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white"
                                 >
-                                    ABORT
+                                    CANCEL
                                 </Button>
-                                <Button 
-                                    onClick={handleSave} 
+                                <Button
+                                    onClick={handleSave}
                                     disabled={saving || editingRole?.name === "owner"}
                                     className="h-10 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-xs neon-glow"
                                 >
                                     {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                                    COMMIT AUTHORITY
+                                    SAVE ROLE
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -297,10 +312,10 @@ export function RoleManagement() {
                 <Table>
                     <TableHeader className="bg-white/[0.02]">
                         <TableRow className="border-b border-white/5 hover:bg-transparent">
-                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14 pl-6">Identifier</TableHead>
-                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14">Protocol Type</TableHead>
-                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14">Access Matrix</TableHead>
-                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14 text-right pr-6">Override</TableHead>
+                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14 pl-6">Role Name</TableHead>
+                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14">Type</TableHead>
+                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14">Permissions</TableHead>
+                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14 text-right pr-6">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -331,11 +346,11 @@ export function RoleManagement() {
                                     <TableCell>
                                         {role.isSystemRole ? (
                                             <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[8px] font-black italic uppercase tracking-widest">
-                                                <Lock className="w-2.5 h-2.5 mr-1" /> CORE
+                                                <Lock className="w-2.5 h-2.5 mr-1" /> SYSTEM
                                             </div>
                                         ) : (
                                             <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary text-[8px] font-black italic uppercase tracking-widest">
-                                                MODIFIED
+                                                CUSTOM
                                             </div>
                                         )}
                                     </TableCell>
@@ -344,17 +359,17 @@ export function RoleManagement() {
                                             {role.name === "owner" ? (
                                                 <span className="text-primary italic font-black uppercase">FULL ACCESS</span>
                                             ) : (
-                                                <span className="uppercase tracking-tighter font-bold">{role.permissions.length} NODES MAPPED</span>
+                                                <span className="uppercase tracking-tighter font-bold">{role.permissions.length} PERMISSIONS</span>
                                             )}
                                         </span>
                                     </TableCell>
                                     <TableCell className="text-right space-x-2 pr-6">
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            onClick={() => openEdit(role)} 
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => openEdit(role)}
                                             disabled={role.name === "owner"}
-                                            className="h-8 w-8 rounded-lg border border-white/5 bg-white/[0.02] text-slate-500 hover:text-white hover:border-white/10 transition-all opacity-0 group-hover/row:opacity-100"
+                                            className="h-8 w-8 rounded-lg border  text-white hover:text-white hover:border-white/20 transition-all"
                                         >
                                             <Edit2 className="w-3.5 h-3.5" />
                                         </Button>
@@ -363,7 +378,7 @@ export function RoleManagement() {
                                             size="icon"
                                             onClick={() => handleDelete(role)}
                                             disabled={role.isSystemRole}
-                                            className="h-8 w-8 rounded-lg border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/row:opacity-100"
+                                            className="h-8 w-8 rounded-lg border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-100 group-hover/row:opacity-100"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
                                         </Button>
@@ -379,9 +394,9 @@ export function RoleManagement() {
                 isOpen={!!roleToDelete}
                 onClose={() => setRoleToDelete(null)}
                 onConfirm={confirmDelete}
-                title="TERMINATE AUTHORITY"
-                description={`Are you sure you want to completely erase the "${roleToDelete?.name}" access matrix? Users bound to this identifier will lose all derived privileges.`}
-                confirmText="CONFIRM DELETION"
+                title="DELETE ROLE"
+                description={`Are you sure you want to delete the "${roleToDelete?.name}" role? Users with this role will lose their access.`}
+                confirmText="DELETE ROLE"
             />
         </div>
     );
