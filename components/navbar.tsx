@@ -180,7 +180,7 @@ export function Navbar() {
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-2 ml-auto">
+      <div className="flex items-center md:gap-2 ml-auto">
 
 
         {/* Notifications */}
@@ -198,78 +198,85 @@ export function Navbar() {
           </Button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 top-14 w-80 glass-premium bg-background/90 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-0 z-50 card-enter overflow-hidden">
-              <div className="px-5 py-4 border-b border-border bg-secondary/50 flex items-center justify-between">
-                <div>
-                  <h3 className="font-black text-xs text-foreground tracking-widest uppercase">Notifications</h3>
-                  <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-0.5">Operational Activity</p>
-                </div>
-                {finalHasNotifications && (
-                  <button
-                    onClick={() => store.clearNotifications(activeNotifications.map(n => n.id))}
-                    className="text-[10px] font-black text-primary hover:text-white transition-colors uppercase tracking-widest"
-                  >
-                    Clear All
-                  </button>
-                )}
-              </div>
+            <>
+              {/* Mobile Overlay to close on click outside */}
               <div
-                className="max-h-[400px] overflow-y-auto p-3 space-y-2 custom-scrollbar overscroll-contain"
-                data-lenis-prevent
-              >
-                {activeNotifications.length > 0 ? (
-                  activeNotifications.map(note => (
-                    <div
-                      key={note.id}
-                      className={cn(
-                        "group/note relative p-3 hover:bg-black/5 dark:hover:bg-white/10 rounded-xl cursor-pointer transition-all border border-black/5 dark:border-white/5",
-                        "bg-black/5 dark:bg-white/5"
-                      )}
-                      onClick={() => {
-                        if (note.memberId) {
-                          router.push(`/members/${note.memberId}`)
-                          setNotificationsOpen(false)
-                        }
-                      }}
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+                onClick={() => setNotificationsOpen(false)}
+              />
+              <div className="fixed inset-x-4 top-20 md:absolute md:right-0 md:top-14 md:w-80 md:inset-x-auto glass-premium bg-background/100 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-0 z-50 card-enter overflow-hidden">
+                <div className="px-5 py-4 border-b border-border bg-secondary/50 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-black text-xs text-foreground tracking-widest uppercase">Notifications</h3>
+                    <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-0.5">Operational Activity</p>
+                  </div>
+                  {finalHasNotifications && (
+                    <button
+                      onClick={() => store.clearNotifications(activeNotifications.map(n => n.id))}
+                      className="text-[10px] font-black text-primary hover:text-white transition-colors uppercase tracking-widest"
                     >
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          store.dismissNotification(note.id)
+                      Clear All
+                    </button>
+                  )}
+                </div>
+                <div
+                  className="max-h-[400px] overflow-y-auto p-3 space-y-2 custom-scrollbar overscroll-contain"
+                  data-lenis-prevent
+                >
+                  {activeNotifications.length > 0 ? (
+                    activeNotifications.map(note => (
+                      <div
+                        key={note.id}
+                        className={cn(
+                          "group/note relative p-3 hover:bg-black/5 dark:hover:bg-white/10 rounded-xl cursor-pointer transition-all border border-black/5 dark:border-white/5",
+                          "bg-black/5 dark:bg-white/5"
+                        )}
+                        onClick={() => {
+                          if (note.memberId) {
+                            router.push(`/members/${note.memberId}`)
+                            setNotificationsOpen(false)
+                          }
                         }}
-                        className="absolute right-2 top-2 p-1 rounded-lg opacity-0 group-hover/note:opacity-100 hover:bg-white/10 transition-all"
                       >
-                        <X className="w-3 h-3 text-slate-500 hover:text-white" />
-                      </button>
-                      <div className="flex items-center gap-2 mb-2 pr-6">
-                        <div className="p-1.5 rounded-lg bg-secondary border border-border text-primary group-hover/note:neon-glow transition-all">
-                          {note.icon}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            store.dismissNotification(note.id)
+                          }}
+                          className="absolute right-2 top-2 p-1 rounded-lg opacity-0 group-hover/note:opacity-100 hover:bg-white/10 transition-all"
+                        >
+                          <X className="w-3 h-3 text-slate-500 hover:text-white" />
+                        </button>
+                        <div className="flex items-center gap-2 mb-2 pr-6">
+                          <div className="p-1.5 rounded-lg bg-secondary border border-border text-primary group-hover/note:neon-glow transition-all">
+                            {note.icon}
+                          </div>
+                          <p className="text-xs font-black text-foreground leading-none tracking-tight uppercase italic">{note.title}</p>
                         </div>
-                        <p className="text-xs font-black text-foreground leading-none tracking-tight uppercase italic">{note.title}</p>
+                        <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">{note.message}</p>
                       </div>
-                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed pl-1">{note.message}</p>
+                    ))
+                  ) : (
+                    <div className="p-10 text-center">
+                      <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 border border-white/5 group-hover:neon-glow transition-all">
+                        <Bell className="w-6 h-6 text-slate-700" />
+                      </div>
+                      <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">No Active Alerts</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="p-10 text-center">
-                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 border border-white/5 group-hover:neon-glow transition-all">
-                      <Bell className="w-6 h-6 text-slate-700" />
-                    </div>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">No Active Alerts</p>
+                  )}
+                </div>
+                {notifications.length > 0 && (
+                  <div className="p-3 border-t border-white/5 bg-white/5 text-center">
+                    <button className="text-[10px] font-black text-slate-400 hover:text-primary transition-colors uppercase tracking-widest" onClick={() => setNotificationsOpen(false)}>Dismiss Overview</button>
                   </div>
                 )}
               </div>
-              {notifications.length > 0 && (
-                <div className="p-3 border-t border-white/5 bg-white/5 text-center">
-                  <button className="text-[10px] font-black text-slate-400 hover:text-primary transition-colors uppercase tracking-widest" onClick={() => setNotificationsOpen(false)}>Dismiss Overview</button>
-                </div>
-              )}
-            </div>
+            </>
           )}
         </div>
 
         {/* User Divider */}
-        <div className="h-8 w-px bg-white/5 mx-3"></div>
+        <div className="hidden md:flex h-8 w-px bg-white/5 mx-3"></div>
 
         {/* User Profile */}
         <DropdownMenu>

@@ -208,92 +208,92 @@ export default function AuditlogsClient() {
         </div>
       </DashboardHeader>
 
-      {/* ULTRA-COMPACT FILTERS HUD */}
-      <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-6 backdrop-blur-md">
-        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
-          <Filter className="w-3.5 h-3.5 text-primary/50" />
-          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
-            FILTER
-          </span>
-        </div>
+      {/* PREMIUM FILTERS HUD */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 p-3 md:p-2 rounded-2xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-xl relative overflow-hidden group/hud">
+        {/* Glow effect */}
+        <div className="absolute top-0 right-0 p-20 bg-primary/5 blur-3xl rounded-full -mr-10 -mt-10 opacity-0 group-hover/hud:opacity-100 transition-opacity pointer-events-none" />
 
-        <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-2">
-          <Select value={resource} onValueChange={setResource}>
-            <SelectTrigger className="h-9 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
-              <span className="text-slate-500 mr-2">Resource:</span>
-              <SelectValue placeholder="All" />
-            </SelectTrigger>
-            <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-              <SelectItem
-                value="all"
-                className="text-[10px] font-bold italic uppercase"
-              >
-                All Types
-              </SelectItem>
-              {RESOURCES.map((r) => (
-                <SelectItem
-                  key={r}
-                  value={r}
-                  className="text-[10px] font-bold italic uppercase"
-                >
-                  {r}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={action} onValueChange={setAction}>
-            <SelectTrigger className="h-9 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
-              <span className="text-slate-500 mr-2">Action:</span>
-              <SelectValue placeholder="All" />
-            </SelectTrigger>
-            <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-              <SelectItem
-                value="all"
-                className="text-[10px] font-bold italic uppercase"
-              >
-                All Actions
-              </SelectItem>
-              {ACTIONS.map((a) => (
-                <SelectItem
-                  key={a}
-                  value={a}
-                  className="text-[10px] font-bold italic uppercase"
-                >
-                  {a.replace("_", " ")}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <div className="relative group">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 uppercase italic">
-              Search:
-            </div>
-            <InputField
-              placeholder=""
-              value={userId}
-              onChange={(val) => setUserId(val)}
-              onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
-              className="!pl-16 h-9 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider pl-8 w-full focus:ring-0"
-              hideLabel
-            />
+        <div className="flex items-center gap-3 px-4 border-r border-white/10 hidden lg:flex">
+          <Filter className="w-4 h-4 text-primary" />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black italic tracking-[0.2em] text-white uppercase leading-none">
+              FILTERS
+            </span>
+            <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-1">
+              Refinement
+            </span>
           </div>
         </div>
 
-        <div className="flex gap-1 pl-2 border-l border-white/10">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-2">
+          <div className="flex w-full md:col-span-2 gap-4">
+            {/* Resource Filter */}
+            <div className="space-y-1.5 w-full">
+              <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Resource</span>
+              <Select value={resource} onValueChange={setResource}>
+                <SelectTrigger className="!w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0 px-4">
+                  <span className="text-slate-500 mr-2 hidden lg:inline">Resource:</span>
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent className="glass-premium border-white/10 bg-slate-950/98 backdrop-blur-2xl">
+                  <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Types</SelectItem>
+                  {RESOURCES.map((r) => (
+                    <SelectItem key={r} value={r} className="text-[10px] font-bold italic uppercase">{r}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Action Filter */}
+            <div className="space-y-1.5 w-full">
+              <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Action</span>
+              <Select value={action} onValueChange={setAction}>
+                <SelectTrigger className="w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0 px-4">
+                  <span className="text-slate-500 mr-2 hidden lg:inline">Action:</span>
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent className="glass-premium border-white/10 bg-slate-950/98 backdrop-blur-2xl">
+                  <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Actions</SelectItem>
+                  {ACTIONS.map((a) => (
+                    <SelectItem key={a} value={a} className="text-[10px] font-bold italic uppercase">{a.replace("_", " ")}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Search Filter */}
+          <div className="space-y-1.5 md:col-span-2 lg:col-span-1">
+            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Search</span>
+            <div className="relative group/search">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 uppercase italic hidden lg:block">
+                Search:
+              </div>
+              <InputField
+                placeholder="Search logs..."
+                value={userId}
+                onChange={(val) => setUserId(val)}
+                onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
+                className="!pl-4 lg:!pl-16 h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider w-full focus:ring-0"
+                hideLabel
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 pt-2 lg:pt-0 lg:pl-3 border-t lg:border-t-0 lg:border-l border-white/10 mt-2 lg:mt-0">
           <Button
             onClick={handleApplyFilters}
-            className="h-9 px-4 bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-[10px] rounded-lg neon-glow"
+            className="flex-1 lg:flex-none h-10 md:h-9 px-8 bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-[11px] rounded-xl lg:rounded-lg neon-glow shadow-lg shadow-primary/20"
           >
             Apply
           </Button>
           <Button
             variant="ghost"
             onClick={handleResetFilters}
-            className="h-9 w-9 text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-lg p-0"
+            className="h-10 w-10 md:h-9 md:w-9 text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl lg:rounded-lg p-0 border border-white/5 lg:border-none"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </div>

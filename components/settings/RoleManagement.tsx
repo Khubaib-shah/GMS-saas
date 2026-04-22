@@ -191,7 +191,7 @@ export function RoleManagement() {
 
     return (
         <div className="space-y-6 animate-fade-up">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-row md:items-center justify-between gap-4">
                 <div>
                     <h3 className="text-xl font-black italic uppercase tracking-tighter text-white flex items-center gap-2">
                         ROLE <span className="text-primary">MANAGEMENT</span>
@@ -313,7 +313,7 @@ export function RoleManagement() {
                     <TableHeader className="bg-white/[0.02]">
                         <TableRow className="border-b border-white/5 hover:bg-transparent">
                             <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14 pl-6">Role Name</TableHead>
-                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14">Type</TableHead>
+                            <TableHead className="hidden md:table-cell text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14">Type</TableHead>
                             <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14">Permissions</TableHead>
                             <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14 text-right pr-6">Actions</TableHead>
                         </TableRow>
@@ -340,10 +340,10 @@ export function RoleManagement() {
                                     <TableCell className="py-5 pl-6">
                                         <div className="flex flex-col">
                                             <span className="text-[11px] font-black italic text-white uppercase tracking-tighter">{role.name}</span>
-                                            {role.description && <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-0.5">{role.description}</span>}
+                                            {role.description && <span className="hidden md:inline-flex text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-0.5">{role.description}</span>}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="hidden md:table-cell">
                                         {role.isSystemRole ? (
                                             <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[8px] font-black italic uppercase tracking-widest">
                                                 <Lock className="w-2.5 h-2.5 mr-1" /> SYSTEM

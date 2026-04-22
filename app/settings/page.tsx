@@ -210,6 +210,15 @@ export default function SettingsPage() {
 
 
 
+  const tabs = [
+    { id: "profile", label: "My Profile", icon: <UserCheck className="w-4 h-4" />, show: isTrainer },
+    { id: "staff", label: "Staff Management", icon: <Users className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer)) },
+    { id: "general_settings", label: "General", icon: <Settings2 className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("settings:view" as any))) },
+    { id: "business_settings", label: "Business", icon: <DollarSign className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("settings:view" as any))) },
+    { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("settings:view" as any))) },
+    { id: "roles", label: "Roles", icon: <Shield className="w-3.5 h-3.5" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("roles:view" as any))) },
+  ].filter((t) => t.show)
+
   return (
     <div className="animate-fade-up space-y-10">
       <DashboardHeader
@@ -219,86 +228,46 @@ export default function SettingsPage() {
         description="Update your information and settings."
       />
 
-      {/* Tab Navigation */}
-      <div className="flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto no-scrollbar">
+      {/* Mobile Tab Select */}
+      <div className="md:hidden mb-8">
+        <Select value={activeTab} onValueChange={(v: any) => setActiveTab(v)}>
+          <SelectTrigger className="w-full h-12 bg-white/5 border-white/10 text-white font-black italic tracking-widest uppercase rounded-xl px-6">
+            <SelectValue placeholder="Navigate Settings" />
+          </SelectTrigger>
+          <SelectContent className="glass-premium border-border p-2">
+            {tabs.map((tab) => (
+              <SelectItem
+                key={tab.id}
+                value={tab.id}
+                className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-3 focus:bg-primary focus:text-black"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="text-primary">{tab.icon}</div>
+                  {tab.label}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-
-        {isTrainer && (
+      {/* Desktop Tab Navigation */}
+      <div className="hidden md:flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto no-scrollbar">
+        {tabs.map((tab) => (
           <button
-            onClick={() => setActiveTab("profile")}
-            className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "profile"
-              ? "text-primary border-primary"
-              : "text-muted-foreground border-transparent hover:text-foreground"
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`px-4 py-3 font-black text-[11px] uppercase tracking-[0.15em] italic border-b-2 transition-all flex items-center gap-2 ${activeTab === tab.id
+              ? "text-primary border-primary neon-text"
+              : "text-slate-500 border-transparent hover:text-foreground hover:border-white/10"
               }`}
           >
-            <UserCheck className="w-4 h-4 inline-block mr-2" />
-            My Profile
+            <span className={activeTab === tab.id ? "text-primary" : "text-slate-500"}>
+              {tab.icon}
+            </span>
+            {tab.label}
           </button>
-        )}
-
-
-
-        {session && (isAdmin || (!isAdmin && !isTrainer)) && (
-          <button
-            onClick={() => setActiveTab("staff")}
-            className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "staff"
-              ? "text-primary border-primary"
-              : "text-muted-foreground border-transparent hover:text-foreground"
-              }`}
-          >
-            <Users className="w-4 h-4 inline-block mr-2" />
-            Staff Management
-          </button>
-        )}
-
-        {/* New: Settings Modules */}
-        {session && (isAdmin || (!isAdmin && !isTrainer && can('settings:view' as any))) && (
-          <>
-            <button
-              onClick={() => setActiveTab("general_settings")}
-              className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "general_settings"
-                ? "text-primary border-primary"
-                : "text-muted-foreground border-transparent hover:text-foreground"
-                }`}
-            >
-              <Settings2 className="w-4 h-4 inline-block mr-2" />
-              General
-            </button>
-            <button
-              onClick={() => setActiveTab("business_settings")}
-              className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "business_settings"
-                ? "text-primary border-primary"
-                : "text-muted-foreground border-transparent hover:text-foreground"
-                }`}
-            >
-              <DollarSign className="w-4 h-4 inline-block mr-2" />
-              Business
-            </button>
-            <button
-              onClick={() => setActiveTab("notifications")}
-              className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "notifications"
-                ? "text-primary border-primary"
-                : "text-muted-foreground border-transparent hover:text-foreground"
-                }`}
-            >
-              <Bell className="w-4 h-4 inline-block mr-2" />
-              Notifications
-            </button>
-          </>
-        )}
-
-        {session && (isAdmin || (!isAdmin && !isTrainer && can('roles:view' as any))) && (
-          <button
-            onClick={() => setActiveTab("roles")}
-            className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === "roles"
-              ? "text-primary border-primary"
-              : "text-muted-foreground border-transparent hover:text-foreground"
-              }`}
-          >
-            <Shield className="w-3.5 h-3.5 inline-block mr-2 -mt-0.5" />
-            Roles
-          </button>
-        )}
+        ))}
       </div>
 
 
@@ -403,7 +372,7 @@ export default function SettingsPage() {
       {/* Staff Tab */}
       {activeTab === "staff" && (
         <div className="space-y-6 animate-fade-in">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4 flex-1">
               <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex-shrink-0">Staff Members</h3>
               <div className="h-px flex-1 bg-white/5"></div>
@@ -496,7 +465,7 @@ export default function SettingsPage() {
                         </td>
                         <td className="hidden lg:table-cell py-6 px-6 text-slate-500 font-mono text-[10px]">{new Date(s.createdAt).toLocaleDateString()}</td>
                         <td className="py-6 px-4 md:px-6 text-right">
-                          <Button variant="ghost" size="sm" className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/row:opacity-100" onClick={() => handleDeleteStaff(s._id || s.id)}>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-100 md:opacity-0 md:group-hover/row:opacity-100" onClick={() => handleDeleteStaff(s._id || s.id)}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </td>
