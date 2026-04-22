@@ -98,10 +98,10 @@ export function MembersTable({
               <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
                 Member Name
               </th>
-              <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
+              <th className="hidden lg:table-cell text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
                 Join Date
               </th>
-              <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
+              <th className="hidden sm:table-cell text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
                 Renewal Date
               </th>
               <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
@@ -122,10 +122,10 @@ export function MembersTable({
                   <td className="py-6 px-6 font-black italic tracking-tighter text-base">
                     {item.member.firstName} {item.member.lastName || ""}
                   </td>
-                  <td className="py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
+                  <td className="hidden lg:table-cell py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
                     {formatDate(item.member.joinDate)}
                   </td>
-                  <td className="py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
+                  <td className="hidden sm:table-cell py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
                     {item.subscription
                       ? formatDate(item.subscription.endDate)
                       : "—"}

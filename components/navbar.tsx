@@ -124,38 +124,49 @@ export function Navbar() {
   }
 
   const hasNotifications = notifications.length > 0
-
-  // Filter out dismissed
   const activeNotifications = notifications.filter(n => !store.dismissedNotifications.includes(n.id))
   const finalHasNotifications = activeNotifications.length > 0
 
   const sidebarCollapsed = store.sidebarCollapsed
   const setSidebarCollapsed = store.setSidebarCollapsed
+  const mobileMenuOpen = store.mobileMenuOpen
+  const setMobileMenuOpen = store.setMobileMenuOpen
 
   return (
     <header className={cn(
-      "fixed top-0 right-0 h-16 glass-premium border-b border-border flex items-center justify-between px-6 z-40 transition-all duration-300 ease-in-out",
-      sidebarCollapsed ? "left-20" : "left-64"
+      "fixed top-0 right-0 h-16 glass-premium border-b border-border flex items-center justify-between px-4 md:px-6 z-40 transition-all duration-300 ease-in-out left-0",
+      "lg:left-64",
+      sidebarCollapsed && "lg:left-20"
     )}>
-      <div className="flex items-center gap-4">
-        {/* Toggle Button */}
+      <div className="flex items-center gap-2 md:gap-4">
+        {/* Toggle Button - Desktop */}
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="h-9 w-9 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-xl"
+          className="h-9 w-9 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-xl hidden lg:flex"
         >
           <Menu className="w-5 h-5" />
         </Button>
 
+        {/* Toggle Button - Mobile */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="h-9 w-9 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-xl lg:hidden"
+        >
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </Button>
+
         {!isAdmin && (
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 neon-glow">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-[10px] font-black text-primary uppercase tracking-widest italic">{gymName}</span>
+          <div className="flex items-center gap-2 px-3 md:px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 neon-glow overflow-hidden">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse flex-shrink-0" />
+            <span className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest italic truncate max-w-[80px] md:max-w-none">{gymName}</span>
           </div>
         )}
         {/* Search Bar - Subtler */}
-        <div data-tour="navbar-search" className="flex-1 max-w-sm hidden md:block">
+        <div data-tour="navbar-search" className="flex-1 max-w-sm hidden lg:block">
           <InputField
             hideLabel
             validateType="text"

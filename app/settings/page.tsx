@@ -305,7 +305,7 @@ export default function SettingsPage() {
 
       {/* Trainer Profile Tab */}
       {activeTab === "profile" && (
-        <Card className="glass-premium p-8 max-w-2xl border-border">
+        <Card className="glass-premium p-4 md:p-8 max-w-2xl border-border">
           <div className="flex items-center gap-4 mb-8">
             <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">My Profile</h3>
             <div className="h-px flex-1 bg-white/5"></div>
@@ -474,11 +474,11 @@ export default function SettingsPage() {
               <table className="w-full text-[11px] font-bold tracking-widest uppercase">
                 <thead>
                   <tr className="border-b border-white/5 bg-white/[0.02]">
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Name</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Email</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Role</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Joined</th>
-                    <th className="text-right py-6 px-6 font-black text-slate-500 italic">Actions</th>
+                    <th className="text-left py-6 px-4 md:px-6 font-black text-slate-500 italic">Name</th>
+                    <th className="hidden md:table-cell text-left py-6 px-6 font-black text-slate-500 italic">Email</th>
+                    <th className="text-left py-6 px-4 md:px-6 font-black text-slate-500 italic">Role</th>
+                    <th className="hidden lg:table-cell text-left py-6 px-6 font-black text-slate-500 italic">Joined</th>
+                    <th className="text-right py-6 px-4 md:px-6 font-black text-slate-500 italic">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -489,13 +489,13 @@ export default function SettingsPage() {
                   ) : (
                     staff.map((s) => (
                       <tr key={s.id || s._id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                        <td className="py-6 px-6 font-black italic text-foreground tracking-tighter">{s.fullName}</td>
-                        <td className="py-6 px-6 font-mono text-slate-400 lowercase">{s.email}</td>
-                        <td className="py-6 px-6">
-                          <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest uppercase">{s.role}</span>
+                        <td className="py-6 px-4 md:px-6 font-black italic text-foreground tracking-tighter">{s.fullName}</td>
+                        <td className="hidden md:table-cell py-6 px-6 font-mono text-slate-400 lowercase">{s.email}</td>
+                        <td className="py-6 px-4 md:px-6">
+                          <span className="bg-primary/10 text-primary border border-primary/20 px-2 md:px-3 py-1 rounded-lg text-[8px] md:text-[9px] font-black italic tracking-widest uppercase">{s.role}</span>
                         </td>
-                        <td className="py-6 px-6 text-slate-500 font-mono text-[10px]">{new Date(s.createdAt).toLocaleDateString()}</td>
-                        <td className="py-6 px-6 text-right">
+                        <td className="hidden lg:table-cell py-6 px-6 text-slate-500 font-mono text-[10px]">{new Date(s.createdAt).toLocaleDateString()}</td>
+                        <td className="py-6 px-4 md:px-6 text-right">
                           <Button variant="ghost" size="sm" className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/row:opacity-100" onClick={() => handleDeleteStaff(s._id || s.id)}>
                             <Trash2 className="w-4 h-4" />
                           </Button>

@@ -68,8 +68,9 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
             <Sidebar />
             <Navbar />
             <main className={cn(
-              "mt-16 p-8 transition-all duration-300 ease-in-out",
-              sidebarCollapsed ? "ml-20" : "ml-64"
+              "mt-16 p-4 md:p-8 transition-all duration-300 ease-in-out min-h-[calc(100vh-4rem)]",
+              "ml-0 lg:ml-64",
+              sidebarCollapsed && "lg:ml-20"
             )}>
               {children}
             </main>

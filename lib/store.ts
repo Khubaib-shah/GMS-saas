@@ -79,6 +79,8 @@ export type AppState = {
   // Sidebar
   sidebarCollapsed: boolean
   setSidebarCollapsed: (collapsed: boolean) => void
+  mobileMenuOpen: boolean
+  setMobileMenuOpen: (open: boolean) => void
 
   // Notifications
   dismissedNotifications: string[]
@@ -766,6 +768,8 @@ export const useAppStore = create<AppState>()(
       // -------------------------
       sidebarCollapsed: false,
       setSidebarCollapsed: (collapsed: boolean) => set({ sidebarCollapsed: collapsed }),
+      mobileMenuOpen: false,
+      setMobileMenuOpen: (open: boolean) => set({ mobileMenuOpen: open }),
 
       // -------------------------
       // NOTIFICATIONS

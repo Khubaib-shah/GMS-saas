@@ -45,7 +45,7 @@ export function DashboardHeader({
               <div className="h-px w-24 bg-white/5"></div>
             </div>
           )}
-          <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-tight md:leading-none">
             {title} {highlight && <span className="text-primary neon-text">{highlight}</span>}
           </h1>
           {description && (
