@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import { AttendanceResult } from "./attendance-result";
+import { div } from "three/src/nodes/math/OperatorNode.js";
 
 export function AttendanceScanner() {
   const store = useAppStore();
@@ -47,7 +48,7 @@ export function AttendanceScanner() {
         controlsRef.current = null;
       }
       setIsVideoReady(false);
-      
+
       if (!useCamera) {
         inputRef.current?.focus();
       }
@@ -73,11 +74,11 @@ export function AttendanceScanner() {
           }
         }
       ).then((controls) => {
-          if (!isMounted) {
-            controls.stop();
-          } else {
-            controlsRef.current = controls;
-          }
+        if (!isMounted) {
+          controls.stop();
+        } else {
+          controlsRef.current = controls;
+        }
       }).catch(err => {
         console.error(err);
         toast.error(`Camera Error: ${err.message || err}`);
@@ -217,7 +218,7 @@ export function AttendanceScanner() {
         </div>
       ) : (
         <>
-          <form onSubmit={handleManualScan} className="flex gap-2">
+          <form onSubmit={handleManualScan} className="flex">
             <InputField
               ref={inputRef}
               hideLabel
@@ -226,13 +227,19 @@ export function AttendanceScanner() {
               value={scanValue}
               onChange={(val) => setScanValue(val)}
               disabled={loading}
+              className="w-full border-r-0 rounded-r-none"
               autoComplete="off"
             />
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="h-12 px-6 rounded-r-md rounded-l-none text-[10px] font-black  bg-primary text-primary-foreground transition-all">
               {loading ? "..." : "Enter"}
             </Button>
           </form>
-          <div className="flex justify-end mt-2">
+          <div className="flex justify-between mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
+              {useCamera
+                ? "Allow camera access when prompted."
+                : "Click inside the box and scan the member's QR/Barcode."}
+            </p>
             <Button
               variant="ghost"
               size="sm"
@@ -244,11 +251,7 @@ export function AttendanceScanner() {
         </>
       )}
 
-      <p className="text-xs text-muted-foreground mt-2">
-        {useCamera
-          ? "Allow camera access when prompted."
-          : "Click inside the box and scan the member's QR/Barcode."}
-      </p>
+
 
       {result && (
         <div className="mt-6">

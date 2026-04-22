@@ -61,15 +61,16 @@ export function DateRangePicker({
               </span>
             )}
             {date && (
-              <button
+              <span
+                role="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDateChange(undefined);
                 }}
-                className="ml-auto p-1 rounded-full hover:bg-white/10 transition-colors"
+                className="ml-auto p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <X className="w-3 h-3 text-slate-500" />
-              </button>
+              </span>
             )}
           </Button>
         </PopoverTrigger>

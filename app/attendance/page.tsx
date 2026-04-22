@@ -6,12 +6,13 @@ import { ManualEntry } from "@/components/attendance/manual-entry";
 import { AttendanceScanner } from "@/components/attendance/attendance-scanner";
 import { AttendanceStats } from "@/components/attendance/attendance-stats";
 import { DashboardHeader } from "@/components/dashboard-header";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, Lock, Sparkles, Filter, Search } from "lucide-react";
 import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
+import { PaginationHUD } from "@/components/ui/pagination-hud";
 import {
     Table,
     TableBody,
@@ -31,6 +32,8 @@ export default function AttendancePage() {
     const [loading, setLoading] = useState(true);
     const [loadingReports, setLoadingReports] = useState(false);
     const [search, setSearch] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 10;
 
     useEffect(() => {
         const loadData = async () => {
@@ -51,6 +54,10 @@ export default function AttendancePage() {
             fetchReports();
         }
     }, [activeTab, store.gymProfile?._id]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search]);
 
     const fetchReports = async () => {
         if (!store.gymProfile?._id) return;
@@ -73,6 +80,17 @@ export default function AttendancePage() {
         }
     };
 
+    const filteredReports = useMemo(() => {
+        return reports.filter(r =>
+            `${r.memberId?.firstName || ""} ${r.memberId?.lastName || ""}`.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [reports, search]);
+
+    const paginatedReports = useMemo(() => {
+        const start = (currentPage - 1) * pageSize;
+        return filteredReports.slice(start, start + pageSize);
+    }, [filteredReports, currentPage]);
+
     return (
         <div className="space-y-10 animate-fade-up">
             <DashboardHeader
@@ -87,13 +105,13 @@ export default function AttendancePage() {
             <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
                 <div className="glass-premium p-2 mb-8 border-border w-max mx-auto md:mx-0">
                     <TabsList className="bg-transparent h-auto p-0 gap-2 flex">
-                        <TabsTrigger 
+                        <TabsTrigger
                             value="mark"
                             className="h-10 px-6 rounded-lg text-[10px] font-black uppercase italic tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
                         >
                             Mark Attendance
                         </TabsTrigger>
-                        <TabsTrigger 
+                        <TabsTrigger
                             value="reports"
                             className="h-10 px-6 rounded-lg text-[10px] font-black uppercase italic tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
                         >
@@ -155,7 +173,7 @@ export default function AttendancePage() {
                             />
                         </div>
                     </div>
-                
+
                     <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
                         <div className="overflow-x-auto">
                             <table className="w-full text-[11px] font-bold tracking-widest uppercase">
@@ -191,8 +209,8 @@ export default function AttendancePage() {
                                                 </td>
                                             </tr>
                                         ))
-                                    ) : reports.filter(r => `${r.memberId?.firstName || ""} ${r.memberId?.lastName || ""}`.toLowerCase().includes(search.toLowerCase())).length > 0 ? (
-                                        reports.filter(r => `${r.memberId?.firstName || ""} ${r.memberId?.lastName || ""}`.toLowerCase().includes(search.toLowerCase())).map((record: any) => {
+                                    ) : filteredReports.length > 0 ? (
+                                        paginatedReports.map((record: any) => {
                                             return (
                                                 <tr key={record.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
                                                     <td className="py-6 px-6 font-black italic text-foreground tracking-tighter">
@@ -233,6 +251,12 @@ export default function AttendancePage() {
                                 </tbody>
                             </table>
                         </div>
+                        <PaginationHUD
+                            totalItems={filteredReports.length}
+                            pageSize={pageSize}
+                            currentPage={currentPage}
+                            onPageChange={setCurrentPage}
+                        />
                     </div>
                 </TabsContent>
             </Tabs>

@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { PaginationHUD } from "@/components/ui/pagination-hud";
 import { InputField } from "@/components/ui/input-field";
 import {
   Select,
@@ -151,11 +152,7 @@ export default function AuditlogsClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, resource, action]);
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      setPagination((prev) => ({ ...prev, page: newPage }));
-    }
-  };
+
 
   const handleApplyFilters = () => {
     setPagination((prev) => ({ ...prev, page: 1 }));
@@ -434,31 +431,12 @@ export default function AuditlogsClient() {
           </Table>
         </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between p-2 border-t">
-          <div className="text-sm text-muted-foreground">
-            Page {pagination.page} of {pagination.totalPages} (
-            {pagination.total} total)
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(pagination.page - 1)}
-              disabled={pagination.page <= 1 || loading}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(pagination.page + 1)}
-              disabled={pagination.page >= pagination.totalPages || loading}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <PaginationHUD
+          totalItems={pagination.total}
+          pageSize={pagination.limit}
+          currentPage={pagination.page}
+          onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+        />
       </Card>
 
       {/* Details Dialog */}

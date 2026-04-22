@@ -13,7 +13,13 @@ import {
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 
-export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean }) {
+export function MembersTable({ 
+  trainerOnly = false, 
+  mode = "recent" 
+}: { 
+  trainerOnly?: boolean,
+  mode?: "recent" | "expiring"
+}) {
   const store = useAppStore();
   const { data: session } = useSession();
   const userId = (session?.user as any)?.id;
@@ -31,8 +37,8 @@ export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean })
     return list;
   }, [store.members, trainerOnly, userId]);
 
-  const expiringMembers = useMemo(() => {
-    return relevantMembers
+  const displayMembers = useMemo(() => {
+    let filtered = relevantMembers
       .filter((member) => {
         if (!store.searchQuery) return true;
         const lower = store.searchQuery.toLowerCase();
@@ -47,22 +53,17 @@ export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean })
           (s) => s.memberId === member.id
         );
 
-        // 1. Try local history
         let activeSub = subs.find((s) => isSubscriptionActive(s.endDate, s.status));
-
-        // 2. Fallback to injected status
         if (!activeSub && (member as any).activeSubscription) {
           activeSub = (member as any).activeSubscription;
         }
 
         const daysLeft = activeSub ? daysUntilExpiry(activeSub.endDate) : -1;
-
-        // Check for paused in history
         const latestSubInHistory = [...subs].sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())[0];
         const isPaused = activeSub?.status === "paused" || latestSubInHistory?.status === "paused";
 
         if (isPaused) {
-          return { member, subscription: activeSub, daysLeft: -1, status: "active" as const };
+          return { member, subscription: activeSub, status: "paused" as const, daysLeft: -1 };
         }
 
         return {
@@ -70,32 +71,26 @@ export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean })
           subscription: activeSub,
           daysLeft,
           status:
-            daysLeft > 0 && daysLeft <= 7
+            daysLeft >= 0 && daysLeft <= 7
               ? ("expiring" as const)
               : daysLeft > 7
                 ? ("active" as const)
                 : ("expired" as const),
         };
-      })
-      .sort((a, b) => {
-        // Priority: Expiring soon > Expired > Active
-        if (a.status === "expiring" && b.status !== "expiring") return -1;
-        if (a.status !== "expiring" && b.status === "expiring") return 1;
-        if (a.status === "expired" && b.status === "active") return -1;
-        if (a.status === "active" && b.status === "expired") return 1;
-        return 0;
-      })
-      .slice(0, 10);
-  }, [relevantMembers, store.subscriptions, store.searchQuery]);
+      });
+
+    if (mode === "expiring") {
+      filtered = filtered.filter(item => item.status === "expiring" || item.status === "expired");
+      filtered.sort((a, b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999));
+    } else {
+      filtered.sort((a, b) => new Date(b.member.joinDate).getTime() - new Date(a.member.joinDate).getTime());
+    }
+
+    return filtered.slice(0, 10);
+  }, [relevantMembers, store.subscriptions, store.searchQuery, mode]);
 
   return (
     <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
-      <div className="p-8 pb-2">
-        <h3 className="text-2xl font-black italic tracking-tighter text-foreground uppercase">
-          Attention Needed ({expiringMembers.length})
-        </h3>
-      </div>
-
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -118,43 +113,50 @@ export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean })
             </tr>
           </thead>
           <tbody>
-            {expiringMembers.length > 0 ? (
-              expiringMembers.map((item) => (
+            {displayMembers.length > 0 ? (
+              displayMembers.map((item) => (
                 <tr
                   key={item.member.id}
                   className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row"
                 >
                   <td className="py-6 px-6 font-black italic tracking-tighter text-base">
-                      {item.member.firstName} {item.member.lastName || ""}
-                    </td>
-                    <td className="py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
-                      {formatDate(item.member.joinDate)}
-                    </td>
-                    <td className="py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
-                      {item.subscription
-                        ? formatDate(item.subscription.endDate)
-                        : "—"}
-                    </td>
-                    <td className="py-6 px-6">
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
-                          item.status === "active"
-                            ? "bg-primary/10 border-primary/20 text-primary"
-                            : "bg-amber-500/10 border-amber-500/20 text-amber-500"
-                        )}
-                      >
-                        <div className={cn("w-1 h-1 rounded-full", item.status === "active" ? "bg-primary" : "bg-amber-500")} />
-                        {item.status === "active" ? "Active" : "Exp Soon"}
-                      </span>
-                    </td>
-                    <td className="py-6 px-6 text-center">
-                      <Link href={`/members/${item.member.id}`}>
-                        <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all uppercase">
-                          {trainerOnly ? "View" : "Renew"}
-                        </Button>
-                      </Link>
-                    </td>
+                    {item.member.firstName} {item.member.lastName || ""}
+                  </td>
+                  <td className="py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
+                    {formatDate(item.member.joinDate)}
+                  </td>
+                  <td className="py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
+                    {item.subscription
+                      ? formatDate(item.subscription.endDate)
+                      : "—"}
+                  </td>
+                  <td className="py-6 px-6">
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest uppercase",
+                        item.status === "active"
+                          ? "bg-primary/10 border-primary/20 text-primary"
+                          : item.status === "expiring"
+                            ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                            : item.status === "paused"
+                              ? "bg-blue-500/10 border-blue-500/20 text-blue-500"
+                              : "bg-rose-500/10 border-rose-500/20 text-rose-500"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-1 h-1 rounded-full",
+                        item.status === "active" ? "bg-primary" : item.status === "expiring" ? "bg-amber-500" : item.status === "paused" ? "bg-blue-500" : "bg-rose-500"
+                      )} />
+                      {item.status === "active" ? "Active" : item.status === "expiring" ? "Exp Soon" : item.status === "paused" ? "Paused" : "Expired"}
+                    </span>
+                  </td>
+                  <td className="py-6 px-6 text-center">
+                    <Link href={`/members/${item.member.id}`}>
+                      <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all uppercase">
+                        {trainerOnly ? "View" : "Renew"}
+                      </Button>
+                    </Link>
+                  </td>
                 </tr>
               ))
             ) : (
@@ -163,7 +165,7 @@ export function MembersTable({ trainerOnly = false }: { trainerOnly?: boolean })
                   colSpan={5}
                   className="py-8 text-center text-muted-foreground"
                 >
-                  No members requiring attention
+                  No members found.
                 </td>
               </tr>
             )}

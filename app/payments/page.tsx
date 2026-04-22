@@ -31,6 +31,7 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Bar, BarChart, Cell, Pie,
 import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
 import { Button } from "@/components/ui/button"
+import { PaginationHUD } from "@/components/ui/pagination-hud"
 import {
   ChartConfig,
   ChartContainer,
@@ -53,6 +54,8 @@ export default function PaymentsPage() {
   const [filterPeriod, setFilterPeriod] = useState<"this-month" | "last-month" | "all">("this-month")
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
 
   useEffect(() => {
     const loadData = async () => {
@@ -65,6 +68,10 @@ export default function PaymentsPage() {
     }
     loadData()
   }, [])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, filterPeriod, dateRange, store.searchQuery])
 
   // ... (filtered useMemo stays same)
 
@@ -113,6 +120,11 @@ export default function PaymentsPage() {
 
     return result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   }, [store.payments, store.members, store.searchQuery, searchTerm, filterPeriod, dateRange])
+
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    return filtered.slice(start, start + pageSize)
+  }, [filtered, currentPage])
 
   const chartData = useMemo(() => {
     const grouped: Record<string, number> = {}
@@ -525,7 +537,7 @@ export default function PaymentsPage() {
             </thead>
             <tbody>
               {loading ? Array.from({ length: 8 }).map((_, i) => <TableTdSkeleton key={i} />) : filtered.length > 0 ? (
-                filtered.map((payment) => {
+                paginatedData.map((payment) => {
                   const member = store.members.find((m) => m.id === payment.memberId)
                   return (
                     <tr key={payment.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
@@ -564,6 +576,12 @@ export default function PaymentsPage() {
             </tbody>
           </table>
         </div>
+        <PaginationHUD
+          totalItems={filtered.length}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   )

@@ -7,6 +7,7 @@ import { Search, Plus, Trash2, QrCode, Sparkles, Users, Filter } from "lucide-re
 import { DashboardHeader } from "@/components/dashboard-header";
 import { MemberQrDialog } from "@/components/member-qr-dialog";
 import { Button } from "@/components/ui/button";
+import { PaginationHUD } from "@/components/ui/pagination-hud";
 import { InputField } from "@/components/ui/input-field";
 import { Card } from "@/components/ui/card";
 import {
@@ -37,6 +38,8 @@ export default function MembersPage() {
   );
   const [loading, setLoading] = useState(true);
   const [showTrash, setShowTrash] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     const loadData = async () => {
@@ -50,6 +53,10 @@ export default function MembersPage() {
     };
     loadData();
   }, [showTrash]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus, store.searchQuery]);
 
   const filtered = useMemo(() => {
     let result = store.members;
@@ -89,6 +96,13 @@ export default function MembersPage() {
 
     return result;
   }, [store.members, store.subscriptions, store.searchQuery, searchTerm, filterStatus, session]);
+
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, currentPage, pageSize]);
+
+  const totalPages = Math.ceil(filtered.length / pageSize);
 
   const handleDelete = async (id: string) => {
     try {
@@ -247,7 +261,7 @@ export default function MembersPage() {
                   </tr>
                 ))
               ) : (
-                filtered.map((member) => {
+                paginatedData.map((member) => {
                   const subs = store.subscriptions.filter(
                     (s) => s.memberId === member.id
                   );
@@ -404,6 +418,13 @@ export default function MembersPage() {
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No members found</p>
           </div>
         )}
+
+        <PaginationHUD
+          totalItems={filtered.length}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       {/* QR Code Dialog */}
@@ -423,8 +444,8 @@ export default function MembersPage() {
         title={showTrash ? "Permanently Purge" : "Delete"}
         highlight="Member?"
         description={showTrash
-            ? "This is a destructive action and cannot be undone. All membership history, payments, and personal data will be wiped forever."
-            : "The member record and their history will be moved to the trash and hidden from the registry."
+          ? "This is a destructive action and cannot be undone. All membership history, payments, and personal data will be wiped forever."
+          : "The member record and their history will be moved to the trash and hidden from the registry."
         }
         onConfirm={() => deleteId && handleDelete(deleteId)}
         confirmText={showTrash ? "Delete" : "Move to Trash"}

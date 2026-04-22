@@ -3,18 +3,25 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Users, TrendingUp, AlertCircle, DollarSign, CheckCircle, UserPlus, Zap, Dumbbell, Plus, Send } from "lucide-react";
 import { StatsCard } from "@/components/stats-card";
-import { RevenueChart, SubscriptionChart } from "@/components/dashboard-charts";
+import { RevenueChart, SubscriptionChart, AttendanceChart, MembershipStatusChart } from "@/components/dashboard-charts";
 import { MembersTable } from "@/components/members-table";
 import { useAppStore } from "@/lib/store";
 import { isSubscriptionActive, daysUntilExpiry, formatCurrency } from "@/lib/utils/file-utils";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { subDays } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 export default function DashboardPage() {
   const store = useAppStore();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 30),
+    to: new Date()
+  });
 
   const router = useRouter();
 
@@ -90,33 +97,42 @@ export default function DashboardPage() {
         description={isTrainer ? `Managing ${totalMembers} members.` : 'See how your gym is doing today.'}
         descriptionIconColor={isTrainer ? "emerald" : "primary"}
       >
-        {isTrainer && (
-          <div className="flex flex-wrap items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => router.push('/trainer/exercises')}
-              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
-            >
-              <Dumbbell className="mr-2 w-4 h-4" />
-              Exercises
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push('/trainer/templates')}
-              className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
-            >
-              <Plus className="mr-2 w-4 h-4" />
-              Templates
-            </Button>
-            <Button
-              onClick={() => router.push('/trainer/deploy')}
-              className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
-            >
-              <Send className="mr-2 w-4 h-4" />
-              Assign Plan
-            </Button>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          {!isTrainer && (
+            <DateRangePicker
+              date={dateRange}
+              onDateChange={setDateRange}
+              placeholder="Filter by date range"
+            />
+          )}
+          {isTrainer && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/trainer/exercises')}
+                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+              >
+                <Dumbbell className="mr-2 w-4 h-4" />
+                Exercises
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/trainer/templates')}
+                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+              >
+                <Plus className="mr-2 w-4 h-4" />
+                Templates
+              </Button>
+              <Button
+                onClick={() => router.push('/trainer/deploy')}
+                className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+              >
+                <Send className="mr-2 w-4 h-4" />
+                Assign Plan
+              </Button>
+            </>
+          )}
+        </div>
       </DashboardHeader>
 
       {/* Stats Grid */}
@@ -145,7 +161,7 @@ export default function DashboardPage() {
         {!isTrainer && (
           <StatsCard
             title="Monthly Revenue"
-            value={`₨ ${formatCurrency(monthlyRevenue).replace("PKR", "")}`}
+            value={`${formatCurrency(monthlyRevenue).replace("PKR", "")}`}
             icon={<DollarSign className="w-5 h-5" />}
             trend={{ value: 12, isPositive: true }}
             isLoading={loading}
@@ -163,12 +179,23 @@ export default function DashboardPage() {
 
       {/* Charts Section - Only for Managers/Owners */}
       {!isTrainer && (
-        <div data-tour="dashboard-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <RevenueChart isLoading={loading} />
+        <div className="space-y-8">
+          <div data-tour="dashboard-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            <div className="lg:col-span-2">
+              <RevenueChart isLoading={loading} dateRange={dateRange} />
+            </div>
+            <div className="h-full">
+              <SubscriptionChart isLoading={loading} dateRange={dateRange} />
+            </div>
           </div>
-          <div className="">
-            <SubscriptionChart isLoading={loading} />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+            <div className="h-full">
+              <MembershipStatusChart isLoading={loading} />
+            </div>
+            <div className="h-full md:col-span-2">
+              <AttendanceChart isLoading={loading} dateRange={dateRange} />
+            </div>
           </div>
         </div>
       )}
@@ -195,51 +222,14 @@ export default function DashboardPage() {
         <div className="relative">
           <div className="flex items-center gap-4 mb-8">
             <h2 className="text-2xl font-black italic tracking-tighter text-red-500 uppercase">
-              Expiring Memberships
+              Expiring & Expired
             </h2>
             <div className="h-px flex-1 bg-black/5 dark:bg-white/5"></div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Expiring in the next 7 days</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Memberships needing immediate renewal</p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {subscriptions
-              .filter(s => {
-                const days = daysUntilExpiry(s.endDate);
-                return s.status === "active" && days > 0 && days <= 7;
-              })
-              .sort((a, b) => daysUntilExpiry(a.endDate) - daysUntilExpiry(b.endDate))
-              .map(sub => {
-                const member = members.find(m => m.id === sub.memberId);
-                if (!member) return null;
-                const days = daysUntilExpiry(sub.endDate);
-                
-                return (
-                  <div key={sub.id} className="glass-premium p-6 border-l-4 border-l-red-500 hover:scale-[1.02] transition-all cursor-pointer group/card active:scale-[0.98]" onClick={() => router.push(`/members/${member.id}`)}>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center border border-red-500/20 group-hover/card:bg-red-500/20 transition-colors">
-                          <AlertCircle className="w-6 h-6 text-red-500" />
-                        </div>
-                        <div>
-                          <p className="font-black uppercase italic text-base tracking-tighter group-hover/card:text-red-500 transition-colors">{member.firstName} {member.lastName}</p>
-                          <p className="text-[10px] font-black text-slate-500 tracking-widest uppercase italic mt-1">Expires in {days} Days</p>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-white/5">
-                        <Plus className="w-4 h-4 rotate-45 text-slate-500" />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            {subscriptions.filter(s => {
-              const days = daysUntilExpiry(s.endDate);
-              return s.status === "active" && days > 0 && days <= 7;
-            }).length === 0 && (
-              <div className="col-span-full py-10 text-center glass-premium border-dashed opacity-50">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic underline underline-offset-4">No memberships expiring in the next 7 days.</p>
-              </div>
-            )}
+
+          <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
+            <MembersTable mode="expiring" />
           </div>
         </div>
       )}
