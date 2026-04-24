@@ -393,10 +393,10 @@ export default function MemberDetailPage({
               </div>
 
               <div className="text-center space-y-1">
-                <h1 className="text-2xl font-bold tracking-tight">{isLoading ? <Skeleton className="w-48 h-8 mx-auto" /> : `${member?.firstName} ${member?.lastName}`}</h1>
-                <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest px-2 py-0.5 rounded-full bg-muted/50 inline-block">
+                <div className="text-2xl font-bold tracking-tight">{isLoading ? <Skeleton className="w-48 h-8 mx-auto" /> : `${member?.firstName} ${member?.lastName}`}</div>
+                <div className="text-sm text-muted-foreground font-medium uppercase tracking-widest px-2 py-0.5 rounded-full bg-muted/50 inline-block">
                   {isLoading ? <Skeleton className="w-20 h-4" /> : (member?.planId || "No Plan").replace("plan_", "").toUpperCase()}
-                </p>
+                </div>
               </div>
 
               <div className="mt-8 space-y-4">
@@ -406,7 +406,7 @@ export default function MemberDetailPage({
                   </div>
                   <div className="flex-1 truncate">
                     <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Email</p>
-                    <p className="font-medium truncate font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-32 h-3" /> : member?.email}</p>
+                    <div className="font-medium truncate font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-32 h-3" /> : member?.email}</div>
                   </div>
                 </div>
 
@@ -416,7 +416,7 @@ export default function MemberDetailPage({
                   </div>
                   <div className="flex-1">
                     <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Phone</p>
-                    <p className="font-medium font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-24 h-3" /> : member?.phone}</p>
+                    <div className="font-medium font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-24 h-3" /> : member?.phone}</div>
                   </div>
                 </div>
 
@@ -426,7 +426,7 @@ export default function MemberDetailPage({
                   </div>
                   <div className="flex-1">
                     <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Joined</p>
-                    <p className="font-medium font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-24 h-3" /> : (member?.joinDate ? formatDate(member.joinDate) : "N/A")}</p>
+                    <div className="font-medium font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-24 h-3" /> : (member?.joinDate ? formatDate(member.joinDate) : "N/A")}</div>
                   </div>
                 </div>
               </div>
@@ -449,10 +449,10 @@ export default function MemberDetailPage({
                       </div>
                     )}
                     <div className="flex-1">
-                      <p className="font-semibold text-sm group-hover:text-primary transition-colors">
+                      <div className="font-semibold text-sm group-hover:text-primary transition-colors">
                         {isLoading ? <Skeleton className="w-24 h-4" /> : ((member as any)?.trainerId?.fullName || `${(member as any)?.trainerId?.firstName || ""} ${(member as any)?.trainerId?.lastName || ""}`.trim() || "Unknown Coach")}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{isLoading ? <Skeleton className="w-16 h-3 mt-1" /> : "Personal Trainer"}</p>
+                      </div>
+                      <div className="text-xs text-muted-foreground">{isLoading ? <Skeleton className="w-16 h-3 mt-1" /> : "Personal Trainer"}</div>
                     </div>
                   </Link>
                 </div>
@@ -477,20 +477,31 @@ export default function MemberDetailPage({
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 items-end gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 items-end gap-4">
                   <div className="space-y-2">
-                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Target Plan</label>
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1 ml-2 italic">Target Plan</label>
                     <Select
                       value={selectedPlan}
                       onValueChange={(val) => setSelectedPlan(val)}
                     >
-                      <SelectTrigger className="w-full !h-[46px] px-3 py-2 rounded-md border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all">
-                        <SelectValue placeholder="Choose a plan..." />
+                      <SelectTrigger className="w-full !h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                        {selectedPlan ? (
+                          <div className="flex justify-between items-center w-full gap-4">
+                            <SelectValue />
+                          </div>
+                        ) : (
+                          <SelectValue placeholder="Choose a plan..." />
+                        )}
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-slate-900 border-white/10">
                         {plans.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>
-                            {p.name} — {formatCurrency(p.price)}
+                          <SelectItem key={p.id} value={p.id} className="text-[10px] font-bold uppercase tracking-widest focus:bg-primary focus:text-black">
+                            <div className="flex justify-between items-center w-full gap-8">
+                              <span>{p.name}</span>
+                              <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded uppercase font-black tracking-tighter group-focus:bg-black/20">
+                                {p.duration} Days
+                              </span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -498,38 +509,26 @@ export default function MemberDetailPage({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1">Payment Method</label>
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1 ml-2 italic">Payment Method</label>
                     <Select
                       value={renewMethod}
                       onValueChange={(val) => setRenewMethod(val as any)}
                     >
-                      <SelectTrigger className="w-full !h-[46px] px-3 py-2 rounded-md border border-input bg-background/50 text-sm focus:ring-2 focus:ring-primary transition-all">
+                      <SelectTrigger className="w-full !h-12 px-6 rounded-xl border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                         <SelectValue placeholder="Select method" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cash">Cash</SelectItem>
-                        <SelectItem value="online">Online</SelectItem>
-                        <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                        <SelectItem value="card">Card</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                      <SelectContent className="bg-slate-900 border-white/10">
+                        <SelectItem value="cash" className="text-[10px] font-bold uppercase tracking-widest focus:bg-primary focus:text-black">CASH</SelectItem>
+                        <SelectItem value="online" className="text-[10px] font-bold uppercase tracking-widest focus:bg-primary focus:text-black">ONLINE</SelectItem>
+                        <SelectItem value="bank_transfer" className="text-[10px] font-bold uppercase tracking-widest focus:bg-primary focus:text-black">BANK TRANSFER</SelectItem>
+                        <SelectItem value="card" className="text-[10px] font-bold uppercase tracking-widest focus:bg-primary focus:text-black">CARD</SelectItem>
+                        <SelectItem value="other" className="text-[10px] font-bold uppercase tracking-widest focus:bg-primary focus:text-black">OTHER</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <div>
-                    <InputField
-                      label="Duration (Days)"
-                      type="number"
-                      validateType="number"
-                      value={String(renewDays)}
-                      onChange={(val) => setRenewDays(Number(val))}
-                      placeholder="Days"
-                      className="bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                    />
-                  </div>
-
                   <Button
-                    className="w-full h-[46px] shadow-lg shadow-primary/20"
+                    className="w-full h-12 shadow-lg shadow-primary/20"
                     onClick={handleRenew}
                     disabled={isRenewing}
                   >
@@ -616,6 +615,10 @@ export default function MemberDetailPage({
                 {selectedPlan && (
                   <div className="pt-4 border-t border-border/40 space-y-2">
                     <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">Renewal Period</span>
+                      <span className="font-bold text-primary italic uppercase tracking-tighter">{plans.find(p => p.id === selectedPlan)?.duration} Days</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Base Price</span>
                       <span className="font-medium">{formatCurrency(plans.find(p => p.id === selectedPlan)?.price || 0)}</span>
                     </div>
@@ -675,14 +678,14 @@ export default function MemberDetailPage({
                 {isLoading ? <Skeleton className="w-6 h-6 rounded-full" /> : (activeSub ? <CreditCard className="w-6 h-6" /> : <Clock className="w-6 h-6" />)}
               </div>
               <div>
-                <h4 className="font-bold text-foreground">
+                <div className="font-bold text-foreground">
                   {isLoading ? <Skeleton className="w-32 h-5" /> : (activeSub ? "Membership Active" : "Membership Expired")}
-                </h4>
-                <p className="text-sm text-muted-foreground leading-none mt-1 text-emerald-500">
+                </div>
+                <div className="text-sm text-muted-foreground leading-none mt-1 text-emerald-500">
                   {isLoading ? <Skeleton className="w-48 h-4 mt-1" /> : (activeSub
                     ? `Expiring on ${formatDate(activeSub.endDate)}`
                     : `Last active on ${memberSubs[0] ? formatDate(memberSubs[0].endDate) : 'never'}`)}
-                </p>
+                </div>
               </div>
             </div>
             {!isLoading && !activeSub && (
@@ -980,7 +983,7 @@ export default function MemberDetailPage({
 
       {/* Edit Payment Modal */}
       <Dialog open={isEditPaymentModalOpen} onOpenChange={setIsEditPaymentModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md glass-premium  border-border">
           <DialogHeader>
             <DialogTitle>Edit Payment Record</DialogTitle>
             <DialogDescription>

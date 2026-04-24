@@ -91,7 +91,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             placeholder={placeholder}
             aria-invalid={isInvalid}
             className={cn(
-              "h-12 bg-white/5 border-transparent focus:bg-white/10 text-[11px] font-bold tracking-wider uppercase transition-all duration-300 rounded-md",
+              "h-12 bg-white/5 border-transparent focus:bg-white/10 text-[11px] font-bold tracking-wider transition-all duration-300 rounded-md",
               leadingIcon && "!pl-12",
               isInvalid
                 ? "border-destructive/50 focus:border-destructive ring-destructive/20"
@@ -105,12 +105,12 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
           {showSuccessIndicator && value && !isInvalid && validateType !== "text" && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-50 group-focus-within/input-field:opacity-100 transition-opacity">
               <div className="w-1 h-1 rounded-full bg-primary animate-pulse"></div>
-              <span className="text-[8px] font-black text-primary uppercase italic">Valid</span>
+              <span className="text-[8px] font-bold text-primary">Valid</span>
             </div>
           )}
         </div>
 
-        {description && <FieldDescription className="text-[9px] text-slate-500 font-bold uppercase pl-[5px] !mt-px">{description}</FieldDescription>}
+        {description && <FieldDescription className="text-[9px] text-slate-500 font-bold pl-[5px] !mt-px">{description}</FieldDescription>}
 
         {error && !hideLabel && (
           <FieldError className="text-[10px] font-bold italic tracking-wider mt-1 text-destructive animate-fade-in absolute top-full left-1">

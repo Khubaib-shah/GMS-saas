@@ -256,6 +256,42 @@ export default function PaymentsPage() {
         </Button>
       </DashboardHeader>
 
+       {/* Search & Filter HUD */}
+      <div className="flex flex-col md:flex-row items-center gap-4 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-md">
+        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
+          <Filter className="w-3.5 h-3.5 text-primary/50" />
+          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+            Filter
+          </span>
+        </div>
+
+        <div className="flex-1 w-full flex flex-col md:flex-row gap-4">
+          <InputField
+            hideLabel
+            validateType="text"
+            placeholder="Search Member..."
+            value={searchTerm || store.searchQuery}
+            onChange={(val) => {
+              setSearchTerm(val)
+              store.setSearchQuery(val)
+            }}
+            leadingIcon={<Search className="w-4 h-4" />}
+            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+            containerClassName="flex-1"
+          />
+
+          <div className="h-6 w-px bg-white/5 hidden md:block self-center" />
+
+          <div className="flex items-center gap-4">
+            <DateRangePicker
+              btnClass="!h-10 border-none bg-transparent hover:bg-white/5 text-[10px] font-black uppercase tracking-widest italic rounded-lg"
+              date={dateRange}
+              onDateChange={setDateRange}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatsCard
@@ -466,41 +502,7 @@ export default function PaymentsPage() {
         </div>
       </div>
 
-      {/* Search & Filter HUD */}
-      <div className="flex flex-col md:flex-row items-center gap-4 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-md">
-        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
-          <Filter className="w-3.5 h-3.5 text-primary/50" />
-          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
-            Filter
-          </span>
-        </div>
-
-        <div className="flex-1 w-full flex flex-col md:flex-row gap-4">
-          <InputField
-            hideLabel
-            validateType="text"
-            placeholder="Search Member..."
-            value={searchTerm || store.searchQuery}
-            onChange={(val) => {
-              setSearchTerm(val)
-              store.setSearchQuery(val)
-            }}
-            leadingIcon={<Search className="w-4 h-4" />}
-            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
-            containerClassName="flex-1"
-          />
-
-          <div className="h-6 w-px bg-white/5 hidden md:block self-center" />
-
-          <div className="flex items-center gap-4">
-            <DateRangePicker
-              btnClass="!h-10 border-none bg-transparent hover:bg-white/5 text-[10px] font-black uppercase tracking-widest italic rounded-lg"
-              date={dateRange}
-              onDateChange={setDateRange}
-            />
-          </div>
-        </div>
-      </div>
+     
 
       {/* Payments Table */}
       <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">

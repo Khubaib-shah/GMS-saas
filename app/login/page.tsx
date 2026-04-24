@@ -75,10 +75,10 @@ function LoginForm() {
 
       <form onSubmit={handleLogin} className="space-y-6">
         <InputField
-          label="Email"
+          label="Email or Phone"
           className="gap-0"
-          validateType="email"
-          placeholder="your@email.com"
+          validateType="text"
+          placeholder="Email or Phone Number"
           value={email}
           onChange={(val) => setEmail(val)}
           required

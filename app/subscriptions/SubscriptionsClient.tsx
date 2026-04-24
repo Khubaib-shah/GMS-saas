@@ -677,10 +677,10 @@ export default function SubscriptionsPage() {
 
       {/* Add Plan Dialog */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent>
+        <DialogContent className="glass-premium">
           <DialogHeader>
             <DialogTitle>Add New Plan</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="-mt-2">
               Create a new subscription plan for your gym members.
             </DialogDescription>
           </DialogHeader>
@@ -752,7 +752,7 @@ export default function SubscriptionsPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="text-slate-500 ml-2 italic font-bold" >Description</Label>
               <Textarea
                 id="description"
                 value={addFormData.description}
