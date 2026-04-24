@@ -11,11 +11,12 @@ interface StatsCardProps {
     value: number
     isPositive: boolean
   }
+  periodLabel?: string
   className?: string
   isLoading?: boolean
 }
 
-export function StatsCard({ title, value, icon, trend, className, isLoading }: StatsCardProps) {
+export function StatsCard({ title, value, icon, trend, className, isLoading, periodLabel = "previous period" }: StatsCardProps) {
   return (
     <div className={cn("glass-premium p-6 flex flex-col justify-between border-border bg-card dark:bg-slate-950/40", className)}>
       <div className="flex items-center justify-between mb-4">
@@ -38,9 +39,9 @@ export function StatsCard({ title, value, icon, trend, className, isLoading }: S
         ) : trend && (
             <div className="flex items-center gap-1 mt-2 text-[9px] font-black italic tracking-widest uppercase">
                 <span className={cn(trend.isPositive ? "text-primary" : "text-red-500")}>
-                {trend.isPositive ? "+" : ""}{trend.value}%
+                {trend.isPositive ? "↑" : "↓"} {trend.value}%
                 </span>
-                <span className="text-slate-500">from last month</span>
+                <span className="text-slate-500">from {periodLabel}</span>
             </div>
         )}
       </div>

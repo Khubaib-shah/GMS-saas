@@ -38,6 +38,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import { getPreviousPeriod, calculateTrend, isDateInRange } from "@/lib/analytics-utils"
 import { endOfMonth, startOfMonth } from "date-fns"
 
 const chartConfig = {
@@ -162,6 +163,20 @@ export default function PaymentsPage() {
   const paidCount = filtered.length
   const avgPayment = paidCount > 0 ? totalRevenue / paidCount : 0
 
+  // Calculate Trends
+  const prevRange = dateRange?.from && dateRange?.to ? getPreviousPeriod({ from: dateRange.from, to: dateRange.to }) : null
+  const prevPayments = prevRange 
+    ? store.payments.filter(p => isDateInRange(p.date, prevRange))
+    : []
+  
+  const prevRevenue = prevPayments.reduce((sum, p) => sum + p.amount, 0)
+  const prevCount = prevPayments.length
+  const prevAvg = prevCount > 0 ? prevRevenue / prevCount : 0
+
+  const revenueTrend = prevRange ? calculateTrend(totalRevenue, prevRevenue) : undefined
+  const countTrend = prevRange ? calculateTrend(paidCount, prevCount) : undefined
+  const avgTrend = prevRange ? calculateTrend(avgPayment, prevAvg) : undefined
+
   const handleExportPDF = () => {
     const doc = new jsPDF()
 
@@ -247,18 +262,21 @@ export default function PaymentsPage() {
           title="Total Revenue"
           value={formatCurrency(totalRevenue)}
           icon={<DollarSign className="w-5 h-5" />}
+          trend={revenueTrend}
           isLoading={loading}
         />
         <StatsCard
           title="Total Transactions"
           value={paidCount.toString()}
           icon={<AlertCircle className="w-5 h-5" />}
+          trend={countTrend}
           isLoading={loading}
         />
         <StatsCard
           title="Average Payment"
           value={formatCurrency(avgPayment)}
           icon={<TrendingUp className="w-5 h-5" />}
+          trend={avgTrend}
           isLoading={loading}
         />
       </div>

@@ -190,7 +190,7 @@ export default function MembersPage() {
               setFilterStatus(value as "all" | "active" | "expired")
             }
           >
-            <SelectTrigger className="h-10 w-full md:w-56 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+            <SelectTrigger className="!h-[41px] w-full md:w-56 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
               <span className="text-slate-500 mr-2">Status:</span>
               <SelectValue placeholder="All Members" />
             </SelectTrigger>

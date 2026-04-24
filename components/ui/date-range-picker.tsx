@@ -74,7 +74,6 @@ export function DateRangePicker({
           >
             <CalendarIcon className="w-4 h-4 text-primary" />
             <div className="flex flex-col items-start leading-none gap-1">
-             
               {activePreset ? (
                 <span className="text-sm font-black italic tracking-tighter uppercase">{activePreset.label}</span>
               ) : date?.from ? (

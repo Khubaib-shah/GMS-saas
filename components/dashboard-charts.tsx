@@ -70,7 +70,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
       <div className="flex-1 min-h-[300px] w-full overflow-x-auto pb-4 scrollbar-hide group/scroll">
         <div 
           className="flex items-end justify-between gap-1 h-full pt-8 pb-2"
-          style={{ minWidth: data.length > 10 ? `${data.length * 35}px` : "100%" }}
+          style={{ minWidth: data.length > 31 ? `${data.length * 30}px` : "100%" }}
         >
           {data.map((item, i) => {
             const height = (item.value / maxValue) * 100;
@@ -383,7 +383,7 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
       <div className="flex-1 min-h-[300px] w-full overflow-x-auto pb-4 scrollbar-hide">
         <div 
           className="flex items-end justify-between gap-1 h-full pt-8 pb-2"
-          style={{ minWidth: data.length > 10 ? `${data.length * 35}px` : "100%" }}
+          style={{ minWidth: data.length > 31 ? `${data.length * 30}px` : "100%" }}
         >
           {data.map((item, i) => {
             const height = (item.value / maxValue) * 100;

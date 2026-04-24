@@ -13,6 +13,7 @@ import { DashboardHeader } from "@/components/dashboard-header";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { getPreviousPeriod, calculateTrend, isDateInRange } from "@/lib/analytics-utils";
 
 export default function DashboardPage() {
   const store = useAppStore();
@@ -28,13 +29,20 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      const today = new Date().toISOString().split('T')[0];
+      
+      // If we have a range, we fetch attendance for current + previous period for trend calculation
+      let fetchFrom = dateRange?.from;
+      if (dateRange?.from && dateRange?.to) {
+        const prev = getPreviousPeriod({ from: dateRange.from, to: dateRange.to });
+        fetchFrom = prev.from;
+      }
+
       await Promise.all([
         store.loadMembers(),
         store.loadSubscriptions(),
         store.loadPayments(),
         store.loadAttendance({
-          from: dateRange?.from?.toISOString(),
+          from: fetchFrom?.toISOString(),
           to: dateRange?.to?.toISOString() || new Date().toISOString()
         })
       ]);
@@ -59,22 +67,35 @@ export default function DashboardPage() {
 
   const totalMembers = myMembers.length;
 
-  const activeSubscriptions = isTrainer
-    ? myMembers.filter(m => (m as any).activeSubscription && isSubscriptionActive((m as any).activeSubscription.endDate, (m as any).activeSubscription.status)).length
-    : subscriptions.filter(s => isSubscriptionActive(s.endDate, s.status)).length;
+  // Calculate Trends
+  const prevRange = dateRange?.from && dateRange?.to ? getPreviousPeriod({ from: dateRange.from, to: dateRange.to }) : null;
 
-  const todayCheckins = attendance.length; // Already filtered by trainer in the API if role is trainer
+  // 1. Members Trend
+  const currentNewMembers = dateRange?.from && dateRange?.to 
+    ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, { from: dateRange.from!, to: dateRange.to! })).length
+    : totalMembers;
+  const prevNewMembers = prevRange 
+    ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, prevRange)).length
+    : 0;
+  const membersTrend = prevRange ? calculateTrend(currentNewMembers, prevNewMembers) : undefined;
 
-  const monthlyRevenue = isTrainer ? 0 : payments
-    .filter((p) => {
-      const paymentDate = new Date(p.date);
-      const now = new Date();
-      return (
-        paymentDate.getFullYear() === now.getFullYear() &&
-        paymentDate.getMonth() === now.getMonth()
-      );
-    })
-    .reduce((sum, p) => sum + p.amount, 0);
+  // 2. Check-ins Trend
+  const currentCheckins = dateRange?.from && dateRange?.to
+    ? attendance.filter(a => isDateInRange(a.date, { from: dateRange.from!, to: dateRange.to! })).length
+    : attendance.length;
+  const prevCheckins = prevRange
+    ? attendance.filter(a => isDateInRange(a.date, prevRange)).length
+    : 0;
+  const checkinsTrend = prevRange ? calculateTrend(currentCheckins, prevCheckins) : undefined;
+
+  // 3. Revenue Trend
+  const currentRevenue = dateRange?.from && dateRange?.to
+    ? payments.filter(p => isDateInRange(p.date, { from: dateRange.from!, to: dateRange.to! })).reduce((sum, p) => sum + p.amount, 0)
+    : payments.reduce((sum, p) => sum + p.amount, 0);
+  const prevRevenue = prevRange
+    ? payments.filter(p => isDateInRange(p.date, prevRange)).reduce((sum, p) => sum + p.amount, 0)
+    : 0;
+  const revenueTrend = prevRange ? calculateTrend(currentRevenue, prevRevenue) : undefined;
 
   const expiringSoon = isTrainer
     ? myMembers.filter(m => {
@@ -141,40 +162,31 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div data-tour="dashboard-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
-          title={isTrainer ? "Total Members" : "Total Members"}
+          title={dateRange?.from ? "New Members" : "Total Members"}
           value={totalMembers.toString()}
           icon={<Users className="w-5 h-5" />}
-          trend={isTrainer ? undefined : { value: 5, isPositive: true }}
+          trend={membersTrend}
           isLoading={loading}
         />
         <StatsCard
-          title={isTrainer ? "Daily Check-ins" : "Daily Check-ins"}
-          value={todayCheckins.toString()}
+          title={dateRange?.from ? "Period Check-ins" : "Total Check-ins"}
+          value={currentCheckins.toString()}
           icon={<CheckCircle className="w-5 h-5" />}
-          trend={isTrainer ? undefined : { value: 2, isPositive: true }}
+          trend={checkinsTrend}
           isLoading={loading}
         />
         <StatsCard
           title="Expiring Plans"
           value={expiringSoon.toString()}
           icon={<AlertCircle className="w-5 h-5" />}
-          trend={expiringSoon > 0 ? { value: 8, isPositive: false } : undefined}
           isLoading={loading}
         />
         {!isTrainer && (
           <StatsCard
-            title="Monthly Revenue"
-            value={`${formatCurrency(monthlyRevenue).replace("PKR", "")}`}
+            title="Period Revenue"
+            value={formatCurrency(currentRevenue)}
             icon={<DollarSign className="w-5 h-5" />}
-            trend={{ value: 12, isPositive: true }}
-            isLoading={loading}
-          />
-        )}
-        {isTrainer && (
-          <StatsCard
-            title="Active Clients"
-            value={activeSubscriptions.toString()}
-            icon={<TrendingUp className="w-5 h-5" />}
+            trend={revenueTrend}
             isLoading={loading}
           />
         )}
