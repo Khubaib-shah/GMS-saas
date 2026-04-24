@@ -33,12 +33,15 @@ export default function DashboardPage() {
         store.loadMembers(),
         store.loadSubscriptions(),
         store.loadPayments(),
-        store.loadAttendance({ date: today })
+        store.loadAttendance({
+          from: dateRange?.from?.toISOString(),
+          to: dateRange?.to?.toISOString() || new Date().toISOString()
+        })
       ]);
       setLoading(false);
     };
     loadData();
-  }, []);
+  }, [dateRange]);
 
   const role = (session?.user as any)?.role;
   const userId = (session?.user as any)?.id;

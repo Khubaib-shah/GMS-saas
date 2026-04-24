@@ -20,8 +20,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
       return days.map(day => {
         const total = store.payments.reduce((sum, p) => {
           const pDate = new Date(p.date)
-          if (isWithinInterval(pDate, { start: startOfDay(dateRange.from!), end: endOfDay(dateRange.to!) }) &&
-            format(pDate, "yyyy-MM-dd") === format(day, "yyyy-MM-dd")) {
+          if (format(pDate, "yyyy-MM-dd") === format(day, "yyyy-MM-dd")) {
             return sum + p.amount
           }
           return sum
@@ -47,41 +46,74 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
     }))
   }, [store.payments, dateRange])
 
-  const maxValue = Math.max(...data.map(d => d.value), 1) // Prevent division by zero
+  const maxValue = Math.max(...data.map(d => d.value), 1)
 
   return (
     <Card className="p-6 md:col-span-2 glass-premium border-border h-full flex flex-col">
-      <div className="mb-6">
-        <h3 className="text-lg font-bold text-foreground">Revenue Trend</h3>
-        <p className="text-sm text-muted-foreground">
-          {dateRange?.from && dateRange?.to
-            ? `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd, yyyy")}`
-            : `Monthly revenue for ${new Date().getFullYear()}`}
-        </p>
+      <div className="mb-6 flex justify-between items-start">
+        <div>
+          <h3 className="text-lg font-bold text-foreground">Revenue Trend</h3>
+          <p className="text-sm text-muted-foreground">
+            {dateRange?.from && dateRange?.to
+              ? `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd, yyyy")}`
+              : `Monthly revenue for ${new Date().getFullYear()}`}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs font-black uppercase tracking-widest text-primary italic">Total Revenue</p>
+          <p className="text-2xl font-black italic tracking-tighter leading-none mt-1">
+            {formatCurrency(data.reduce((sum, d) => sum + d.value, 0))}
+          </p>
+        </div>
       </div>
 
       <div className="flex-1 min-h-[300px] w-full overflow-x-auto pb-4 scrollbar-hide group/scroll">
-        <div className={cn(
-          "flex items-end justify-between gap-1.5 h-full pt-4",
-          data.length > 10 ? "min-w-[700px]" : "w-full"
-        )}>
+        <div 
+          className="flex items-end justify-between gap-1 h-full pt-8 pb-2"
+          style={{ minWidth: data.length > 10 ? `${data.length * 35}px` : "100%" }}
+        >
           {data.map((item, i) => {
-            const showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 4 === 0;
+            const height = (item.value / maxValue) * 100;
+            const showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 5 === 0;
+            
             return (
-              <div key={i} className="flex-1 flex flex-col items-center gap-3 h-full justify-end group cursor-pointer">
-                <div
-                  className="w-full bg-primary/5 rounded-t-lg group-hover:bg-primary/20 transition-all relative overflow-hidden"
-                  style={{ height: `${Math.max((item.value / maxValue) * 100, 2)}%` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-primary/5 opacity-50" />
-                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight">
-                    {formatCurrency(item.value)}
-                  </div>
-                  <div
-                    className="absolute bottom-0 left-0 right-0 bg-primary h-[3px] shadow-[0_0_10px_rgba(var(--primary),0.5)]"
-                  />
+              <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative px-1">
+                {/* Column Hover Background */}
+                <div className="absolute inset-x-0 top-0 bottom-8 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
+                
+                {/* Tooltip */}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight pointer-events-none">
+                  {formatCurrency(item.value)}
                 </div>
-                {showLabel && <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest italic">{item.name}</span>}
+
+                {/* Bar */}
+                <div
+                  className={cn(
+                    "w-full rounded-t-lg transition-all relative overflow-hidden",
+                    item.value > 0 ? "bg-primary/20 group-hover:bg-primary/40" : "bg-transparent"
+                  )}
+                  style={{ height: `${item.value > 0 ? Math.max(height, 4) : 0}%` }}
+                >
+                  {item.value > 0 && (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-primary/5 opacity-50" />
+                      <div className="absolute bottom-0 left-0 right-0 bg-primary h-[3px] shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
+                    </>
+                  )}
+                </div>
+                
+                {/* Zero Value Indicator */}
+                {item.value === 0 && (
+                  <div className="w-1 h-1 rounded-full bg-slate-800 mb-2" />
+                )}
+
+                <div className="h-6 flex items-center mt-2">
+                  {showLabel && (
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest italic group-hover:text-primary transition-colors">
+                      {item.name}
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -90,6 +122,8 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
     </Card>
   )
 }
+
+// ... SubscriptionChart and MembershipStatusChart remain largely same but I'll check for consistency ...
 
 export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolean, dateRange?: DateRange }) {
   if (isLoading) return <ChartSkeleton />
@@ -129,13 +163,12 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
       "bg-purple-500",
     ]
 
-    // No mock data - purely dynamic
     return Object.entries(planCounts).map(([name, value], i) => ({
       name,
       value,
       color: colors[i % colors.length]
     }))
-  }, [store.subscriptions, store.plans])
+  }, [store.subscriptions, store.plans, dateRange])
 
   const total = stats.reduce((acc, curr) => acc + curr.value, 0)
 
@@ -160,7 +193,7 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
                 const startPerc = (prevValues / total) * 100;
                 const endPerc = ((prevValues + stat.value) / total) * 100;
 
-                let color = '#3b82f6'; // default blue
+                let color = '#3b82f6';
                 if (stat.color.includes('primary')) color = 'hsl(var(--primary))';
                 else if (stat.color.includes('emerald')) color = '#10b981';
                 else if (stat.color.includes('amber')) color = '#f59e0b';
@@ -173,7 +206,6 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
               : 'hsl(var(--muted))'
           }}
         >
-          {/* Inner Circle (The Hole) */}
           <div className="absolute inset-0 m-[1.2rem] rounded-full bg-slate-950 flex items-center justify-center shadow-inner">
             <div className="text-center group-hover/donut:scale-110 transition-transform duration-500">
               <span className="text-4xl font-black italic tracking-tighter block leading-none">{total}</span>
@@ -192,7 +224,7 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
                 <div className={`w-3 h-3 rounded-full ${stat.color}`} />
                 <span className="text-sm font-medium">{stat.name}</span>
               </div>
-              <span className="text-sm text-muted-foreground">{stat.value} ({Math.round(stat.value / total * 100)}%)</span>
+              <span className="text-sm text-muted-foreground">{stat.value} ({total > 0 ? Math.round(stat.value / total * 100) : 0}%)</span>
             </div>
           ))}
         </div>
@@ -209,7 +241,6 @@ export function MembershipStatusChart({ isLoading }: { isLoading?: boolean }) {
   const stats = useMemo(() => {
     const today = new Date()
 
-    // Group by memberId to only count the LATEST subscription per member
     const latestSubsPerMember = new Map<string, any>()
     store.subscriptions.forEach(sub => {
       const current = latestSubsPerMember.get(sub.memberId)
@@ -270,7 +301,6 @@ export function MembershipStatusChart({ isLoading }: { isLoading?: boolean }) {
               : 'hsl(var(--muted))'
           }}
         >
-          {/* Inner Circle (The Hole) */}
           <div className="absolute inset-0 m-[1.2rem] rounded-full bg-slate-950 flex items-center justify-center shadow-inner">
             <div className="text-center group-hover/donut:scale-110 transition-transform duration-500">
               <span className="text-4xl font-black italic tracking-tighter block leading-none">{total}</span>
@@ -316,8 +346,6 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
 
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     const counts = new Array(7).fill(0)
-
-    // Last 7 days
     const now = new Date()
     store.attendance.forEach(att => {
       const date = new Date(att.date)
@@ -334,38 +362,71 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
   const maxValue = Math.max(...data.map(d => d.value), 1)
 
   return (
-    <Card className="p-6 md:col-span-2  glass-premium border-border h-full flex flex-col">
-      <div className="mb-6">
-        <h3 className="text-lg font-bold text-foreground">Attendance</h3>
-        <p className="text-sm text-muted-foreground">
-          {dateRange?.from && dateRange?.to
-            ? `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd")}`
-            : "Check-ins for the last 7 days"}
-        </p>
+    <Card className="p-6 md:col-span-2 glass-premium border-border h-full flex flex-col">
+      <div className="mb-6 flex justify-between items-start">
+        <div>
+          <h3 className="text-lg font-bold text-foreground">Attendance</h3>
+          <p className="text-sm text-muted-foreground">
+            {dateRange?.from && dateRange?.to
+              ? `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd")}`
+              : "Check-ins for the last 7 days"}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs font-black uppercase tracking-widest text-emerald-500 italic">Total Check-ins</p>
+          <p className="text-2xl font-black italic tracking-tighter leading-none mt-1">
+            {data.reduce((sum, d) => sum + d.value, 0)}
+          </p>
+        </div>
       </div>
 
       <div className="flex-1 min-h-[300px] w-full overflow-x-auto pb-4 scrollbar-hide">
-        <div className={cn(
-          "flex items-end justify-between gap-1.5 h-full pt-4",
-          data.length > 10 ? "min-w-[700px]" : "w-full"
-        )}>
+        <div 
+          className="flex items-end justify-between gap-1 h-full pt-8 pb-2"
+          style={{ minWidth: data.length > 10 ? `${data.length * 35}px` : "100%" }}
+        >
           {data.map((item, i) => {
-            const showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 4 === 0;
+            const height = (item.value / maxValue) * 100;
+            const showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 5 === 0;
+            
             return (
-              <div key={i} className="flex-1 flex flex-col items-center gap-3 h-full justify-end group">
-                <div
-                  className="w-full bg-emerald-500/5 rounded-t-lg group-hover:bg-emerald-500/20 transition-all relative overflow-hidden"
-                  style={{ height: `${Math.max((item.value / maxValue) * 100, 2)}%` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/40 to-emerald-500/5 opacity-50" />
-                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight">
-                    {item.value} Check-ins
-                  </div>
-                  <div
-                    className="absolute bottom-0 left-0 right-0 bg-emerald-500 h-[3px] shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                  />
+              <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative px-1">
+                {/* Column Hover Background */}
+                <div className="absolute inset-x-0 top-0 bottom-8 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
+                
+                {/* Tooltip */}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight pointer-events-none">
+                  {item.value} Check-ins
                 </div>
-                {showLabel && <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest italic">{item.name}</span>}
+
+                {/* Bar */}
+                <div
+                  className={cn(
+                    "w-full rounded-t-lg transition-all relative overflow-hidden",
+                    item.value > 0 ? "bg-emerald-500/20 group-hover:bg-emerald-500/40" : "bg-transparent"
+                  )}
+                  style={{ height: `${item.value > 0 ? Math.max(height, 4) : 0}%` }}
+                >
+                  {item.value > 0 && (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/40 to-emerald-500/5 opacity-50" />
+                      <div className="absolute bottom-0 left-0 right-0 bg-emerald-500 h-[3px] shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                    </>
+                  )}
+                </div>
+
+                {/* Zero Value Indicator */}
+                {item.value === 0 && (
+                  <div className="w-1 h-1 rounded-full bg-slate-800 mb-2" />
+                )}
+
+                <div className="h-6 flex items-center mt-2">
+                  {showLabel && (
+                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest italic group-hover:text-emerald-500 transition-colors">
+                      {item.name}
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}

@@ -66,7 +66,7 @@ export type AppState = {
 
   // Attendance
   attendance: any[]
-  loadAttendance: (params?: { date?: string, month?: string }) => Promise<void>
+  loadAttendance: (params?: { date?: string, month?: string, from?: string, to?: string }) => Promise<void>
 
   // Exercises
   exercises: any[]
@@ -723,6 +723,8 @@ export const useAppStore = create<AppState>()(
           let url = `/api/attendance/report?gymId=${gymId}`;
           if (params.date) url += `&date=${params.date}`;
           if (params.month) url += `&month=${params.month}`;
+          if (params.from) url += `&from=${params.from}`;
+          if (params.to) url += `&to=${params.to}`;
 
           const res = await fetch(url);
           const data = await res.json();

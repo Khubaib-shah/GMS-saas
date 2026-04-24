@@ -109,25 +109,14 @@ export default function BillingPage() {
             </div>
 
             {/* Filter */}
-            <div className="flex items-center justify-end">
-                <div className="flex items-center  gap-4">
-                    <DateRangePicker
-                        date={dateRange}
-                        onDateChange={(range) => {
-                            setDateRange(range);
-                            setPage(1);
-                        }}
-                    />
-                </div>
-
-                {dateRange?.from && (
-                    <button
-                        onClick={() => { setDateRange(undefined); setPage(1); }}
-                        className="text-[10px] font-black tracking-widest text-indigo-400 hover:text-indigo-300 uppercase transition-colors"
-                    >
-                        RESET FILTERS
-                    </button>
-                )}
+            <div className="flex items-center justify-end gap-4 mt-8">
+                <DateRangePicker
+                    date={dateRange}
+                    onDateChange={(range) => {
+                        setDateRange(range);
+                        setPage(1);
+                    }}
+                />
             </div>
 
             {/* Table */}

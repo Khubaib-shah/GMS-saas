@@ -39,6 +39,12 @@ export async function GET(req: Request) {
             const endOfDay = new Date(date);
             endOfDay.setHours(23, 59, 59, 999);
             query.date = { $gte: startOfDay, $lte: endOfDay };
+        } else if (searchParams.get("from") && searchParams.get("to")) {
+            const from = new Date(searchParams.get("from")!);
+            const to = new Date(searchParams.get("to")!);
+            from.setHours(0, 0, 0, 0);
+            to.setHours(23, 59, 59, 999);
+            query.date = { $gte: from, $lte: to };
         } else if (month) {
             // month format: YYYY-MM
             const [year, m] = month.split("-").map(Number);

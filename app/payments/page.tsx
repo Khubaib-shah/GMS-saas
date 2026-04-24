@@ -38,6 +38,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import { endOfMonth, startOfMonth } from "date-fns"
 
 const chartConfig = {
   revenue: {
@@ -51,8 +52,10 @@ const PIE_COLORS = ['hsl(var(--primary))', '#8b5cf6', '#10b981', '#f59e0b', '#ef
 export default function PaymentsPage() {
   const store = useAppStore()
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterPeriod, setFilterPeriod] = useState<"this-month" | "last-month" | "all">("this-month")
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: startOfMonth(new Date()),
+    to: endOfMonth(new Date())
+  })
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
@@ -71,7 +74,7 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, filterPeriod, dateRange, store.searchQuery])
+  }, [searchTerm, dateRange, store.searchQuery])
 
   // ... (filtered useMemo stays same)
 
@@ -89,24 +92,6 @@ export default function PaymentsPage() {
         const date = new Date(p.date)
         return date >= from && date <= to
       })
-    } else if (filterPeriod !== "all") {
-      const now = new Date()
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-
-      if (filterPeriod === "this-month") {
-        result = result.filter((p) => {
-          const date = new Date(p.date)
-          return date >= startOfMonth && date <= endOfMonth
-        })
-      } else if (filterPeriod === "last-month") {
-        const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-        const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0)
-        result = result.filter((p) => {
-          const date = new Date(p.date)
-          return date >= lastMonthStart && date <= lastMonthEnd
-        })
-      }
     }
 
     if (currentSearch) {
@@ -119,7 +104,7 @@ export default function PaymentsPage() {
     }
 
     return result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  }, [store.payments, store.members, store.searchQuery, searchTerm, filterPeriod, dateRange])
+  }, [store.payments, store.members, store.searchQuery, searchTerm, dateRange])
 
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * pageSize
@@ -136,7 +121,7 @@ export default function PaymentsPage() {
       const dateStr = dateObj.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
-        year: filterPeriod === "all" || dateRange ? '2-digit' : undefined
+        year: !dateRange ? '2-digit' : undefined
       })
       grouped[dateStr] = (grouped[dateStr] || 0) + p.amount
     })
@@ -145,7 +130,7 @@ export default function PaymentsPage() {
       date,
       revenue: grouped[date]
     }))
-  }, [filtered, filterPeriod, dateRange])
+  }, [filtered, dateRange])
 
   const methodData = useMemo(() => {
     const grouped: Record<string, number> = {}
@@ -493,31 +478,8 @@ export default function PaymentsPage() {
             <DateRangePicker
               btnClass="!h-10 border-none bg-transparent hover:bg-white/5 text-[10px] font-black uppercase tracking-widest italic rounded-lg"
               date={dateRange}
-              onDateChange={(range) => {
-                setDateRange(range);
-                if (range) setFilterPeriod("all");
-              }}
+              onDateChange={setDateRange}
             />
-
-            <div className="h-6 w-px bg-white/5 hidden md:block" />
-
-            <Select
-              value={filterPeriod}
-              onValueChange={(value) => {
-                setFilterPeriod(value as "this-month" | "last-month" | "all");
-                if (value !== "all") setDateRange(undefined);
-              }}
-            >
-              <SelectTrigger className="h-10 w-full md:w-48 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
-                <span className="text-slate-500 mr-2">Period:</span>
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-                <SelectItem value="this-month" className="text-[10px] font-bold uppercase tracking-widest">This Month</SelectItem>
-                <SelectItem value="last-month" className="text-[10px] font-bold uppercase tracking-widest">Last Month</SelectItem>
-                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Time</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
       </div>
