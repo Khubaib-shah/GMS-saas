@@ -79,7 +79,7 @@ export function MemberQrDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="glass-premium sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             Member QR Code
@@ -98,7 +98,7 @@ export function MemberQrDialog({
               level="H" // High error correction
             />
           </div>
-          
+
           <div className="text-center">
             <h3 className="text-lg font-semibold">{memberName}</h3>
             <p className="text-sm text-muted-foreground font-mono mt-1 text-xs">

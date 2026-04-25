@@ -134,7 +134,7 @@ export function Navbar() {
 
   return (
     <header className={cn(
-      "fixed top-0 right-0 h-16 glass-premium border-b border-border flex items-center justify-between px-4 md:px-6 z-40 transition-all duration-300 ease-in-out left-0",
+      "!rounded-none fixed top-0 right-0 h-16 glass-premium border-b border-border flex items-center justify-between px-4 md:px-6 z-40 transition-all duration-300 ease-in-out left-0",
       "lg:left-64",
       sidebarCollapsed && "lg:left-20"
     )}>
@@ -144,7 +144,7 @@ export function Navbar() {
           variant="ghost"
           size="icon"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="h-9 w-9 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-xl hidden lg:flex"
+          className="h-9 w-9 text-slate-400 hover:text-primary hover:bg-primary/10 hidden lg:flex"
         >
           <Menu className="w-5 h-5" />
         </Button>
