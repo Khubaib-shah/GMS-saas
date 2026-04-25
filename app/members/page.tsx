@@ -17,11 +17,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import { isSubscriptionActive, formatDate } from "@/lib/utils/file-utils";
 import { toast } from "sonner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function MembersPage() {
   const { data: session } = useSession();
@@ -132,27 +145,41 @@ export default function MembersPage() {
         description="See all your gym members in one place."
       >
         <div className="flex items-center gap-2">
-          <Button
-            variant={showTrash ? "destructive" : "outline"}
-            size="sm"
-            onClick={() => setShowTrash(!showTrash)}
-            className={cn(
-              "!h-[38px] px-8 rounded-xl font-black italic tracking-tighter transition-all",
-              showTrash
-                ? "bg-destructive text-white shadow-lg shadow-destructive/20"
-                : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
-            )}
-          >
-            <Trash2 className="w-5 h-5 mr-2" />
-            {showTrash ? "Exit Trash" : "View Trash"}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={showTrash ? "destructive" : "outline"}
+                size="sm"
+                onClick={() => setShowTrash(!showTrash)}
+                className={cn(
+                  "!h-[38px] px-8 rounded-xl font-black italic tracking-tighter transition-all",
+                  showTrash
+                    ? "bg-destructive text-white shadow-lg shadow-destructive/20"
+                    : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
+                )}
+              >
+                <Trash2 className="w-5 h-5 mr-2" />
+                {showTrash ? "Exit Trash" : "View Trash"}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+              {showTrash ? "Back to Member List" : "View Deleted Members"}
+            </TooltipContent>
+          </Tooltip>
 
           {((session?.user as any)?.role !== 'trainer') && !showTrash && (
             <Link href="/members/add">
-              <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                Add Member
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
+                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                    Add Member
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                  Register New Member
+                </TooltipContent>
+              </Tooltip>
             </Link>
           )}
         </div>
@@ -206,209 +233,243 @@ export default function MembersPage() {
       {/* Members Table */}
       <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
         <div className="overflow-x-auto">
-          <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-            <thead>
-              <tr className="border-b border-white/5 bg-white/[0.02]">
-                <th className="text-center md:text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic">
-                  Name
-                </th>
-                <th className="text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic text-nowrap">
-                  Contact Info
-                </th>
-                <th className="text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic">
-                  Subscription
-                </th>
-                <th className="text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic text-nowrap hidden md:table-cell">
-                  Join Date
-                </th>
-                <th className="text-center py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic">
-                  Manage
-                </th>
-              </tr>
-            </thead>
+        <Table className="w-full text-[11px] font-bold tracking-widest uppercase border-none">
+          <TableHeader className="border-b border-white/5 bg-white/[0.02]">
+            <TableRow className="border-none hover:bg-transparent transition-none">
+              <TableHead className="text-center md:text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic text-nowrap">
+                Name
+              </TableHead>
+              <TableHead className="text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic text-nowrap">
+                Contact Info
+              </TableHead>
+              <TableHead className="text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic text-nowrap">
+                Subscription
+              </TableHead>
+              <TableHead className="text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic text-nowrap hidden md:table-cell">
+                Join Date
+              </TableHead>
+              <TableHead className="text-center py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic text-nowrap">
+                Manage
+              </TableHead>
+            </TableRow>
+          </TableHeader>
 
-            <tbody>
-              {loading ? (
-                Array.from({ length: 8 }).map((_, i) => (
-                  <tr key={i} className="border-b border-white/5 animate-pulse">
-                    <td className="py-6 px-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-white/5" />
-                        <div className="space-y-2">
-                          <div className="h-4 w-32 bg-white/5 rounded" />
-                          <div className="h-3 w-20 bg-white/5 rounded" />
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-6 px-6">
+          <TableBody>
+            {loading ? (
+              Array.from({ length: 8 }).map((_, i) => (
+                <TableRow key={i} className="border-b border-white/5 animate-pulse hover:bg-transparent">
+                  <TableCell className="py-6 px-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-white/5" />
                       <div className="space-y-2">
-                        <div className="h-3 w-24 bg-white/5 rounded" />
-                        <div className="h-3 w-32 bg-white/5 rounded" />
+                        <div className="h-4 w-32 bg-white/5 rounded" />
+                        <div className="h-3 w-20 bg-white/5 rounded" />
                       </div>
-                    </td>
-                    <td className="py-6 px-6">
-                      <div className="h-6 w-20 bg-white/5 rounded-lg" />
-                    </td>
-                    <td className="py-6 px-6">
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-6 px-6">
+                    <div className="space-y-2">
                       <div className="h-3 w-24 bg-white/5 rounded" />
-                    </td>
-                    <td className="py-6 px-6">
-                      <div className="flex justify-center gap-2">
-                        <div className="h-9 w-9 bg-white/5 rounded-xl" />
-                        <div className="h-9 w-24 bg-white/5 rounded-xl" />
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                paginatedData.map((member) => {
-                  const subs = store.subscriptions.filter(
-                    (s) => s.memberId === member.id
-                  );
-                  // 1. Check local history if available
-                  let activeSub = subs.find((s) =>
-                    isSubscriptionActive(s.endDate, s.status)
-                  );
-                  // 2. Check injected status fallback
-                  if (!activeSub && (member as any).activeSubscription) {
-                    activeSub = (member as any).activeSubscription;
-                  }
+                      <div className="h-3 w-32 bg-white/5 rounded" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-6 px-6">
+                    <div className="h-6 w-20 bg-white/5 rounded-lg" />
+                  </TableCell>
+                  <TableCell className="py-6 px-6">
+                    <div className="h-3 w-24 bg-white/5 rounded" />
+                  </TableCell>
+                  <TableCell className="py-6 px-6">
+                    <div className="flex justify-center gap-2">
+                      <div className="h-9 w-9 bg-white/5 rounded-xl" />
+                      <div className="h-9 w-24 bg-white/5 rounded-xl" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              paginatedData.map((member) => {
+                const subs = store.subscriptions.filter(
+                  (s) => s.memberId === member.id
+                );
+                // 1. Check local history if available
+                let activeSub = subs.find((s) =>
+                  isSubscriptionActive(s.endDate, s.status)
+                );
+                // 2. Check injected status fallback
+                if (!activeSub && (member as any).activeSubscription) {
+                  activeSub = (member as any).activeSubscription;
+                }
 
-                  const isActive = !!activeSub;
-                  const isPaused = activeSub?.status === "paused" || subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate));
+                const isActive = !!activeSub;
+                const isPaused = activeSub?.status === "paused" || subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate));
 
-                  return (
-                    <tr
-                      key={member.id}
-                      className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row"
-                    >
-                      <td className="py-3 px-2 md:py-6 md:px-6">
-                        <div className="flex items-center gap-4">
-                          <div className="relative">
-                            {member.photoBase64 ? (
-                              <img
-                                src={member.photoBase64 || "/placeholder.svg"}
-                                alt={member.firstName}
-                                className="w-10 h-10 rounded-xl object-cover grayscale group-hover/row:grayscale-0 transition-all border border-white/5"
-                              />
-                            ) : (
-                              <div className="hidden md:flex w-10 h-10 rounded-xl bg-slate-900 border border-white/5  items-center justify-center text-primary font-black text-xs">
-                                {member.firstName.charAt(0)}
-                              </div>
-                            )}
-                            <div className="hidden md:flex absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-background border border-black/10 dark:border-white/10 items-center justify-center">
-                              <div className={cn("w-1.5 h-1.5 rounded-full", isActive ? "bg-primary" : "bg-red-500")} />
+                return (
+                  <TableRow
+                    key={member.id}
+                    className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row"
+                  >
+                    <TableCell className="py-3 px-2 md:py-6 md:px-6">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          {member.photoBase64 ? (
+                            <img
+                              src={member.photoBase64 || "/placeholder.svg"}
+                              alt={member.firstName}
+                              className="w-10 h-10 rounded-xl object-cover grayscale group-hover/row:grayscale-0 transition-all border border-white/5"
+                            />
+                          ) : (
+                            <div className="hidden md:flex w-10 h-10 rounded-xl bg-slate-900 border border-white/5  items-center justify-center text-primary font-black text-xs">
+                              {member.firstName.charAt(0)}
                             </div>
-                          </div>
-                          <div>
-                            <span className="text-foreground font-black italic tracking-tighter text-sm md:text-lg block group-hover/row:text-primary transition-colors text-nowrap">
-                              {member.firstName} <span className="hidden md:inline">{member.lastName || ""}</span>
-                            </span>
-                            <span className="hidden md:block text-[9px] text-slate-500 font-mono tracking-widest mt-0.5">ID: {member.id.toUpperCase().slice(-8)}</span>
+                          )}
+                          <div className="hidden md:flex absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-background border border-black/10 dark:border-white/10 items-center justify-center">
+                            <div className={cn("w-1.5 h-1.5 rounded-full", isActive ? "bg-primary" : "bg-red-500")} />
                           </div>
                         </div>
-                      </td>
-                      <td className="py-3 px-2 md:py-6 md:px-6">
-                        <div className="space-y-1">
-                          <div className="text-foreground font-mono text-nowrap text-[10px]">{member.phone}</div>
-                          <div className="text-slate-500 text-[9px] font-mono lowercase hidden md:block">
-                            {member.email}
+                        <div>
+                          <span className="text-foreground font-black italic tracking-tighter text-sm md:text-lg block group-hover/row:text-primary transition-colors text-nowrap">
+                            {member.firstName} <span className="hidden md:inline">{member.lastName || ""}</span>
+                          </span>
+                          <span className="hidden md:block text-[9px] text-slate-500 font-mono tracking-widest mt-0.5">ID: {member.id.toUpperCase().slice(-8)}</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3 px-2 md:py-6 md:px-6">
+                      <div className="space-y-1">
+                        <div className="text-foreground font-mono text-nowrap text-[10px]">{member.phone}</div>
+                        <div className="text-slate-500 text-[9px] font-mono lowercase hidden md:block">
+                          {member.email}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3 px-2 md:py-6 md:px-6 text-center">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className={cn(
+                            "inline-flex items-center justify-center p-2 rounded-lg border",
+                            isPaused
+                              ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                              : isActive
+                                ? "bg-primary/10 border-primary/20 text-primary"
+                                : "bg-red-500/10 border-red-500/20 text-red-500"
+                          )}>
+                            {isPaused ? <AlertTriangle className="w-4 h-4 text-amber-500" /> : isActive ? <CircleCheckBigIcon className="w-4 h-4 text-primary" /> : <AlertCircle className="w-4 h-4 text-red-500" />}
                           </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-2 md:py-6 md:px-6 text-center">
-                        <div className={cn(
-                          "inline-flex items-center justify-center p-2 rounded-lg border",
-                          isPaused
-                            ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
-                            : isActive
-                              ? "bg-primary/10 border-primary/20 text-primary"
-                              : "bg-red-500/10 border-red-500/20 text-red-500"
-                        )}>
-                          {isPaused ? <AlertTriangle className="w-4 h-4 text-amber-500" /> : isActive ? <CircleCheckBigIcon className="w-4 h-4 text-primary" /> : <AlertCircle className="w-4 h-4 text-red-500" />}
-                        </div>
-                      </td>
-                      <td className="py-3 px-2 md:py-6 md:px-6 text-slate-500 font-mono text-[10px] text-nowrap hidden md:table-cell">
-                        {formatDate(member.joinDate).toUpperCase()}
-                      </td>
-                      <td className="py-3 px-2 md:py-6 md:px-6">
-                        <div className="flex gap-2 items-center justify-center">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              if (!canScan) {
-                                toast("Premium Feature", {
-                                  description: "QR Code scanning is a premium feature.",
-                                  action: {
-                                    label: "Upgrade",
-                                    onClick: () => {
-                                      // router.push("/plans");
+                        </TooltipTrigger>
+                        <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                          {isPaused ? "Paused" : isActive ? "Active" : "Expired"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell className="py-3 px-2 md:py-6 md:px-6 text-slate-500 font-mono text-[10px] text-nowrap hidden md:table-cell">
+                      {formatDate(member.joinDate).toUpperCase()}
+                    </TableCell>
+                    <TableCell className="py-3 px-2 md:py-6 md:px-6">
+                      <div className="flex gap-2 items-center justify-center">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (!canScan) {
+                                  toast("Premium Feature", {
+                                    description: "QR Code scanning is a premium feature.",
+                                    action: {
+                                      label: "Upgrade",
+                                      onClick: () => {
+                                        // router.push("/plans");
+                                      },
                                     },
-                                  },
+                                  });
+                                  return;
+                                }
+                                setQrMember({
+                                  id: member.id,
+                                  name: `${member.firstName} ${member.lastName || ""}`,
                                 });
-                                return;
-                              }
-                              setQrMember({
-                                id: member.id,
-                                name: `${member.firstName} ${member.lastName || ""}`,
-                              });
-                            }}
-                            className={cn(
-                              "h-9 w-9 rounded-xl border border-white/5 bg-white/5 transition-all text-slate-400 hover:text-primary hover:border-primary/50",
-                              !canScan && "opacity-20 grayscale"
-                            )}
-                          >
-                            <QrCode className="w-4 h-4" />
-                          </Button>
-
-                          {showTrash && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRestore(member.id)}
-                              className="h-9 px-4 rounded-xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all font-black italic text-[10px] tracking-tighter"
-                            >
-                              Restore
-                            </Button>
-                          )}
-
-                          {!showTrash && (
-                            <Link href={`/members/${member.id}`}>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all"
-                              >
-                                <Eye className="w-4 h-4" />
-                                <span className="read-only:hidden md:block">View Profile</span>
-                              </Button>
-                            </Link>
-                          )}
-                          {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeleteId(member.id)}
+                              }}
                               className={cn(
-                                "h-9 w-9 rounded-xl border transition-all",
-                                showTrash
-                                  ? "border-destructive bg-destructive/10 text-destructive hover:bg-destructive hover:text-white"
-                                  : "border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white"
+                                "h-9 w-9 rounded-xl border border-white/5 bg-white/5 transition-all text-slate-400 hover:text-primary hover:border-primary/50",
+                                !canScan && "opacity-20 grayscale"
                               )}
-                              title={showTrash ? "Permanently Delete" : "Move to Trash"}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <QrCode className="w-4 h-4" />
                             </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                          </TooltipTrigger>
+                          <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                            {canScan ? "Member QR Code" : "Upgrade to use QR"}
+                          </TooltipContent>
+                        </Tooltip>
+
+                        {showTrash && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRestore(member.id)}
+                                className="h-9 px-4 rounded-xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all font-black italic text-[10px] tracking-tighter"
+                              >
+                                Restore
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                              Restore Member
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+
+                        {!showTrash && (
+                          <Link href={`/members/${member.id}`}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                  <span className="read-only:hidden md:block ml-2">View Profile</span>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                View Details
+                              </TooltipContent>
+                            </Tooltip>
+                          </Link>
+                        )}
+                        {['owner', 'gym_owner', 'super_admin', 'manager'].includes((session?.user as any)?.role) && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDeleteId(member.id)}
+                                className={cn(
+                                  "h-9 w-9 rounded-xl border transition-all",
+                                  showTrash
+                                    ? "border-destructive bg-destructive/10 text-destructive hover:bg-destructive hover:text-white"
+                                    : "border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white"
+                                )}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                              {showTrash ? "Permanently Delete" : "Move to Trash"}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
         </div>
         {filtered.length === 0 && !loading && (
           <div className="text-center py-24 bg-white/[0.01]">

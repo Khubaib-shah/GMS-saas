@@ -45,6 +45,20 @@ import { Label } from "@/components/ui/label";
 import { formatCurrency, formatDate, isSubscriptionActive } from "@/lib/utils/file-utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function MemberDetailPage({
   params,
@@ -799,27 +813,27 @@ export default function MemberDetailPage({
 
                 <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-                      <thead>
-                        <tr className="border-b border-white/5 bg-white/[0.02]">
-                          <th className="px-6 py-6 font-black text-slate-500 italic text-left">Transaction ID</th>
-                          <th className="px-6 py-6 font-black text-slate-500 italic text-left">Date</th>
-                          <th className="px-6 py-6 font-black text-slate-500 italic text-left">Method</th>
-                          <th className="px-6 py-6 font-black text-slate-500 italic text-right relative min-w-[100px]">Amount</th>
+                    <Table className="w-full text-[11px] font-bold tracking-widest uppercase border-none">
+                      <TableHeader className="border-b border-white/5 bg-white/[0.02]">
+                        <TableRow className="border-none hover:bg-transparent transition-none">
+                          <TableHead className="px-6 py-6 font-black text-slate-500 italic text-left">Transaction ID</TableHead>
+                          <TableHead className="px-6 py-6 font-black text-slate-500 italic text-left">Date</TableHead>
+                          <TableHead className="px-6 py-6 font-black text-slate-500 italic text-left">Method</TableHead>
+                          <TableHead className="px-6 py-6 font-black text-slate-500 italic text-right relative min-w-[100px]">Amount</TableHead>
                           {((session?.user as any)?.role !== 'trainer') && (
-                            <th className="px-6 py-6 font-black text-slate-500 italic text-right text-slate-500 uppercase tracking-widest">Actions</th>
+                            <TableHead className="px-6 py-6 font-black text-slate-500 italic text-right text-slate-500 uppercase tracking-widest">Actions</TableHead>
                           )}
-                        </tr>
-                      </thead>
-                      <tbody>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
                         {isLoading ? (
-                          <tr>
-                            <td colSpan={5} className="py-6 px-6"><Skeleton className="w-full h-8" /></td>
-                          </tr>
+                          <TableRow>
+                            <TableCell colSpan={5} className="py-6 px-6 hover:bg-transparent"><Skeleton className="w-full h-8" /></TableCell>
+                          </TableRow>
                         ) : memberPayments.length > 0 ? (
                           memberPayments.map((pay) => (
-                            <tr key={pay.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                              <td className="px-6 py-6 font-mono text-[10px] text-slate-500 flex items-center gap-2">
+                            <TableRow key={pay.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
+                              <TableCell className="px-6 py-6 font-mono text-[10px] text-slate-500 flex items-center gap-2">
                                 {pay.id.slice(-8).toUpperCase()}
                                 {pay.receiptUrl && (
                                   <button
@@ -830,49 +844,63 @@ export default function MemberDetailPage({
                                     <Eye className="w-3 h-3" />
                                   </button>
                                 )}
-                              </td>
-                              <td className="px-6 py-6 font-mono text-slate-400 text-[11px]">{formatDate(pay.date)}</td>
-                              <td className="px-6 py-6">
+                              </TableCell>
+                              <TableCell className="px-6 py-6 font-mono text-slate-400 text-[11px]">{formatDate(pay.date)}</TableCell>
+                              <TableCell className="px-6 py-6">
                                 <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest uppercase">
                                   {pay.method || "Cash"}
                                 </span>
-                              </td>
-                              <td className="px-6 py-6 text-right font-black tracking-tighter text-base text-foreground font-mono">
+                              </TableCell>
+                              <TableCell className="px-6 py-6 text-right font-black tracking-tighter text-base text-foreground font-mono">
                                 {formatCurrency(pay.amount)}
-                              </td>
+                              </TableCell>
                               {((session?.user as any)?.role !== 'trainer') && (
-                                <td className="px-6 py-6 text-right">
+                                <TableCell className="px-6 py-6 text-right">
                                   <div className="flex justify-end gap-1 opacity-100 transition-opacity">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 rounded-xl border border-white/5 bg-white/5 text-slate-400 hover:text-primary hover:border-primary/50 transition-all"
-                                      onClick={() => handleOpenEditPayment(pay)}
-                                    >
-                                      <Edit className="w-3.5 h-3.5" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all"
-                                      onClick={() => setDeletePaymentId(pay.id)}
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </Button>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-8 w-8 rounded-xl border border-white/5 bg-white/5 text-slate-400 hover:text-primary hover:border-primary/50 transition-all"
+                                          onClick={() => handleOpenEditPayment(pay)}
+                                        >
+                                          <Edit className="w-3.5 h-3.5" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                        Edit Payment
+                                      </TooltipContent>
+                                    </Tooltip>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                                          onClick={() => setDeletePaymentId(pay.id)}
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                        Delete Payment
+                                      </TooltipContent>
+                                    </Tooltip>
                                   </div>
-                                </td>
+                                </TableCell>
                               )}
-                            </tr>
+                            </TableRow>
                           ))
                         ) : (
-                          <tr>
-                            <td colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                          <TableRow className="hover:bg-transparent">
+                            <TableCell colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
                               No payment history recorded for this member.
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         )}
-                      </tbody>
-                    </table>
+                      </TableBody>
+                    </Table>
                   </div>
                 </div>
               </div>

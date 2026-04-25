@@ -176,58 +176,58 @@ export default function AttendancePage() {
 
                     <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-                                <thead>
-                                    <tr className="border-b border-white/5 bg-white/[0.02]">
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Member</th>
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Check In</th>
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Check Out</th>
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Status</th>
-                                        <th className="text-right py-6 px-6 font-black text-slate-500 italic">View</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <Table className="w-full text-[11px] font-bold tracking-widest uppercase border-none">
+                                <TableHeader className="border-b border-white/5 bg-white/[0.02]">
+                                    <TableRow className="border-none hover:bg-transparent transition-none">
+                                        <TableHead className="text-left py-6 px-6 font-black text-slate-500 italic">Member</TableHead>
+                                        <TableHead className="text-left py-6 px-6 font-black text-slate-500 italic">Check In</TableHead>
+                                        <TableHead className="text-left py-6 px-6 font-black text-slate-500 italic">Check Out</TableHead>
+                                        <TableHead className="text-left py-6 px-6 font-black text-slate-500 italic">Status</TableHead>
+                                        <TableHead className="text-right py-6 px-6 font-black text-slate-500 italic">View</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
                                     {loadingReports ? (
                                         Array.from({ length: 8 }).map((_, i) => (
-                                            <tr key={i} className="border-b border-white/5 animate-pulse">
-                                                <td className="py-6 px-6">
+                                            <TableRow key={i} className="border-b border-white/5 animate-pulse hover:bg-transparent">
+                                                <TableCell className="py-6 px-6">
                                                     <div className="h-4 w-32 bg-white/5 rounded" />
-                                                </td>
-                                                <td className="py-6 px-6">
+                                                </TableCell>
+                                                <TableCell className="py-6 px-6">
                                                     <div className="h-4 w-24 bg-white/5 rounded" />
-                                                </td>
-                                                <td className="py-6 px-6">
+                                                </TableCell>
+                                                <TableCell className="py-6 px-6">
                                                     <div className="h-4 w-24 bg-white/5 rounded" />
-                                                </td>
-                                                <td className="py-6 px-6">
+                                                </TableCell>
+                                                <TableCell className="py-6 px-6">
                                                     <div className="h-6 w-16 bg-white/5 rounded-lg" />
-                                                </td>
-                                                <td className="py-6 px-6">
+                                                </TableCell>
+                                                <TableCell className="py-6 px-6">
                                                     <div className="flex justify-end">
                                                         <div className="h-8 w-8 bg-white/5 rounded-xl" />
                                                     </div>
-                                                </td>
-                                            </tr>
+                                                </TableCell>
+                                            </TableRow>
                                         ))
                                     ) : filteredReports.length > 0 ? (
                                         paginatedReports.map((record: any) => {
                                             return (
-                                                <tr key={record.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                                                    <td className="py-6 px-6 font-black italic text-foreground tracking-tighter">
+                                                <TableRow key={record.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
+                                                    <TableCell className="py-6 px-6 font-black italic text-foreground tracking-tighter">
                                                         {record.memberId?.firstName} {record.memberId?.lastName}
-                                                    </td>
-                                                    <td className="py-6 px-6 font-mono text-primary">
+                                                    </TableCell>
+                                                    <TableCell className="py-6 px-6 font-mono text-primary">
                                                         {record.checkInTime ? new Date(record.checkInTime).toLocaleTimeString() : '-'}
-                                                    </td>
-                                                    <td className="py-6 px-6 font-mono text-slate-500">
+                                                    </TableCell>
+                                                    <TableCell className="py-6 px-6 font-mono text-slate-500">
                                                         {record.checkOutTime ? new Date(record.checkOutTime).toLocaleTimeString() : '-'}
-                                                    </td>
-                                                    <td className="py-6 px-6">
+                                                    </TableCell>
+                                                    <TableCell className="py-6 px-6">
                                                         <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest border border-primary/20">
                                                             {record.status}
                                                         </span>
-                                                    </td>
-                                                    <td className="py-6 px-6 text-right">
+                                                    </TableCell>
+                                                    <TableCell className="py-6 px-6 text-right">
                                                         <Link href={`/members/${record.memberId?.id}`}>
                                                             <Button
                                                                 variant="ghost"
@@ -237,19 +237,19 @@ export default function AttendancePage() {
                                                                 <Eye className="w-4 h-4" />
                                                             </Button>
                                                         </Link>
-                                                    </td>
-                                                </tr>
+                                                    </TableCell>
+                                                </TableRow>
                                             )
                                         })
                                     ) : (
-                                        <tr>
-                                            <td colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                                        <TableRow className="hover:bg-transparent">
+                                            <TableCell colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
                                                 No records found for today.
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     )}
-                                </tbody>
-                            </table>
+                                </TableBody>
+                            </Table>
                         </div>
                         <PaginationHUD
                             totalItems={filteredReports.length}

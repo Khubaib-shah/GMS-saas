@@ -4,13 +4,11 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
     Search,
-    Filter,
     Building2,
     ChevronLeft,
     ChevronRight,
     ExternalLink,
     Users,
-    CreditCard,
     Plus,
     Trash2,
     X,
@@ -29,6 +27,20 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
@@ -206,9 +218,9 @@ export default function GymsPage() {
             {/* Table - Glass Style */}
             <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-                        <thead>
-                            <tr className="border-b border-white/5 bg-white/[0.02]">
+                    <Table className="w-full text-[11px] font-bold tracking-widest uppercase border-none">
+                        <TableHeader className="border-b border-white/5 bg-white/[0.02]">
+                            <TableRow className="border-none hover:bg-transparent transition-none">
                                 {[
                                     "Gym Name",
                                     "Owner",
@@ -221,20 +233,20 @@ export default function GymsPage() {
                                     "Expiry",
                                     "Actions",
                                 ].map((h) => (
-                                    <th
+                                    <TableHead
                                         key={h}
                                         className="px-6 py-6 text-left font-black text-slate-500 italic"
                                     >
                                         {h}
-                                    </th>
+                                    </TableHead>
                                 ))}
-                            </tr>
-                        </thead>
-                        <tbody>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
                             {loading ? (
                                 Array.from({ length: 3 }).map((_, i) => (
-                                    <tr key={i} className="border-b border-black/5 dark:border-white/5 animate-pulse">
-                                        <td className="px-6 py-6" colSpan={2}>
+                                    <TableRow key={i} className="border-b border-black/5 dark:border-white/5 animate-pulse hover:bg-transparent">
+                                        <TableCell className="px-6 py-6" colSpan={2}>
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-xl bg-white/5" />
                                                 <div className="space-y-2">
@@ -242,33 +254,33 @@ export default function GymsPage() {
                                                     <div className="h-3 w-40 bg-white/5 rounded" />
                                                 </div>
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-6"><div className="h-3 w-16 bg-white/5 rounded" /></td>
-                                        <td className="px-6 py-6"><div className="h-3 w-12 bg-white/5 rounded" /></td>
-                                        <td className="px-6 py-6"><div className="h-6 w-20 bg-white/5 rounded-lg" /></td>
-                                        <td className="px-6 py-6"><div className="h-4 w-12 bg-white/5 rounded" /></td>
-                                        <td className="px-6 py-6"><div className="h-4 w-20 bg-white/5 rounded" /></td>
-                                        <td className="px-6 py-6"><div className="h-3 w-8 bg-white/5 rounded" /></td>
-                                        <td className="px-6 py-6"><div className="h-3 w-20 bg-white/5 rounded" /></td>
-                                        <td className="px-6 py-6"><div className="h-9 w-9 bg-white/5 rounded-xl ml-auto" /></td>
-                                    </tr>
+                                        </TableCell>
+                                        <TableCell className="px-6 py-6"><div className="h-3 w-16 bg-white/5 rounded" /></TableCell>
+                                        <TableCell className="px-6 py-6"><div className="h-3 w-12 bg-white/5 rounded" /></TableCell>
+                                        <TableCell className="px-6 py-6"><div className="h-6 w-20 bg-white/5 rounded-lg" /></TableCell>
+                                        <TableCell className="px-6 py-6"><div className="h-4 w-12 bg-white/5 rounded" /></TableCell>
+                                        <TableCell className="px-6 py-6"><div className="h-4 w-20 bg-white/5 rounded" /></TableCell>
+                                        <TableCell className="px-6 py-6"><div className="h-3 w-8 bg-white/5 rounded" /></TableCell>
+                                        <TableCell className="px-6 py-6"><div className="h-3 w-20 bg-white/5 rounded" /></TableCell>
+                                        <TableCell className="px-6 py-6"><div className="h-9 w-9 bg-white/5 rounded-xl ml-auto" /></TableCell>
+                                    </TableRow>
                                 ))
                             ) : gyms.length === 0 ? (
-                                <tr>
-                                    <td colSpan={10} className="px-4 py-12 text-center text-slate-500 font-black italic uppercase tracking-widest text-[10px]">
+                                <TableRow className="hover:bg-transparent">
+                                    <TableCell colSpan={10} className="px-4 py-12 text-center text-slate-500 font-black italic uppercase tracking-widest text-[10px]">
                                         No gyms found matching your criteria
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ) : (
                                 gyms.map((gym) => {
                                     const badge = gym.deletedAt ? STATUS_BADGES.deleted : (STATUS_BADGES[gym.subscriptionStatus] || STATUS_BADGES.trial);
                                     return (
-                                        <tr
+                                        <TableRow
                                             key={gym.id}
                                             className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] cursor-pointer transition-colors group/row"
                                             onClick={() => router.push(`/super-admin/gyms/${gym.id}`)}
                                         >
-                                            <td className="px-6 py-6">
+                                            <TableCell className="px-6 py-6">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20 shadow-[0_0_15px_rgba(var(--indigo-500),0.1)] group-hover/row:bg-indigo-500/20 transition-colors">
                                                         <Building2 className="w-5 h-5 text-indigo-400" />
@@ -277,70 +289,90 @@ export default function GymsPage() {
                                                         {gym.name}
                                                     </span>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-6">
+                                            </TableCell>
+                                            <TableCell className="px-6 py-6">
                                                 <div>
                                                     <p className="text-foreground font-black italic tracking-tighter text-sm mb-0.5">{gym.ownerName}</p>
                                                     <p className="text-[9px] text-slate-500 font-mono tracking-widest lowercase">{gym.ownerEmail}</p>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-6 text-slate-500 font-black italic tracking-widest text-[10px]">{gym.city || "—"}</td>
-                                            <td className="px-6 py-6">
+                                            </TableCell>
+                                            <TableCell className="px-6 py-6 text-slate-500 font-black italic tracking-widest text-[10px]">{gym.city || "—"}</TableCell>
+                                            <TableCell className="px-6 py-6">
                                                 <span className="text-[10px] font-black italic tracking-widest text-indigo-400">{gym.planName}</span>
-                                            </td>
-                                            <td className="px-6 py-6">
-                                                <span
-                                                    className={cn(
-                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
-                                                        badge.class
-                                                    )}
-                                                >
-                                                    <div className={cn("w-1 h-1 rounded-full bg-current")} />
-                                                    {badge.label}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-6">
+                                            </TableCell>
+                                            <TableCell className="px-6 py-6">
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <span
+                                                            className={cn(
+                                                                "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
+                                                                badge.class
+                                                            )}
+                                                        >
+                                                            <div className={cn("w-1 h-1 rounded-full bg-current")} />
+                                                            {badge.label}
+                                                        </span>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                                        Gym Status
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell className="px-6 py-6">
                                                 <div className="flex items-center gap-2 text-slate-300">
                                                     <Users className="w-4 h-4 text-slate-500" />
                                                     <span className="text-base font-black italic tracking-tighter">{gym.totalMembers}</span>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-6 text-base font-black italic tracking-tighter text-emerald-400">
+                                            </TableCell>
+                                            <TableCell className="px-6 py-6 text-base font-black italic tracking-tighter text-emerald-400">
                                                 {formatPKR(gym.totalRevenue)}
-                                            </td>
-                                            <td className="px-6 py-6 text-slate-500 font-mono text-[10px]">{gym.branchCount}</td>
-                                            <td className="px-6 py-6 text-slate-500 font-mono text-[10px]">
+                                            </TableCell>
+                                            <TableCell className="px-6 py-6 text-slate-500 font-mono text-[10px]">{gym.branchCount}</TableCell>
+                                            <TableCell className="px-6 py-6 text-slate-500 font-mono text-[10px]">
                                                 {gym.expiryDate
                                                     ? new Date(gym.expiryDate).toLocaleDateString("en-PK").toUpperCase()
                                                     : "—"}
-                                            </td>
-                                            <td className="px-6 py-6">
+                                            </TableCell>
+                                            <TableCell className="px-6 py-6">
                                                 <div className="flex items-center justify-end gap-3">
                                                     {gym.deletedAt && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-9 w-9 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"
-                                                            title="Delete Permanently"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setGymToDelete(gym.id);
-                                                            }}
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </Button>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-9 w-9 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setGymToDelete(gym.id);
+                                                                    }}
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                                                Delete Permanently
+                                                            </TooltipContent>
+                                                        </Tooltip>
                                                     )}
-                                                    <div className="h-9 w-9 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-slate-500 group-hover/row:text-primary transition-colors">
-                                                        <ExternalLink className="w-4 h-4" />
-                                                    </div>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <div className="h-9 w-9 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-slate-500 group-hover/row:text-primary transition-colors">
+                                                                <ExternalLink className="w-4 h-4" />
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                                            View Dashboard
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     );
                                 })
                             )}
-                        </tbody>
-                    </table>
+                        </TableBody>
+                    </Table>
                 </div>
 
                 {/* Pagination */}

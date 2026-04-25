@@ -58,6 +58,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Resource types from AuditLog model
 const RESOURCES = [
@@ -187,24 +192,39 @@ export default function AuditlogsClient() {
         description="See everything that happens in your gym"
       >
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={fetchLogs}
-            disabled={loading}
-            className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
-          >
-            <RefreshCw
-              className={cn("h-4 w-4 mr-2", loading && "animate-spin")}
-            />
-            REFRESH
-          </Button>
-          <Button
-            variant="outline"
-            className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            EXPORT
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                onClick={fetchLogs}
+                disabled={loading}
+                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+              >
+                <RefreshCw
+                  className={cn("h-4 w-4 mr-2", loading && "animate-spin")}
+                />
+                REFRESH
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+              Reload activity logs
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                EXPORT
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+              Download history
+            </TooltipContent>
+          </Tooltip>
         </div>
       </DashboardHeader>
 
@@ -282,19 +302,33 @@ export default function AuditlogsClient() {
         </div>
 
         <div className="flex items-center gap-2 pt-2 lg:pt-0 lg:pl-3 border-t lg:border-t-0 lg:border-l border-white/10 mt-2 lg:mt-0">
-          <Button
-            onClick={handleApplyFilters}
-            className="flex-1 lg:flex-none h-10 md:h-9 px-8 bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-[11px] rounded-xl lg:rounded-lg neon-glow shadow-lg shadow-primary/20"
-          >
-            Apply
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={handleResetFilters}
-            className="h-10 w-10 md:h-9 md:w-9 text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl lg:rounded-lg p-0 border border-white/5 lg:border-none"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleApplyFilters}
+                className="flex-1 lg:flex-none h-10 md:h-9 px-8 bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-[11px] rounded-xl lg:rounded-lg neon-glow shadow-lg shadow-primary/20"
+              >
+                Apply
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+              Filter records
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                onClick={handleResetFilters}
+                className="h-10 w-10 md:h-9 md:w-9 text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl lg:rounded-lg p-0 border border-white/5 lg:border-none"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+              Clear all filters
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
@@ -385,15 +419,22 @@ export default function AuditlogsClient() {
                       </div>
                     </TableCell>
                     <TableCell className="py-2">
-                      <Badge
-                        className={cn(
-                          "text-[9px] font-black uppercase tracking-widest h-5 px-2 rounded-md",
-                          getActionColor(log.action),
-                        )}
-                        variant="outline"
-                      >
-                        {log.action.replace("_", ":")}
-                      </Badge>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Badge
+                            className={cn(
+                              "text-[9px] font-black uppercase tracking-widest h-5 px-2 rounded-md",
+                              getActionColor(log.action),
+                            )}
+                            variant="outline"
+                          >
+                            {log.action.replace("_", ":")}
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                          Action Type
+                        </TooltipContent>
+                      </Tooltip>
                     </TableCell>
                     <TableCell className="py-2">
                       <div className="flex flex-col">
@@ -414,15 +455,22 @@ export default function AuditlogsClient() {
                       {JSON.stringify(log.details || {})}
                     </TableCell>
                     <TableCell className="py-2 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedLog(log)}
-                        className="h-7 w-7 p-0 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-md"
-                      >
-                        <Eye className="h-3.5 w-3.5" />
-                        <span className="sr-only">View Details</span>
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedLog(log)}
+                            className="h-7 w-7 p-0 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-md"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                            <span className="sr-only">View Details</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                          Inspect log
+                        </TooltipContent>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))

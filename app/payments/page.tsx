@@ -38,6 +38,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { getPreviousPeriod, calculateTrend, isDateInRange } from "@/lib/analytics-utils"
 import { endOfMonth, startOfMonth } from "date-fns"
 
@@ -247,13 +253,20 @@ export default function PaymentsPage() {
         subtitle="Track your gym's income"
         description="View all payments received from members."
       >
-        <Button 
-          onClick={handleExportPDF} 
-          className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] flex items-center gap-2"
-        >
-          <Download className="w-3.5 h-3.5" />
-          Export PDF
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              onClick={handleExportPDF} 
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] flex items-center gap-2"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Export PDF
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+            Download Payment Report
+          </TooltipContent>
+        </Tooltip>
       </DashboardHeader>
 
        {/* Search & Filter HUD */}
@@ -507,56 +520,63 @@ export default function PaymentsPage() {
       {/* Payments Table */}
       <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
         <div className="overflow-x-auto">
-          <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-            <thead>
-              <tr className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]">
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Member</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Amount</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Date</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Method</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Description</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table className="w-full text-[11px] font-bold tracking-widest uppercase border-none">
+            <TableHeader className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]">
+              <TableRow className="border-none hover:bg-transparent transition-none">
+                <TableHead className="text-left py-6 px-6 font-black text-slate-500 italic">Member</TableHead>
+                <TableHead className="text-left py-6 px-6 font-black text-slate-500 italic">Amount</TableHead>
+                <TableHead className="text-left py-6 px-6 font-black text-slate-500 italic">Date</TableHead>
+                <TableHead className="text-left py-6 px-6 font-black text-slate-500 italic">Method</TableHead>
+                <TableHead className="text-left py-6 px-6 font-black text-slate-500 italic">Description</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {loading ? Array.from({ length: 8 }).map((_, i) => <TableTdSkeleton key={i} />) : filtered.length > 0 ? (
                 paginatedData.map((payment) => {
                   const member = store.members.find((m) => m.id === payment.memberId)
                   return (
-                    <tr key={payment.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                      <td className="py-6 px-6">
+                    <TableRow key={payment.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
+                      <TableCell className="py-6 px-6">
                         <span className="text-foreground font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
                           {member?.firstName} {member?.lastName || ""}
                         </span>
-                      </td>
-                      <td className="py-6 px-6 font-black text-primary text-base">
+                      </TableCell>
+                      <TableCell className="py-6 px-6 font-black text-primary text-base">
                         {formatCurrency(payment.amount)}
-                      </td>
-                      <td className="py-6 px-6 text-slate-500 font-mono text-[10px] whitespace-nowrap">
+                      </TableCell>
+                      <TableCell className="py-6 px-6 text-slate-500 font-mono text-[10px] whitespace-nowrap">
                         {formatDate(payment.date).toUpperCase()}
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[9px] font-black tracking-widest italic group-hover/row:border-primary/20 transition-all">
-                          {payment.method.toUpperCase()}
-                        </div>
-                      </td>
-                      <td className="py-6 px-6 text-slate-500 font-mono text-[9px] lowercase max-w-xs truncate">
+                      </TableCell>
+                      <TableCell className="py-6 px-6">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[9px] font-black tracking-widest italic group-hover:border-primary/20 transition-all">
+                              {payment.method.toUpperCase()}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                            Payment Method
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell className="py-6 px-6 text-slate-500 font-mono text-[9px] lowercase max-w-xs truncate">
                         {payment.description}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   )
                 })
               ) : (
-                <tr>
-                  <td colSpan={5} className="py-24 text-center">
+                <TableRow>
+                  <TableCell colSpan={5} className="py-24 text-center hover:bg-transparent">
                     <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
                       <DollarSign className="w-8 h-8 text-slate-700" />
                     </div>
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No payments found</p>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
         <PaginationHUD
           totalItems={filtered.length}

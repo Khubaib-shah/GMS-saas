@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 import { Card } from "@/components/ui/card";
-import { Edit2, Plus, Trash2, PauseCircle, PlayCircle, Eye, Search } from "lucide-react";
+import { Edit2, Plus, Trash2, PauseCircle, PlayCircle, Eye, Search, PauseCircleIcon, CircleCheckBig, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/lib/store";
+import { PaginationHUD } from "@/components/ui/pagination-hud";
 import { DashboardHeader } from "@/components/dashboard-header";
 import {
   isSubscriptionActive,
@@ -28,6 +29,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
 import {
   Table,
   TableBody,
@@ -46,7 +48,12 @@ import {
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import Link from "next/link";
 import { PlanSkeleton } from "@/components/plan-skeleton";
-import { div } from "three/src/nodes/math/OperatorNode.js";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 
 export default function SubscriptionsPage() {
   const { data: session, status } = useSession();
@@ -74,6 +81,8 @@ export default function SubscriptionsPage() {
 
   const [editFormData, setEditFormData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   // Load data on mount
   useEffect(() => {
@@ -178,6 +187,10 @@ export default function SubscriptionsPage() {
     }
   };
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [store.searchQuery]);
+
   const handlePauseSubscription = async () => {
     if (!selectedSubscription) return;
     setIsProcessing(true);
@@ -221,25 +234,32 @@ export default function SubscriptionsPage() {
     );
   });
 
-  const memberSubscriptions = store.subscriptions
-    .map((sub) => {
-      const member = store.members.find((m) => m.id === sub.memberId);
-      const plan = store.plans.find((p) => p.id === sub.planId);
-      const gym = gyms.find((g) => g._id === sub.gymId);
-      return { ...sub, member, plan, gym };
-    })
-    .filter((sub) => sub.member) // Filter out orphans (deleted members)
-    .filter((sub) => {
-      if (!store.searchQuery) return true;
-      const lower = store.searchQuery.toLowerCase();
-      return (
-        `${sub.member?.firstName} ${sub.member?.lastName || ""}`
-          .toLowerCase()
-          .includes(lower) ||
-        (sub.plan?.name || "").toLowerCase().includes(lower) ||
-        (sub.gym?.name || "").toLowerCase().includes(lower)
-      );
-    });
+  const filteredSubscriptions = useMemo(() => {
+    return store.subscriptions
+      .map((sub) => {
+        const member = store.members.find((m) => m.id === sub.memberId);
+        const plan = store.plans.find((p) => p.id === sub.planId);
+        const gym = gyms.find((g) => g._id === sub.gymId);
+        return { ...sub, member, plan, gym };
+      })
+      .filter((sub) => sub.member) // Filter out orphans (deleted members)
+      .filter((sub) => {
+        if (!store.searchQuery) return true;
+        const lower = store.searchQuery.toLowerCase();
+        return (
+          `${sub.member?.firstName} ${sub.member?.lastName || ""}`
+            .toLowerCase()
+            .includes(lower) ||
+          (sub.plan?.name || "").toLowerCase().includes(lower) ||
+          (sub.gym?.name || "").toLowerCase().includes(lower)
+        );
+      });
+  }, [store.subscriptions, store.members, store.plans, gyms, store.searchQuery]);
+
+  const paginatedSubscriptions = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredSubscriptions.slice(start, start + pageSize);
+  }, [filteredSubscriptions, currentPage, pageSize]);
 
   return (
     <div className="space-y-10 animate-fade-up">
@@ -291,88 +311,109 @@ export default function SubscriptionsPage() {
         ))}</div> : isAdmin ? (
           <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
             <div className="overflow-x-auto">
-              <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-                <thead>
-                  <tr className="border-b border-white/5 bg-white/[0.02]">
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Gym Name</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Plan Name</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Price</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Duration</th>
-                    <th className="text-center py-6 px-6 font-black text-slate-500 italic">Members</th>
-                    {(canEditPlans || canDeletePlans) && <th className="text-right py-6 px-6 font-black text-slate-500 italic">Actions</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPlans.length > 0 ? (
-                    filteredPlans.map((plan) => {
-                      const gym = gyms.find(g => g._id === plan.gymId);
-                      const memberCount = store.subscriptions.filter(
-                        (s) => s.planId === plan.id
-                      ).length;
+            <Table className="text-[11px] font-bold tracking-widest uppercase border-none">
+              <TableHeader className="border-b border-white/5 bg-white/[0.02]">
+                <TableRow className="border-none hover:bg-transparent transition-none">
+                  <TableHead className="py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Gym Name</TableHead>
+                  <TableHead className="py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Plan Name</TableHead>
+                  <TableHead className="py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Price</TableHead>
+                  <TableHead className="py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Duration</TableHead>
+                  <TableHead className="text-center py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Members</TableHead>
+                  {(canEditPlans || canDeletePlans) && <TableHead className="text-right py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Actions</TableHead>}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPlans.length > 0 ? (
+                  filteredPlans.map((plan) => {
+                    const gym = gyms.find(g => g._id === plan.gymId);
+                    const memberCount = store.subscriptions.filter(
+                      (s) => s.planId === plan.id
+                    ).length;
 
-                      return (
-                        <tr key={plan.mongoId || `${plan.gymId}-${plan.id}`} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                          <td className="py-6 px-6 font-black italic text-foreground tracking-tighter">
-                            {gym?.name || "Unknown Gym"}
-                          </td>
-                          <td className="py-6 px-6">
-                            <div className="flex flex-col">
-                              <span className="font-black text-foreground">{plan.name}</span>
-                              <span className="text-[9px] font-mono text-slate-500">ID: {plan.id.slice(-8)}</span>
+                    return (
+                      <TableRow key={plan.mongoId || `${plan.gymId}-${plan.id}`} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6 font-black italic text-foreground tracking-tighter">
+                          {gym?.name || "Unknown Gym"}
+                        </TableCell>
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6">
+                          <div className="flex flex-col">
+                            <span className="font-black text-foreground">{plan.name}</span>
+                            <span className="text-[9px] font-mono text-slate-500">ID: {plan.id.slice(-8)}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6 font-mono text-primary">{formatCurrency(plan.price)}</TableCell>
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6 font-mono text-slate-500">{plan.duration} DAYS</TableCell>
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6 text-center">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest border border-primary/20">
+                                {memberCount} ACTIVE
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                              Active Members
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                        {(canEditPlans || canDeletePlans) && (
+                          <TableCell className="py-3 md:py-6 px-3 md:px-6 text-right">
+                            <div className="flex justify-end gap-2">
+                              {canEditPlans && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedPlan(plan);
+                                        setEditFormData({
+                                          ...plan,
+                                          price: plan.price,
+                                        });
+                                        setShowEditModal(true);
+                                      }}
+                                      className="h-8 w-8 rounded-xl border border-white/5 bg-white/5 text-slate-400 hover:text-primary hover:border-primary/50 transition-all opacity-0 group-hover/row:opacity-100"
+                                    >
+                                      <Edit2 className="w-4 h-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                    Edit Plan
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                              {canDeletePlans && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/row:opacity-100"
+                                      onClick={() => setPlanToDelete(plan.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                    Delete Plan
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
                             </div>
-                          </td>
-                          <td className="py-6 px-6 font-mono text-primary">{formatCurrency(plan.price)}</td>
-                          <td className="py-6 px-6 font-mono text-slate-500">{plan.duration} DAYS</td>
-                          <td className="py-6 px-6 text-center">
-                            <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest border border-primary/20">
-                              {memberCount} ACTIVE
-                            </span>
-                          </td>
-                          {(canEditPlans || canDeletePlans) && (
-                            <td className="py-6 px-6 text-right">
-                              <div className="flex justify-end gap-2">
-                                {canEditPlans && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      setSelectedPlan(plan);
-                                      setEditFormData({
-                                        ...plan,
-                                        price: plan.price,
-                                      });
-                                      setShowEditModal(true);
-                                    }}
-                                    className="h-8 w-8 rounded-xl border border-white/5 bg-white/5 text-slate-400 hover:text-primary hover:border-primary/50 transition-all opacity-0 group-hover/row:opacity-100"
-                                  >
-                                    <Edit2 className="w-4 h-4" />
-                                  </Button>
-                                )}
-                                {canDeletePlans && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/row:opacity-100"
-                                    onClick={() => setPlanToDelete(plan.id)}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                )}
-                              </div>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan={(canEditPlans || canDeletePlans) ? 6 : 5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
-                        No plans created yet.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow className="hover:bg-transparent border-none">
+                    <TableCell colSpan={(canEditPlans || canDeletePlans) ? 6 : 5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                      No plans created yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
             </div>
           </div>
         ) : (
@@ -461,29 +502,29 @@ export default function SubscriptionsPage() {
 
       {/* Subscriptions Table */}
       <div>
-        <div className="flex items-center gap-4 mb-6">
-          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Member Subscriptions ({memberSubscriptions.length})</h3>
+        <div className="flex items-center gap-4 mb-4">
+          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Member Subscriptions ({filteredSubscriptions.length})</h3>
           <div className="h-px flex-1 bg-white/5"></div>
         </div>
 
         <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
           <div className="overflow-x-auto">
-            <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-              <thead>
-                <tr className="border-b border-white/5 bg-white/[0.02]">
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Member</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Plan</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Start Date</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Expiry Date</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Status</th>
-                  <th className="text-right py-6 px-6 font-black text-slate-500 italic">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table className="w-full text-[11px] font-bold tracking-widest uppercase border-none">
+              <TableHeader className="border-b border-white/5 bg-white/[0.02]">
+                <TableRow className="[&_th]:text-nowrap border-none hover:bg-transparent transition-none">
+                  <TableHead className="text-left py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Member</TableHead>
+                  <TableHead className="text-left py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Plan</TableHead>
+                  <TableHead className="text-left py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Start Date</TableHead>
+                  <TableHead className="text-left py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Expiry Date</TableHead>
+                  <TableHead className="text-left py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Status</TableHead>
+                  <TableHead className="text-right py-3 md:py-6 px-3 md:px-6 font-black text-slate-500 italic">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {loading ? (
                   Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i} className="border-b border-white/5 animate-pulse">
-                      <td className="py-6 px-6">
+                    <TableRow key={i} className="border-b border-white/5 animate-pulse hover:bg-transparent">
+                      <TableCell className="py-3 md:py-6 px-3 md:px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-xl bg-white/5" />
                           <div className="space-y-2">
@@ -491,52 +532,55 @@ export default function SubscriptionsPage() {
                             <div className="h-3 w-20 bg-white/5 rounded" />
                           </div>
                         </div>
-                      </td>
-                      <td className="py-6 px-6">
+                      </TableCell>
+                      <TableCell className="py-3 md:py-6 px-3 md:px-6">
                         <div className="h-4 w-24 bg-white/5 rounded" />
-                      </td>
-                      <td className="py-6 px-6">
+                      </TableCell>
+                      <TableCell className="py-3 md:py-6 px-3 md:px-6">
                         <div className="h-4 w-20 bg-white/5 rounded" />
-                      </td>
-                      <td className="py-6 px-6">
+                      </TableCell>
+                      <TableCell className="py-3 md:py-6 px-3 md:px-6">
                         <div className="h-4 w-20 bg-white/5 rounded" />
-                      </td>
-                      <td className="py-6 px-6">
+                      </TableCell>
+                      <TableCell className="py-3 md:py-6 px-3 md:px-6">
                         <div className="h-6 w-20 bg-white/5 rounded-lg" />
-                      </td>
-                      <td className="py-6 px-6">
+                      </TableCell>
+                      <TableCell className="py-3 md:py-6 px-3 md:px-6">
                         <div className="flex justify-end gap-2">
                           <div className="h-8 w-8 bg-white/5 rounded-xl" />
                           <div className="h-8 w-8 bg-white/5 rounded-xl" />
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))
-                ) : memberSubscriptions.length > 0 ? (
-                  memberSubscriptions.map((sub) => {
+                ) : paginatedSubscriptions.length > 0 ? (
+                  paginatedSubscriptions.map((sub) => {
                     const isActive = isSubscriptionActive(sub.endDate, sub.status);
                     const isPaused = sub.status === "paused";
 
                     return (
-                      <tr key={sub.id || sub.mongoId} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                        <td className="py-6 px-6">
+                      <TableRow key={sub.id || sub.mongoId} className="[&_td]:text-nowrap border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6">
                           <div className="flex items-center gap-3">
-                            <Avatar className="flex justify-center items-center w-8 h-8 rounded-xl border border-white/5 grayscale group-hover/row:grayscale-0 transition-all">
+                            <Avatar className="hidden md:flex justify-center items-center w-8 h-8 rounded-xl border border-white/5 grayscale group-hover/row:grayscale-0 transition-all">
                               <AvatarFallback className="bg-primary/10 text-primary font-black italic text-[10px]">
                                 {sub.member?.firstName?.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <span className="font-black italic text-foreground tracking-tighter block group-hover/row:text-primary transition-colors">
+                              <span className="text-nowrap font-black italic text-foreground tracking-tighter block group-hover/row:text-primary transition-colors">
                                 {sub.member?.firstName} {sub.member?.lastName || ""}
                               </span>
                               <span className="text-[9px] font-mono text-slate-500">ID: {sub.memberId?.slice(-8)}</span>
                             </div>
                           </div>
-                        </td>
-                        <td className="py-6 px-6 font-black uppercase text-slate-300">{sub.plan?.name}</td>
-                        <td className="py-6 px-6 font-mono text-slate-500">{formatDate(sub.startDate)}</td>
-                        <td className="py-6 px-6 font-mono">
+                        </TableCell>
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6 font-black uppercase text-slate-300">
+                          <span className="hidden md:block">{sub.plan?.name || "N/A"}</span>
+                          <span className="block md:hidden">{sub.plan?.name.split(" ")[0]}</span>
+                        </TableCell>
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6 font-mono text-slate-500">{formatDate(sub.startDate)}</TableCell>
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6 font-mono">
                           {isPaused ? (
                             <div>
                               <span className="line-through text-muted-foreground text-xs block">{formatDate(sub.originalEndDate || sub.endDate)}</span>
@@ -545,78 +589,108 @@ export default function SubscriptionsPage() {
                           ) : (
                             <span className="text-slate-500">{formatDate(sub.endDate)}</span>
                           )}
-                        </td>
-                        <td className="py-6 px-6">
-                          <div className={cn(
-                            "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
-                            isPaused
-                              ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
-                              : isActive
-                                ? "bg-primary/10 border-primary/20 text-primary"
-                                : "bg-red-500/10 border-red-500/20 text-red-500"
-                          )}>
-                            <div className={cn("w-1 h-1 rounded-full", isPaused ? "bg-amber-500" : isActive ? "bg-primary" : "bg-red-500")} />
-                            {isPaused ? "PAUSED" : isActive ? "ACTIVE" : "EXPIRED"}
-                          </div>
+                        </TableCell>
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className={cn(
+                                "inline-flex items-center justify-center gap-2 p-1 border text-[9px] font-black italic tracking-widest h-8 w-8 rounded-xl mx-auto",
+                                isPaused
+                                  ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                                  : isActive
+                                    ? "bg-primary/10 border-primary/20 text-primary"
+                                    : "bg-red-500/10 border-red-500/20 text-red-500"
+                              )}>
+                                {isPaused ? <PauseCircleIcon className="h-4 w-4" /> : isActive ? <CircleCheckBig className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                              {isPaused ? "Paused" : isActive ? "Active" : "Expired"}
+                            </TooltipContent>
+                          </Tooltip>
                           {sub.totalPausedDays ? (
                             <div className="text-[9px] font-mono font-black text-muted-foreground mt-2 uppercase">
                               Paused: {sub.totalPausedDays}d
                             </div>
                           ) : null}
-                        </td>
-                        <td className="py-6 px-6 text-right space-x-2">
+                        </TableCell>
+                        <TableCell className="py-3 md:py-6 px-3 md:px-6 text-right space-x-2">
                           {isPaused ? (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500 opacity-0 group-hover/row:opacity-100"
-                              onClick={() => {
-                                setSelectedSubscription(sub);
-                                setShowResumeDialog(true);
-                              }}
-                              title="Resume Subscription"
-                            >
-                              <PlayCircle className="h-4 w-4" />
-                            </Button>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500 opacity-0 group-hover/row:opacity-100"
+                                  onClick={() => {
+                                    setSelectedSubscription(sub);
+                                    setShowResumeDialog(true);
+                                  }}
+                                >
+                                  <PlayCircle className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                Resume Subscription
+                              </TooltipContent>
+                            </Tooltip>
                           ) : isActive ? (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 rounded-xl border border-amber-500/10 bg-amber-500/5 transition-all text-amber-500 hover:text-white hover:bg-amber-500 row:opacity-100"
-                              onClick={() => {
-                                setSelectedSubscription(sub);
-                                setShowPauseDialog(true);
-                              }}
-                              title="Pause Subscription"
-                            >
-                              <PauseCircle className="h-4 w-4" />
-                            </Button>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 rounded-xl border border-amber-500/10 bg-amber-500/5 transition-all text-amber-500 hover:text-white hover:bg-amber-500 row:opacity-100"
+                                  onClick={() => {
+                                    setSelectedSubscription(sub);
+                                    setShowPauseDialog(true);
+                                  }}
+                                >
+                                  <PauseCircle className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                Pause Subscription
+                              </TooltipContent>
+                            </Tooltip>
                           ) : null}
                           <Link href={`/members/${sub.member?.id}`}>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500 row:opacity-100"
-                              title="View Member"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500 row:opacity-100"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                View Member
+                              </TooltipContent>
+                            </Tooltip>
                           </Link>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     )
                   })
                 ) : (
-                  <tr>
-                    <td colSpan={7} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                  <TableRow className="hover:bg-transparent border-none">
+                    <TableCell colSpan={7} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
                       No subscriptions yet.
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
+        <PaginationHUD
+          totalItems={filteredSubscriptions.length}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       {/* Edit Plan Dialog */}

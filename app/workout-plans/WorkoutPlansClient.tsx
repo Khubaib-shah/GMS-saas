@@ -23,6 +23,11 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { WorkoutPlanBuilder } from "@/components/workout-plan-builder";
 import { DashboardHeader } from "@/components/dashboard-header";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function WorkoutPlansClient() {
     const { data: session } = useSession();
@@ -80,13 +85,20 @@ export default function WorkoutPlansClient() {
                 subtitle="MANAGEMENT: WORKOUT_PLANS"
                 description="Create and manage training programs for your clients."
             >
-                <Button className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" onClick={() => {
-                    setEditingPlan(null);
-                    setIsBuilderOpen(true);
-                }}>
-                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                    NEW PLAN
-                </Button>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" onClick={() => {
+                            setEditingPlan(null);
+                            setIsBuilderOpen(true);
+                        }}>
+                            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                            NEW PLAN
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                        Create training program
+                    </TooltipContent>
+                </Tooltip>
             </DashboardHeader>
 
             {/* Search & Filters */}
@@ -116,29 +128,43 @@ export default function WorkoutPlansClient() {
                                         <Dumbbell className="w-6 h-6" />
                                     </div>
                                     <div className="flex gap-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-colors z-10"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setEditingPlan(plan);
-                                                setIsBuilderOpen(true);
-                                            }}
-                                        >
-                                            <Edit className="w-4 h-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-9 w-9 rounded-xl hover:bg-destructive/10 hover:text-destructive transition-colors z-10"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                deleteWorkoutPlan(plan._id || plan.id);
-                                            }}
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-colors z-10"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setEditingPlan(plan);
+                                                        setIsBuilderOpen(true);
+                                                    }}
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                                Edit Plan
+                                            </TooltipContent>
+                                        </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-9 w-9 rounded-xl hover:bg-destructive/10 hover:text-destructive transition-colors z-10"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        deleteWorkoutPlan(plan._id || plan.id);
+                                                    }}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                                Delete Plan
+                                            </TooltipContent>
+                                        </Tooltip>
                                     </div>
                                 </div>
 
@@ -168,12 +194,19 @@ export default function WorkoutPlansClient() {
                                     </div>
                                 </div>
 
-                                <Button className="w-full h-12 rounded-xl bg-foreground/5 hover:bg-primary hover:text-primary-foreground border-none text-xs font-black uppercase tracking-widest transition-all italic group/btn" asChild>
-                                    <Link href={`/workout-plans/${plan._id || plan.id}`}>
-                                        VIEW PLAN DETAILS
-                                        <ChevronRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                                    </Link>
-                                </Button>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button className="w-full h-12 rounded-xl bg-foreground/5 hover:bg-primary hover:text-primary-foreground border-none text-xs font-black uppercase tracking-widest transition-all italic group/btn" asChild>
+                                            <Link href={`/workout-plans/${plan._id || plan.id}`}>
+                                                VIEW PLAN DETAILS
+                                                <ChevronRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                                            </Link>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                                        Open full details
+                                    </TooltipContent>
+                                </Tooltip>
                             </div>
                         </Card>
                     ))}

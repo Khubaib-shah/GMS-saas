@@ -14,6 +14,11 @@ import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { getPreviousPeriod, calculateTrend, isDateInRange } from "@/lib/analytics-utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function DashboardPage() {
   const store = useAppStore();
@@ -123,37 +128,67 @@ export default function DashboardPage() {
       >
         <div className="flex flex-wrap items-center gap-3">
           {!isTrainer && (
-            <DateRangePicker
-              date={dateRange}
-              onDateChange={setDateRange}
-              placeholder="Filter by date range"
-            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="inline-block">
+                  <DateRangePicker
+                    date={dateRange}
+                    onDateChange={setDateRange}
+                    placeholder="Filter by date range"
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                Select Report Period
+              </TooltipContent>
+            </Tooltip>
           )}
           {isTrainer && (
             <>
-              <Button
-                variant="outline"
-                onClick={() => router.push('/trainer/exercises')}
-                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
-              >
-                <Dumbbell className="mr-2 w-4 h-4" />
-                Exercises
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => router.push('/trainer/templates')}
-                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
-              >
-                <Plus className="mr-2 w-4 h-4" />
-                Templates
-              </Button>
-              <Button
-                onClick={() => router.push('/trainer/deploy')}
-                className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
-              >
-                <Send className="mr-2 w-4 h-4" />
-                Assign Plan
-              </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push('/trainer/exercises')}
+                      className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+                    >
+                      <Dumbbell className="mr-2 w-4 h-4" />
+                      Exercises
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                    Library of exercises
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push('/trainer/templates')}
+                      className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+                    >
+                      <Plus className="mr-2 w-4 h-4" />
+                      Templates
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                    Workout templates
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => router.push('/trainer/deploy')}
+                      className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+                    >
+                      <Send className="mr-2 w-4 h-4" />
+                      Assign Plan
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="font-black italic uppercase tracking-widest text-[9px] bg-card border-border text-foreground">
+                    Deploy workout plan
+                  </TooltipContent>
+                </Tooltip>
             </>
           )}
         </div>
