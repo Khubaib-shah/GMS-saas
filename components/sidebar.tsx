@@ -43,13 +43,13 @@ export function Sidebar() {
     <>
       {/* Mobile Backdrop */}
       {mobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[45] lg:hidden animate-in fade-in duration-300"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
       <aside className={cn(
-        "fixed left-0 top-0 h-screen bg-sidebar backdrop-blur-xl border-r border-sidebar-border flex flex-col z-50 transition-all duration-300 ease-in-out selection:bg-primary selection:text-primary-foreground",
+        "!rounded-none glass-premium fixed left-0 top-0 h-screen flex flex-col z-50 transition-all duration-300 ease-in-out selection:bg-primary selection:text-primary-foreground",
         "w-64",
         sidebarCollapsed ? "lg:w-20" : "lg:w-64",
         mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
