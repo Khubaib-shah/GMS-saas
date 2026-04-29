@@ -74,7 +74,7 @@ export function ManualEntry() {
   };
 
   return (
-    <div className="space-y-4 p-4 border rounded-lg bg-card">
+    <div className="glass-premium space-y-4 p-4 border rounded-lg bg-card">
       <h3 className="text-lg font-semibold">Manual Entry</h3>
 
       <div className="flex items-center space-x-2 mb-4">

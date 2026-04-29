@@ -7,9 +7,20 @@ export function fileToBase64(file: File): Promise<string> {
   })
 }
 
-export function isSubscriptionActive(endDate: string, status?: string): boolean {
+export function isSubscriptionActive(endDate: string | Date, status?: string, gracePeriodDays: number = 0): boolean {
   if (status === "paused") return false;
-  return new Date(endDate) > new Date()
+  if (status === "expired" && gracePeriodDays === 0) return false;
+  if (status === "cancelled") return false;
+
+  const end = new Date(endDate);
+  const now = new Date();
+
+  if (gracePeriodDays > 0) {
+    const graceEnd = new Date(end);
+    graceEnd.setDate(graceEnd.getDate() + gracePeriodDays);
+    return graceEnd > now;
+  }
+  return end > now;
 }
 
 export function daysUntilExpiry(endDate: string): number {

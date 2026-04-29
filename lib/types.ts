@@ -105,7 +105,6 @@ export type AuditLogEntry = {
 }
 
 export type BusinessSettings = {
-  taxPercentage: number
   joiningFee: number
   autoExpireDays: number
   gracePeriodDays: number

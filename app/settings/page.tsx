@@ -371,7 +371,7 @@ export default function SettingsPage() {
 
       {/* Staff Tab */}
       {activeTab === "staff" && (
-        <div className="space-y-6 animate-fade-in">
+        <div className=" space-y-6 animate-fade-in">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4 flex-1">
               <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex-shrink-0">Staff Members</h3>
@@ -381,7 +381,7 @@ export default function SettingsPage() {
               <DialogTrigger asChild>
                 <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group ml-4"><Plus className="w-4 h-4 mr-2" /> Add Staff</Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="glass-premium border-border bg-card">
                 <form onSubmit={handleAddStaff}>
                   <DialogHeader>
                     <DialogTitle>Add Team Member</DialogTitle>
@@ -419,7 +419,7 @@ export default function SettingsPage() {
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="glass-premium border-border bg-card">
                           {(isAdmin || (session?.user as any)?.role === 'owner') && (
                             <SelectItem value="manager">Manager</SelectItem>
                           )}
@@ -439,42 +439,47 @@ export default function SettingsPage() {
           </div>
 
           <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
-            <div className="overflow-x-auto">
-              <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-                <thead>
-                  <tr className="border-b border-white/5 bg-white/[0.02]">
-                    <th className="text-left py-6 px-4 md:px-6 font-black text-slate-500 italic">Name</th>
-                    <th className="hidden md:table-cell text-left py-6 px-6 font-black text-slate-500 italic">Email</th>
-                    <th className="text-left py-6 px-4 md:px-6 font-black text-slate-500 italic">Role</th>
-                    <th className="hidden lg:table-cell text-left py-6 px-6 font-black text-slate-500 italic">Joined</th>
-                    <th className="text-right py-6 px-4 md:px-6 font-black text-slate-500 italic">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {staff.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No staff members found.</td>
-                    </tr>
-                  ) : (
-                    staff.map((s) => (
-                      <tr key={s.id || s._id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                        <td className="py-6 px-4 md:px-6 font-black italic text-foreground tracking-tighter">{s.fullName}</td>
-                        <td className="hidden md:table-cell py-6 px-6 font-mono text-slate-400 lowercase">{s.email}</td>
-                        <td className="py-6 px-4 md:px-6">
-                          <span className="bg-primary/10 text-primary border border-primary/20 px-2 md:px-3 py-1 rounded-lg text-[8px] md:text-[9px] font-black italic tracking-widest uppercase">{s.role}</span>
-                        </td>
-                        <td className="hidden lg:table-cell py-6 px-6 text-slate-500 font-mono text-[10px]">{new Date(s.createdAt).toLocaleDateString()}</td>
-                        <td className="py-6 px-4 md:px-6 text-right">
-                          <Button variant="ghost" size="sm" className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-100 md:opacity-0 md:group-hover/row:opacity-100" onClick={() => handleDeleteStaff(s._id || s.id)}>
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <Table className="w-full text-[11px] font-bold tracking-widest uppercase">
+              <TableHeader>
+                <TableRow className="border-b border-white/5 bg-white/[0.02] hover:bg-transparent">
+                  <TableHead className="py-6 px-4 md:px-6 font-black text-slate-500 italic h-auto">Name</TableHead>
+                  <TableHead className="hidden md:table-cell py-6 px-6 font-black text-slate-500 italic h-auto">Email</TableHead>
+                  <TableHead className="py-6 px-4 md:px-6 font-black text-slate-500 italic h-auto">Role</TableHead>
+                  <TableHead className="hidden lg:table-cell py-6 px-6 font-black text-slate-500 italic h-auto">Joined</TableHead>
+                  <TableHead className="py-6 px-4 md:px-6 font-black text-slate-500 italic text-right h-auto">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {staff.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No staff members found.</TableCell>
+                  </TableRow>
+                ) : (
+                  staff.map((s) => (
+                    <TableRow key={s.id || s._id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
+                      <TableCell className="py-6 px-4 md:px-6 font-black italic text-foreground tracking-tighter">
+                        <span className="text-base">{s.fullName}</span>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell py-6 px-6 font-mono text-slate-400 lowercase">{s.email}</TableCell>
+                      <TableCell className="py-6 px-4 md:px-6">
+                        <span className="bg-primary/10 text-primary border border-primary/20 px-2 md:px-3 py-1 rounded-lg text-[8px] md:text-[9px] font-black italic tracking-widest uppercase">{s.role}</span>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell py-6 px-6 text-slate-500 font-mono text-[10px]">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="py-6 px-4 md:px-6 text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-100 md:opacity-0 md:group-hover/row:opacity-100" 
+                          onClick={() => handleDeleteStaff(s._id || s.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
       )}

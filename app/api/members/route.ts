@@ -7,6 +7,7 @@ import { isSubscriptionActive } from "@/lib/subscription-utils";
 import { PERMISSIONS } from "@/lib/permissions";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
+import GymSettings from "@/models/GymSettings";
 
 export async function GET(req: Request) {
     const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW);
@@ -76,14 +77,16 @@ export async function GET(req: Request) {
         if (gymId) subscriptionQuery.gymId = gymId;
 
         const activeSubs = await Subscription.find(subscriptionQuery).lean();
+        const settings = await GymSettings.findOne({ gymId }).lean();
+        const graceDays = (settings as any)?.business?.gracePeriodDays || 0;
 
         // Map members and inject status info
         const mappedMembers = members.map((m: any) => {
             const mId = m._id.toString();
             const mySubs = activeSubs.filter(s => s.memberId === mId);
 
-            // Find current active one
-            const currentSub = mySubs.find(s => isSubscriptionActive(s.endDate, s.status));
+            // Find current active one (respecting grace period)
+            const currentSub = mySubs.find(s => isSubscriptionActive(s.endDate, s.status, graceDays));
 
             return {
                 ...m,

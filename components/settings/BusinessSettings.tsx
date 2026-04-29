@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 
 export function BusinessSettings() {
     const [data, setData] = useState({
-        taxPercentage: 0,
         joiningFee: 0,
         autoExpireDays: 0,
         gracePeriodDays: 0,
@@ -90,21 +89,7 @@ export function BusinessSettings() {
             </div>
 
             <div className="p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="relative">
-                        <InputField
-                            label="Tax Percentage (%)"
-                            validateType="number"
-                            min={0}
-                            max={100}
-                            value={data.taxPercentage.toString()}
-                            onChange={val => setData({ ...data, taxPercentage: parseFloat(val) || 0 })}
-                            className={cn(loading && data.taxPercentage === 0 && "text-transparent")}
-                        />
-                        {loading && data.taxPercentage === 0 && (
-                            <Skeleton className="absolute bottom-2.5 left-3 right-3 h-4 bg-white/5 rounded" />
-                        )}
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="relative">
                         <InputField
                             label="Joining Fee"
@@ -118,9 +103,6 @@ export function BusinessSettings() {
                             <Skeleton className="absolute bottom-2.5 left-3 right-3 h-4 bg-white/5 rounded" />
                         )}
                     </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative">
                         <InputField
                             label="Auto-Expire Days"

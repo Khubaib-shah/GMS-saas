@@ -14,15 +14,11 @@ import { z } from "zod";
 
 export const GeneralSettingsSchema = z.object({
     name: z.string().min(1).max(100).optional(),
-    logo: z.string().max(500).optional(),
     address: z.string().max(300).optional(),
     phone: z.string().max(20).optional(),
-    timezone: z.string().max(50).optional(),
-    currency: z.string().max(10).optional(),
-}).strict(); // .strict() blocks unknown keys
+}).strict();
 
 export const BusinessSettingsSchema = z.object({
-    taxPercentage: z.number().min(0).max(100).optional(),
     joiningFee: z.number().min(0).optional(),
     autoExpireDays: z.number().min(0).max(365).optional(),
     gracePeriodDays: z.number().min(0).max(90).optional(),

@@ -18,7 +18,7 @@ interface StatsCardProps {
 
 export function StatsCard({ title, value, icon, trend, className, isLoading, periodLabel = "previous period" }: StatsCardProps) {
   return (
-    <div className={cn("glass-premium p-6 flex flex-col justify-between border-border bg-card dark:bg-slate-950/40", className)}>
+    <div className={cn("glass-premium bg-card p-6 flex flex-col justify-between border-border", className)}>
       <div className="flex items-center justify-between mb-4">
         <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">{title}</span>
         <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.1)]">

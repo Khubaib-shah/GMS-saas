@@ -47,7 +47,8 @@ export default function MembersPage() {
       await Promise.all([
         store.loadMembers({ showDeleted: showTrash }),
         store.loadSubscriptions(),
-        store.loadGymProfile()
+        store.loadGymProfile(),
+        store.loadBusinessSettings()
       ]);
       setLoading(false);
     };
@@ -81,13 +82,14 @@ export default function MembersPage() {
 
     if (filterStatus !== "all") {
       result = result.filter((m) => {
-        // 1. Check local subscriptions first (for managers/owners)
+        const graceDays = store.businessSettings.gracePeriodDays || 0;
+        // 1. Check local subscriptions first
         const subs = store.subscriptions.filter((s) => s.memberId === m.id);
-        let isActive = subs.some((s) => isSubscriptionActive(s.endDate, s.status));
+        let isActive = subs.some((s) => isSubscriptionActive(s.endDate, s.status, graceDays));
 
-        // 2. Fallback to injected status (for trainers)
+        // 2. Fallback to injected status
         if (!isActive && (m as any).activeSubscription) {
-          isActive = isSubscriptionActive((m as any).activeSubscription.endDate, (m as any).activeSubscription.status);
+          isActive = isSubscriptionActive((m as any).activeSubscription.endDate, (m as any).activeSubscription.status, graceDays);
         }
 
         return filterStatus === "active" ? isActive : !isActive;
@@ -215,7 +217,7 @@ export default function MembersPage() {
                 <th className="text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic text-nowrap">
                   Contact Info
                 </th>
-                <th className="text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic">
+                <th className="text-center py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic">
                   Subscription
                 </th>
                 <th className="text-left py-3 px-2 md:py-6 md:px-6 font-black text-slate-500 italic text-nowrap hidden md:table-cell">
@@ -262,12 +264,13 @@ export default function MembersPage() {
                 ))
               ) : (
                 paginatedData.map((member) => {
+                  const graceDays = store.businessSettings.gracePeriodDays || 0;
                   const subs = store.subscriptions.filter(
                     (s) => s.memberId === member.id
                   );
                   // 1. Check local history if available
                   let activeSub = subs.find((s) =>
-                    isSubscriptionActive(s.endDate, s.status)
+                    isSubscriptionActive(s.endDate, s.status, graceDays)
                   );
                   // 2. Check injected status fallback
                   if (!activeSub && (member as any).activeSubscription) {
@@ -275,7 +278,8 @@ export default function MembersPage() {
                   }
 
                   const isActive = !!activeSub;
-                  const isPaused = activeSub?.status === "paused" || subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate));
+                  const isPaused = activeSub?.status === "paused" || subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate, "active", graceDays));
+                  const isGrace = isActive && activeSub && new Date(activeSub.endDate) < new Date();
 
                   return (
                     <tr
@@ -310,7 +314,7 @@ export default function MembersPage() {
                       </td>
                       <td className="py-3 px-2 md:py-6 md:px-6">
                         <div className="space-y-1">
-                          <div className="text-foreground font-mono text-nowrap text-[10px]">{member.phone}</div>
+                          <div className="text-foreground font-mono text-nowrap text-[10px] font-normal">{member.phone}</div>
                           <div className="text-slate-500 text-[9px] font-mono lowercase hidden md:block">
                             {member.email}
                           </div>
@@ -321,11 +325,13 @@ export default function MembersPage() {
                           "inline-flex items-center justify-center p-2 rounded-lg border",
                           isPaused
                             ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
-                            : isActive
-                              ? "bg-primary/10 border-primary/20 text-primary"
-                              : "bg-red-500/10 border-red-500/20 text-red-500"
+                            : isGrace
+                              ? "bg-orange-500/10 border-orange-500/20 text-orange-500"
+                              : isActive
+                                ? "bg-primary/10 border-primary/20 text-primary"
+                                : "bg-red-500/10 border-red-500/20 text-red-500"
                         )}>
-                          {isPaused ? <AlertTriangle className="w-4 h-4 text-amber-500" /> : isActive ? <CircleCheckBigIcon className="w-4 h-4 text-primary" /> : <AlertCircle className="w-4 h-4 text-red-500" />}
+                          {isPaused ? <AlertTriangle className="w-4 h-4 text-amber-500" /> : isGrace ? <AlertCircle className="w-4 h-4 text-orange-500" /> : isActive ? <CircleCheckBigIcon className="w-4 h-4 text-primary" /> : <AlertCircle className="w-4 h-4 text-red-500" />}
                         </div>
                       </td>
                       <td className="py-3 px-2 md:py-6 md:px-6 text-slate-500 font-mono text-[10px] text-nowrap hidden md:table-cell">

@@ -8,15 +8,14 @@ import { Save, Loader2, Sparkles, Database } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 export function GeneralSettings() {
     const [data, setData] = useState({
         name: "",
-        logo: "",
         address: "",
         phone: "",
-        timezone: "UTC",
-        currency: "USD",
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -110,52 +109,8 @@ export function GeneralSettings() {
                             <Skeleton className="absolute bottom-2.5 left-3 right-3 h-4 bg-white/5 rounded" />
                         )}
                     </div>
-                    <div className="relative">
-                        <InputField
-                            label="Currency"
-                            validateType="text"
-                            value={data.currency}
-                            onChange={val => setData({ ...data, currency: val })}
-                            placeholder="USD"
-                            className={cn(loading && !data.currency && "text-transparent")}
-                        />
-                        {loading && !data.currency && (
-                            <Skeleton className="absolute bottom-2.5 left-3 right-3 h-4 bg-white/5 rounded" />
-                        )}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="relative">
-                        <InputField
-                            label="Address"
-                            validateType="text"
-                            value={data.address}
-                            onChange={val => setData({ ...data, address: val })}
-                            placeholder="123 Main St"
-                            className={cn(loading && !data.address && "text-transparent")}
-                        />
-                        {loading && !data.address && (
-                            <Skeleton className="absolute bottom-2.5 left-3 right-3 h-4 bg-white/5 rounded" />
-                        )}
-                    </div>
-                    <div className="relative">
-                        <InputField
-                            label="Timezone"
-                            validateType="text"
-                            value={data.timezone}
-                            onChange={val => setData({ ...data, timezone: val })}
-                            placeholder="UTC"
-                            className={cn(loading && !data.timezone && "text-transparent")}
-                        />
-                        {loading && !data.timezone && (
-                            <Skeleton className="absolute bottom-2.5 left-3 right-3 h-4 bg-white/5 rounded" />
-                        )}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="relative">
+                    
+                     <div className="relative">
                         <InputField
                             label="Phone Number"
                             validateType="phone"
@@ -168,17 +123,22 @@ export function GeneralSettings() {
                             <Skeleton className="absolute bottom-2.5 left-3 right-3 h-4 bg-white/5 rounded" />
                         )}
                     </div>
-                    <div className="relative">
-                        <InputField
-                            label="Logo URL"
-                            validateType="text"
-                            value={data.logo}
-                            onChange={val => setData({ ...data, logo: val })}
-                            placeholder="https://..."
-                            className={cn(loading && !data.logo && "text-transparent")}
+                </div>
+
+                <div className="grid grid-cols-1">
+                    <div className="relative space-y-1">
+                        <Label className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">Address</Label>
+                        <Textarea
+                            value={data.address}
+                            onChange={e => setData({ ...data, address: e.target.value })}
+                            placeholder="Enter gym address..."
+                            className={cn(
+                                "min-h-[100px] bg-white/5 border-transparent focus:border-primary/50 focus:bg-white/10 text-[11px] font-bold tracking-wider transition-all duration-300 rounded-md resize-none",
+                                loading && !data.address && "text-transparent"
+                            )}
                         />
-                        {loading && !data.logo && (
-                            <Skeleton className="absolute bottom-2.5 left-3 right-3 h-4 bg-white/5 rounded" />
+                        {loading && !data.address && (
+                            <Skeleton className="absolute top-8 left-3 right-3 bottom-3 bg-white/5 rounded-md" />
                         )}
                     </div>
                 </div>

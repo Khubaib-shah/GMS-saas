@@ -172,8 +172,9 @@ export default function MemberDetailPage({
   );
 
   const activeSub = useMemo(() => {
+    const graceDays = businessSettings.gracePeriodDays || 0;
     // 1. Try to find in the loaded history (for managers/owners)
-    const found = memberSubs.find(s => isSubscriptionActive(s.endDate, s.status));
+    const found = memberSubs.find(s => isSubscriptionActive(s.endDate, s.status, graceDays));
     if (found) return found;
 
     // 2. Fallback to injected data from API (for trainers who can't see history)
@@ -622,23 +623,11 @@ export default function MemberDetailPage({
                       <span className="text-muted-foreground">Base Price</span>
                       <span className="font-medium">{formatCurrency(plans.find(p => p.id === selectedPlan)?.price || 0)}</span>
                     </div>
-                    {businessSettings.taxPercentage > 0 && (
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Tax ({businessSettings.taxPercentage}%)</span>
-                        <span className="font-medium text-amber-600">+{formatCurrency((plans.find(p => p.id === selectedPlan)?.price || 0) * (businessSettings.taxPercentage / 100))}</span>
-                      </div>
-                    )}
-                    {memberSubs.length === 0 && businessSettings.joiningFee > 0 && (
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Joining Fee</span>
-                        <span className="font-medium text-amber-600">+{formatCurrency(businessSettings.joiningFee)}</span>
-                      </div>
-                    )}
                     <div className="flex justify-between text-sm font-bold pt-1 border-t border-dashed">
                       <span>Total Amount</span>
                       <span className="text-primary">
                         {formatCurrency(
-                          ((plans.find(p => p.id === selectedPlan)?.price || 0) * (1 + (businessSettings.taxPercentage / 100))) +
+                          (plans.find(p => p.id === selectedPlan)?.price || 0) +
                           (memberSubs.length === 0 ? businessSettings.joiningFee : 0)
                         )}
                       </span>
@@ -668,7 +657,7 @@ export default function MemberDetailPage({
           {/* Active Status Banner - Visible to all roles */}
           <Card className={cn(
             "glass-premium gap-1 p-6 border-y-border border-r-border border-l-4 flex items-center justify-between shadow-2xl transition-all",
-            isLoading ? "border-l-border" : (activeSub ? "border-l-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/5" : "border-l-destructive bg-destructive/5")
+            isLoading ? "border-l-border" : (activeSub ? (new Date(activeSub.endDate) < new Date() ? "border-l-orange-500 bg-orange-500/5" : "border-l-emerald-500 bg-emerald-500/5") : "border-l-destructive bg-destructive/5")
           )}>
             <div className="flex items-center gap-4">
               <div className={cn(
@@ -679,11 +668,11 @@ export default function MemberDetailPage({
               </div>
               <div>
                 <div className="font-bold text-foreground">
-                  {isLoading ? <Skeleton className="w-32 h-5" /> : (activeSub ? "Membership Active" : "Membership Expired")}
+                  {isLoading ? <Skeleton className="w-32 h-5" /> : (activeSub ? (new Date(activeSub.endDate) < new Date() ? "Grace Period" : "Membership Active") : "Membership Expired")}
                 </div>
-                <div className="text-sm text-muted-foreground leading-none mt-1 text-emerald-500">
+                <div className={cn("text-sm leading-none mt-1", activeSub && new Date(activeSub.endDate) < new Date() ? "text-orange-500" : "text-emerald-500")}>
                   {isLoading ? <Skeleton className="w-48 h-4 mt-1" /> : (activeSub
-                    ? `Expiring on ${formatDate(activeSub.endDate)}`
+                    ? (new Date(activeSub.endDate) < new Date() ? `Expired on ${formatDate(activeSub.endDate)}` : `Expiring on ${formatDate(activeSub.endDate)}`)
                     : `Last active on ${memberSubs[0] ? formatDate(memberSubs[0].endDate) : 'never'}`)}
                 </div>
               </div>
@@ -715,7 +704,8 @@ export default function MemberDetailPage({
                     </div>
                   ) : memberSubs.length > 0 ? (
                     memberSubs.map((sub, idx) => {
-                      const isActive = isSubscriptionActive(sub.endDate, sub.status);
+                      const graceDays = businessSettings.gracePeriodDays || 0;
+                      const isActive = isSubscriptionActive(sub.endDate, sub.status, graceDays);
                       const planName = plans.find(p => p.id === sub.planId)?.name || sub.planId;
                       return (
                         <div key={sub.id} className="glass-premium group relative flex items-start gap-6 p-6 border-border dark:bg-slate-950/40">

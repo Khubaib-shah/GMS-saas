@@ -1,8 +1,19 @@
-export function isSubscriptionActive(endDate: string | Date, status?: string): boolean {
+export function isSubscriptionActive(endDate: string | Date, status?: string, gracePeriodDays: number = 0): boolean {
   if (status === "paused") return false;
-  if (status === "expired") return false;
+  if (status === "expired" && gracePeriodDays === 0) return false;
   if (status === "cancelled") return false;
-  return new Date(endDate) > new Date();
+
+  const end = new Date(endDate);
+  const now = new Date();
+
+  // If we have a grace period, the subscription is active until (endDate + gracePeriodDays)
+  if (gracePeriodDays > 0) {
+    const graceEnd = new Date(end);
+    graceEnd.setDate(graceEnd.getDate() + gracePeriodDays);
+    return graceEnd > now;
+  }
+
+  return end > now;
 }
 
 export function daysUntilExpiry(endDate: string | Date): number {

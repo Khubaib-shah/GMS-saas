@@ -5,6 +5,7 @@ import { isSubscriptionActive } from "@/lib/subscription-utils";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { invalidatePattern } from "@/lib/redis";
 import connectDB from "@/lib/db";
+import GymSettings from "@/models/GymSettings";
 import Attendance from "@/models/Attendance";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
@@ -45,11 +46,21 @@ export async function POST(req: Request) {
             }, { status: 403 });
         }
 
-        // Get gym settings for attendance rules
-        const gym = await Gym.findById(gymId).lean();
+        // Get gym settings for attendance rules and business logic
+        const [gym, settings] = await Promise.all([
+            Gym.findById(gymId).lean(),
+            GymSettings.findOne({ gymId }).lean()
+        ]);
+
         const attendanceRules = (gym as any)?.settings?.attendanceRules || {
             preventDuplicateCheckin: true,
             dailyLimit: 1,
+        };
+
+        const businessSettings = (settings as any)?.business || {
+            joiningFee: 0,
+            autoExpireDays: 0,
+            gracePeriodDays: 0,
         };
 
         // 1. Check if member exists
@@ -82,12 +93,26 @@ export async function POST(req: Request) {
             }, { status: 403 });
         }
 
-        // Check if subscription is expired
-        if (!isSubscriptionActive(subscription.endDate, subscription.status)) {
+        // Check if subscription is expired (taking grace period into account)
+        if (!isSubscriptionActive(subscription.endDate, subscription.status, businessSettings.gracePeriodDays)) {
+            const isGracePeriod = new Date(subscription.endDate) < new Date();
+            
             return NextResponse.json({
-                error: "Subscription has expired",
+                error: isGracePeriod ? "Grace period expired" : "Subscription has expired",
                 isExpired: true,
+                isGracePeriod,
             }, { status: 403 });
+        }
+
+        // Check for Auto-Expiry (Archiving)
+        if (businessSettings.autoExpireDays > 0) {
+            const daysSinceExpiry = -Math.floor((new Date(subscription.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+            if (daysSinceExpiry > businessSettings.autoExpireDays) {
+                return NextResponse.json({
+                    error: "Membership has auto-expired due to prolonged inactivity",
+                    isAutoExpired: true,
+                }, { status: 403 });
+            }
         }
 
         // 3. Check for duplicate check-in today (if rule enabled)

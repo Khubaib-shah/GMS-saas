@@ -150,7 +150,7 @@ export function AttendanceScanner() {
 
   // Update UI to include Flip Camera button
   return (
-    <div className="space-y-4 p-4 border rounded-lg bg-card">
+    <div className="glass-premium space-y-4 p-4 border rounded-lg bg-card">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Scan className="w-5 h-5" /> Quick Scan

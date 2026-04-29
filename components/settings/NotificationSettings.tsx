@@ -139,7 +139,10 @@ export function NotificationSettings() {
                             <Shield className="w-4 h-4" />
                         </div>
                         <div>
-                            <Label className="text-[11px] font-black italic uppercase tracking-wider text-white">SMS Notifications</Label>
+                            <div className="flex items-center gap-2">
+                                <Label className="text-[11px] font-black italic uppercase tracking-wider text-white">SMS Notifications</Label>
+                                <span className="bg-amber-500/10 text-amber-500 text-[8px] font-black px-1.5 py-0.5 rounded border border-amber-500/20 tracking-tighter">COMING SOON</span>
+                            </div>
                             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Critical alerts via SMS gateway</p>
                         </div>
                     </div>
@@ -147,8 +150,8 @@ export function NotificationSettings() {
                         <Skeleton className="w-9 h-5 rounded-full bg-white/5" />
                     ) : (
                         <Switch 
-                            checked={data.sendSMS} 
-                            onCheckedChange={v => setData({ ...data, sendSMS: v })} 
+                            checked={false} 
+                            disabled={true}
                         />
                     )}
                 </div>

@@ -106,7 +106,6 @@ export const useAppStore = create<AppState>()(
       updateGymProfile: (data) =>
         set((state) => ({ gymProfile: { ...state.gymProfile, ...data } })),
       businessSettings: {
-        taxPercentage: 0,
         joiningFee: 0,
         autoExpireDays: 0,
         gracePeriodDays: 0,
@@ -347,15 +346,19 @@ export const useAppStore = create<AppState>()(
           // 1. Create Payment record first if plan exists to get the ID
           let paymentId = undefined;
           if (plan) {
+            const isNewMember = memberSubs.length === 0;
+            const joiningFee = isNewMember ? state.businessSettings.joiningFee : 0;
+            const totalAmount = plan.price + joiningFee;
+
             const payRes = await fetch("/api/payments", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 memberId,
-                amount: (plan.price * (1 + (state.businessSettings.taxPercentage / 100))) + (memberSubs.length === 0 ? state.businessSettings.joiningFee : 0),
+                amount: totalAmount,
                 date: new Date().toISOString(),
                 method: method || "cash",
-                description: `Renewal: ${plan.name} (Starts ${new Date(startDate).toLocaleDateString()})${state.businessSettings.taxPercentage > 0 ? ` incl. ${state.businessSettings.taxPercentage}% tax` : ""}${memberSubs.length === 0 && state.businessSettings.joiningFee > 0 ? " incl. joining fee" : ""}`,
+                description: `Renewal: ${plan.name} (Starts ${new Date(startDate).toLocaleDateString()})${joiningFee > 0 ? ` + Rs ${joiningFee} Joining Fee` : ""}`,
                 receiptUrl: receiptUrl || undefined,
               }),
             });

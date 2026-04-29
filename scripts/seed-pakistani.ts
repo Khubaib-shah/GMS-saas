@@ -183,7 +183,7 @@ async function seed() {
 
             await GymSettings.create({
                 gymId: gym._id,
-                general: { name: gymName, address: address, currency: "PKR" },
+                general: { name: gymName, address: address },
                 attendanceRules: { preventDuplicateCheckin: true, dailyLimit: 2 }
             } as any);
 

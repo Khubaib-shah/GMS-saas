@@ -8,7 +8,7 @@ import { useAppStore } from "@/lib/store"
 import { formatDate, formatCurrency } from "@/lib/utils/file-utils"
 import { StatsCard } from "@/components/stats-card"
 import { DashboardHeader } from "@/components/dashboard-header"
-import { ChartSkeleton } from "@/components/ui/skeleton-components"
+import { ChartSkeleton, PieChartSkeleton, BarChartSkeleton } from "@/components/ui/skeleton-components"
 import {
   Table,
   TableBody,
@@ -115,7 +115,9 @@ export default function PaymentsPage() {
   const chartData = useMemo(() => {
     const grouped: Record<string, number> = {}
 
-    const ascending = [...filtered].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    const ascending = [...filtered]
+      .filter(p => new Date(p.date).getDay() !== 0) // Remove Sundays
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
     ascending.forEach(p => {
       const dateObj = new Date(p.date)
@@ -331,9 +333,7 @@ export default function PaymentsPage() {
           </div>
           
           {loading ? (
-            <div className="h-[250px] w-full">
-              <ChartSkeleton className="h-full border-none bg-transparent p-0" />
-            </div>
+            <ChartSkeleton className="border-none bg-transparent p-0" />
           ) : chartData.length > 0 ? (
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
               <AreaChart
@@ -395,9 +395,7 @@ export default function PaymentsPage() {
           </div>
 
           {loading ? (
-            <div className="h-[250px] w-full">
-              <ChartSkeleton className="h-full border-none bg-transparent p-0" />
-            </div>
+            <PieChartSkeleton />
           ) : methodData.length > 0 ? (
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
                <ResponsiveContainer width="100%" height="100%">
@@ -456,9 +454,7 @@ export default function PaymentsPage() {
           </div>
 
           {loading ? (
-            <div className="h-[250px] w-full">
-              <ChartSkeleton className="h-full border-none bg-transparent p-0" />
-            </div>
+            <BarChartSkeleton />
           ) : topMembersData.length > 0 ? (
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
               <BarChart

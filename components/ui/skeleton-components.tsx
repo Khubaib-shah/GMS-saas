@@ -69,16 +69,127 @@ export function TableSkeleton({
   );
 }
 
-// Chart Skeleton - matches chart containers
+// Chart Content Skeletons - pure visualization placeholders
 export function ChartSkeleton({ className }: { className?: string }) {
   return (
-    <Card className={cn("p-6", className)}>
-      <Skeleton className="h-6 w-32 mb-6" />
-      <div className="space-y-3">
-        <Skeleton className="h-48 w-full rounded-md" />
+    <div className={cn("w-full h-[250px] flex flex-col justify-end gap-1 pb-4", className)}>
+      <div className="flex-1 flex items-end gap-1 px-2">
+        {Array.from({ length: 40 }).map((_, i) => (
+          <Skeleton 
+            key={i} 
+            className="flex-1 bg-white/[0.03] rounded-t-[2px] transition-all" 
+            style={{ 
+              height: `${40 + Math.sin(i / 5) * 20 + Math.random() * 15}%`,
+              opacity: 0.2 + (i % 8 === 0 ? 0.3 : 0)
+            }}
+          />
+        ))}
+      </div>
+      <div className="h-4 flex justify-between px-4 mt-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-1.5 w-12 bg-white/5" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Specifically for Dashboard Bar Charts (Revenue/Attendance)
+export function VerticalBarChartSkeleton() {
+  return (
+    <div className="w-full h-[250px] flex flex-col justify-end pb-4">
+      <div className="flex-1 flex items-end justify-around px-8 gap-4">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="flex flex-col items-center flex-1 max-w-[40px] gap-2">
+            <Skeleton 
+              className="w-full bg-white/[0.03] rounded-t-md relative overflow-hidden" 
+              style={{ 
+                height: i % 3 === 0 ? `${20 + Math.random() * 60}%` : '4px',
+                opacity: i % 3 === 0 ? 0.8 : 0.2
+              }}
+            >
+               {i % 3 === 0 && <div className="absolute inset-x-0 top-0 h-1 bg-primary/20" />}
+            </Skeleton>
+          </div>
+        ))}
+      </div>
+      <div className="h-4 flex justify-around px-8 mt-6">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-1.5 w-10 bg-white/5" />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function PieChartSkeleton() {
+  return (
+    <div className="w-full h-[250px] flex flex-col items-center justify-center">
+      <div className="relative w-36 h-36 rounded-full border-[10px] border-white/[0.03] flex items-center justify-center animate-pulse">
+        <div className="w-20 h-20 rounded-full border-4 border-white/[0.02]" />
+        {/* Fake neon segment hint */}
+        <div className="absolute inset-0 rounded-full border-[10px] border-primary/20 border-t-transparent border-l-transparent rotate-[30deg]" />
+      </div>
+      <div className="flex flex-wrap justify-center gap-6 mt-8 w-full px-4">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-primary/40' : 'bg-purple-500/40'}`} />
+            <Skeleton className="h-2 w-16 bg-white/5" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function BarChartSkeleton() {
+  return (
+    <div className="w-full h-[250px] flex flex-col justify-center space-y-5 px-2">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="space-y-2">
+          <div className="flex justify-between items-center px-1">
+            <Skeleton className="h-2 w-24 bg-white/5" />
+            <Skeleton className="h-2 w-12 bg-white/5" />
+          </div>
+          <div className="relative w-full h-6 bg-white/[0.02] rounded-r-md overflow-hidden">
+             <Skeleton 
+               className="absolute inset-y-0 left-0 bg-white/5" 
+               style={{ width: `${90 - (i * 15)}%` }} 
+             />
+             {/* Neon hint on the leading edge */}
+             <div className="absolute inset-y-0 left-0 w-1 bg-primary/30" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Full Card Skeleton with Header (for Dashboard)
+export function ChartCardSkeleton({ title, subtitle, type = "bar" }: { title?: string, subtitle?: string, type?: "bar" | "area" | "pie" }) {
+  return (
+    <Card className="p-6 glass-premium border-border bg-card dark:bg-slate-950/40 h-full flex flex-col">
+      <div className="flex justify-between items-start mb-8">
+        <div className="space-y-2">
+          {title ? (
+             <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] italic">{title}</h3>
+          ) : (
+            <Skeleton className="h-4 w-32 bg-white/5" />
+          )}
+          <Skeleton className="h-3 w-40 bg-white/5" />
+        </div>
+        <div className="text-right space-y-1">
+          <Skeleton className="h-2 w-24 ml-auto bg-primary/10" />
+          <Skeleton className="h-7 w-28 bg-white/5" />
+        </div>
+      </div>
+      <div className="flex-1 min-h-[250px]">
+        {type === "bar" && <VerticalBarChartSkeleton />}
+        {type === "area" && <ChartSkeleton />}
+        {type === "pie" && <PieChartSkeleton />}
       </div>
     </Card>
-  );
+  )
 }
 
 // Form/Filter Card Skeleton - matches search and filter cards

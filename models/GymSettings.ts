@@ -14,14 +14,10 @@ const GymSettingsSchema = new mongoose.Schema(
         },
         general: {
             name: { type: String, default: "" },
-            logo: { type: String, default: "" },
             address: { type: String, default: "" },
             phone: { type: String, default: "" },
-            timezone: { type: String, default: "UTC" },
-            currency: { type: String, default: "USD" },
         },
         business: {
-            taxPercentage: { type: Number, default: 0 },
             joiningFee: { type: Number, default: 0 },
             autoExpireDays: { type: Number, default: 0 },
             gracePeriodDays: { type: Number, default: 0 },
@@ -39,7 +35,6 @@ const GymSettingsSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-GymSettingsSchema.index({ gymId: 1 });
 
 GymSettingsSchema.set("toJSON", {
     virtuals: true,

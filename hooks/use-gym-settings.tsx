@@ -9,14 +9,11 @@ import { useSession } from "next-auth/react";
 
 interface GeneralSettings {
     name: string;
-    logo: string;
     address: string;
-    timezone: string;
-    currency: string;
+    phone: string;
 }
 
 interface BusinessSettings {
-    taxPercentage: number;
     joiningFee: number;
     autoExpireDays: number;
     gracePeriodDays: number;

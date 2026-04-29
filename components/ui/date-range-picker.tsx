@@ -92,7 +92,7 @@ export function DateRangePicker({
           align="start"
         >
           {/* Presets List */}
-          <div className="w-48 border-r border-white/5 p-2 bg-black/20">
+          <div className="glass-premium w-48 border-r border-white/5 p-2 bg-black/20">
             <div className="px-3 py-2 mb-2">
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Quick Select</span>
             </div>

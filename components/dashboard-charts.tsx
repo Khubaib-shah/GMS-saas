@@ -4,19 +4,21 @@ import { Card } from "@/components/ui/card"
 import { useAppStore } from "@/lib/store"
 import { useMemo } from "react"
 import { formatCurrency } from "@/lib/utils/file-utils"
-import { ChartSkeleton } from "@/components/ui/skeleton-components"
+import { ChartSkeleton, ChartCardSkeleton } from "@/components/ui/skeleton-components"
 import { DateRange } from "react-day-picker"
 import { isWithinInterval, startOfDay, endOfDay, eachDayOfInterval, format } from "date-fns"
 import { cn } from "@/lib/utils"
 
 export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, dateRange?: DateRange }) {
-  if (isLoading) return <ChartSkeleton />
+  if (isLoading) return <ChartCardSkeleton title="Revenue Trend" />
 
   const store = useAppStore()
 
-  const data = useMemo(() => {
+  const data = useMemo<{ name: string; value: number; date?: Date }[]>(() => {
     if (dateRange?.from && dateRange?.to) {
       const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to })
+        .filter(day => day.getDay() !== 0) // Remove Sundays
+      
       return days.map(day => {
         const total = store.payments.reduce((sum, p) => {
           const pDate = new Date(p.date)
@@ -25,7 +27,11 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
           }
           return sum
         }, 0)
-        return { name: format(day, "MMM dd"), value: total }
+        return { 
+          name: format(day, "MMM dd"), 
+          value: total,
+          date: day 
+        }
       })
     }
 
@@ -42,7 +48,8 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
 
     return months.map((month, index) => ({
       name: month,
-      value: monthlyTotals[index]
+      value: monthlyTotals[index],
+      date: undefined
     }))
   }, [store.payments, dateRange])
 
@@ -67,14 +74,22 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
         </div>
       </div>
 
-      <div className="flex-1 min-h-[300px] w-full overflow-x-auto pb-4 scrollbar-hide group/scroll">
+      <div className="flex-1 min-h-[300px] w-full pb-4 scrollbar-hide group/scroll">
         <div 
-          className="flex items-end justify-between gap-1 h-full pt-8 pb-2"
-          style={{ minWidth: data.length > 31 ? `${data.length * 30}px` : "100%" }}
+          className="flex items-end justify-between gap-0.5 h-full pt-8 pb-2"
+          style={{ minWidth: "100%" }}
         >
           {data.map((item, i) => {
             const height = (item.value / maxValue) * 100;
-            const showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 5 === 0;
+            
+            // Weekly legend logic: 1st, 7th, 14th, 21st, 28th
+            let showLabel = false;
+            if (item.date) {
+              const d = item.date.getDate();
+              showLabel = d === 1 || d === 7 || d === 14 || d === 21 || d === 28;
+            } else {
+              showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 5 === 0;
+            }
             
             return (
               <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative px-1">
@@ -126,7 +141,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
 // ... SubscriptionChart and MembershipStatusChart remain largely same but I'll check for consistency ...
 
 export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolean, dateRange?: DateRange }) {
-  if (isLoading) return <ChartSkeleton />
+  if (isLoading) return <ChartCardSkeleton title="Subscriptions" type="pie" />
 
   const store = useAppStore()
 
@@ -234,7 +249,7 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
 }
 
 export function MembershipStatusChart({ isLoading }: { isLoading?: boolean }) {
-  if (isLoading) return <ChartSkeleton />
+  if (isLoading) return <ChartCardSkeleton title="Membership Health" type="pie" />
 
   const store = useAppStore()
 
@@ -328,19 +343,25 @@ export function MembershipStatusChart({ isLoading }: { isLoading?: boolean }) {
 }
 
 export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean, dateRange?: DateRange }) {
-  if (isLoading) return <ChartSkeleton />
+  if (isLoading) return <ChartCardSkeleton title="Attendance" />
 
   const store = useAppStore()
 
-  const data = useMemo(() => {
+  const data = useMemo<{ name: string; value: number; date?: Date }[]>(() => {
     if (dateRange?.from && dateRange?.to) {
       const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to })
+        .filter(day => day.getDay() !== 0) // Remove Sundays
+        
       return days.map(day => {
         const count = store.attendance.filter(att => {
           const aDate = new Date(att.date)
           return format(aDate, "yyyy-MM-dd") === format(day, "yyyy-MM-dd")
         }).length
-        return { name: format(day, "MMM dd"), value: count }
+        return { 
+          name: format(day, "MMM dd"), 
+          value: count,
+          date: day
+        }
       })
     }
 
@@ -356,7 +377,11 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
       }
     })
 
-    return days.map((day, i) => ({ name: day, value: counts[i] }))
+    return days.map((day, i) => ({ 
+      name: day, 
+      value: counts[i],
+      date: undefined
+    }))
   }, [store.attendance, dateRange])
 
   const maxValue = Math.max(...data.map(d => d.value), 1)
@@ -380,14 +405,22 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
         </div>
       </div>
 
-      <div className="flex-1 min-h-[300px] w-full overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex-1 min-h-[300px] w-full pb-4 scrollbar-hide">
         <div 
-          className="flex items-end justify-between gap-1 h-full pt-8 pb-2"
-          style={{ minWidth: data.length > 31 ? `${data.length * 30}px` : "100%" }}
+          className="flex items-end justify-between gap-0.5 h-full pt-8 pb-2"
+          style={{ minWidth: "100%" }}
         >
           {data.map((item, i) => {
             const height = (item.value / maxValue) * 100;
-            const showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 5 === 0;
+            
+            // Weekly legend logic: 1st, 7th, 14th, 21st, 28th
+            let showLabel = false;
+            if (item.date) {
+              const d = item.date.getDate();
+              showLabel = d === 1 || d === 7 || d === 14 || d === 21 || d === 28;
+            } else {
+              showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 5 === 0;
+            }
             
             return (
               <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative px-1">

@@ -70,7 +70,7 @@ export function ConfirmModal({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="bg-background border-white/5 shadow-2xl">
+            <AlertDialogContent className="glass-premium border-white/5 shadow-2xl">
                 <AlertDialogHeader>
                     {Icon && (
                         <Icon className={cn("w-12 h-12 mb-4 mx-auto", iconColor)} />
