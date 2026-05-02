@@ -15,6 +15,7 @@ import {
     Square,
     CheckSquare,
     AlertCircle,
+    Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -61,6 +62,7 @@ export default function PlansPage() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [form, setForm] = useState<any>({ ...emptyPlan });
     const [saving, setSaving] = useState(false);
+    const [isProcessingToggle, setIsProcessingToggle] = useState(false);
     const [toggleConfirm, setToggleConfirm] = useState<any>(null);
 
     const fetchPlans = async () => {
@@ -115,13 +117,17 @@ export default function PlansPage() {
 
     const togglePlan = async (id: string) => {
         try {
+            setIsProcessingToggle(true);
             const res = await fetch(`/api/super-admin/plans/${id}`, { method: "DELETE" });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
             toast.success(data.message);
+            setToggleConfirm(null);
             await fetchPlans();
         } catch (e: any) {
             toast.error(e.message);
+        } finally {
+            setIsProcessingToggle(false);
         }
     };
 
@@ -336,7 +342,7 @@ export default function PlansPage() {
                             disabled={saving}
                             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
                         >
-                            <Save className="w-4 h-4" />
+                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                             {saving ? "Saving..." : editingId ? "Update Plan" : "Create Plan"}
                         </button>
                     </div>
@@ -459,8 +465,8 @@ export default function PlansPage() {
                 }
                 onConfirm={() => {
                     togglePlan(toggleConfirm?._id || toggleConfirm?.id);
-                    setToggleConfirm(null);
                 }}
+                loading={isProcessingToggle}
                 confirmText={toggleConfirm?.isActive ? "Deactivate" : "Activate"}
                 variant={toggleConfirm?.isActive ? "destructive" : "primary"}
             />

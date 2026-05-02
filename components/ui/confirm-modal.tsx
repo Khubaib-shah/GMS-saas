@@ -11,7 +11,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { AlertTriangle, type LucideIcon } from "lucide-react";
+import { AlertTriangle, Loader2, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -102,7 +102,12 @@ export function ConfirmModal({
                                     disabled={loading}
                                     className={cn("rounded-xl font-black italic uppercase tracking-widest", buttonClass)}
                                 >
-                                    {loading ? `${cancelText === "Cancel" ? "Processing" : confirmText}...` : confirmText}
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            {confirmText}...
+                                        </>
+                                    ) : confirmText}
                                 </AlertDialogAction>
                             )}
                         </>

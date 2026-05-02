@@ -28,7 +28,8 @@ import {
   RotateCcw,
   Lock,
   Key,
-  Smartphone
+  Smartphone,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -91,6 +92,11 @@ export default function MemberDetailPage({
   const [isDeletingMember, setIsDeletingMember] = useState(false);
   const [deleteSubId, setDeleteSubId] = useState<string | null>(null);
   const [isRenewing, setIsRenewing] = useState(false);
+  const [isProcessingDelete, setIsProcessingDelete] = useState(false);
+  const [isProcessingRestore, setIsProcessingRestore] = useState(false);
+  const [isProcessingDeleteSub, setIsProcessingDeleteSub] = useState(false);
+  const [isProcessingDeletePayment, setIsProcessingDeletePayment] = useState(false);
+  const [isProcessingEditPayment, setIsProcessingEditPayment] = useState(false);
   const [fallbackMember, setFallbackMember] = useState<Member | null>(null);
 
   // Payment Edit/Delete State
@@ -217,30 +223,43 @@ export default function MemberDetailPage({
   const handleDelete = async () => {
     if (!member) return;
     try {
+      setIsProcessingDelete(true);
       await deleteMember(memberId, { permanent: !!member.deletedAt });
       toast.success(member.deletedAt ? "Member record permanently purged" : "Member moved to trash");
       router.push("/members");
     } catch (error) {
       toast.error("Failed to remove member");
+    } finally {
+      setIsProcessingDelete(false);
     }
   };
 
   const handleRestore = async () => {
     try {
+      setIsProcessingRestore(true);
       await restoreMember(memberId);
       toast.success("Member successfully restored");
       // Reload member data to update UI
       loadMembers();
     } catch (error) {
       toast.error("Failed to restore member");
+    } finally {
+      setIsProcessingRestore(false);
     }
   };
 
   const handleDeleteSubscription = async () => {
     if (!deleteSubId) return;
-    await deleteSubscription(deleteSubId);
-    toast.success("Subscription and associated payment removed");
-    setDeleteSubId(null);
+    try {
+      setIsProcessingDeleteSub(true);
+      await deleteSubscription(deleteSubId);
+      toast.success("Subscription and associated payment removed");
+      setDeleteSubId(null);
+    } catch (error) {
+      toast.error("Failed to delete subscription");
+    } finally {
+      setIsProcessingDeleteSub(false);
+    }
   };
 
   const handleOpenEditPayment = (payment: Payment) => {
@@ -258,6 +277,7 @@ export default function MemberDetailPage({
   const handleSavePayment = async () => {
     if (!editingPayment) return;
     try {
+      setIsProcessingEditPayment(true);
       toast.loading("Updating payment...", { id: "edit-payment" });
       await updatePayment(editingPayment.id, paymentEditData);
       toast.success("Payment record updated", { id: "edit-payment" });
@@ -265,12 +285,15 @@ export default function MemberDetailPage({
       setEditingPayment(null);
     } catch (error) {
       toast.error("Failed to update payment", { id: "edit-payment" });
+    } finally {
+      setIsProcessingEditPayment(false);
     }
   };
 
   const handleDeletePayment = async () => {
     if (!deletePaymentId) return;
     try {
+      setIsProcessingDeletePayment(true);
       toast.loading("Deleting payment...", { id: "delete-payment" });
       await deletePayment(deletePaymentId);
       toast.success("Payment record removed", { id: "delete-payment" });
@@ -278,6 +301,7 @@ export default function MemberDetailPage({
       toast.error("Failed to delete payment", { id: "delete-payment" });
     } finally {
       setDeletePaymentId(null);
+      setIsProcessingDeletePayment(false);
     }
   };
 
@@ -409,10 +433,15 @@ export default function MemberDetailPage({
               variant="outline"
               size="sm"
               onClick={handleRestore}
+              disabled={isProcessingRestore}
               className="h-10 px-5 rounded-xl border-emerald-500/20 bg-emerald-500/10 text-[10px] font-black uppercase tracking-widest text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all shadow-[0_0_20px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
             >
-              <RotateCcw className="w-3.5 h-3.5 mr-2" />
-              Restore Member
+              {isProcessingRestore ? (
+                <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+              ) : (
+                <RotateCcw className="w-3.5 h-3.5 mr-2" />
+              )}
+              {isProcessingRestore ? "Restoring..." : "Restore Member"}
             </Button>
           )}
 
@@ -651,7 +680,7 @@ export default function MemberDetailPage({
                   >
                     {isRenewing ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mr-2" />
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Processing...
                       </>
                     ) : (
@@ -1055,6 +1084,7 @@ export default function MemberDetailPage({
             : "The member will be moved to the trash and hidden from active lists."
         }
         onConfirm={handleDelete}
+        loading={isProcessingDelete}
         confirmText={member?.deletedAt ? "Permanently Purge" : "Move to Trash"}
         variant="destructive"
       />
@@ -1069,6 +1099,7 @@ export default function MemberDetailPage({
             <>This will remove this specific membership period and its <strong>associated payment record</strong>. This may affect the member's current status.</>
         }
         onConfirm={handleDeleteSubscription}
+        loading={isProcessingDeleteSub}
         confirmText="Delete Record"
         variant="destructive"
       />
@@ -1083,6 +1114,7 @@ export default function MemberDetailPage({
             <>Are you sure you want to delete this payment record? This will <strong>NOT</strong> affect the member's subscription status, but it will be removed from all financial totals.</>
         }
         onConfirm={handleDeletePayment}
+        loading={isProcessingDeletePayment}
         confirmText="Delete Record"
         variant="destructive"
       />
@@ -1215,7 +1247,14 @@ export default function MemberDetailPage({
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditPaymentModalOpen(false)}>Cancel</Button>
-            <Button onClick={handleSavePayment} className="bg-emerald-600 hover:bg-emerald-700">Save Changes</Button>
+            <Button onClick={handleSavePayment} className="bg-emerald-600 hover:bg-emerald-700 h-10 px-6 font-bold" disabled={isProcessingEditPayment}>
+              {isProcessingEditPayment ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : "Save Changes"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1288,7 +1327,9 @@ export default function MemberDetailPage({
                   onClick={handleDisablePortal}
                   disabled={isPortalProcessing}
                 >
-                  Disable Access
+                  {isPortalProcessing ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : "Disable Access"}
                 </Button>
               )}
               <Button 
@@ -1304,7 +1345,12 @@ export default function MemberDetailPage({
                 className="h-11 px-6 rounded-xl font-black italic text-xs uppercase tracking-widest bg-primary text-black hover:bg-white shadow-lg shadow-primary/20"
                 disabled={isPortalProcessing}
               >
-                {isPortalProcessing ? "Saving..." : (member?.portalEnabled ? "Update Portal" : "Enable Portal")}
+                {isPortalProcessing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (member?.portalEnabled ? "Update Portal" : "Enable Portal")}
               </Button>
             </DialogFooter>
           </form>

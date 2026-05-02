@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronLeft, Upload, Users, AlertCircle, Target, Crown, Sparkles } from "lucide-react";
+import { ChevronLeft, Upload, Users, AlertCircle, Target, Crown, Sparkles, Loader2 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { fileToBase64 } from "@/lib/utils/file-utils";
 import { toast } from "sonner";
@@ -398,6 +398,7 @@ export default function EditMemberPage({
                 disabled={loading || !formData.firstName}
                 className="flex-1 h-11 bg-primary text-black hover:bg-white font-black italic tracking-tighter text-lg rounded-lg transition-all uppercase neon-glow z-20 group"
               >
+                {loading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
                 {loading ? "Saving..." : "Update Member"}
               </Button>
             </div>

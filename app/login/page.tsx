@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
-import { Zap, Shield, ArrowRight, Trophy, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Zap, Shield, ArrowRight, Trophy, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
@@ -121,6 +121,7 @@ function LoginForm() {
           disabled={loading}
           className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
         >
+          {loading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
           {loading ? "Logging in..." : "Login"}
           {!loading && <ArrowRight className="ml-2 w-5 h-5" />}
         </Button>

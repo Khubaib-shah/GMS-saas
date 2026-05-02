@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 import { Card } from "@/components/ui/card";
-import { Edit2, Plus, Trash2, PauseCircle, PlayCircle, Eye, Search } from "lucide-react";
+import { Edit2, Plus, Trash2, PauseCircle, PlayCircle, Eye, Search, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -669,6 +669,7 @@ export default function SubscriptionsPage() {
               Cancel
             </Button>
             <Button onClick={handlePlanUpdate} disabled={loading}>
+              {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               {loading ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
@@ -770,6 +771,7 @@ export default function SubscriptionsPage() {
               Cancel
             </Button>
             <Button onClick={handlePlanAdd} disabled={loading}>
+              {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               {loading ? "Creating..." : "Create Plan"}
             </Button>
           </DialogFooter>
@@ -784,6 +786,7 @@ export default function SubscriptionsPage() {
         highlight="Plan?"
         description="This action cannot be undone. This will permanently delete the subscription plan."
         onConfirm={handleDeletePlan}
+        loading={loading}
         confirmText="Delete"
         variant="destructive"
       />
@@ -813,6 +816,7 @@ export default function SubscriptionsPage() {
               Cancel
             </Button>
             <Button onClick={handlePauseSubscription} disabled={isProcessing}>
+              {isProcessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               {isProcessing ? "Pausing..." : "Pause Subscription"}
             </Button>
           </DialogFooter>

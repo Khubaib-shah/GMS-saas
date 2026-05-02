@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Search, Plus, Trash2, QrCode, Sparkles, Users, Filter, Eye, AlertTriangle, CircleCheckBigIcon, AlertCircle } from "lucide-react";
+import { Search, Plus, Trash2, QrCode, Sparkles, Users, Filter, Eye, AlertTriangle, CircleCheckBigIcon, AlertCircle, Loader2 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { MemberQrDialog } from "@/components/member-qr-dialog";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,8 @@ export default function MembersPage() {
     null
   );
   const [loading, setLoading] = useState(true);
+  const [isProcessingDelete, setIsProcessingDelete] = useState(false);
+  const [isProcessingRestore, setIsProcessingRestore] = useState(false);
   const [showTrash, setShowTrash] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -108,20 +110,26 @@ export default function MembersPage() {
 
   const handleDelete = async (id: string) => {
     try {
+      setIsProcessingDelete(true);
       await store.deleteMember(id, { permanent: showTrash });
       setDeleteId(null);
       toast.success(showTrash ? "Member permanently deleted" : "Member moved to trash");
     } catch (error) {
       toast.error("Action failed");
+    } finally {
+      setIsProcessingDelete(false);
     }
   };
 
   const handleRestore = async (id: string) => {
     try {
+      setIsProcessingRestore(true);
       await store.restoreMember(id);
       toast.success("Member successfully restored");
     } catch (error) {
       toast.error("Failed to restore member");
+    } finally {
+      setIsProcessingRestore(false);
     }
   };
 
@@ -372,10 +380,12 @@ export default function MembersPage() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              disabled={isProcessingRestore}
                               onClick={() => handleRestore(member.id)}
                               className="h-9 px-4 rounded-xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all font-black italic text-[10px] tracking-tighter"
                             >
-                              Restore
+                              {isProcessingRestore ? <Loader2 className="w-3 h-3 mr-2 animate-spin" /> : null}
+                              {isProcessingRestore ? "Restoring" : "Restore"}
                             </Button>
                           )}
 
@@ -454,6 +464,7 @@ export default function MembersPage() {
           : "The member record and their history will be moved to the trash and hidden from the registry."
         }
         onConfirm={() => deleteId && handleDelete(deleteId)}
+        loading={isProcessingDelete}
         confirmText={showTrash ? "Delete" : "Move to Trash"}
         variant="destructive"
       />
