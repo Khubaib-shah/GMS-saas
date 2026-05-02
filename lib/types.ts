@@ -5,17 +5,19 @@ export type Member = {
   phone?: string
   email?: string
   gender?: "male" | "female" | "other"
-  joinDate: string // ISO
+  joinDate: string
   photoBase64?: string | null
   planId?: string
   notes?: string
   gymId?: string
   trainerId?: string
-  branchId?: string // Multi-branch support
+  branchId?: string
   workoutPlanId?: string
   lastCheckIn?: string | null
-  createdAt?: string // ISO
-  deletedAt?: string | null // Soft delete
+  portalEnabled?: boolean
+  lastPortalLogin?: string | null
+  createdAt?: string
+  deletedAt?: string | null
 }
 
 export type Plan = {
@@ -23,7 +25,7 @@ export type Plan = {
   mongoId?: string
   name: string
   price: number
-  duration: number // days
+  duration: number
   description?: string
   gymId?: string
 }
@@ -33,12 +35,11 @@ export type Subscription = {
   mongoId?: string
   memberId: string
   planId: string
-  startDate: string // ISO
-  endDate: string // ISO
+  startDate: string
+  endDate: string
   status: "active" | "expired" | "paused"
   paymentId?: string
   gymId?: string
-  // Pause/freeze support (Phase 2)
   pauseHistory?: Array<{
     startDate: string
     endDate?: string
@@ -46,23 +47,23 @@ export type Subscription = {
   }>
   totalPausedDays?: number
   originalEndDate?: string
-  currentPauseStart?: string // ISO
+  currentPauseStart?: string
 }
 
 export type Payment = {
   id: string
   memberId: string
   amount: number
-  date: string // ISO
+  date: string
   method: "cash" | "online" | "bank_transfer" | "card" | "other"
   description?: string
   receiptUrl?: string | null
   gymId?: string
-  branchId?: string // Multi-branch support
+  branchId?: string
   receiptNumber?: string
-  collectedBy?: string // Staff user ID
+  collectedBy?: string
   notes?: string
-  deletedAt?: string | null // Soft delete
+  deletedAt?: string | null
 }
 
 export type Branch = {

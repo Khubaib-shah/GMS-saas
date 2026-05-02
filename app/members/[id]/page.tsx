@@ -25,7 +25,10 @@ import {
   Upload,
   Eye,
   Dumbbell,
-  RotateCcw
+  RotateCcw,
+  Lock,
+  Key,
+  Smartphone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -107,6 +110,12 @@ export default function MemberDetailPage({
     description: "",
     receiptUrl: null,
   });
+
+  // Member Portal State
+  const [isPortalModalOpen, setIsPortalModalOpen] = useState(false);
+  const [portalPassword, setPortalPassword] = useState("");
+  const [portalPin, setPortalPin] = useState("");
+  const [isPortalProcessing, setIsPortalProcessing] = useState(false);
 
   useEffect(() => {
     if (selectedPlan) {
@@ -317,6 +326,64 @@ export default function MemberDetailPage({
     }
   };
 
+  const handlePortalSetup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!portalPassword && !portalPin && !member?.portalEnabled) {
+      toast.error("Please set at least a Password or a PIN");
+      return;
+    }
+    setIsPortalProcessing(true);
+    try {
+      const res = await fetch("/api/member-portal/setup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          memberId,
+          password: portalPassword || undefined,
+          pin: portalPin || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message);
+        setIsPortalModalOpen(false);
+        setPortalPassword("");
+        setPortalPin("");
+        // Reload member data to update UI
+        loadMembers();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Failed to setup portal");
+    } finally {
+      setIsPortalProcessing(false);
+    }
+  };
+
+  const handleDisablePortal = async () => {
+    if (!confirm("Are you sure you want to disable portal access? This will remove the member's login credentials.")) return;
+    
+    setIsPortalProcessing(true);
+    try {
+      const res = await fetch(`/api/member-portal/setup?memberId=${memberId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message);
+        setIsPortalModalOpen(false);
+        loadMembers();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Failed to disable portal");
+    } finally {
+      setIsPortalProcessing(false);
+    }
+  };
+
   return (
     <div className="space-y-10 animate-fade-up">
       {/* Top Header */}
@@ -460,8 +527,57 @@ export default function MemberDetailPage({
               )}
             </div>
           </Card>
+ 
+          {/* Member Portal Access */}
+          <Card className="glass-premium p-6 border-border dark:bg-slate-950/40 space-y-6">
+            <div className="flex flex-col gap-2">
+              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                <Smartphone className="w-4 h-4 text-primary" />
+                MEMBER PORTAL
+              </h3>
+              <div className="h-px w-full bg-white/5 mt-2"></div>
+            </div>
 
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-black/20 dark:bg-white/5 border border-white/5">
+                <div>
+                  <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Portal Access</p>
+                  <div className={cn(
+                    "text-[11px] font-bold uppercase",
+                    member?.portalEnabled ? "text-emerald-500" : "text-slate-500"
+                  )}>
+                    {member?.portalEnabled ? "Enabled" : "Disabled"}
+                  </div>
+                </div>
+                <div className={cn(
+                  "w-2 h-2 rounded-full",
+                  member?.portalEnabled ? "bg-emerald-500 animate-pulse" : "bg-slate-700"
+                )}></div>
+              </div>
 
+              {member?.portalEnabled && (
+                <div className="flex items-center gap-3 text-sm p-3 rounded-xl bg-black/20 dark:bg-white/5 border border-white/5">
+                  <div className="w-8 h-8 rounded-lg bg-black/20 dark:bg-slate-900 border border-white/5 flex items-center justify-center shadow-sm">
+                    <Clock className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Last Portal Login</p>
+                    <div className="font-medium font-mono text-[11px] font-bold">
+                      {member?.lastPortalLogin ? formatDate(member.lastPortalLogin) : "Never"}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <Button 
+                variant="outline" 
+                className="w-full h-11 border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-widest hover:text-primary hover:border-primary/50 transition-all"
+                onClick={() => setIsPortalModalOpen(true)}
+              >
+                {member?.portalEnabled ? "Manage Credentials" : "Setup Portal Access"}
+              </Button>
+            </div>
+          </Card>
         </div>
 
         {/* Right Column: Detailed History */}
@@ -1115,6 +1231,83 @@ export default function MemberDetailPage({
             />
 
           </div>
+        </DialogContent>
+      </Dialog>
+      {/* Member Portal Setup Modal */}
+      <Dialog open={isPortalModalOpen} onOpenChange={setIsPortalModalOpen}>
+        <DialogContent className="max-w-md glass-premium border-border">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black italic tracking-tighter uppercase">
+              Portal <span className="text-primary">Management</span>
+            </DialogTitle>
+            <DialogDescription className="text-slate-400 text-xs font-bold uppercase tracking-wider">
+              {member?.portalEnabled 
+                ? `Update credentials for ${member?.firstName}` 
+                : `Enable self-service portal for ${member?.firstName}`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handlePortalSetup} className="space-y-6 py-4">
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed">
+                Members can use their email and either a Password or a Fast PIN to access the portal.
+              </div>
+
+              <InputField
+                label="Set Portal Password"
+                type="password"
+                validateType="password"
+                placeholder="MIN 6 CHARACTERS"
+                value={portalPassword}
+                onChange={(val) => setPortalPassword(val)}
+                leadingIcon={<Lock className="w-4 h-4" />}
+                className="pl-9"
+              />
+
+              <div className="relative group/pin-setup">
+                <InputField
+                  label="Set Fast PIN"
+                  type="text"
+                  validateType="number"
+                  placeholder="4-6 DIGITS"
+                  maxLength={6}
+                  value={portalPin}
+                  onChange={(val) => setPortalPin(val.replace(/\D/g, ""))}
+                  leadingIcon={<Key className="w-4 h-4" />}
+                  className="pl-9 font-mono tracking-widest"
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="flex flex-col sm:flex-row gap-3">
+              {member?.portalEnabled && (
+                <Button 
+                  type="button" 
+                  variant="destructive" 
+                  className="sm:mr-auto h-11 px-6 rounded-xl font-black italic text-xs uppercase tracking-widest"
+                  onClick={handleDisablePortal}
+                  disabled={isPortalProcessing}
+                >
+                  Disable Access
+                </Button>
+              )}
+              <Button 
+                variant="outline" 
+                type="button"
+                onClick={() => setIsPortalModalOpen(false)}
+                className="h-11 px-6 rounded-xl font-black italic text-xs uppercase tracking-widest border-white/5 bg-white/5"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                className="h-11 px-6 rounded-xl font-black italic text-xs uppercase tracking-widest bg-primary text-black hover:bg-white shadow-lg shadow-primary/20"
+                disabled={isPortalProcessing}
+              >
+                {isPortalProcessing ? "Saving..." : (member?.portalEnabled ? "Update Portal" : "Enable Portal")}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
