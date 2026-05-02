@@ -27,8 +27,8 @@ interface MailOptions {
  * Injects content into a glass-premium, HUD-inspired HTML container.
  */
 export function getBaseTemplate(title: string, content: string): string {
-  const primaryColor = "#ccff00"; // Neon Lime matching 82 100% 55%
-  const bgColor = "#05080a"; // Dark Onyx matching 224 71.4% 2%
+  const primaryColor = "#ccff00";
+  const bgColor = "#05080a";
 
   return `
     <!DOCTYPE html>
@@ -64,7 +64,7 @@ export function getBaseTemplate(title: string, content: string): string {
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: -1px;
-            color: #fff;
+            color: #9f9f9f;
             font-style: italic;
           }
           .logo-text span { color: ${primaryColor}; }
@@ -94,6 +94,10 @@ export function getBaseTemplate(title: string, content: string): string {
           h1 { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; margin-bottom: 20px; color: ${primaryColor}; }
           p { margin-bottom: 16px; font-size: 15px; color: #cbd5e1; }
           .divider { height: 1px; background: rgba(255, 255, 255, 0.05); margin: 30px 0; }
+          @media only screen and (max-width: 600px) {
+            .receipt-box { padding: 10px !important; }
+            .content { padding: 30px 15px; }
+          }
         </style>
       </head>
       <body>
@@ -136,9 +140,9 @@ export async function sendEmail({ to, subject, html, attachments }: MailOptions)
       html,
       attachments,
     });
-    
+
     console.log("Message sent: %s", info.messageId);
-    
+
     // Ethereal provides a preview URL
     if (info.messageId && process.env.SMTP_HOST?.includes("ethereal")) {
       console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
@@ -147,7 +151,7 @@ export async function sendEmail({ to, subject, html, attachments }: MailOptions)
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Email send error:", error);
-    
+
     // Fallback: Log the HTML content so the user can verify it works
     console.log("\n--- [FAILED EMAIL CONTENT FALLBACK] ---");
     console.log("The email could not be sent due to a network error, but here is the content generated:");
@@ -155,7 +159,7 @@ export async function sendEmail({ to, subject, html, attachments }: MailOptions)
     console.log(`RECIPIENT: ${to}`);
     console.log("---------------------------------------");
     console.log("Check the logic above - the data generation is successful!");
-    
+
     return { success: false, error };
   }
 }

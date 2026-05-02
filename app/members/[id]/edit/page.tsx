@@ -33,6 +33,7 @@ export default function EditMemberPage({
   const [photoBase64, setPhotoBase64] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [trainers, setTrainers] = useState<any[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const [formData, setFormData] = useState<{
     firstName: string;
@@ -55,30 +56,62 @@ export default function EditMemberPage({
   });
 
   useEffect(() => {
-    store.loadMembers();
-    store.loadPlans();
-    fetchTrainers();
+    let mounted = true;
 
-    const member = store.members.find((m) => m.id === memberId);
-    if (member) {
-      setFormData({
-        firstName: member.firstName,
-        lastName: member.lastName || "",
-        email: member.email || "",
-        phone: member.phone || "",
-        gender: (member.gender as any) || "male",
-        planId: member.planId || "",
-        notes: member.notes || "",
-        trainerId: (typeof member.trainerId === 'object' && member.trainerId !== null)
-          ? String((member.trainerId as any)._id || (member.trainerId as any).id || "")
-          : String((member.trainerId as any) || ""),
-      });
-      if (member.photoBase64) {
-        setPhotoPreview(member.photoBase64);
-        setPhotoBase64(member.photoBase64);
+    const initializeData = async () => {
+      // 1. Fire off global data loads
+      store.loadPlans();
+      fetchTrainers();
+      
+      // Wait for members to load to check if our member is in there
+      await store.loadMembers();
+      
+      if (!mounted) return;
+
+      let member = useAppStore.getState().members.find((m) => m.id === memberId);
+
+      // 2. Fallback fetch if not in global list
+      if (!member) {
+        try {
+          const res = await fetch(`/api/members/${memberId}`);
+          if (res.ok) {
+            member = await res.json();
+          }
+        } catch (error) {
+          console.error("Failed to fetch individual member", error);
+        }
       }
-    }
-  }, [memberId, store.members.length]);
+
+      if (!mounted) return;
+
+      // 3. Initialize Form
+      if (member && !isInitialized) {
+        setFormData({
+          firstName: member.firstName,
+          lastName: member.lastName || "",
+          email: member.email || "",
+          phone: member.phone || "",
+          gender: (member.gender as any) || "male",
+          planId: member.planId || "",
+          notes: member.notes || "",
+          trainerId: (typeof member.trainerId === 'object' && member.trainerId !== null)
+            ? String((member.trainerId as any)._id || (member.trainerId as any).id || "")
+            : String((member.trainerId as any) || ""),
+        });
+        if (member.photoBase64) {
+          setPhotoPreview(member.photoBase64);
+          setPhotoBase64(member.photoBase64);
+        }
+        setIsInitialized(true);
+      }
+    };
+
+    initializeData();
+
+    return () => {
+      mounted = false;
+    };
+  }, [memberId]);
 
   const fetchTrainers = async () => {
     try {

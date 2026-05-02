@@ -91,6 +91,11 @@ export async function PUT(
     const { id } = await params;
     const body = await req.json();
 
+    // Sanitize body to prevent CastError for ObjectId fields
+    if (body.trainerId === "") body.trainerId = null;
+    if (body.branchId === "") body.branchId = null;
+    if (body.workoutPlanId === "") body.workoutPlanId = null;
+
     // Defensive guard
     if (!id || id === "undefined" || id === "null" || !mongoose.Types.ObjectId.isValid(id)) {
         return NextResponse.json({ message: "Invalid member ID" }, { status: 400 });
