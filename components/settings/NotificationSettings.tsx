@@ -49,11 +49,16 @@ export function NotificationSettings() {
 
     const handleSave = async () => {
         setSaving(true);
+        const payload = {
+            sendExpiryReminder: data.sendExpiryReminder,
+            sendInvoiceEmail: data.sendInvoiceEmail,
+            sendSMS: data.sendSMS,
+        };
         try {
             const res = await fetch("/api/settings/notifications", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify(payload),
             });
             if (!res.ok) {
                 const err = await res.json();

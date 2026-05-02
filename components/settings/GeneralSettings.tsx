@@ -10,8 +10,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useAppStore } from "@/lib/store";
 
 export function GeneralSettings() {
+    const updateGymProfile = useAppStore(state => state.updateGymProfile);
     const [data, setData] = useState({
         name: "",
         address: "",
@@ -54,18 +56,24 @@ export function GeneralSettings() {
 
     const handleSave = async () => {
         setSaving(true);
+        const payload = {
+            name: data.name,
+            address: data.address,
+            phone: data.phone,
+        };
         try {
             const res = await fetch("/api/settings/general", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify(payload),
             });
             if (!res.ok) {
                 const err = await res.json();
                 throw new Error(err.message || "Failed to save");
             }
             
-            // Update cache after successful save
+            // Update global store and cache after successful save
+            updateGymProfile(payload);
             localStorage.setItem(CACHE_KEY, JSON.stringify(data));
             toast.success("General settings saved");
         } catch (err: any) {

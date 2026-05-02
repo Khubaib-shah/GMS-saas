@@ -16,24 +16,24 @@ export const GeneralSettingsSchema = z.object({
     name: z.string().min(1).max(100).optional(),
     address: z.string().max(300).optional(),
     phone: z.string().max(20).optional(),
-}).strict();
+});
 
 export const BusinessSettingsSchema = z.object({
     joiningFee: z.number().min(0).optional(),
     autoExpireDays: z.number().min(0).max(365).optional(),
     gracePeriodDays: z.number().min(0).max(90).optional(),
-}).strict();
+});
 
 export const NotificationSettingsSchema = z.object({
     sendExpiryReminder: z.boolean().optional(),
     sendInvoiceEmail: z.boolean().optional(),
     sendSMS: z.boolean().optional(),
-}).strict();
+});
 
 export const ModuleSettingsSchema = z.object({
     trainersEnabled: z.boolean().optional(),
     attendanceEnabled: z.boolean().optional(),
-}).strict();
+});
 
 // ─────────────────────────────────────────────────
 // Platform Settings Schema (super admin only)
@@ -46,13 +46,13 @@ export const PlatformSettingsUpdateSchema = z.object({
         trainersModule: z.boolean().optional(),
         dietModule: z.boolean().optional(),
         advancedReports: z.boolean().optional(),
-    }).strict().optional(),
+    }).optional(),
     pricingTiers: z.array(z.object({
         name: z.string().min(1),
         price: z.number().min(0),
         allowedFeatures: z.array(z.string()),
     })).optional(),
-}).strict();
+});
 
 // ─────────────────────────────────────────────────
 // Role Schemas
@@ -62,13 +62,13 @@ export const CreateRoleSchema = z.object({
     name: z.string().min(1).max(50),
     permissions: z.array(z.string()).min(0),
     description: z.string().max(200).optional(),
-}).strict();
+});
 
 export const UpdateRoleSchema = z.object({
     name: z.string().min(1).max(50).optional(),
     permissions: z.array(z.string()).optional(),
     description: z.string().max(200).optional(),
-}).strict();
+});
 
 // ─────────────────────────────────────────────────
 // User Preferences Schema
@@ -77,7 +77,7 @@ export const UpdateRoleSchema = z.object({
 export const UserPreferencesSchema = z.object({
     theme: z.enum(["dark", "light", "system"]).optional(),
     notificationMode: z.enum(["email", "sms", "both", "none"]).optional(),
-}).strict();
+});
 
 // ─────────────────────────────────────────────────
 // Helpers

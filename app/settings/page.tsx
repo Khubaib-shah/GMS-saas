@@ -466,10 +466,10 @@ export default function SettingsPage() {
                       </TableCell>
                       <TableCell className="hidden lg:table-cell py-6 px-6 text-slate-500 font-mono text-[10px]">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell className="py-6 px-4 md:px-6 text-right">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-100 md:opacity-0 md:group-hover/row:opacity-100" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 transition-all opacity-100 "
                           onClick={() => handleDeleteStaff(s._id || s.id)}
                         >
                           <Trash2 className="w-4 h-4" />

@@ -12,11 +12,6 @@ const GymSettingsSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        general: {
-            name: { type: String, default: "" },
-            address: { type: String, default: "" },
-            phone: { type: String, default: "" },
-        },
         business: {
             joiningFee: { type: Number, default: 0 },
             autoExpireDays: { type: Number, default: 0 },

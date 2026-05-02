@@ -48,11 +48,16 @@ export function BusinessSettings() {
 
     const handleSave = async () => {
         setSaving(true);
+        const payload = {
+            joiningFee: data.joiningFee,
+            autoExpireDays: data.autoExpireDays,
+            gracePeriodDays: data.gracePeriodDays,
+        };
         try {
             const res = await fetch("/api/settings/business", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify(payload),
             });
             if (!res.ok) {
                 const err = await res.json();
