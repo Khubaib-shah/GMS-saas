@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
-import { Card } from "@/components/ui/card";
 import { Edit2, Plus, Trash2, PauseCircle, PlayCircle, Eye, Search, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
@@ -16,6 +15,8 @@ import {
   formatCurrency,
 } from "@/lib/utils/file-utils";
 import { toast } from "sonner";
+import { DataTable } from "@/components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   Dialog,
   DialogContent,
@@ -28,14 +29,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import {
   Select,
   SelectContent,
@@ -46,7 +40,6 @@ import {
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import Link from "next/link";
 import { PlanSkeleton } from "@/components/plan-skeleton";
-import { div } from "three/src/nodes/math/OperatorNode.js";
 
 export default function SubscriptionsPage() {
   const { data: session, status } = useSession();
@@ -65,7 +58,6 @@ export default function SubscriptionsPage() {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
 
-  // Pause/Resume state
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
@@ -74,6 +66,7 @@ export default function SubscriptionsPage() {
 
   const [editFormData, setEditFormData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [subFilterStatus, setSubFilterStatus] = useState<"all" | "active" | "paused" | "expired">("all");
 
   // Load data on mount
   useEffect(() => {
@@ -226,9 +219,27 @@ export default function SubscriptionsPage() {
       const member = store.members.find((m) => m.id === sub.memberId);
       const plan = store.plans.find((p) => p.id === sub.planId);
       const gym = gyms.find((g) => g._id === sub.gymId);
-      return { ...sub, member, plan, gym };
+      return {
+        ...sub,
+        member,
+        plan,
+        gym,
+        memberName: `${member?.firstName} ${member?.lastName || ""}`,
+        firstName: member?.firstName || ""
+      };
     })
     .filter((sub) => sub.member) // Filter out orphans (deleted members)
+    .filter((sub) => {
+      if (subFilterStatus === "all") return true;
+      const isActive = isSubscriptionActive(sub.endDate, sub.status);
+      const isPaused = sub.status === "paused";
+      const isExpired = !isActive && !isPaused;
+
+      if (subFilterStatus === "active") return isActive && !isPaused;
+      if (subFilterStatus === "paused") return isPaused;
+      if (subFilterStatus === "expired") return isExpired;
+      return true;
+    })
     .filter((sub) => {
       if (!store.searchQuery) return true;
       const lower = store.searchQuery.toLowerCase();
@@ -240,6 +251,136 @@ export default function SubscriptionsPage() {
         (sub.gym?.name || "").toLowerCase().includes(lower)
       );
     });
+
+  const columns: ColumnDef<any>[] = [
+    {
+      accessorKey: "memberName",
+      header: "Member",
+      cell: ({ row }) => {
+        const sub = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar className="flex justify-center items-center w-8 h-8 rounded-xl border border-white/5 grayscale group-hover/row:grayscale-0 transition-all overflow-hidden">
+              <AvatarFallback className="bg-primary/10 text-primary font-black italic text-[10px] w-full h-full flex items-center justify-center">
+                {sub.member?.firstName?.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <span className="font-black italic text-foreground tracking-tighter block group-hover/row:text-primary transition-colors text-sm">
+                {sub.member?.firstName} {sub.member?.lastName || ""}
+              </span>
+              <span className="text-[9px] font-mono text-slate-500">ID: {sub.memberId?.slice(-8)}</span>
+            </div>
+          </div>
+        );
+      }
+    },
+    {
+      accessorKey: "plan",
+      header: "Plan",
+      cell: ({ row }) => <span className="font-black uppercase text-slate-300">{row.original.plan?.name}</span>
+    },
+    {
+      accessorKey: "startDate",
+      header: "Start Date",
+      cell: ({ row }) => <span className="font-mono text-slate-500">{formatDate(row.original.startDate)}</span>
+    },
+    {
+      accessorKey: "endDate",
+      header: "Expiry Date",
+      cell: ({ row }) => {
+        const sub = row.original;
+        const isPaused = sub.status === "paused";
+        return isPaused ? (
+          <div>
+            <span className="line-through text-muted-foreground text-[10px] block opacity-50">{formatDate(sub.originalEndDate || sub.endDate)}</span>
+            <span className="text-amber-500 font-mono">{formatDate(sub.endDate)}</span>
+          </div>
+        ) : (
+          <span className="text-slate-500 font-mono">{formatDate(sub.endDate)}</span>
+        );
+      }
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const sub = row.original;
+        const isActive = isSubscriptionActive(sub.endDate, sub.status);
+        const isPaused = sub.status === "paused";
+        return (
+          <div className="flex flex-col gap-1">
+            <div className={cn(
+              "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest w-fit",
+              isPaused
+                ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                : isActive
+                  ? "bg-primary/10 border-primary/20 text-primary"
+                  : "bg-red-500/10 border-red-500/20 text-red-500"
+            )}>
+              <div className={cn("w-1 h-1 rounded-full", isPaused ? "bg-amber-500" : isActive ? "bg-primary" : "bg-red-500")} />
+              {isPaused ? "PAUSED" : isActive ? "ACTIVE" : "EXPIRED"}
+            </div>
+            {sub.totalPausedDays ? (
+              <div className="text-[9px] font-mono font-black text-muted-foreground/40 uppercase">
+                Paused: {sub.totalPausedDays}d
+              </div>
+            ) : null}
+          </div>
+        );
+      }
+    },
+    {
+      id: "actions",
+      header: () => <div className="text-right">Actions</div>,
+      cell: ({ row }) => {
+        const sub = row.original;
+        const isActive = isSubscriptionActive(sub.endDate, sub.status);
+        const isPaused = sub.status === "paused";
+        return (
+          <div className="flex justify-end gap-2">
+            {isPaused ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500"
+                onClick={() => {
+                  setSelectedSubscription(sub);
+                  setShowResumeDialog(true);
+                }}
+                title="Resume Subscription"
+              >
+                <PlayCircle className="h-4 w-4" />
+              </Button>
+            ) : isActive ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 rounded-xl border border-amber-500/10 bg-amber-500/5 transition-all text-amber-500 hover:text-white hover:bg-amber-500"
+                onClick={() => {
+                  setSelectedSubscription(sub);
+                  setShowPauseDialog(true);
+                }}
+                title="Pause Subscription"
+              >
+                <PauseCircle className="h-4 w-4" />
+              </Button>
+            ) : null}
+            <Link href={`/members/${sub.member?.id}`}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500"
+                title="View Member"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        );
+      }
+    }
+  ];
 
   return (
     <div className="space-y-10 animate-fade-up">
@@ -257,27 +398,6 @@ export default function SubscriptionsPage() {
         )}
       </DashboardHeader>
 
-      {/* Search & Filter HUD */}
-      <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-12 backdrop-blur-md">
-        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
-          <Search className="w-3.5 h-3.5 text-primary/50" />
-          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
-            Search
-          </span>
-        </div>
-
-        <div className="flex-1 w-full">
-          <InputField
-            hideLabel
-            validateType="text"
-            placeholder="Search plans, members, or gyms..."
-            value={store.searchQuery}
-            onChange={(val) => store.setSearchQuery(val)}
-            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
-            containerClassName="w-full"
-          />
-        </div>
-      </div>
 
       {/* Plans Section */}
       <div className="mb-12">
@@ -466,156 +586,31 @@ export default function SubscriptionsPage() {
           <div className="h-px flex-1 bg-white/5"></div>
         </div>
 
-        <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
-          <div className="overflow-x-auto">
-            <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-              <thead>
-                <tr className="border-b border-white/5 bg-white/[0.02]">
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Member</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Plan</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Start Date</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Expiry Date</th>
-                  <th className="text-left py-6 px-6 font-black text-slate-500 italic">Status</th>
-                  <th className="text-right py-6 px-6 font-black text-slate-500 italic">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i} className="border-b border-white/5 animate-pulse">
-                      <td className="py-6 px-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-white/5" />
-                          <div className="space-y-2">
-                            <div className="h-4 w-32 bg-white/5 rounded" />
-                            <div className="h-3 w-20 bg-white/5 rounded" />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="h-4 w-24 bg-white/5 rounded" />
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="h-4 w-20 bg-white/5 rounded" />
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="h-4 w-20 bg-white/5 rounded" />
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="h-6 w-20 bg-white/5 rounded-lg" />
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="flex justify-end gap-2">
-                          <div className="h-8 w-8 bg-white/5 rounded-xl" />
-                          <div className="h-8 w-8 bg-white/5 rounded-xl" />
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : memberSubscriptions.length > 0 ? (
-                  memberSubscriptions.map((sub) => {
-                    const isActive = isSubscriptionActive(sub.endDate, sub.status);
-                    const isPaused = sub.status === "paused";
-
-                    return (
-                      <tr key={sub.id || sub.mongoId} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                        <td className="py-6 px-6">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="flex justify-center items-center w-8 h-8 rounded-xl border border-white/5 grayscale group-hover/row:grayscale-0 transition-all">
-                              <AvatarFallback className="bg-primary/10 text-primary font-black italic text-[10px]">
-                                {sub.member?.firstName?.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <span className="font-black italic text-foreground tracking-tighter block group-hover/row:text-primary transition-colors">
-                                {sub.member?.firstName} {sub.member?.lastName || ""}
-                              </span>
-                              <span className="text-[9px] font-mono text-slate-500">ID: {sub.memberId?.slice(-8)}</span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-6 px-6 font-black uppercase text-slate-300">{sub.plan?.name}</td>
-                        <td className="py-6 px-6 font-mono text-slate-500">{formatDate(sub.startDate)}</td>
-                        <td className="py-6 px-6 font-mono">
-                          {isPaused ? (
-                            <div>
-                              <span className="line-through text-muted-foreground text-xs block">{formatDate(sub.originalEndDate || sub.endDate)}</span>
-                              <span className="text-amber-500">{formatDate(sub.endDate)}</span>
-                            </div>
-                          ) : (
-                            <span className="text-slate-500">{formatDate(sub.endDate)}</span>
-                          )}
-                        </td>
-                        <td className="py-6 px-6">
-                          <div className={cn(
-                            "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
-                            isPaused
-                              ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
-                              : isActive
-                                ? "bg-primary/10 border-primary/20 text-primary"
-                                : "bg-red-500/10 border-red-500/20 text-red-500"
-                          )}>
-                            <div className={cn("w-1 h-1 rounded-full", isPaused ? "bg-amber-500" : isActive ? "bg-primary" : "bg-red-500")} />
-                            {isPaused ? "PAUSED" : isActive ? "ACTIVE" : "EXPIRED"}
-                          </div>
-                          {sub.totalPausedDays ? (
-                            <div className="text-[9px] font-mono font-black text-muted-foreground mt-2 uppercase">
-                              Paused: {sub.totalPausedDays}d
-                            </div>
-                          ) : null}
-                        </td>
-                        <td className="py-6 px-6 text-right space-x-2">
-                          {isPaused ? (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500 opacity-0 group-hover/row:opacity-100"
-                              onClick={() => {
-                                setSelectedSubscription(sub);
-                                setShowResumeDialog(true);
-                              }}
-                              title="Resume Subscription"
-                            >
-                              <PlayCircle className="h-4 w-4" />
-                            </Button>
-                          ) : isActive ? (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 rounded-xl border border-amber-500/10 bg-amber-500/5 transition-all text-amber-500 hover:text-white hover:bg-amber-500 row:opacity-100"
-                              onClick={() => {
-                                setSelectedSubscription(sub);
-                                setShowPauseDialog(true);
-                              }}
-                              title="Pause Subscription"
-                            >
-                              <PauseCircle className="h-4 w-4" />
-                            </Button>
-                          ) : null}
-                          <Link href={`/members/${sub.member?.id}`}>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 rounded-xl border border-emerald-500/10 bg-emerald-500/5 transition-all text-emerald-500 hover:text-white hover:bg-emerald-500 row:opacity-100"
-                              title="View Member"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </td>
-                      </tr>
-                    )
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={7} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
-                      No subscriptions yet.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        <div className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40 rounded-3xl">
+          <DataTable
+            isLoading={loading}
+            columns={columns}
+            data={memberSubscriptions}
+            filter={
+              <Select
+                value={subFilterStatus}
+                onValueChange={(value) => setSubFilterStatus(value as any)}
+              >
+                <SelectTrigger className="!h-[41px] w-full md:w-56 bg-white/5 border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+                  <span className="text-slate-500 mr-2">Status:</span>
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
+                  <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">All Status</SelectItem>
+                  <SelectItem value="active" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Active</SelectItem>
+                  <SelectItem value="paused" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Paused</SelectItem>
+                  <SelectItem value="expired" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Expired</SelectItem>
+                </SelectContent>
+              </Select>
+            }
+            searchKey="memberName"
+            searchPlaceholder="Filter by member name..."
+          />
         </div>
       </div>
 
@@ -793,7 +788,7 @@ export default function SubscriptionsPage() {
 
       {/* Pause Subscription Dialog */}
       <Dialog open={showPauseDialog} onOpenChange={setShowPauseDialog}>
-        <DialogContent>
+        <DialogContent className="glass-premium">
           <DialogHeader>
             <DialogTitle>Pause Subscription</DialogTitle>
             <DialogDescription>

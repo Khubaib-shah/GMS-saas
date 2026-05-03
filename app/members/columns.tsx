@@ -74,6 +74,7 @@ export const createColumns = (
         {
             accessorKey: "isActive",
             header: "Subscription",
+            meta: { align: "center" },
             cell: ({ row }) => {
                 const { isPaused, isGrace, isActive } = row.original;
                 return (
@@ -105,7 +106,8 @@ export const createColumns = (
         },
         {
             id: "actions",
-            header: () => <div className="text-center">Manage</div>,
+            header: "Actions",
+            meta: { align: "center" },
             cell: ({ row }) => {
                 const member = row.original;
                 return (
@@ -136,14 +138,18 @@ export const createColumns = (
                         )}
 
                         {!showTrash && (
-                            <Link href={`/members/${member.id}`}>
+                            <Link href={`/members/${member.id}`} className="group">
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all"
+                                    className="h-9 w-[110px] px-0 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary transition-all overflow-hidden relative"
                                 >
-                                    <Eye className="w-4 h-4" />
-                                    <span className="hidden md:block ml-2">View Profile</span>
+                                    <div className="flex items-center justify-center w-full h-full relative">
+                                        <Eye className="w-4 h-4 transition-all duration-500 group-hover:scale-125 group-hover:translate-x-[35px] relative z-10" />
+                                        <span className="ml-2 transition-all duration-500 group-hover:opacity-0 group-hover:translate-x-10 whitespace-nowrap">
+                                            View Profile
+                                        </span>
+                                    </div>
                                 </Button>
                             </Link>
                         )}

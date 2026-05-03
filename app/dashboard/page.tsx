@@ -1,12 +1,12 @@
 "use client"
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Users, TrendingUp, AlertCircle, DollarSign, CheckCircle, UserPlus, Zap, Dumbbell, Plus, Send } from "lucide-react";
+import { Users, AlertCircle, DollarSign, CheckCircle, UserPlus, Zap, Dumbbell, Plus, Send } from "lucide-react";
 import { StatsCard } from "@/components/stats-card";
 import { RevenueChart, SubscriptionChart, AttendanceChart, MembershipStatusChart } from "@/components/dashboard-charts";
 import { MembersTable } from "@/components/members-table";
 import { useAppStore } from "@/lib/store";
-import { isSubscriptionActive, daysUntilExpiry, formatCurrency } from "@/lib/utils/file-utils";
+import { daysUntilExpiry, formatCurrency } from "@/lib/utils/file-utils";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardHeader } from "@/components/dashboard-header";
@@ -29,8 +29,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      
-      // If we have a range, we fetch attendance for current + previous period for trend calculation
+
       let fetchFrom = dateRange?.from;
       if (dateRange?.from && dateRange?.to) {
         const prev = getPreviousPeriod({ from: dateRange.from, to: dateRange.to });
@@ -49,7 +48,7 @@ export default function DashboardPage() {
       setLoading(false);
     };
     loadData();
-  }, [dateRange]);
+  }, [dateRange, store.gymProfile._id]);
 
   const role = (session?.user as any)?.role;
   const userId = (session?.user as any)?.id;
@@ -71,10 +70,10 @@ export default function DashboardPage() {
   const prevRange = dateRange?.from && dateRange?.to ? getPreviousPeriod({ from: dateRange.from, to: dateRange.to }) : null;
 
   // 1. Members Trend
-  const currentNewMembers = dateRange?.from && dateRange?.to 
+  const currentNewMembers = dateRange?.from && dateRange?.to
     ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, { from: dateRange.from!, to: dateRange.to! })).length
     : totalMembers;
-  const prevNewMembers = prevRange 
+  const prevNewMembers = prevRange
     ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, prevRange)).length
     : 0;
   const membersTrend = prevRange ? calculateTrend(currentNewMembers, prevNewMembers) : undefined;
@@ -163,7 +162,8 @@ export default function DashboardPage() {
       <div data-tour="dashboard-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title={dateRange?.from ? "New Members" : "Total Members"}
-          value={totalMembers.toString()}
+          // value={totalMembers.toString()}
+          value={currentNewMembers.toString()}
           icon={<Users className="w-5 h-5" />}
           trend={membersTrend}
           isLoading={loading}

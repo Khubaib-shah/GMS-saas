@@ -35,15 +35,19 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "No active subscription plan" }, { status: 403 });
         }
 
-        const requiredFeature = method === "qr" ? "qrAttendance" : "manualAttendance";
-        const hasSpecificFeature = subPlan.enabledFeatures?.includes(requiredFeature);
-        const hasLegacyFeature = subPlan.enabledFeatures?.includes("attendance");
+        const canScan = subPlan.enabledFeatures?.includes("qrAttendance");
+        const canManual = subPlan.enabledFeatures?.includes("manualAttendance");
 
-        if (!hasSpecificFeature && !hasLegacyFeature) {
-            return NextResponse.json({
-                error: `Feature not available on your plan: ${method === "qr" ? "QR Attendance" : "Manual Attendance"}`,
-                feature: requiredFeature
-            }, { status: 403 });
+        if (!canScan && !canManual) {
+            return NextResponse.json({ message: "Attendance feature not enabled for this gym" }, { status: 403 });
+        }
+
+        if (method === "qr" && !canScan) {
+            return NextResponse.json({ error: "QR Attendance not available on your plan" }, { status: 403 });
+        }
+
+        if (method === "manual" && !canManual) {
+            return NextResponse.json({ error: "Manual Attendance not available on your plan" }, { status: 403 });
         }
 
         // Get gym settings for attendance rules and business logic

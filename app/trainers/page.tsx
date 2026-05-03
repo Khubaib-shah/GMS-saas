@@ -26,8 +26,8 @@ export default function TrainersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const filteredTrainers = trainers.filter(t => 
-    t.fullName.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredTrainers = trainers.filter(t =>
+    t.fullName.toLowerCase().includes(search.toLowerCase()) ||
     t.email.toLowerCase().includes(search.toLowerCase()) ||
     t.specialties?.some(s => s.toLowerCase().includes(search.toLowerCase()))
   );
@@ -85,7 +85,7 @@ export default function TrainersPage() {
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="glass-premium p-8 border-border dark:bg-slate-950/40 animate-pulse flex flex-col items-center">
               <div className="w-24 h-24 rounded-2xl bg-white/5 mb-6" />
               <div className="h-6 w-40 bg-white/5 rounded-lg mb-2" />
@@ -117,9 +117,9 @@ export default function TrainersPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredTrainers.map((trainer) => (
-            <div key={trainer._id} className="glass-premium p-8 border-border dark:bg-slate-950/40 hover:scale-[1.02] transition-all group flex flex-col items-center text-center">
+            <div key={trainer._id} className="glass-premium p-8 border-border dark:bg-slate-950/40 transition-all flex flex-col items-center text-center">
               <div className="relative mb-6">
-                <Avatar className="w-24 h-24 transition-transform group-hover:scale-110 duration-500">
+                <Avatar className="w-24 h-24 transition-transform">
                   <AvatarImage src={trainer.photo} alt={trainer.fullName} className="object-cover" />
                   <AvatarFallback className="text-2xl font-black italic bg-primary/10 text-primary">
                     {trainer.fullName
@@ -178,9 +178,17 @@ export default function TrainersPage() {
 
               <div className="w-full mt-8">
                 <Link href={`/trainers/${trainer._id}`} className="block">
-                  <Button className="w-full h-12 rounded-xl bg-white/5 border-white/10 text-white font-black italic text-[10px] tracking-widest uppercase hover:bg-primary hover:text-black transition-all group-hover:neon-glow">
-                    View Profile <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
+                  <button className="group relative w-full h-12 bg-white/5 border border-white/10 text-white font-black italic text-[10px] tracking-widest uppercase rounded-xl overflow-hidden transition-all">
+                    {/* Expanding background icon container - now using app primary color */}
+                    <div className="absolute right-1.5 top-1.5 h-9 w-9 bg-primary rounded-lg flex items-center justify-center transition-all duration-300 group-hover:w-[calc(100%-12px)] shadow-[0_0_20px_rgba(var(--primary),0.3)] z-10">
+                      <ArrowRight className="w-4 h-4 text-black transition-transform duration-300 group-hover:translate-x-1" />
+                    </div>
+
+                    {/* Button Text */}
+                    <span className="relative z-20 pl-6 pr-12 flex items-center h-full transition-colors duration-300 group-hover:text-black">
+                      View Profile
+                    </span>
+                  </button>
                 </Link>
               </div>
             </div>

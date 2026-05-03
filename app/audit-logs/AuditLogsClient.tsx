@@ -3,18 +3,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { format } from "date-fns";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { columns } from "./columns";
-import { InputField } from "@/components/ui/input-field";
 import {
   Select,
   SelectContent,
@@ -22,31 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+
 import { Badge } from "@/components/ui/badge";
 import {
-  Loader2,
   Download,
-  Filter,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
   RefreshCw,
-  Clock,
-  Globe,
   User,
   Box,
-  Activity,
   Terminal,
   Calendar,
   Layers,
+  Globe,
 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
@@ -60,20 +38,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Resource types from AuditLog model
 const RESOURCES = [
   "member",
   "subscription",
   "payment",
   "plan",
-  "attendance",
   "user",
   "branch",
   "settings",
   "gym",
 ];
 
-// Action types from AuditLog model
 const ACTIONS = [
   "create",
   "update",
@@ -91,7 +66,6 @@ const ACTIONS = [
 ];
 
 export default function AuditlogsClient() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
@@ -103,7 +77,6 @@ export default function AuditlogsClient() {
     totalPages: 0,
   });
 
-  // Filters
   const [resource, setResource] = useState(
     searchParams.get("resource") || "all",
   );
@@ -127,7 +100,6 @@ export default function AuditlogsClient() {
       if (!res.ok) {
         if (res.status === 403) {
           toast.error("You don't have permission to view audit logs");
-          // Optionally redirect, or just show empty state
           setLogs([]);
           return;
         }
@@ -150,7 +122,6 @@ export default function AuditlogsClient() {
 
   useEffect(() => {
     fetchLogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, resource, action]);
 
 
@@ -209,111 +180,53 @@ export default function AuditlogsClient() {
         </div>
       </DashboardHeader>
 
-      {/* PREMIUM FILTERS HUD */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 p-3 md:p-2 rounded-2xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-xl relative overflow-hidden group/hud">
-        {/* Glow effect */}
-        <div className="absolute top-0 right-0 p-20 bg-primary/5 blur-3xl rounded-full -mr-10 -mt-10 opacity-0 group-hover/hud:opacity-100 transition-opacity pointer-events-none" />
-
-        <div className="flex items-center gap-3 px-4 border-r border-white/10 hidden lg:flex">
-          <Filter className="w-4 h-4 text-primary" />
-          <div className="flex flex-col">
-            <span className="text-[10px] font-black italic tracking-[0.2em] text-white uppercase leading-none">
-              FILTERS
-            </span>
-            <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest mt-1">
-              Refinement
-            </span>
-          </div>
-        </div>
-
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-2">
-          <div className="flex w-full md:col-span-2 gap-4">
-            {/* Resource Filter */}
-            <div className="space-y-1.5 w-full">
-              <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Resource</span>
-              <Select value={resource} onValueChange={setResource}>
-                <SelectTrigger className="!w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0 px-4">
-                  <span className="text-slate-500 mr-2 hidden lg:inline">Resource:</span>
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent className="glass-premium border-white/10 bg-slate-950/98 backdrop-blur-2xl">
-                  <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Types</SelectItem>
-                  {RESOURCES.map((r) => (
-                    <SelectItem key={r} value={r} className="text-[10px] font-bold italic uppercase">{r}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Action Filter */}
-            <div className="space-y-1.5 w-full">
-              <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Action</span>
-              <Select value={action} onValueChange={setAction}>
-                <SelectTrigger className="w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0 px-4">
-                  <span className="text-slate-500 mr-2 hidden lg:inline">Action:</span>
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent className="glass-premium border-white/10 bg-slate-950/98 backdrop-blur-2xl">
-                  <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Actions</SelectItem>
-                  {ACTIONS.map((a) => (
-                    <SelectItem key={a} value={a} className="text-[10px] font-bold italic uppercase">{a.replace("_", " ")}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Search Filter */}
-          <div className="space-y-1.5 md:col-span-2 lg:col-span-1">
-            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Search</span>
-            <div className="relative group/search">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 uppercase italic hidden lg:block">
-                Search:
-              </div>
-              <InputField
-                placeholder="Search logs..."
-                value={userId}
-                onChange={(val) => setUserId(val)}
-                onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
-                className="!pl-4 lg:!pl-16 h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider w-full focus:ring-0"
-                hideLabel
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 pt-2 lg:pt-0 lg:pl-3 border-t lg:border-t-0 lg:border-l border-white/10 mt-2 lg:mt-0">
-          <Button
-            onClick={handleApplyFilters}
-            className="flex-1 lg:flex-none h-10 md:h-9 px-8 bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-[11px] rounded-xl lg:rounded-lg neon-glow shadow-lg shadow-primary/20"
-          >
-            Apply
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={handleResetFilters}
-            className="h-10 w-10 md:h-9 md:w-9 text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl lg:rounded-lg p-0 border border-white/5 lg:border-none"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
 
       <div className="glass-premium p-6 border-white/5 bg-slate-950/20 backdrop-blur-xl rounded-xl border-t-0 -mt-1 relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/20 after:to-transparent">
-        {loading ? (
-           <div className="space-y-4">
-             {Array.from({ length: 5 }).map((_, i) => (
-               <div key={i} className="h-16 w-full bg-white/5 animate-pulse rounded-xl" />
-             ))}
-           </div>
-        ) : (
-          <DataTable 
-            columns={columns(setSelectedLog)} 
-            data={logs} 
-            searchKey="userName"
-            searchPlaceholder="Filter by user name..."
-          />
-        )}
+        <DataTable
+          columns={columns(setSelectedLog)}
+          data={logs}
+          isLoading={loading}
+
+          filter={
+            <div className="flex w-full md:col-span-2 gap-4">
+              {/* Resource Filter */}
+              <div className="space-y-1.5 w-full">
+                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Resource</span>
+                <Select value={resource} onValueChange={setResource}>
+                  <SelectTrigger className="!w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0 px-4">
+                    <span className="text-slate-500 mr-2 hidden lg:inline">Resource:</span>
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="glass-premium border-white/10 bg-slate-950/98 backdrop-blur-2xl">
+                    <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Types</SelectItem>
+                    {RESOURCES.map((r) => (
+                      <SelectItem key={r} value={r} className="text-[10px] font-bold italic uppercase">{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Action Filter */}
+              <div className="space-y-1.5 w-full">
+                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Action</span>
+                <Select value={action} onValueChange={setAction}>
+                  <SelectTrigger className="w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0 px-4">
+                    <span className="text-slate-500 mr-2 hidden lg:inline">Action:</span>
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="glass-premium border-white/10 bg-slate-950/98 backdrop-blur-2xl">
+                    <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Actions</SelectItem>
+                    {ACTIONS.map((a) => (
+                      <SelectItem key={a} value={a} className="text-[10px] font-bold italic uppercase">{a.replace("_", " ")}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          }
+          searchKey="userName"
+          searchPlaceholder="Filter by user name..."
+        />
 
         {logs.length === 0 && !loading && (
           <div className="text-center py-24 bg-white/[0.01]">
@@ -322,13 +235,11 @@ export default function AuditlogsClient() {
         )}
       </div>
 
-      {/* Details Dialog */}
       <Dialog
         open={!!selectedLog}
         onOpenChange={(open) => !open && setSelectedLog(null)}
       >
         <DialogContent className="max-w-2xl max-h-[95vh] flex flex-col p-0 gap-0 overflow-hidden glass-premium border-white/10 bg-slate-950/95 shadow-2xl focus:ring-0 outline-none">
-          {/* Header */}
           <div className="flex-none p-6 border-b border-white/10 bg-white/[0.02]">
             <DialogHeader>
               <div className="flex items-center justify-between">
@@ -355,11 +266,9 @@ export default function AuditlogsClient() {
             </DialogHeader>
           </div>
 
-          {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
             {selectedLog && (
               <>
-                {/* Unified Info Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/10overflow-hidden">
                   <div className="p-4 bg-slate-950/40 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
                     <Calendar className="w-4 h-4 text-primary/60 mt-1" />

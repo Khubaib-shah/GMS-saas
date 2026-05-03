@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Trash2, Plus, Clock, Calendar } from "lucide-react";
+import { Trash2, Plus, Clock, Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -50,8 +50,8 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
         body: JSON.stringify({ ...newAvail, trainerId }),
       });
       if (!res.ok) {
-          const error = await res.json();
-          throw new Error(error.message || "Failed to add availability");
+        const error = await res.json();
+        throw new Error(error.message || "Failed to add availability");
       }
       toast.success("Availability added");
       onRefresh();
@@ -63,6 +63,7 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
   };
 
   const handleDelete = async (id: string) => {
+    setLoading(true);
     try {
       const res = await fetch(`/api/trainers/availability/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete availability");
@@ -70,6 +71,8 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
       onRefresh();
     } catch (error) {
       toast.error("Error removing availability");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,7 +96,7 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
               <SelectTrigger className="w-full h-10 px-3 py-2 rounded-lg border border-input bg-background text-sm focus:ring-2 focus:ring-primary">
                 <SelectValue placeholder="Select Day" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="glass-premium">
                 {DAYS.map((day) => (
                   <SelectItem key={day} value={String(DAY_MAP[day])}>
                     {day}
@@ -125,7 +128,16 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
             value={String(newAvail.slotDurationMinutes)}
             onChange={(val) => setNewAvail({ ...newAvail, slotDurationMinutes: Number(val) })}
           />
-          <Button className="w-full" onClick={handleAdd} disabled={loading}>Add Entry</Button>
+          <Button className="w-full h-10 font-bold uppercase italic tracking-widest rounded-xl" onClick={handleAdd} disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              "Add Entry"
+            )}
+          </Button>
         </CardContent>
       </Card>
 
@@ -139,21 +151,21 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
         <CardContent>
           <div className="space-y-3">
             {availabilities.length > 0 ? (
-                availabilities.map((avail) => (
-                    <div key={avail._id} className="flex items-center justify-between p-3 border rounded-xl bg-muted/30">
-                        <div>
-                            <div className="font-bold">{avail.dayOfWeek === 0 ? "Sunday" : DAYS[avail.dayOfWeek - 1]}</div>
-                            <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Clock className="w-3 h-3" /> {avail.startTime} - {avail.endTime} ({avail.slotDurationMinutes}m slots)
-                            </div>
-                        </div>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => handleDelete(avail._id)}>
-                            <Trash2 className="w-4 h-4" />
-                        </Button>
+              availabilities.map((avail) => (
+                <div key={avail._id} className="flex items-center justify-between p-3 border rounded-xl bg-muted/30">
+                  <div>
+                    <div className="font-bold">{avail.dayOfWeek === 0 ? "Sunday" : DAYS[avail.dayOfWeek - 1]}</div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> {avail.startTime} - {avail.endTime} ({avail.slotDurationMinutes}m slots)
                     </div>
-                ))
+                  </div>
+                  <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => handleDelete(avail._id)} disabled={loading}>
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  </Button>
+                </div>
+              ))
             ) : (
-                <div className="text-center py-8 text-muted-foreground italic">No availability set.</div>
+              <div className="text-center py-8 text-muted-foreground italic">No availability set.</div>
             )}
           </div>
         </CardContent>

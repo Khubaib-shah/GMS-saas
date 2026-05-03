@@ -14,7 +14,6 @@ import {
     Users,
     Activity,
     DollarSign,
-    Shield,
     ShieldOff,
     Clock,
     RefreshCw,
@@ -27,7 +26,6 @@ import {
     X,
     ToggleLeft,
     ToggleRight,
-    Search
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -43,7 +41,7 @@ import { Button } from "@/components/ui/button";
 import { SYSTEM_FEATURES } from "@/lib/constants/features";
 
 function formatPKR(amount: number) {
-    return `₨ ${amount.toLocaleString("en-PK")}`;
+    return `Rs. ${amount.toLocaleString("en-PK")}`;
 }
 
 export default function GymDetailPage() {
@@ -344,12 +342,12 @@ export default function GymDetailPage() {
                     {SYSTEM_FEATURES.map((f) => {
                         const isEnabled = (gym as any).enabledFeatures?.includes(f.key);
                         return (
-                            <div 
-                                key={f.key} 
+                            <div
+                                key={f.key}
                                 className={cn(
                                     "p-4 rounded-xl border transition-all flex items-center justify-between group/feat text-slate-300",
-                                    isEnabled 
-                                        ? "bg-emerald-500/10 border-emerald-500/20" 
+                                    isEnabled
+                                        ? "bg-emerald-500/10 border-emerald-500/20"
                                         : "bg-white/[0.02] border-white/5 text-slate-500"
                                 )}
                             >

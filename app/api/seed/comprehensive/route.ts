@@ -76,9 +76,9 @@ export async function POST(req: Request) {
 
         await PlatformSettings.create({});
         await PlatformPlan.create([
-            { name: "Starter", slug: "starter", monthlyPricePKR: 3000, branchLimit: 1, maxStaffAccounts: 3, featureFlags: ["members", "manualAttendance", "payments"] },
-            { name: "Professional", slug: "professional", monthlyPricePKR: 5000, branchLimit: 3, maxStaffAccounts: 10, featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics"] },
-            { name: "Enterprise", slug: "enterprise", monthlyPricePKR: 8000, branchLimit: 10, maxStaffAccounts: 50, featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics", "workoutPlanner", "auditLogs"] }
+            { name: "Starter", slug: "starter", monthlyPricePKR: 3000, branchLimit: 1, maxStaffAccounts: 3, featureFlags: ["members", "manualAttendance"] },
+            { name: "Professional", slug: "professional", monthlyPricePKR: 5000, branchLimit: 3, maxStaffAccounts: 10, featureFlags: ["members", "manualAttendance", "qrAttendance", "trainersModule", "analytics"] },
+            { name: "Enterprise", slug: "enterprise", monthlyPricePKR: 8000, branchLimit: 10, maxStaffAccounts: 50, featureFlags: ["members", "manualAttendance", "qrAttendance", "trainersModule", "analytics", "workoutPlanner", "auditLogs"] }
         ]);
 
         const globalCredentials = [];
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
             });
 
             await GymSettings.create({ gymId: gym._id, general: { name: gymName, address: gym.address } });
-            await SubscriptionPlan.create({ gymId: gym._id, tierName: "Professional", active: true, enabledFeatures: ["members", "subscriptions", "payments", "attendance", "workout_plans"] });
+            await SubscriptionPlan.create({ gymId: gym._id, tierName: "Professional", active: true, enabledFeatures: ["members", "manualAttendance", "qrAttendance", "workout_plans"] });
 
             const rolesMap: Record<string, any> = {};
             const rolesToCreate = [

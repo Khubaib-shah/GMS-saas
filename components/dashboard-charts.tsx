@@ -18,7 +18,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
     if (dateRange?.from && dateRange?.to) {
       const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to })
         .filter(day => day.getDay() !== 0) // Remove Sundays
-      
+
       return days.map(day => {
         const total = store.payments.reduce((sum, p) => {
           const pDate = new Date(p.date)
@@ -27,10 +27,10 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
           }
           return sum
         }, 0)
-        return { 
-          name: format(day, "MMM dd"), 
+        return {
+          name: format(day, "MMM dd"),
           value: total,
-          date: day 
+          date: day
         }
       })
     }
@@ -75,13 +75,13 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
       </div>
 
       <div className="flex-1 min-h-[300px] w-full pb-4 scrollbar-hide group/scroll">
-        <div 
+        <div
           className="flex items-end justify-between gap-0.5 h-full pt-8 pb-2"
           style={{ minWidth: "100%" }}
         >
           {data.map((item, i) => {
             const height = (item.value / maxValue) * 100;
-            
+
             // Weekly legend logic: 1st, 7th, 14th, 21st, 28th
             let showLabel = false;
             if (item.date) {
@@ -90,12 +90,12 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
             } else {
               showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 5 === 0;
             }
-            
+
             return (
               <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative px-1">
                 {/* Column Hover Background */}
                 <div className="absolute inset-x-0 top-0 bottom-8 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
-                
+
                 {/* Tooltip */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight pointer-events-none">
                   {formatCurrency(item.value)}
@@ -116,7 +116,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
                     </>
                   )}
                 </div>
-                
+
                 {/* Zero Value Indicator */}
                 {item.value === 0 && (
                   <div className="w-1 h-1 rounded-full bg-slate-800 mb-2" />
@@ -221,7 +221,7 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
               : 'hsl(var(--muted))'
           }}
         >
-          <div className="absolute inset-0 m-[1.2rem] rounded-full bg-slate-950 flex items-center justify-center shadow-inner">
+          <div className="absolute inset-0 m-[1.2rem] rounded-full bg-[#0e1016dd] flex items-center justify-center shadow-inner">
             <div className="text-center group-hover/donut:scale-110 transition-transform duration-500">
               <span className="text-4xl font-black italic tracking-tighter block leading-none">{total}</span>
               <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest italic mt-1 block">Total</span>
@@ -316,7 +316,7 @@ export function MembershipStatusChart({ isLoading }: { isLoading?: boolean }) {
               : 'hsl(var(--muted))'
           }}
         >
-          <div className="absolute inset-0 m-[1.2rem] rounded-full bg-slate-950 flex items-center justify-center shadow-inner">
+          <div className="absolute inset-0 m-[1.2rem] rounded-full bg-[#0e1016dd] flex items-center justify-center shadow-inner">
             <div className="text-center group-hover/donut:scale-110 transition-transform duration-500">
               <span className="text-4xl font-black italic tracking-tighter block leading-none">{total}</span>
               <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest italic mt-1 block">Members</span>
@@ -351,14 +351,14 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
     if (dateRange?.from && dateRange?.to) {
       const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to })
         .filter(day => day.getDay() !== 0) // Remove Sundays
-        
+
       return days.map(day => {
         const count = store.attendance.filter(att => {
           const aDate = new Date(att.date)
           return format(aDate, "yyyy-MM-dd") === format(day, "yyyy-MM-dd")
         }).length
-        return { 
-          name: format(day, "MMM dd"), 
+        return {
+          name: format(day, "MMM dd"),
           value: count,
           date: day
         }
@@ -377,8 +377,8 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
       }
     })
 
-    return days.map((day, i) => ({ 
-      name: day, 
+    return days.map((day, i) => ({
+      name: day,
       value: counts[i],
       date: undefined
     }))
@@ -406,13 +406,13 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
       </div>
 
       <div className="flex-1 min-h-[300px] w-full pb-4 scrollbar-hide">
-        <div 
+        <div
           className="flex items-end justify-between gap-0.5 h-full pt-8 pb-2"
           style={{ minWidth: "100%" }}
         >
           {data.map((item, i) => {
             const height = (item.value / maxValue) * 100;
-            
+
             // Weekly legend logic: 1st, 7th, 14th, 21st, 28th
             let showLabel = false;
             if (item.date) {
@@ -421,12 +421,12 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
             } else {
               showLabel = data.length <= 12 || i === 0 || i === data.length - 1 || i % 5 === 0;
             }
-            
+
             return (
               <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative px-1">
                 {/* Column Hover Background */}
                 <div className="absolute inset-x-0 top-0 bottom-8 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
-                
+
                 {/* Tooltip */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight pointer-events-none">
                   {item.value} Check-ins

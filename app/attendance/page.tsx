@@ -20,8 +20,8 @@ export default function AttendancePage() {
     const store = useAppStore();
     const { data: session } = useSession();
     const isPremium = (session?.user as any)?.isPremium;
-    const canManual = store.gymProfile?.enabledFeatures?.includes("manualAttendance") || store.gymProfile?.enabledFeatures?.includes("attendance");
-    const canScan = store.gymProfile?.enabledFeatures?.includes("qrAttendance") || store.gymProfile?.enabledFeatures?.includes("attendance");
+    const canManual = store.gymProfile?.enabledFeatures?.includes("manualAttendance");
+    const canScan = store.gymProfile?.enabledFeatures?.includes("qrAttendance");
     const [reports, setReports] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingReports, setLoadingReports] = useState(false);
@@ -57,7 +57,6 @@ export default function AttendancePage() {
         if (!store.gymProfile?._id) return;
         setLoadingReports(true);
         try {
-            // Default to today
             const today = new Date().toISOString().split('T')[0];
             const res = await fetch(`/api/attendance/report?gymId=${store.gymProfile._id}&date=${today}`);
             const data = await res.json();
@@ -174,14 +173,8 @@ export default function AttendancePage() {
                     </div>
 
                     <div className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40 rounded-3xl">
-                        {loadingReports ? (
-                            <div className="space-y-4">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                    <div key={i} className="h-16 w-full bg-white/5 animate-pulse rounded-xl" />
-                                ))}
-                            </div>
-                        ) : (
                             <DataTable
+                                isLoading={loadingReports}
                                 columns={columns}
                                 data={filteredReports.map((record: any) => ({
                                     id: record.id,
@@ -191,10 +184,7 @@ export default function AttendancePage() {
                                     checkOutTime: record.checkOutTime,
                                     status: record.status
                                 }))}
-                                searchKey="memberName"
-                                searchPlaceholder="Filter by member name..."
                             />
-                        )}
 
                         {filteredReports.length === 0 && !loadingReports && (
                             <div className="text-center py-24 bg-white/[0.01]">

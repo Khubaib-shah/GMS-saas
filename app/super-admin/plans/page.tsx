@@ -47,7 +47,7 @@ const emptyPlan = {
     maxStaffAccounts: 5,
     maxTrainers: 2,
     trialDays: 14,
-    featureFlags: ["members", "subscriptions", "payments", "attendance"],
+    featureFlags: ["members", "manualAttendance", "qrAttendance"],
     description: "",
 };
 

@@ -32,14 +32,17 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "No active subscription plan" }, { status: 403 });
         }
 
-        const requiredFeature = method === "qr" ? "qrAttendance" : "manualAttendance";
-        const hasSpecificFeature = subPlan.enabledFeatures?.includes(requiredFeature);
-        const hasLegacyFeature = subPlan.enabledFeatures?.includes("attendance");
+        const canScan = subPlan.enabledFeatures?.includes("qrAttendance");
+        const canManual = subPlan.enabledFeatures?.includes("manualAttendance");
 
-        if (!hasSpecificFeature && !hasLegacyFeature) {
+        if (!canScan && !canManual) {
+            return NextResponse.json({ message: "Attendance feature not enabled for this gym" }, { status: 403 });
+        }
+
+        if ((method === "qr" && !canScan) || (method === "manual" && !canManual)) {
             return NextResponse.json({
                 error: `Feature not available on your plan: ${method === "qr" ? "QR Attendance" : "Manual Attendance"}`,
-                feature: requiredFeature
+                feature: method === "qr" ? "qrAttendance" : "manualAttendance"
             }, { status: 403 });
         }
 

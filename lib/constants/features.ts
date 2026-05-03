@@ -6,11 +6,8 @@
 
 export const SYSTEM_FEATURES = [
     { key: "members", label: "Members Registry" },
-    { key: "subscriptions", label: "Billing & Subscriptions" },
-    { key: "payments", label: "Payment History" },
-    { key: "attendance", label: "Attendance Core" },
     { key: "manualAttendance", label: "Manual Attendance" },
-    { key: "qrAttendance", label: "QR Access Control" },
+    { key: "qrAttendance", label: "QR Attendance" },
     { key: "workoutPlanner", label: "Workout Planner" },
     { key: "dietModule", label: "Diet & Nutrition" },
     { key: "advancedReports", label: "Advanced Analytics" },
@@ -43,9 +40,6 @@ export const FEATURE_KEYS = SYSTEM_FEATURES.map((f) => f.key);
  */
 export const DEFAULT_FEATURES: FeatureKey[] = [
     "members",
-    "subscriptions",
-    "payments",
-    "attendance",
     "manualAttendance",
     "qrAttendance",
 ];

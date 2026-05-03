@@ -487,14 +487,8 @@ export default function PaymentsPage() {
 
       {/* Payments Table */}
       <div className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40 rounded-3xl">
-        {loading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-16 w-full bg-white/5 animate-pulse rounded-xl" />
-            ))}
-          </div>
-        ) : (
           <DataTable
+            isLoading={loading}
             columns={createColumns(store.members)}
             data={filtered.map(payment => {
               const member = store.members.find(m => m.id === payment.memberId);
@@ -506,7 +500,6 @@ export default function PaymentsPage() {
             searchKey="memberName"
             searchPlaceholder="Filter by member name..."
           />
-        )}
 
         {filtered.length === 0 && !loading && (
           <div className="text-center py-24 bg-white/[0.01]">

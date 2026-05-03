@@ -22,10 +22,10 @@ export function StatsCard({ title, value, icon, trend, className, isLoading, per
       <div className="flex items-center justify-between mb-4">
         <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">{title}</span>
         <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.1)]">
-            {icon}
+          {icon}
         </div>
       </div>
-      
+
       <div className="flex-1 flex flex-col justify-end">
         {isLoading ? (
           <Skeleton className="h-8 w-24 mb-1" />
@@ -37,12 +37,12 @@ export function StatsCard({ title, value, icon, trend, className, isLoading, per
         {isLoading ? (
           <Skeleton className="h-3 w-32 mt-2" />
         ) : trend && (
-            <div className="flex items-center gap-1 mt-2 text-[9px] font-black italic tracking-widest uppercase">
-                <span className={cn(trend.isPositive ? "text-primary" : "text-red-500")}>
-                {trend.isPositive ? "↑" : "↓"} {trend.value}%
-                </span>
-                <span className="text-slate-500">from {periodLabel}</span>
-            </div>
+          <div className="flex items-center gap-1 mt-1 text-[9px] font-black italic tracking-widest uppercase">
+            <span className={cn(trend.isPositive ? "text-primary" : "text-red-500")}>
+              {trend.isPositive ? "↑" : "↓"} {trend.value}%
+            </span>
+            <span className="text-slate-500">from {periodLabel}</span>
+          </div>
         )}
       </div>
     </div>

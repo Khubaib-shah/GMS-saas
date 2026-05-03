@@ -61,7 +61,7 @@ export async function POST(req: Request) {
         maxStaffAccounts: maxStaffAccounts || 5,
         maxTrainers: maxTrainers || 2,
         trialDays: trialDays || 14,
-        featureFlags: featureFlags || ["members", "subscriptions", "payments", "attendance"],
+        featureFlags: featureFlags || ["members", "manualAttendance", "qrAttendance"],
         description: description || "",
     });
 

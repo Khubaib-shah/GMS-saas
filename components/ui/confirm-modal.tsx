@@ -60,7 +60,7 @@ export function ConfirmModal({
         ? "text-destructive"
         : isWarning
             ? "text-orange-500"
-            : "text-primary/40";
+            : "text-primary";
 
     const buttonClass = isDestructive
         ? "bg-destructive text-white hover:bg-destructive/80"
@@ -82,7 +82,7 @@ export function ConfirmModal({
                         {description}
                     </div>
                 </AlertDialogHeader>
-                
+
                 <AlertDialogFooter className="mt-6">
                     {customActions ? (
                         customActions
