@@ -35,6 +35,16 @@ export const ModuleSettingsSchema = z.object({
     attendanceEnabled: z.boolean().optional(),
 });
 
+export const EmailSettingsSchema = z.object({
+    host: z.string().min(1, "SMTP Host is required").optional().or(z.literal("")),
+    port: z.number().min(1).max(65535).optional(),
+    secure: z.boolean().optional(),
+    user: z.string().optional().or(z.literal("")),
+    pass: z.string().optional().or(z.literal("")),
+    fromName: z.string().optional().or(z.literal("")),
+    fromEmail: z.string().email("Invalid email format").optional().or(z.literal("")),
+});
+
 // ─────────────────────────────────────────────────
 // Platform Settings Schema (super admin only)
 // ─────────────────────────────────────────────────

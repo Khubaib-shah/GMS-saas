@@ -40,6 +40,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { SYSTEM_FEATURES } from "@/lib/constants/features";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
@@ -340,21 +341,7 @@ export default function GymDetailPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[
-                        { key: "members", label: "Members Registry" },
-                        { key: "subscriptions", label: "Billing & Subscriptions" },
-                        { key: "payments", label: "Payment History" },
-                        { key: "attendance", label: "Attendance Core" },
-                        { key: "manualAttendance", label: "Manual Attendance" },
-                        { key: "qrAttendance", label: "QR Access Control" },
-                        { key: "workoutPlanner", label: "Workout Planner" },
-                        { key: "dietModule", label: "Diet & Nutrition" },
-                        { key: "advancedReports", label: "Advanced Analytics" },
-                        { key: "trainersModule", label: "Trainers/Staff" },
-                        { key: "branches", label: "Multi-Branch Support" },
-                        { key: "memberPortal", label: "Customer Portal" },
-                        { key: "api_access", label: "External API" },
-                    ].map((f) => {
+                    {SYSTEM_FEATURES.map((f) => {
                         const isEnabled = (gym as any).enabledFeatures?.includes(f.key);
                         return (
                             <div 

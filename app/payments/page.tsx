@@ -1,37 +1,22 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { Card } from "@/components/ui/card"
 import { InputField } from "@/components/ui/input-field"
 import { TrendingUp, DollarSign, AlertCircle, Download, Filter, Search } from "lucide-react"
 import { useAppStore } from "@/lib/store"
-import { formatDate, formatCurrency } from "@/lib/utils/file-utils"
+import { formatCurrency } from "@/lib/utils/file-utils"
 import { StatsCard } from "@/components/stats-card"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { ChartSkeleton, PieChartSkeleton, BarChartSkeleton } from "@/components/ui/skeleton-components"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { TableTdSkeleton } from "@/components/table-td-skeleton"
+
 import { DateRangePicker } from "@/components/ui/date-range-picker"
 import { DateRange } from "react-day-picker"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Legend } from "recharts"
 import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
 import { Button } from "@/components/ui/button"
-import { PaginationHUD } from "@/components/ui/pagination-hud"
+import { DataTable } from "@/components/ui/data-table"
+import { createColumns } from "./columns"
 import {
   ChartConfig,
   ChartContainer,
@@ -167,10 +152,10 @@ export default function PaymentsPage() {
 
   // Calculate Trends
   const prevRange = dateRange?.from && dateRange?.to ? getPreviousPeriod({ from: dateRange.from, to: dateRange.to }) : null
-  const prevPayments = prevRange 
+  const prevPayments = prevRange
     ? store.payments.filter(p => isDateInRange(p.date, prevRange))
     : []
-  
+
   const prevRevenue = prevPayments.reduce((sum, p) => sum + p.amount, 0)
   const prevCount = prevPayments.length
   const prevAvg = prevCount > 0 ? prevRevenue / prevCount : 0
@@ -191,7 +176,7 @@ export default function PaymentsPage() {
     doc.setFontSize(10)
     doc.setTextColor(100, 116, 139)
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 28)
-    
+
     doc.setFontSize(11)
     doc.setTextColor(15, 23, 42)
     doc.text(`Total Revenue: ${formatCurrency(totalRevenue)}`, 14, 38)
@@ -216,18 +201,18 @@ export default function PaymentsPage() {
       head: [['ID', 'Member', 'Amount', 'Date', 'Method']],
       body: tableBody,
       theme: 'grid',
-      headStyles: { 
+      headStyles: {
         fillColor: [99, 102, 241],
-        textColor: 255, 
+        textColor: 255,
         fontStyle: 'bold',
         halign: 'left'
       },
-      styles: { 
-        fontSize: 9, 
+      styles: {
+        fontSize: 9,
         cellPadding: 5,
         textColor: [15, 23, 42]
       },
-      alternateRowStyles: { 
+      alternateRowStyles: {
         fillColor: [248, 250, 252]
       },
       columnStyles: {
@@ -249,8 +234,8 @@ export default function PaymentsPage() {
         subtitle="Track your gym's income"
         description="View all payments received from members."
       >
-        <Button 
-          onClick={handleExportPDF} 
+        <Button
+          onClick={handleExportPDF}
           className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] hover:shadow-[0_0_25px_rgba(99,102,241,0.4)] flex items-center gap-2"
         >
           <Download className="w-3.5 h-3.5" />
@@ -258,7 +243,7 @@ export default function PaymentsPage() {
         </Button>
       </DashboardHeader>
 
-       {/* Search & Filter HUD */}
+      {/* Search & Filter HUD */}
       <div className="flex flex-col md:flex-row items-center gap-4 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-md">
         <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
           <Filter className="w-3.5 h-3.5 text-primary/50" />
@@ -321,7 +306,7 @@ export default function PaymentsPage() {
 
       {/* add some charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Main Revenue Area Chart */}
         <div className="glass-premium p-6 border-border lg:col-span-3">
           <div className="flex flex-col gap-2 mb-6">
@@ -331,7 +316,7 @@ export default function PaymentsPage() {
             </h3>
             <div className="h-px w-full bg-white/5 mt-2"></div>
           </div>
-          
+
           {loading ? (
             <ChartSkeleton className="border-none bg-transparent p-0" />
           ) : chartData.length > 0 ? (
@@ -356,11 +341,11 @@ export default function PaymentsPage() {
                   tickFormatter={(value) => value}
                   style={{ fontSize: '10px', fontFamily: 'monospace', fill: '#64748b' }}
                 />
-                <YAxis 
+                <YAxis
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
-                  tickFormatter={(value) => value >= 1000 ? `₨${(value/1000).toFixed(1)}k` : `₨${value}`}
+                  tickFormatter={(value) => value >= 1000 ? `₨${(value / 1000).toFixed(1)}k` : `₨${value}`}
                   style={{ fontSize: '10px', fontFamily: 'monospace', fill: '#64748b' }}
                 />
                 <ChartTooltip
@@ -379,7 +364,7 @@ export default function PaymentsPage() {
             </ChartContainer>
           ) : (
             <div className="h-[250px] w-full flex items-center justify-center border border-dashed border-white/5 rounded-xl">
-               <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No chart data available</p>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No chart data available</p>
             </div>
           )}
         </div>
@@ -398,48 +383,48 @@ export default function PaymentsPage() {
             <PieChartSkeleton />
           ) : methodData.length > 0 ? (
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
-               <ResponsiveContainer width="100%" height="100%">
-                 <PieChart>
-                    <ChartTooltip content={<ChartTooltipContent indicator="dot" />} cursor={false} />
-                    <Legend 
-                      verticalAlign="bottom" 
-                      height={36}
-                      content={(props) => {
-                        const { payload } = props;
-                        return (
-                          <ul className="flex flex-wrap justify-center gap-4 text-[10px] font-bold tracking-widest uppercase mt-4">
-                            {payload?.map((entry, index) => (
-                              <li key={`item-${index}`} className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                                <span className="text-slate-400">{entry.value}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        );
-                      }}
-                    />
-                    <Pie
-                      data={methodData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={4}
-                      stroke="none"
-                    >
-                      {methodData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                      ))}
-                    </Pie>
-                 </PieChart>
-               </ResponsiveContainer>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <ChartTooltip content={<ChartTooltipContent indicator="dot" />} cursor={false} />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    content={(props) => {
+                      const { payload } = props;
+                      return (
+                        <ul className="flex flex-wrap justify-center gap-4 text-[10px] font-bold tracking-widest uppercase mt-4">
+                          {payload?.map((entry, index) => (
+                            <li key={`item-${index}`} className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                              <span className="text-slate-400">{entry.value}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      );
+                    }}
+                  />
+                  <Pie
+                    data={methodData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={4}
+                    stroke="none"
+                  >
+                    {methodData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
             </ChartContainer>
           ) : (
-             <div className="h-[250px] w-full flex items-center justify-center border border-dashed border-white/5 rounded-xl">
-               <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No data</p>
-             </div>
+            <div className="h-[250px] w-full flex items-center justify-center border border-dashed border-white/5 rounded-xl">
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No data</p>
+            </div>
           )}
         </div>
 
@@ -464,102 +449,73 @@ export default function PaymentsPage() {
                 margin={{ left: 24, top: 0, bottom: 0, right: 12 }}
               >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis 
-                   type="number" 
-                   tickLine={false} 
-                   axisLine={false} 
-                   tickFormatter={(value) => value >= 1000 ? `₨${(value/1000).toFixed(1)}k` : `₨${value}`}
-                   style={{ fontSize: '10px', fontFamily: 'monospace', fill: '#64748b' }}
+                <XAxis
+                  type="number"
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => value >= 1000 ? `₨${(value / 1000).toFixed(1)}k` : `₨${value}`}
+                  style={{ fontSize: '10px', fontFamily: 'monospace', fill: '#64748b' }}
                 />
-                <YAxis 
-                   dataKey="name" 
-                   type="category" 
-                   tickLine={false} 
-                   axisLine={false} 
-                   tickMargin={8}
-                   style={{ fontSize: '10px', fontWeight: 'bold', fill: '#94a3b8' }}
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  style={{ fontSize: '10px', fontWeight: 'bold', fill: '#94a3b8' }}
                 />
                 <ChartTooltip
                   cursor={{ fill: 'rgba(255,255,255,0.02)' }}
                   content={<ChartTooltipContent indicator="dashed" />}
                 />
                 <Bar dataKey="amount" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]}>
-                   {topMembersData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                   ))}
+                  {topMembersData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                  ))}
                 </Bar>
               </BarChart>
             </ChartContainer>
           ) : (
             <div className="h-[250px] w-full flex items-center justify-center border border-dashed border-white/5 rounded-xl">
-               <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No data</p>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No data</p>
             </div>
           )}
         </div>
       </div>
 
-     
+
 
       {/* Payments Table */}
-      <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
-        <div className="overflow-x-auto">
-          <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-            <thead>
-              <tr className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]">
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Member</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Amount</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Date</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Method</th>
-                <th className="text-left py-6 px-6 font-black text-slate-500 italic">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? Array.from({ length: 8 }).map((_, i) => <TableTdSkeleton key={i} />) : filtered.length > 0 ? (
-                paginatedData.map((payment) => {
-                  const member = store.members.find((m) => m.id === payment.memberId)
-                  return (
-                    <tr key={payment.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                      <td className="py-6 px-6">
-                        <span className="text-foreground font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
-                          {member?.firstName} {member?.lastName || ""}
-                        </span>
-                      </td>
-                      <td className="py-6 px-6 font-black text-primary text-base">
-                        {formatCurrency(payment.amount)}
-                      </td>
-                      <td className="py-6 px-6 text-slate-500 font-mono text-[10px] whitespace-nowrap">
-                        {formatDate(payment.date).toUpperCase()}
-                      </td>
-                      <td className="py-6 px-6">
-                        <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[9px] font-black tracking-widest italic group-hover/row:border-primary/20 transition-all">
-                          {payment.method.toUpperCase()}
-                        </div>
-                      </td>
-                      <td className="py-6 px-6 text-slate-500 font-mono text-[9px] lowercase max-w-xs truncate">
-                        {payment.description}
-                      </td>
-                    </tr>
-                  )
-                })
-              ) : (
-                <tr>
-                  <td colSpan={5} className="py-24 text-center">
-                    <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
-                      <DollarSign className="w-8 h-8 text-slate-700" />
-                    </div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No payments found</p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        <PaginationHUD
-          totalItems={filtered.length}
-          pageSize={pageSize}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-        />
+      <div className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40 rounded-3xl">
+        {loading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-16 w-full bg-white/5 animate-pulse rounded-xl" />
+            ))}
+          </div>
+        ) : (
+          <DataTable
+            columns={createColumns(store.members)}
+            data={filtered.map(payment => {
+              const member = store.members.find(m => m.id === payment.memberId);
+              return {
+                ...payment,
+                memberName: member ? `${member.firstName} ${member.lastName || ""}` : "Unknown"
+              };
+            })}
+            searchKey="memberName"
+            searchPlaceholder="Filter by member name..."
+          />
+        )}
+
+        {filtered.length === 0 && !loading && (
+          <div className="text-center py-24 bg-white/[0.01]">
+            <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
+              <DollarSign className="w-8 h-8 text-slate-700" />
+            </div>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No payments found</p>
+          </div>
+        )}
       </div>
     </div>
   )

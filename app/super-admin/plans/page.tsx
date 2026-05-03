@@ -31,17 +31,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Layers } from "lucide-react";
+import { SYSTEM_FEATURES, FEATURE_KEYS } from "@/lib/constants/features";
 
 function formatPKR(amount: number) {
     return `₨ ${amount.toLocaleString("en-PK")}`;
 }
 
-const FEATURE_OPTIONS = [
-    "members", "subscriptions", "payments", "attendance",
-    "trainersModule", "advancedReports", "dietModule",
-    "branches", "multipleTrainers", "workoutPlanner",
-    "memberPortal", "api_access",
-];
+const FEATURE_OPTIONS = FEATURE_KEYS;
 
 const emptyPlan = {
     name: "",
@@ -307,7 +303,7 @@ export default function PlansPage() {
                                                 onSelect={(e) => e.preventDefault()}
                                                 className="text-xs capitalize py-2 focus:bg-white/[0.04]"
                                             >
-                                                {f.replace(/([A-Z])/g, ' $1').trim()}
+                                                {SYSTEM_FEATURES.find(sf => sf.key === f)?.label || f.replace(/([A-Z])/g, ' $1').trim()}
                                             </DropdownMenuCheckboxItem>
                                         ))}
                                     </div>

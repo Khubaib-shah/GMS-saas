@@ -43,10 +43,12 @@ export async function GET(req: Request) {
         let skippedCount = 0;
 
         // 4. Process notifications
+        const Gym = require("@/models/Gym").default;
         for (const sub of expiringSubs) {
-            const [member, settings] = await Promise.all([
+            const [member, settings, gym] = await Promise.all([
                 Member.findById(sub.memberId).lean(),
-                GymSettings.findOne({ gymId: sub.gymId }).lean()
+                GymSettings.findOne({ gymId: sub.gymId }).lean(),
+                Gym.findById(sub.gymId).select("name").lean()
             ]);
 
             if (settings?.notifications?.sendExpiryReminder && member?.email) {
@@ -54,14 +56,15 @@ export async function GET(req: Request) {
                     memberName: member.firstName,
                     planName: sub.planId.replace("plan_", "").toUpperCase(),
                     expiryDate: sub.endDate,
-                    gymName: settings.general?.name || "Our Gym",
+                    gymName: gym?.name || "Our Gym",
                     daysRemaining: 3
                 });
 
                 await sendEmail({
                     to: member.email,
-                    subject: `Membership Reminder: 3 Days Remaining - ${settings.general?.name || 'GymFlow'}`,
-                    html
+                    subject: `Membership Reminder: 3 Days Remaining - ${gym?.name || 'GymFlow'}`,
+                    html,
+                    gymId: sub.gymId.toString()
                 });
                 sentCount++;
             } else {

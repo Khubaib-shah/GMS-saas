@@ -74,44 +74,41 @@ export async function POST(req: Request) {
         // Send Email Notification
         try {
             console.log(`[Email Debug] Checking settings for Gym: ${session.user.gymId}`);
-            const [settings, member] = await Promise.all([
+            const Gym = require("@/models/Gym").default;
+            const [settings, member, gym] = await Promise.all([
                 GymSettings.findOne({ gymId: session.user.gymId }).lean(),
-                Member.findById(body.memberId).lean()
+                Member.findById(body.memberId).lean(),
+                Gym.findById(session.user.gymId).select("name").lean()
             ]);
 
             const canSend = settings?.notifications?.sendInvoiceEmail;
             const hasEmail = !!member?.email;
 
-            console.log(`[Email Debug] Settings Found: ${!!settings}, Send Enabled: ${canSend}, Member Email: ${member?.email || 'N/A'}`);
-
             if (canSend && hasEmail) {
-                // Extract plan name from description if possible
                 const planName = body.description?.includes(':')
                     ? body.description.split(':')[1].split('(')[0].trim()
                     : "Membership Subscription";
 
-                console.log(`[Email Debug] Attempting to send branded receipt to ${member?.email}...`);
+                console.log(`[Email Debug] Attempting to send dynamic receipt to ${member?.email}...`);
                 const html = EmailTemplates.paymentReceipt({
                     memberName: member?.firstName || "Member",
                     amount: payment.amount,
                     planName,
                     date: payment.date,
-                    gymName: (settings as any)?.general?.name || "Our Gym",
+                    gymName: gym?.name || "Our Gym",
                     paymentId: payment._id.toString()
                 });
 
                 const mailResult = await sendEmail({
                     to: member?.email!,
-                    subject: `Payment Receipt - ${(settings as any)?.general?.name || 'GymFlow'}`,
-                    html
+                    subject: `Payment Receipt - ${gym?.name || 'GymFlow'}`,
+                    html,
+                    gymId: session.user.gymId // Enable custom SMTP
                 });
                 console.log(`[Email Debug] Send Result:`, mailResult);
-            } else {
-                console.log(`[Email Debug] Skipping email: ${!canSend ? 'Notification disabled in settings' : 'Member has no email'}`);
             }
         } catch (mailError) {
             console.error("[Email Debug] Failed to send invoice email:", mailError);
-            // We don't fail the request if email fails
         }
 
         return NextResponse.json(payment.toJSON(), { status: 201 });

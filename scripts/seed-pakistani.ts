@@ -120,7 +120,7 @@ const specialties = [
     "Functional Training", "Sports Conditioning", "Powerlifting", "MMA & Boxing"
 ];
 
-function getRandomDate(monthsBack = 5, monthsForward = 0): Date {
+function getRandomDate(monthsBack = 3, monthsForward = 0): Date {
     const now = new Date();
     const start = new Date(now);
     start.setMonth(now.getMonth() - monthsBack);
@@ -130,8 +130,25 @@ function getRandomDate(monthsBack = 5, monthsForward = 0): Date {
     return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
+/**
+ * Generates a list of monthly dates starting from joinDate until now
+ */
+function getMonthlyDates(startDate: Date): Date[] {
+    const dates = [];
+    const current = new Date(startDate);
+    const now = new Date();
+    
+    while (current <= now) {
+        dates.push(new Date(current));
+        current.setMonth(current.getMonth() + 1);
+    }
+    return dates;
+}
+
 async function seed() {
     try {
+        console.log("Connecting to MongoDB...");
+        await mongoose.connect(MONGODB_URL!);
         console.log("Database connection established");
         console.log("Cleaning database...");
         const models = [
@@ -310,13 +327,13 @@ async function seed() {
             ] as any);
 
             // 8. Members
-            const memberCount = 15;
+            const memberCount = 20; // Increased count
             const mDocs = [];
             for (let m = 0; m < memberCount; m++) {
                 const mName = getRandomName();
                 const plan = plans[m % plans.length];
                 const trainer = createdTrainers[m % createdTrainers.length];
-                const joinDate = getRandomDate(4, 0);
+                const joinDate = getRandomDate(3, 0); // Past 3 months
 
                 mDocs.push({
                     firstName: mName.first,
@@ -339,46 +356,58 @@ async function seed() {
 
             // 9. Subscriptions, Payments, Attendance
             for (const member of createdMembers) {
-                const subDate = new Date(member.joinDate);
+                const joinDate = new Date(member.joinDate);
+                const paymentDates = getMonthlyDates(joinDate);
                 const plan = plans.find(p => p.id === member.planId);
-                const expiryDate = new Date(subDate);
+                
+                // 9.1 Monthly Payments
+                for (const pDate of paymentDates) {
+                    await Payment.create({
+                        memberId: member._id,
+                        amount: plan?.price || 3000,
+                        date: pDate,
+                        method: Math.random() > 0.3 ? "cash" : "bank_transfer",
+                        gymId: gym._id,
+                        collectedBy: manager._id,
+                        description: `Renewal payment for ${plan?.name}`
+                    });
+                }
+
+                // 9.2 Subscription (Set based on latest payment)
+                const lastPaymentDate = paymentDates[paymentDates.length - 1];
+                const expiryDate = new Date(lastPaymentDate);
                 expiryDate.setDate(expiryDate.getDate() + (plan?.duration || 30));
 
                 await Subscription.create({
                     memberId: member._id.toString(),
                     planId: member.planId,
-                    startDate: subDate.toISOString(),
+                    startDate: lastPaymentDate.toISOString(),
                     endDate: expiryDate.toISOString(),
                     status: expiryDate > new Date() ? "active" : "expired",
                     gymId: gym._id
                 });
 
-                // Historical payments
-                await Payment.create({
-                    memberId: member._id,
-                    amount: plan?.price || 3000,
-                    date: subDate,
-                    method: Math.random() > 0.3 ? "cash" : "bank_transfer",
-                    gymId: gym._id,
-                    collectedBy: manager._id,
-                    description: `Initial payment for ${plan?.name}`
-                });
-
-                // Attendance logs (past 30 days)
-                const attendanceCount = 10 + Math.floor(Math.random() * 15);
-                for (let a = 0; a < attendanceCount; a++) {
-                    const attDate = new Date();
-                    attDate.setDate(attDate.getDate() - (a + 1));
-                    if (attDate >= subDate) {
-                        const checkIn = new Date(attDate);
-                        checkIn.setHours(8 + Math.floor(Math.random() * 12), Math.floor(Math.random() * 60));
-                        await Attendance.create({
-                            gymId: gym._id,
-                            memberId: member._id,
-                            date: attDate,
-                            checkInTime: checkIn,
-                            status: "present"
-                        });
+                // 9.3 Attendance logs (Higher density since join date)
+                const now = new Date();
+                const diffTime = Math.abs(now.getTime() - joinDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                // Average 4-5 days a week
+                for (let d = 0; d < diffDays; d++) {
+                    if (Math.random() > 0.4) { // 60% attendance rate
+                        const attDate = new Date(joinDate);
+                        attDate.setDate(joinDate.getDate() + d);
+                        if (attDate <= now) {
+                            const checkIn = new Date(attDate);
+                            checkIn.setHours(8 + Math.floor(Math.random() * 12), Math.floor(Math.random() * 60));
+                            await Attendance.create({
+                                gymId: gym._id,
+                                memberId: member._id,
+                                date: attDate,
+                                checkInTime: checkIn,
+                                status: "present"
+                            });
+                        }
                     }
                 }
 
@@ -388,7 +417,7 @@ async function seed() {
                     memberId: member._id,
                     trainerId: member.trainerId,
                     templateId: template._id,
-                    startDate: subDate,
+                    startDate: joinDate,
                     status: "active"
                 });
 

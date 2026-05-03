@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/field"
 import { useInputValidation } from "@/hooks/use-input-validation"
 import { type ValidationType } from "@/lib/utils/validators"
+import { Eye, EyeOff } from "lucide-react"
 
 interface InputFieldProps extends Omit<React.ComponentProps<typeof Input>, "onChange" | "value"> {
   label?: string
@@ -47,8 +48,12 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     className,
     placeholder,
     showSuccessIndicator = false,
+    type: initialType = "text",
     ...props
   }, ref) => {
+    const [showPassword, setShowPassword] = React.useState(false)
+    const type = initialType === "password" ? (showPassword ? "text" : "password") : initialType
+
     const {
       value,
       error,
@@ -64,8 +69,6 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
       onValueChange: onChange,
       onValidationError,
     })
-
-
 
     return (
       <Field className={cn("w-full relative", containerClassName)}>
@@ -83,6 +86,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
           )}
           <Input
             {...props}
+            type={type}
             ref={ref}
             value={value}
             onChange={handleChange}
@@ -93,6 +97,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             className={cn(
               "h-12 bg-white/5 border-transparent focus:bg-white/10 text-[11px] font-bold tracking-wider transition-all duration-300 rounded-md",
               leadingIcon && "!pl-12",
+              initialType === "password" && "pr-12",
               isInvalid
                 ? "border-destructive/50 focus:border-destructive ring-destructive/20"
                 : "focus:border-primary/50",
@@ -101,8 +106,19 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             )}
           />
 
+          {/* Password toggle */}
+          {initialType === "password" && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors focus:outline-none"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          )}
+
           {/* Tactical status indicator (bottom right) */}
-          {showSuccessIndicator && value && !isInvalid && validateType !== "text" && (
+          {showSuccessIndicator && value && !isInvalid && validateType !== "text" && initialType !== "password" && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-50 group-focus-within/input-field:opacity-100 transition-opacity">
               <div className="w-1 h-1 rounded-full bg-primary animate-pulse"></div>
               <span className="text-[8px] font-bold text-primary">Valid</span>

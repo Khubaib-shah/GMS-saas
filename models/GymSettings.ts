@@ -26,6 +26,15 @@ const GymSettingsSchema = new mongoose.Schema(
             trainersEnabled: { type: Boolean, default: true },
             attendanceEnabled: { type: Boolean, default: true },
         },
+        email: {
+            host: { type: String, default: "smtp.gmail.com" },
+            port: { type: Number, default: 587 },
+            secure: { type: Boolean, default: false },
+            user: { type: String, default: "" },
+            pass: { type: String, default: "" },
+            fromName: { type: String, default: "" },
+            fromEmail: { type: String, default: "" },
+        },
     },
     { timestamps: true }
 );

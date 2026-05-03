@@ -8,26 +8,20 @@ import { AttendanceStats } from "@/components/attendance/attendance-stats";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Lock, Sparkles, Filter, Search } from "lucide-react";
+import { Lock, Search } from "lucide-react";
 import { InputField } from "@/components/ui/input-field";
-import { Button } from "@/components/ui/button";
-import { PaginationHUD } from "@/components/ui/pagination-hud";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import Link from "next/link";
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from "./columns";
+import { WhatsAppUpgradeButton } from "@/components/ui/whatsapp-upgrade-button";
+import { FeatureLock } from "@/components/ui/feature-lock";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AttendancePage() {
     const store = useAppStore();
     const { data: session } = useSession();
     const isPremium = (session?.user as any)?.isPremium;
-    const canScan = store.gymProfile?.enabledFeatures?.includes("qrAttendance") || store.gymProfile?.enabledFeatures?.includes("attendance") || isPremium;
+    const canManual = store.gymProfile?.enabledFeatures?.includes("manualAttendance") || store.gymProfile?.enabledFeatures?.includes("attendance");
+    const canScan = store.gymProfile?.enabledFeatures?.includes("qrAttendance") || store.gymProfile?.enabledFeatures?.includes("attendance");
     const [reports, setReports] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingReports, setLoadingReports] = useState(false);
@@ -122,25 +116,30 @@ export default function AttendancePage() {
 
                 <TabsContent value="mark" className="space-y-6">
                     <div className="grid gap-6 md:grid-cols-2">
-                        <ManualEntry />
-                        {canScan ? (
-                            <AttendanceScanner />
+                        {loading ? (
+                            <>
+                                <Skeleton className="h-[400px] w-full rounded-xl bg-white/5" />
+                                <Skeleton className="h-[400px] w-full rounded-xl bg-white/5" />
+                            </>
                         ) : (
-                            <div className="p-8 border-2 border-dashed rounded-xl bg-muted/30 flex flex-col items-center justify-center text-center space-y-4">
-                                <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
-                                    <Lock className="w-6 h-6 text-amber-600" />
-                                </div>
-                                <div className="space-y-2">
-                                    <h3 className="font-semibold text-lg">Quick Scan Locked</h3>
-                                    <p className="text-sm text-muted-foreground max-w-[250px]">
-                                        QR Code scanning and automated check-ins are only available for Premium gyms.
-                                    </p>
-                                </div>
-                                <Button className="bg-amber-500 hover:bg-amber-600 gap-2">
-                                    <Sparkles className="w-4 h-4" />
-                                    Upgrade to Premium
-                                </Button>
-                            </div>
+                            <>
+                                {canManual ? (
+                                    <ManualEntry />
+                                ) : (
+                                    <FeatureLock
+                                        title="Manual Entry Locked"
+                                        description="Manual check-ins are currently disabled for your gym instance. Upgrade your plan to enable this feature."
+                                    />
+                                )}
+                                {canScan ? (
+                                    <AttendanceScanner />
+                                ) : (
+                                    <FeatureLock
+                                        title="Quick Scan Locked"
+                                        description="QR Code scanning and automated check-ins are only available for Premium gyms."
+                                    />
+                                )}
+                            </>
                         )}
                     </div>
                 </TabsContent>
@@ -174,89 +173,36 @@ export default function AttendancePage() {
                         </div>
                     </div>
 
-                    <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-                                <thead>
-                                    <tr className="border-b border-white/5 bg-white/[0.02]">
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Member</th>
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Check In</th>
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Check Out</th>
-                                        <th className="text-left py-6 px-6 font-black text-slate-500 italic">Status</th>
-                                        <th className="text-right py-6 px-6 font-black text-slate-500 italic">View</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {loadingReports ? (
-                                        Array.from({ length: 8 }).map((_, i) => (
-                                            <tr key={i} className="border-b border-white/5 animate-pulse">
-                                                <td className="py-6 px-6">
-                                                    <div className="h-4 w-32 bg-white/5 rounded" />
-                                                </td>
-                                                <td className="py-6 px-6">
-                                                    <div className="h-4 w-24 bg-white/5 rounded" />
-                                                </td>
-                                                <td className="py-6 px-6">
-                                                    <div className="h-4 w-24 bg-white/5 rounded" />
-                                                </td>
-                                                <td className="py-6 px-6">
-                                                    <div className="h-6 w-16 bg-white/5 rounded-lg" />
-                                                </td>
-                                                <td className="py-6 px-6">
-                                                    <div className="flex justify-end">
-                                                        <div className="h-8 w-8 bg-white/5 rounded-xl" />
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : filteredReports.length > 0 ? (
-                                        paginatedReports.map((record: any) => {
-                                            return (
-                                                <tr key={record.id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                                                    <td className="py-6 px-6 font-black italic text-foreground tracking-tighter">
-                                                        {record.memberId?.firstName} {record.memberId?.lastName}
-                                                    </td>
-                                                    <td className="py-6 px-6 font-mono text-primary">
-                                                        {record.checkInTime ? new Date(record.checkInTime).toLocaleTimeString() : '-'}
-                                                    </td>
-                                                    <td className="py-6 px-6 font-mono text-slate-500">
-                                                        {record.checkOutTime ? new Date(record.checkOutTime).toLocaleTimeString() : '-'}
-                                                    </td>
-                                                    <td className="py-6 px-6">
-                                                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest border border-primary/20">
-                                                            {record.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-6 px-6 text-right">
-                                                        <Link href={`/members/${record.memberId?.id}`}>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="h-8 w-8 rounded-xl border border-white/5 bg-white/5 text-slate-400 hover:text-primary hover:border-primary/50 transition-all opacity-0 group-hover/row:opacity-100"
-                                                            >
-                                                                <Eye className="w-4 h-4" />
-                                                            </Button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                            )
-                                        })
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
-                                                No records found for today.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                        <PaginationHUD
-                            totalItems={filteredReports.length}
-                            pageSize={pageSize}
-                            currentPage={currentPage}
-                            onPageChange={setCurrentPage}
-                        />
+                    <div className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40 rounded-3xl">
+                        {loadingReports ? (
+                            <div className="space-y-4">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <div key={i} className="h-16 w-full bg-white/5 animate-pulse rounded-xl" />
+                                ))}
+                            </div>
+                        ) : (
+                            <DataTable
+                                columns={columns}
+                                data={filteredReports.map((record: any) => ({
+                                    id: record.id,
+                                    memberName: `${record.memberId?.firstName || ""} ${record.memberId?.lastName || ""}`,
+                                    memberId: record.memberId?.id,
+                                    checkInTime: record.checkInTime,
+                                    checkOutTime: record.checkOutTime,
+                                    status: record.status
+                                }))}
+                                searchKey="memberName"
+                                searchPlaceholder="Filter by member name..."
+                            />
+                        )}
+
+                        {filteredReports.length === 0 && !loadingReports && (
+                            <div className="text-center py-24 bg-white/[0.01]">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                                    No records found for today.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </TabsContent>
             </Tabs>

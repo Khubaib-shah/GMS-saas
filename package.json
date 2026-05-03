@@ -42,6 +42,7 @@
     "@react-three/fiber": "^9.5.0",
     "@reactour/tour": "^3.8.0",
     "@stripe/stripe-js": "^8.11.0",
+    "@tanstack/react-table": "^8.21.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemailer": "^7.0.11",
     "@types/three": "^0.183.1",

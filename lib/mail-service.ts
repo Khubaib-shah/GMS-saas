@@ -1,11 +1,14 @@
 import nodemailer from "nodemailer";
+import connectDB from "@/lib/db";
+import GymSettings from "@/models/GymSettings";
 
 /**
  * Mail Service Utility
  * Handles SMTP transport and branded HTML email templates.
  */
 
-const transporter = nodemailer.createTransport({
+// Global transporter (Fallback)
+const globalTransporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT) || 587,
   secure: process.env.SMTP_SECURE === "true",
@@ -20,11 +23,11 @@ interface MailOptions {
   subject: string;
   html: string;
   attachments?: any[];
+  gymId?: string; // Optional gym context for dynamic SMTP
 }
 
 /**
  * Base Brand Template Wrapper
- * Injects content into a glass-premium, HUD-inspired HTML container.
  */
 export function getBaseTemplate(title: string, content: string): string {
   const primaryColor = "#ccff00";
@@ -121,20 +124,46 @@ export function getBaseTemplate(title: string, content: string): string {
 }
 
 /**
- * Generic Send Email Function
+ * Generic Send Email Function with Dynamic SMTP support
  */
-export async function sendEmail({ to, subject, html, attachments }: MailOptions) {
+export async function sendEmail({ to, subject, html, attachments, gymId }: MailOptions) {
   try {
-    // In development, we log a preview even if we try to send
+    let transporter = globalTransporter;
+    let from = process.env.EMAIL_FROM || '"GymFlow Admin" <noreply@gymflow.pk>';
+
+    // If gymId is provided, try to use custom SMTP settings
+    if (gymId) {
+      await connectDB();
+      const settings = await GymSettings.findOne({ gymId }).lean();
+      
+      if (settings?.email?.host && settings?.email?.user) {
+        console.log(`[MailService] Using custom SMTP for Gym: ${gymId}`);
+        transporter = nodemailer.createTransport({
+          host: settings.email.host,
+          port: settings.email.port || 587,
+          secure: settings.email.secure || false,
+          auth: {
+            user: settings.email.user,
+            pass: settings.email.pass,
+          },
+        });
+        
+        const fromName = settings.email.fromName || "Gym Notifications";
+        const fromEmail = settings.email.fromEmail || settings.email.user;
+        from = `"${fromName}" <${fromEmail}>`;
+      }
+    }
+
     if (process.env.NODE_ENV === "development") {
       console.log("\n--- [DEVELOPMENT EMAIL PREVIEW] ---");
       console.log(`To: ${to}`);
       console.log(`Subject: ${subject}`);
+      console.log(`From: ${from}`);
       console.log("-----------------------------------\n");
     }
 
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM || '"GymFlow Admin" <noreply@gymflow.pk>',
+      from,
       to,
       subject,
       html,
@@ -143,23 +172,9 @@ export async function sendEmail({ to, subject, html, attachments }: MailOptions)
 
     console.log("Message sent: %s", info.messageId);
 
-    // Ethereal provides a preview URL
-    if (info.messageId && process.env.SMTP_HOST?.includes("ethereal")) {
-      console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    }
-
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Email send error:", error);
-
-    // Fallback: Log the HTML content so the user can verify it works
-    console.log("\n--- [FAILED EMAIL CONTENT FALLBACK] ---");
-    console.log("The email could not be sent due to a network error, but here is the content generated:");
-    console.log(`SUBJECT: ${subject}`);
-    console.log(`RECIPIENT: ${to}`);
-    console.log("---------------------------------------");
-    console.log("Check the logic above - the data generation is successful!");
-
     return { success: false, error };
   }
 }

@@ -12,7 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { PaginationHUD } from "@/components/ui/pagination-hud";
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from "./columns";
 import { InputField } from "@/components/ui/input-field";
 import {
   Select,
@@ -298,146 +299,28 @@ export default function AuditlogsClient() {
         </div>
       </div>
 
-      <Card className="glass-premium border-white/5 bg-slate-950/20 backdrop-blur-xl overflow-hidden rounded-xl border-t-0 -mt-1 relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/20 after:to-transparent">
-        <div>
-          <Table>
-            <TableHeader>
-              <TableRow className="border-white/5 bg-white/[0.02]">
-                <TableHead className="w-[150px] text-[10px] font-black uppercase italic tracking-widest py-2">
-                  TIME
-                </TableHead>
-                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">
-                  USER
-                </TableHead>
-                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">
-                  ACTION
-                </TableHead>
-                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">
-                  TARGET
-                </TableHead>
-                <TableHead className="text-[10px] font-black uppercase italic tracking-widest py-2">
-                  DETAILS
-                </TableHead>
-                <TableHead className="w-[80px] text-[10px] font-black uppercase italic tracking-widest py-2 text-right">
-                  VIEW
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                Array.from({ length: 10 }).map((_, i) => (
-                  <TableRow key={i} className="border-white/5 animate-pulse">
-                    <TableCell className="py-4">
-                      <div className="h-3 w-28 bg-white/5 rounded" />
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="space-y-2">
-                        <div className="h-3 w-24 bg-white/5 rounded" />
-                        <div className="h-2 w-16 bg-white/5 rounded" />
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="h-5 w-20 bg-white/5 rounded" />
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="space-y-2">
-                        <div className="h-3 w-20 bg-white/5 rounded" />
-                        <div className="h-2 w-28 bg-white/5 rounded" />
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="h-3 w-32 bg-white/5 rounded" />
-                    </TableCell>
-                    <TableCell className="py-4 text-right">
-                      <div className="h-7 w-7 bg-white/5 rounded-md ml-auto" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : logs.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    No logs found matching your filters.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                logs.map((log) => (
-                  <TableRow
-                    key={log.id}
-                    className="border-white/5 hover:bg-white/[0.02] transition-colors group"
-                  >
-                    <TableCell className="font-mono text-[10px] whitespace-nowrap py-2 text-slate-400 group-hover:text-primary transition-colors">
-                      {format(new Date(log.createdAt), "MM.dd.yy // HH:mm:ss")}
-                    </TableCell>
-                    <TableCell className="py-2">
-                      <div className="flex flex-col">
-                        <span className="font-black text-[10px] uppercase italic tracking-tight text-foreground">
-                          {log.userName || "System"}
-                        </span>
-                        <span
-                          className="text-[9px] font-mono text-slate-500 truncate max-w-[100px]"
-                          title={log.userId}
-                        >
-                          {log.userId}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-2">
-                      <Badge
-                        className={cn(
-                          "text-[9px] font-black uppercase tracking-widest h-5 px-2 rounded-md",
-                          getActionColor(log.action),
-                        )}
-                        variant="outline"
-                      >
-                        {log.action.replace("_", ":")}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="py-2">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold uppercase text-slate-300">
-                          {log.resource}
-                        </span>
-                        {log.resourceName && (
-                          <span
-                            className="text-[9px] text-slate-500 truncate max-w-[120px] italic"
-                            title={log.resourceName}
-                          >
-                            {log.resourceName}
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-[150px] truncate text-[9px] text-slate-500 font-mono py-2">
-                      {JSON.stringify(log.details || {})}
-                    </TableCell>
-                    <TableCell className="py-2 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedLog(log)}
-                        className="h-7 w-7 p-0 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-md"
-                      >
-                        <Eye className="h-3.5 w-3.5" />
-                        <span className="sr-only">View Details</span>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+      <div className="glass-premium p-6 border-white/5 bg-slate-950/20 backdrop-blur-xl rounded-xl border-t-0 -mt-1 relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/20 after:to-transparent">
+        {loading ? (
+           <div className="space-y-4">
+             {Array.from({ length: 5 }).map((_, i) => (
+               <div key={i} className="h-16 w-full bg-white/5 animate-pulse rounded-xl" />
+             ))}
+           </div>
+        ) : (
+          <DataTable 
+            columns={columns(setSelectedLog)} 
+            data={logs} 
+            searchKey="userName"
+            searchPlaceholder="Filter by user name..."
+          />
+        )}
 
-        <PaginationHUD
-          totalItems={pagination.total}
-          pageSize={pagination.limit}
-          currentPage={pagination.page}
-          onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
-        />
-      </Card>
+        {logs.length === 0 && !loading && (
+          <div className="text-center py-24 bg-white/[0.01]">
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No logs found matching your filters.</p>
+          </div>
+        )}
+      </div>
 
       {/* Details Dialog */}
       <Dialog
