@@ -12,8 +12,6 @@ import { ChartSkeleton, PieChartSkeleton, BarChartSkeleton } from "@/components/
 import { DateRangePicker } from "@/components/ui/date-range-picker"
 import { DateRange } from "react-day-picker"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Legend } from "recharts"
-import { jsPDF } from "jspdf"
-import autoTable from "jspdf-autotable"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
 import { createColumns } from "./columns"
@@ -164,7 +162,11 @@ export default function PaymentsPage() {
   const countTrend = prevRange ? calculateTrend(paidCount, prevCount) : undefined
   const avgTrend = prevRange ? calculateTrend(avgPayment, prevAvg) : undefined
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
+    // Dynamic imports to reduce initial bundle size
+    const { jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
+    
     const doc = new jsPDF()
 
     doc.setFont("helvetica", "bold")

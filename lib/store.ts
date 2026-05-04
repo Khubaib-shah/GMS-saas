@@ -19,14 +19,14 @@ export type AppState = {
     address: string
     enabledFeatures?: string[]
   }
-  loadGymProfile: () => Promise<void>
+  loadGymProfile: (options?: { force?: boolean }) => Promise<void>
   updateGymProfile: (data: Partial<AppState["gymProfile"]>) => void
   businessSettings: BusinessSettings
-  loadBusinessSettings: () => Promise<void>
+  loadBusinessSettings: (options?: { force?: boolean }) => Promise<void>
 
   // Members
   members: Member[]
-  loadMembers: (options?: { showDeleted?: boolean }) => Promise<void>
+  loadMembers: (options?: { showDeleted?: boolean; force?: boolean }) => Promise<void>
   addMember: (data: Omit<Member, "id">) => Promise<Member>
   updateMember: (id: string, data: Partial<Member>) => Promise<void>
   deleteMember: (id: string, options?: { permanent?: boolean }) => Promise<void>
@@ -34,15 +34,15 @@ export type AppState = {
 
   // Plans
   plans: Plan[]
-  loadPlans: () => Promise<void>
-  loadPayments: () => Promise<void>
+  loadPlans: (options?: { force?: boolean }) => Promise<void>
+  loadPayments: (options?: { force?: boolean }) => Promise<void>
   updatePlan: (id: string, data: Partial<Plan>) => Promise<void>
   deletePlan: (id: string) => Promise<void>
   addPlan: (data: Plan) => Promise<void>
 
   // Subscriptions
   subscriptions: Subscription[]
-  loadSubscriptions: () => Promise<void>
+  loadSubscriptions: (options?: { force?: boolean }) => Promise<void>
   renewSubscription: (memberId: string, planId: string, days: number, method?: "cash" | "online" | "bank_transfer" | "card" | "other", receiptUrl?: string | null) => Promise<boolean>
   updateSubscription: (id: string, data: Partial<Subscription>) => Promise<void>
   deleteSubscription: (id: string) => Promise<void>
@@ -76,6 +76,9 @@ export type AppState = {
   searchQuery: string
   setSearchQuery: (query: string) => void
 
+  // Status
+  lastLoaded: Record<string, any>
+
   // Sidebar
   sidebarCollapsed: boolean
   setSidebarCollapsed: (collapsed: boolean) => void
@@ -95,6 +98,11 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       // -------------------------
+      // STATUS
+      // -------------------------
+      lastLoaded: {},
+
+      // -------------------------
       // GYM PROFILE
       // -------------------------
       gymProfile: {
@@ -110,13 +118,21 @@ export const useAppStore = create<AppState>()(
         autoExpireDays: 0,
         gracePeriodDays: 0,
       },
-      loadBusinessSettings: async () => {
+      loadBusinessSettings: async (options) => {
+        const state = get();
+        const now = Date.now();
+        const last = state.lastLoaded?.businessSettings || 0;
+        if (!options?.force && now - last < 3600000 && state.businessSettings.joiningFee !== 0) return;
+
         try {
           const res = await fetch("/api/settings/business");
           if (res.ok) {
             const data = await res.json();
             if (data.business) {
-              set({ businessSettings: data.business });
+              set((state) => ({ 
+                businessSettings: data.business,
+                lastLoaded: { ...state.lastLoaded, businessSettings: Date.now() }
+              }));
             }
           }
         } catch (error) {
@@ -124,21 +140,27 @@ export const useAppStore = create<AppState>()(
         }
       },
 
-      loadGymProfile: async () => {
+      loadGymProfile: async (options) => {
+        const state = get();
+        const now = Date.now();
+        const last = state.lastLoaded?.gymProfile || 0;
+        if (!options?.force && now - last < 3600000 && state.gymProfile._id) return;
+
         try {
           const res = await fetch("/api/gym");
           if (res.ok) {
             const data = await res.json();
-            set({
+            set((state) => ({
               gymProfile: {
                 _id: data._id || data.id,
                 name: data.name || "GymFlow",
-                owner: data.owner || "Owner", // Fallback, usually from session
+                owner: data.owner || "Owner", 
                 phone: data.phone || "",
                 address: data.address || "",
                 enabledFeatures: data.enabledFeatures || [],
               },
-            });
+              lastLoaded: { ...state.lastLoaded, gymProfile: Date.now() }
+            }));
           }
         } catch (error) {
           console.error("Failed to load gym profile", error);
@@ -151,12 +173,29 @@ export const useAppStore = create<AppState>()(
       members: [],
 
       loadMembers: async (options) => {
+        const state = get();
+        const now = Date.now();
+        const last = state.lastLoaded?.members || 0;
+        const lastOptions = state.lastLoaded?.membersOptions || {};
+        const optionsChanged = JSON.stringify(options) !== JSON.stringify(lastOptions);
+
+        if (!options?.force && !optionsChanged && now - last < 300000 && state.members.length > 0) {
+          return;
+        }
+
         try {
           const url = options?.showDeleted ? "/api/members?showDeleted=true" : "/api/members";
           const res = await fetch(url);
           const data = await res.json();
           if (Array.isArray(data)) {
-            set({ members: data });
+            set((state) => ({ 
+              members: data,
+              lastLoaded: { 
+                ...state.lastLoaded, 
+                members: Date.now(),
+                membersOptions: options || {}
+              }
+            }));
           } else {
             set({ members: [] });
           }
@@ -228,12 +267,20 @@ export const useAppStore = create<AppState>()(
       // -------------------------
       plans: [],
 
-      loadPlans: async () => {
+      loadPlans: async (options) => {
+        const state = get();
+        const now = Date.now();
+        const last = state.lastLoaded?.plans || 0;
+        if (!options?.force && now - last < 300000 && state.plans.length > 0) return;
+
         try {
           const res = await fetch("/api/plans");
           const data = await res.json();
           if (Array.isArray(data)) {
-            set({ plans: data });
+            set((state) => ({ 
+              plans: data,
+              lastLoaded: { ...state.lastLoaded, plans: Date.now() }
+            }));
           } else {
             set({ plans: [] });
           }
@@ -307,12 +354,20 @@ export const useAppStore = create<AppState>()(
       // -------------------------
       subscriptions: [],
 
-      loadSubscriptions: async () => {
+      loadSubscriptions: async (options) => {
+        const state = get();
+        const now = Date.now();
+        const last = state.lastLoaded?.subscriptions || 0;
+        if (!options?.force && now - last < 300000 && state.subscriptions.length > 0) return;
+
         try {
           const res = await fetch("/api/subscriptions");
           const data = await res.json();
           if (Array.isArray(data)) {
-            set({ subscriptions: data });
+            set((state) => ({ 
+              subscriptions: data,
+              lastLoaded: { ...state.lastLoaded, subscriptions: Date.now() }
+            }));
           } else {
             set({ subscriptions: [] });
           }
@@ -510,12 +565,20 @@ export const useAppStore = create<AppState>()(
       // -------------------------
       payments: [],
 
-      loadPayments: async () => {
+      loadPayments: async (options) => {
+        const state = get();
+        const now = Date.now();
+        const last = state.lastLoaded?.payments || 0;
+        if (!options?.force && now - last < 300000 && state.payments.length > 0) return;
+
         try {
           const res = await fetch("/api/payments");
           const data = await res.json();
           if (Array.isArray(data)) {
-            set({ payments: data });
+            set((state) => ({ 
+              payments: data,
+              lastLoaded: { ...state.lastLoaded, payments: Date.now() }
+            }));
           } else {
             set({ payments: [] });
           }

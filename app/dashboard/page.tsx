@@ -7,7 +7,7 @@ import { RevenueChart, SubscriptionChart, AttendanceChart, MembershipStatusChart
 import { MembersTable } from "@/components/members-table";
 import { useAppStore } from "@/lib/store";
 import { daysUntilExpiry, formatCurrency } from "@/lib/utils/file-utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
@@ -54,60 +54,61 @@ export default function DashboardPage() {
   const userId = (session?.user as any)?.id;
   const isTrainer = role === 'trainer';
 
-  const members = Array.isArray(store.members) ? store.members : [];
-  const subscriptions = Array.isArray(store.subscriptions) ? store.subscriptions : [];
-  const payments = Array.isArray(store.payments) ? store.payments : [];
-  const attendance = Array.isArray(store.attendance) ? store.attendance : [];
+  const { totalMembers, currentNewMembers, membersTrend, currentCheckins, checkinsTrend, currentRevenue, revenueTrend, expiringSoon } = useMemo(() => {
+    const members = Array.isArray(store.members) ? store.members : [];
+    const subscriptions = Array.isArray(store.subscriptions) ? store.subscriptions : [];
+    const payments = Array.isArray(store.payments) ? store.payments : [];
+    const attendance = Array.isArray(store.attendance) ? store.attendance : [];
 
-  // Filter data for trainer
-  const myMembers = isTrainer
-    ? members.filter(m => (m as any).trainerId === userId || (m as any).trainerId?._id === userId)
-    : members;
+    const myMembers = isTrainer
+      ? members.filter(m => (m as any).trainerId === userId || (m as any).trainerId?._id === userId)
+      : members;
 
-  const totalMembers = myMembers.length;
+    const totalMembers = myMembers.length;
+    const prevRange = dateRange?.from && dateRange?.to ? getPreviousPeriod({ from: dateRange.from, to: dateRange.to }) : null;
 
-  // Calculate Trends
-  const prevRange = dateRange?.from && dateRange?.to ? getPreviousPeriod({ from: dateRange.from, to: dateRange.to }) : null;
+    // 1. Members Trend
+    const currentNewMembers = dateRange?.from && dateRange?.to 
+      ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, { from: dateRange.from!, to: dateRange.to! })).length
+      : totalMembers;
+    const prevNewMembers = prevRange 
+      ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, prevRange)).length
+      : 0;
+    const membersTrend = prevRange ? calculateTrend(currentNewMembers, prevNewMembers) : undefined;
 
-  // 1. Members Trend
-  const currentNewMembers = dateRange?.from && dateRange?.to
-    ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, { from: dateRange.from!, to: dateRange.to! })).length
-    : totalMembers;
-  const prevNewMembers = prevRange
-    ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, prevRange)).length
-    : 0;
-  const membersTrend = prevRange ? calculateTrend(currentNewMembers, prevNewMembers) : undefined;
+    // 2. Check-ins Trend
+    const currentCheckins = dateRange?.from && dateRange?.to
+      ? attendance.filter(a => isDateInRange(a.date, { from: dateRange.from!, to: dateRange.to! })).length
+      : attendance.length;
+    const prevCheckins = prevRange
+      ? attendance.filter(a => isDateInRange(a.date, prevRange)).length
+      : 0;
+    const checkinsTrend = prevRange ? calculateTrend(currentCheckins, prevCheckins) : undefined;
 
-  // 2. Check-ins Trend
-  const currentCheckins = dateRange?.from && dateRange?.to
-    ? attendance.filter(a => isDateInRange(a.date, { from: dateRange.from!, to: dateRange.to! })).length
-    : attendance.length;
-  const prevCheckins = prevRange
-    ? attendance.filter(a => isDateInRange(a.date, prevRange)).length
-    : 0;
-  const checkinsTrend = prevRange ? calculateTrend(currentCheckins, prevCheckins) : undefined;
+    // 3. Revenue Trend
+    const currentRevenue = dateRange?.from && dateRange?.to
+      ? payments.filter(p => isDateInRange(p.date, { from: dateRange.from!, to: dateRange.to! })).reduce((sum, p) => sum + p.amount, 0)
+      : payments.reduce((sum, p) => sum + p.amount, 0);
+    const prevRevenue = prevRange
+      ? payments.filter(p => isDateInRange(p.date, prevRange)).reduce((sum, p) => sum + p.amount, 0)
+      : 0;
+    const revenueTrend = prevRange ? calculateTrend(currentRevenue, prevRevenue) : undefined;
 
-  // 3. Revenue Trend
-  const currentRevenue = dateRange?.from && dateRange?.to
-    ? payments.filter(p => isDateInRange(p.date, { from: dateRange.from!, to: dateRange.to! })).reduce((sum, p) => sum + p.amount, 0)
-    : payments.reduce((sum, p) => sum + p.amount, 0);
-  const prevRevenue = prevRange
-    ? payments.filter(p => isDateInRange(p.date, prevRange)).reduce((sum, p) => sum + p.amount, 0)
-    : 0;
-  const revenueTrend = prevRange ? calculateTrend(currentRevenue, prevRevenue) : undefined;
+    const expiringSoon = isTrainer
+      ? myMembers.filter(m => {
+        const active = (m as any).activeSubscription;
+        if (!active || active.status === "paused") return false;
+        const daysLeft = daysUntilExpiry(active.endDate);
+        return daysLeft > 0 && daysLeft <= 7;
+      }).length
+      : subscriptions.filter((s) => {
+        if (s.status === "paused") return false;
+        const daysLeft = daysUntilExpiry(s.endDate);
+        return daysLeft > 0 && daysLeft <= 7;
+      }).length;
 
-  const expiringSoon = isTrainer
-    ? myMembers.filter(m => {
-      const active = (m as any).activeSubscription;
-      if (!active || active.status === "paused") return false;
-      const daysLeft = daysUntilExpiry(active.endDate);
-      return daysLeft > 0 && daysLeft <= 7;
-    }).length
-    : subscriptions.filter((s) => {
-      if (s.status === "paused") return false;
-      const daysLeft = daysUntilExpiry(s.endDate);
-      return daysLeft > 0 && daysLeft <= 7;
-    }).length;
+    return { totalMembers, currentNewMembers, membersTrend, currentCheckins, checkinsTrend, currentRevenue, revenueTrend, expiringSoon };
+  }, [store.members, store.subscriptions, store.payments, store.attendance, isTrainer, userId, dateRange]);
 
 
 
@@ -194,8 +195,8 @@ export default function DashboardPage() {
 
       {/* Charts Section - Only for Managers/Owners */}
       {!isTrainer && (
-        <div className="space-y-8">
-          <div data-tour="dashboard-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+        <div className="space-y-6 md:space-y-8">
+          <div data-tour="dashboard-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8 items-stretch">
             <div className="lg:col-span-2">
               <RevenueChart isLoading={loading} dateRange={dateRange} />
             </div>
@@ -204,7 +205,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 items-stretch">
             <div className="h-full">
               <MembershipStatusChart isLoading={loading} />
             </div>

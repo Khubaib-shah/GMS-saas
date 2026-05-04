@@ -38,7 +38,7 @@ export function TableSkeleton({
             <thead>
               <tr className="border-b border-border">
                 {Array.from({ length: columns }).map((_, i) => (
-                  <th key={i} className="text-left py-4 px-4">
+                  <th key={i} className="text-left py-6 px-6">
                     <Skeleton className="h-4 w-20" />
                   </th>
                 ))}
@@ -49,7 +49,7 @@ export function TableSkeleton({
             {Array.from({ length: rows }).map((_, rowIndex) => (
               <tr key={rowIndex} className="border-b border-border">
                 {Array.from({ length: columns }).map((_, colIndex) => (
-                  <td key={colIndex} className="py-4 px-4">
+                  <td key={colIndex} className="py-6 px-6">
                     {colIndex === 0 ? (
                       <div className="flex items-center gap-3">
                         <Skeleton className="w-8 h-8 rounded-full" />

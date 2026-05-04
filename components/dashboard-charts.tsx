@@ -16,20 +16,21 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
 
   const data = useMemo<{ name: string; value: number; date?: Date }[]>(() => {
     if (dateRange?.from && dateRange?.to) {
+      // Pre-group payments by date for O(1) lookup
+      const paymentsByDate = new Map<string, number>()
+      store.payments.forEach(p => {
+        const dateStr = format(new Date(p.date), "yyyy-MM-dd")
+        paymentsByDate.set(dateStr, (paymentsByDate.get(dateStr) || 0) + p.amount)
+      })
+
       const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to })
         .filter(day => day.getDay() !== 0) // Remove Sundays
 
       return days.map(day => {
-        const total = store.payments.reduce((sum, p) => {
-          const pDate = new Date(p.date)
-          if (format(pDate, "yyyy-MM-dd") === format(day, "yyyy-MM-dd")) {
-            return sum + p.amount
-          }
-          return sum
-        }, 0)
+        const dateStr = format(day, "yyyy-MM-dd")
         return {
           name: format(day, "MMM dd"),
-          value: total,
+          value: paymentsByDate.get(dateStr) || 0,
           date: day
         }
       })
@@ -56,7 +57,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
   const maxValue = Math.max(...data.map(d => d.value), 1)
 
   return (
-    <Card className="p-6 md:col-span-2 glass-premium border-border h-full flex flex-col">
+    <Card className="p-4 md:p-6 glass-premium border-border h-full flex flex-col overflow-hidden">
       <div className="mb-6 flex justify-between items-start">
         <div>
           <h3 className="text-lg font-bold text-foreground">Revenue Trend</h3>
@@ -74,7 +75,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
         </div>
       </div>
 
-      <div className="flex-1 min-h-[300px] w-full pb-4 scrollbar-hide group/scroll">
+      <div className="flex-1 min-h-[300px] w-full pb-4 overflow-x-auto scrollbar-hide group/scroll">
         <div
           className="flex items-end justify-between gap-0.5 h-full pt-8 pb-2"
           style={{ minWidth: "100%" }}
@@ -122,12 +123,15 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
                   <div className="w-1 h-1 rounded-full bg-slate-800 mb-2" />
                 )}
 
-                <div className="h-6 flex items-center mt-2">
-                  {showLabel && (
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest italic group-hover:text-primary transition-colors">
-                      {item.name}
-                    </span>
-                  )}
+                <div className="h-6 w-full flex items-center justify-center mt-2 relative">
+                  <span className={cn(
+                    "text-[9px] whitespace-nowrap text-slate-500 font-black uppercase tracking-widest italic transition-all duration-300 absolute",
+                    "group-hover:text-primary group-hover:opacity-100 group-hover:translate-y-0",
+                    showLabel ? "opacity-100" : "opacity-0 -translate-y-1",
+                    "max-md:opacity-0 max-md:-translate-y-1 max-md:group-hover:opacity-100 max-md:group-hover:translate-y-0"
+                  )}>
+                    {item.name}
+                  </span>
                 </div>
               </div>
             );
@@ -188,7 +192,7 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
   const total = stats.reduce((acc, curr) => acc + curr.value, 0)
 
   return (
-    <Card className="p-6 glass-premium border-border h-full flex flex-col">
+    <Card className="p-4 md:p-6 glass-premium border-border h-full flex flex-col overflow-hidden">
       <div className="mb-6">
         <h3 className="text-lg font-bold text-foreground">Subscriptions</h3>
         <p className="text-sm text-muted-foreground">
@@ -349,17 +353,21 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
 
   const data = useMemo<{ name: string; value: number; date?: Date }[]>(() => {
     if (dateRange?.from && dateRange?.to) {
+      // Pre-group attendance by date for O(1) lookup
+      const attendanceByDate = new Map<string, number>()
+      store.attendance.forEach(att => {
+        const dateStr = format(new Date(att.date), "yyyy-MM-dd")
+        attendanceByDate.set(dateStr, (attendanceByDate.get(dateStr) || 0) + 1)
+      })
+
       const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to })
         .filter(day => day.getDay() !== 0) // Remove Sundays
 
       return days.map(day => {
-        const count = store.attendance.filter(att => {
-          const aDate = new Date(att.date)
-          return format(aDate, "yyyy-MM-dd") === format(day, "yyyy-MM-dd")
-        }).length
+        const dateStr = format(day, "yyyy-MM-dd")
         return {
           name: format(day, "MMM dd"),
-          value: count,
+          value: attendanceByDate.get(dateStr) || 0,
           date: day
         }
       })
@@ -387,7 +395,7 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
   const maxValue = Math.max(...data.map(d => d.value), 1)
 
   return (
-    <Card className="p-6 md:col-span-2 glass-premium border-border h-full flex flex-col">
+    <Card className="p-4 md:p-6 glass-premium border-border h-full flex flex-col overflow-hidden">
       <div className="mb-6 flex justify-between items-start">
         <div>
           <h3 className="text-lg font-bold text-foreground">Attendance</h3>
@@ -405,7 +413,7 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
         </div>
       </div>
 
-      <div className="flex-1 min-h-[300px] w-full pb-4 scrollbar-hide">
+      <div className="flex-1 min-h-[300px] w-full pb-4 overflow-x-auto scrollbar-hide">
         <div
           className="flex items-end justify-between gap-0.5 h-full pt-8 pb-2"
           style={{ minWidth: "100%" }}
@@ -453,12 +461,15 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
                   <div className="w-1 h-1 rounded-full bg-slate-800 mb-2" />
                 )}
 
-                <div className="h-6 flex items-center mt-2">
-                  {showLabel && (
-                    <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest italic group-hover:text-emerald-500 transition-colors">
-                      {item.name}
-                    </span>
-                  )}
+                <div className="h-6 w-full flex items-center justify-center mt-2 relative">
+                  <span className={cn(
+                    "text-[9px] whitespace-nowrap text-slate-500 font-black uppercase tracking-widest italic transition-all duration-300 absolute",
+                    "group-hover:text-emerald-500 group-hover:opacity-100 group-hover:translate-y-0",
+                    showLabel ? "opacity-100" : "opacity-0 -translate-y-1",
+                    "max-md:opacity-0 max-md:-translate-y-1 max-md:group-hover:opacity-100 max-md:group-hover:translate-y-0"
+                  )}>
+                    {item.name}
+                  </span>
                 </div>
               </div>
             );
