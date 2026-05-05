@@ -502,7 +502,7 @@ export default function MemberDetailPage({
                     <Mail className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex-1 truncate">
-                    <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Email</p>
+                    <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest leading-none mb-1">Email</p>
                     <div className="font-medium truncate font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-32 h-3" /> : member?.email}</div>
                   </div>
                 </div>
@@ -512,7 +512,7 @@ export default function MemberDetailPage({
                     <Phone className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Phone</p>
+                    <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest leading-none mb-1">Phone</p>
                     <div className="font-medium font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-24 h-3" /> : member?.phone}</div>
                   </div>
                 </div>
@@ -522,7 +522,7 @@ export default function MemberDetailPage({
                     <Calendar className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Joined</p>
+                    <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest leading-none mb-1">Joined</p>
                     <div className="font-medium font-mono text-[11px] font-bold">{isLoading ? <Skeleton className="w-24 h-3" /> : (member?.joinDate ? formatDate(member.joinDate) : "N/A")}</div>
                   </div>
                 </div>
@@ -531,7 +531,7 @@ export default function MemberDetailPage({
               {/* Assigned Coach Section */}
               {(isLoading || (member as any)?.trainerId) && (
                 <div className="mt-6 pt-6 border-t border-white/5">
-                  <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2 mb-4">
+                  <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-4">
                     <ShieldCheck className="w-3.5 h-3.5 text-primary" />
                     ASSIGNED COACH
                   </h3>
@@ -560,7 +560,7 @@ export default function MemberDetailPage({
           {/* Member Portal Access */}
           <Card className="glass-premium p-6 border-border dark:bg-slate-950/40 space-y-6">
             <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                 <Smartphone className="w-4 h-4 text-primary" />
                 MEMBER PORTAL
               </h3>
@@ -570,7 +570,7 @@ export default function MemberDetailPage({
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 rounded-xl bg-black/20 dark:bg-white/5 border border-white/5">
                 <div>
-                  <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Portal Access</p>
+                  <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest leading-none mb-1">Portal Access</p>
                   <div className={cn(
                     "text-[11px] font-bold uppercase",
                     member?.portalEnabled ? "text-emerald-500" : "text-slate-500"
@@ -590,7 +590,7 @@ export default function MemberDetailPage({
                     <Clock className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest italic leading-none mb-1">Last Portal Login</p>
+                    <p className="text-[10px] uppercase font-black text-slate-500 tracking-widest leading-none mb-1">Last Portal Login</p>
                     <div className="font-medium font-mono text-[11px] font-bold">
                       {member?.lastPortalLogin ? formatDate(member.lastPortalLogin) : "Never"}
                     </div>
@@ -615,7 +615,7 @@ export default function MemberDetailPage({
           {((session?.user as any)?.role !== 'trainer') && (
             <Card className="glass-premium p-6 border-border dark:bg-slate-950/40 space-y-6">
               <div className="flex flex-col gap-2">
-                <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                   <Clock className="w-4 h-4 text-primary" />
                   MANAGE SUBSCRIPTION
                 </h3>
@@ -625,7 +625,7 @@ export default function MemberDetailPage({
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 items-end gap-4">
                   <div className="space-y-2">
-                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1 ml-2 italic">Target Plan</label>
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1 ml-2">Target Plan</label>
                     <Select
                       value={selectedPlan}
                       onValueChange={(val) => setSelectedPlan(val)}
@@ -655,7 +655,7 @@ export default function MemberDetailPage({
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1 ml-2 italic">Payment Method</label>
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase pl-1 ml-2">Payment Method</label>
                     <Select
                       value={renewMethod}
                       onValueChange={(val) => setRenewMethod(val as any)}
@@ -752,7 +752,7 @@ export default function MemberDetailPage({
                 )}
 
                 {activeSub && (
-                  <p className="text-[11px] text-center text-muted-foreground italic">
+                  <p className="text-[11px] text-center text-muted-foreground">
                     New sub will start on {formatDate(activeSub.endDate)}
                   </p>
                 )}
@@ -762,7 +762,7 @@ export default function MemberDetailPage({
                   <div className="pt-4 border-t border-border/40 space-y-2">
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Renewal Period</span>
-                      <span className="font-bold text-primary italic uppercase tracking-tighter">{plans.find(p => p.id === selectedPlan)?.duration} Days</span>
+                      <span className="font-bold text-primary uppercase tracking-tighter">{plans.find(p => p.id === selectedPlan)?.duration} Days</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Base Price</span>
@@ -834,7 +834,7 @@ export default function MemberDetailPage({
               {/* Subscriptions History */}
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                  <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                     <History className="w-4 h-4 text-primary" />
                     MEMBERSHIP HISTORY
                   </h3>
@@ -916,7 +916,7 @@ export default function MemberDetailPage({
                     })
                   ) : (
                     <div className="p-12 text-center rounded-3xl border border-dashed bg-muted/20">
-                      <p className="text-muted-foreground text-sm italic">No subscription history found.</p>
+                      <p className="text-muted-foreground text-sm">No subscription history found.</p>
                     </div>
                   )}
                 </div>
@@ -925,7 +925,7 @@ export default function MemberDetailPage({
               {/* Payments History */}
               <div className="space-y-6 mt-8">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                  <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                     <CreditCard className="w-4 h-4 text-emerald-500" />
                     PAYMENT RECORDS
                   </h3>
@@ -937,12 +937,12 @@ export default function MemberDetailPage({
                     <table className="w-full text-[11px] font-bold tracking-widest uppercase">
                       <thead>
                         <tr className="border-b border-white/5 bg-white/[0.02]">
-                          <th className="px-6 py-6 font-black text-slate-500 italic text-left">Transaction ID</th>
-                          <th className="px-6 py-6 font-black text-slate-500 italic text-left">Date</th>
-                          <th className="px-6 py-6 font-black text-slate-500 italic text-left">Method</th>
-                          <th className="px-6 py-6 font-black text-slate-500 italic text-right relative min-w-[100px]">Amount</th>
+                          <th className="px-6 py-6 font-black text-slate-500 uppercase text-left">Transaction ID</th>
+                          <th className="px-6 py-6 font-black text-slate-500 uppercase text-left">Date</th>
+                          <th className="px-6 py-6 font-black text-slate-500 uppercase text-left">Method</th>
+                          <th className="px-6 py-6 font-black text-slate-500 uppercase text-right relative min-w-[100px]">Amount</th>
                           {((session?.user as any)?.role !== 'trainer') && (
-                            <th className="px-6 py-6 font-black text-slate-500 italic text-right text-slate-500 uppercase tracking-widest">Actions</th>
+                            <th className="px-6 py-6 font-black text-slate-500 uppercase text-right tracking-widest">Actions</th>
                           )}
                         </tr>
                       </thead>
@@ -968,7 +968,7 @@ export default function MemberDetailPage({
                               </td>
                               <td className="px-6 py-6 font-mono text-slate-400 text-[11px]">{formatDate(pay.date)}</td>
                               <td className="px-6 py-6">
-                                <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest uppercase">
+                                <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-lg text-[9px] font-black tracking-widest uppercase">
                                   {pay.method || "Cash"}
                                 </span>
                               </td>
@@ -1001,7 +1001,7 @@ export default function MemberDetailPage({
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                            <td colSpan={5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">
                               No payment history recorded for this member.
                             </td>
                           </tr>
@@ -1019,7 +1019,7 @@ export default function MemberDetailPage({
             ((member as any).trainerId?._id === (session?.user as any)?.id || (member as any).trainerId === (session?.user as any)?.id)) && (
               <div className="space-y-6 mt-8">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                  <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                     <Dumbbell className="w-4 h-4 text-primary" />
                     WORKOUT PLAN
                   </h3>
@@ -1276,7 +1276,7 @@ export default function MemberDetailPage({
       <Dialog open={isPortalModalOpen} onOpenChange={setIsPortalModalOpen}>
         <DialogContent className="max-w-md glass-premium border-border">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black italic tracking-tighter uppercase">
+            <DialogTitle className="text-xl font-black tracking-tighter uppercase">
               Portal <span className="text-primary">Management</span>
             </DialogTitle>
             <DialogDescription className="text-slate-400 text-xs font-bold uppercase tracking-wider">
@@ -1323,7 +1323,7 @@ export default function MemberDetailPage({
                 <Button 
                   type="button" 
                   variant="destructive" 
-                  className="sm:mr-auto h-11 px-6 rounded-xl font-black italic text-xs uppercase tracking-widest"
+                  className="sm:mr-auto h-11 px-6 rounded-xl font-black text-xs uppercase tracking-widest"
                   onClick={handleDisablePortal}
                   disabled={isPortalProcessing}
                 >
@@ -1336,13 +1336,13 @@ export default function MemberDetailPage({
                 variant="outline" 
                 type="button"
                 onClick={() => setIsPortalModalOpen(false)}
-                className="h-11 px-6 rounded-xl font-black italic text-xs uppercase tracking-widest border-white/5 bg-white/5"
+                className="h-11 px-6 rounded-xl font-black text-xs uppercase tracking-widest border-white/5 bg-white/5"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                className="h-11 px-6 rounded-xl font-black italic text-xs uppercase tracking-widest bg-primary text-black hover:bg-white shadow-lg shadow-primary/20"
+                className="h-11 px-6 rounded-xl font-black text-xs uppercase tracking-widest bg-primary text-black hover:bg-white shadow-lg shadow-primary/20"
                 disabled={isPortalProcessing}
               >
                 {isPortalProcessing ? (

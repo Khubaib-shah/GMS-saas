@@ -73,7 +73,7 @@ function SignupForm() {
           <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6 neon-glow">
             <Zap className="w-10 h-10 text-black" />
           </div>
-          <h2 className="text-3xl font-black italic text-white mb-2 uppercase tracking-tight">
+          <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">
             System <span className="text-primary">Signup</span>
           </h2>
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Start Your {planName} Journey</p>
@@ -138,7 +138,7 @@ function SignupForm() {
           <Button
             type="submit"
             disabled={loading}
-            className="md:col-span-2 bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all mt-4"
+            className="md:col-span-2 bg-primary text-black hover:bg-white py-6 h-auto font-black text-lg rounded-xl neon-glow transition-all mt-4"
           >
             {loading ? "INITIALIZING ACCOUNT..." : "START SUBSCRIPTION"}
             {!loading && <ArrowRight className="ml-2 w-5 h-5" />}
@@ -200,12 +200,12 @@ export default function SignupPage() {
             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center neon-glow">
               <Zap className="w-8 h-8 text-black" />
             </div>
-            <span className="text-4xl font-black italic tracking-tighter text-white uppercase">
+            <span className="text-4xl font-black tracking-tighter text-white uppercase">
               GYM<span className="text-primary neon-text">FLOW</span>
             </span>
           </div>
 
-          <h1 className="text-6xl font-black mb-6 italic text-white leading-[0.9] tracking-tighter uppercase">
+          <h1 className="text-6xl font-black mb-6 text-white leading-[0.9] tracking-tighter uppercase">
             Build Your <br />
             Legacy <br />
             <span className="text-primary neon-text">Today.</span>
@@ -234,7 +234,7 @@ export default function SignupPage() {
 
       {/* Right Side - Signup Form area */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10">
-        <Suspense fallback={<div className="text-primary font-black italic animate-pulse tracking-widest uppercase text-xs">Calibrating Signup Matrix...</div>}>
+        <Suspense fallback={<div className="text-primary font-black animate-pulse tracking-widest uppercase text-xs">Calibrating Signup Matrix...</div>}>
           <SignupForm />
         </Suspense>
       </div>

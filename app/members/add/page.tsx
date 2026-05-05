@@ -82,7 +82,7 @@ export default function AddMemberPage() {
       if (res.ok) {
         const data = await res.json();
         // Filter only trainers
-        setTrainers(data.filter((u: any) => u.role === 'trainer'));
+        setTrainers(data.filter((u: any) => u.role === "trainer"));
       }
     } catch (error) {
       console.error("Failed to fetch trainers");
@@ -123,7 +123,10 @@ export default function AddMemberPage() {
       if (!payload.email) delete payload.email;
       if (!payload.phone) delete payload.phone;
       if (!payload.notes) delete payload.notes;
-      console.log("[AddMember] Submitting payload:", { ...payload, photoBase64: payload.photoBase64 ? "[BASE64_IMAGE]" : null });
+      console.log("[AddMember] Submitting payload:", {
+        ...payload,
+        photoBase64: payload.photoBase64 ? "[BASE64_IMAGE]" : null,
+      });
 
       const newMember = await store.addMember(payload);
 
@@ -137,7 +140,11 @@ export default function AddMemberPage() {
       // Create a subscription for the member
       const plan = store.plans.find((p) => p.id === formData.planId);
       if (plan) {
-        await store.renewSubscription(newMember.id, formData.planId, plan.duration);
+        await store.renewSubscription(
+          newMember.id,
+          formData.planId,
+          plan.duration,
+        );
       }
 
       toast.success("Member added successfully!");
@@ -151,37 +158,39 @@ export default function AddMemberPage() {
   };
 
   return (
-    <div className="space-y-10 animate-fade-up">
-      {/* HUD HEADER */}
-      <div className="flex items-center justify-between mb-8 relative">
+    <div className="space-y-4 md:space-y-10 animate-fade-up">
+      <div className="flex flex-col gap-4 md:flex-row items-center justify-between md:mb-8 relative">
         <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
         <div>
           <div className="flex items-center gap-4 mb-2">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">NEW MEMBER REGISTRATION</span>
+            <span className="text-[10px] font-bold md:font-black text-slate-500 tracking-[0.4em] leading-none">
+              NEW MEMBER REGISTRATION
+            </span>
             <div className="h-px w-24 bg-black/5 dark:bg-white/5"></div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
+          <h1 className="text-3xl md:text-6xl font-black text-foreground tracking-tighter uppercase leading-none">
             ADD <span className="text-primary neon-text">MEMBER</span>
           </h1>
-          <div className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+          <div className="text-slate-500 font-bold md:font-bold uppercase tracking-widest text-[10px] md:mt-4 flex items-center gap-2">
             Please fill out the form below to add a new member.
           </div>
         </div>
         <Link
           href="/members"
-          className="h-12 px-6 rounded-xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 flex items-center gap-3 text-[10px] font-black text-slate-400 hover:text-foreground hover:bg-black/10 dark:hover:bg-white/10 uppercase tracking-widest transition-all italic"
+          className="ml-auto md:ml-0 h-10 px-2 md:px-6 md:h-12 rounded-xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 flex items-center md:gap-3 text-[10px] font-normal md:font-black text-slate-400 hover:text-foreground hover:bg-black/10 dark:hover:bg-white/10 uppercase tracking-widest transition-all"
         >
           <ChevronLeft className="w-4 h-4" />
           Cancel
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-12 items-start">
         {/* LEFT: MEMBER DETAILS FORM */}
-        <div className="glass-premium p-8 border-border dark:bg-slate-950/40 space-y-8">
+        <div className="glass-premium p-4 md:p-8 border-border dark:bg-slate-950/40 space-y-8">
           <div className="flex items-center gap-4 mb-2">
-            <h2 className="text-xl font-black italic tracking-tighter text-foreground uppercase">Member Details</h2>
+            <h2 className="text-xl font-black tracking-tighter text-foreground uppercase">
+              Member Details
+            </h2>
             <div className="h-px flex-1 bg-white/5"></div>
           </div>
 
@@ -195,7 +204,10 @@ export default function AddMemberPage() {
                 validateType="text"
                 accept="image/*"
                 hideLabel={true}
-                onChange={(_, e) => e && handlePhotoChange(e as React.ChangeEvent<HTMLInputElement>)}
+                onChange={(_, e) =>
+                  e &&
+                  handlePhotoChange(e as React.ChangeEvent<HTMLInputElement>)
+                }
                 className="hidden"
               />
               <div
@@ -212,7 +224,7 @@ export default function AddMemberPage() {
                       />
                       <div className="absolute inset-0 border-2 border-primary/20 rounded-2xl pointer-events-none group-hover:border-primary/50 transition-all"></div>
                     </div>
-                    <p className="text-[10px] font-black text-primary uppercase tracking-widest italic animate-pulse">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">
                       Update Photo
                     </p>
                   </div>
@@ -221,7 +233,7 @@ export default function AddMemberPage() {
                     <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                       <Upload className="w-6 h-6 text-slate-500 group-hover:text-primary transition-colors" />
                     </div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic group-hover:text-slate-300 transition-colors">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] group-hover:text-slate-300 transition-colors">
                       Click or drag to upload photo
                     </p>
                   </div>
@@ -238,18 +250,14 @@ export default function AddMemberPage() {
                 validateType="name"
                 placeholder="EX: JOHN"
                 value={formData.firstName}
-                onChange={(val) =>
-                  setFormData({ ...formData, firstName: val })
-                }
+                onChange={(val) => setFormData({ ...formData, firstName: val })}
                 required
               />
               <InputField
                 label="Last Name"
                 placeholder="EX: DOE"
                 value={formData.lastName}
-                onChange={(val) =>
-                  setFormData({ ...formData, lastName: val })
-                }
+                onChange={(val) => setFormData({ ...formData, lastName: val })}
               />
             </div>
 
@@ -260,9 +268,7 @@ export default function AddMemberPage() {
                 validateType="email"
                 placeholder="user@example.com"
                 value={formData.email}
-                onChange={(val) =>
-                  setFormData({ ...formData, email: val })
-                }
+                onChange={(val) => setFormData({ ...formData, email: val })}
                 required
               />
               <InputField
@@ -270,17 +276,14 @@ export default function AddMemberPage() {
                 validateType="phone"
                 placeholder="+92 XXX XXXXXXX"
                 value={formData.phone}
-                onChange={(val) =>
-                  setFormData({ ...formData, phone: val })
-                }
+                onChange={(val) => setFormData({ ...formData, phone: val })}
               />
             </div>
 
             {/* Gender Plan & Assign Trainner */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
               <Field>
-                <FieldLabel className="mb-1 italic text-slate-500 ml-2">
+                <FieldLabel className="mb-1 text-slate-500 ml-2">
                   Gender
                 </FieldLabel>
                 <Select
@@ -296,15 +299,30 @@ export default function AddMemberPage() {
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-white/10">
-                    <SelectItem value="male" className="text-[10px] font-bold uppercase tracking-widest">MALE</SelectItem>
-                    <SelectItem value="female" className="text-[10px] font-bold uppercase tracking-widest">FEMALE</SelectItem>
-                    <SelectItem value="other" className="text-[10px] font-bold uppercase tracking-widest">OTHER</SelectItem>
+                    <SelectItem
+                      value="male"
+                      className="text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      MALE
+                    </SelectItem>
+                    <SelectItem
+                      value="female"
+                      className="text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      FEMALE
+                    </SelectItem>
+                    <SelectItem
+                      value="other"
+                      className="text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      OTHER
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
 
               <Field>
-                <FieldLabel className="mb-1 italic text-slate-500 ml-2">
+                <FieldLabel className="mb-1 text-slate-500 ml-2">
                   Membership Plan <span className="text-primary">*</span>
                 </FieldLabel>
                 <Select
@@ -318,7 +336,11 @@ export default function AddMemberPage() {
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-white/10">
                     {store.plans.map((plan) => (
-                      <SelectItem key={plan.id} value={plan.id} className="text-[10px] font-bold uppercase tracking-widest">
+                      <SelectItem
+                        key={plan.id}
+                        value={plan.id}
+                        className="text-[10px] font-bold uppercase tracking-widest"
+                      >
                         {plan.name.toUpperCase()} - Rs {plan.price}
                       </SelectItem>
                     ))}
@@ -327,22 +349,34 @@ export default function AddMemberPage() {
               </Field>
 
               <Field>
-                <FieldLabel className="mb-1 italic text-slate-500 ml-2">
+                <FieldLabel className="mb-1 text-slate-500 ml-2">
                   Assign Trainer
                 </FieldLabel>
                 <Select
                   value={formData.trainerId || "__none__"}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, trainerId: value === "__none__" ? "" : value })
+                    setFormData({
+                      ...formData,
+                      trainerId: value === "__none__" ? "" : value,
+                    })
                   }
                 >
                   <SelectTrigger className="w-full !h-12 px-6 rounded-md border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                     <SelectValue placeholder="Select trainer" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-white/10">
-                    <SelectItem value="__none__" className="text-[10px] font-bold uppercase tracking-widest">NO TRAINER ASSIGNED</SelectItem>
+                    <SelectItem
+                      value="__none__"
+                      className="text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      NO TRAINER ASSIGNED
+                    </SelectItem>
                     {trainers.map((trainer) => (
-                      <SelectItem key={trainer._id || trainer.id} value={trainer._id || trainer.id} className="text-[10px] font-bold uppercase tracking-widest">
+                      <SelectItem
+                        key={trainer._id || trainer.id}
+                        value={trainer._id || trainer.id}
+                        className="text-[10px] font-bold uppercase tracking-widest"
+                      >
                         {trainer.fullName.toUpperCase()}
                       </SelectItem>
                     ))}
@@ -353,7 +387,7 @@ export default function AddMemberPage() {
 
             {/* Notes */}
             <Field>
-              <FieldLabel className="italic text-slate-500 ml-2">
+              <FieldLabel className=" text-slate-500 ml-2">
                 Additional Notes
               </FieldLabel>
               <textarea
@@ -371,9 +405,11 @@ export default function AddMemberPage() {
               <Button
                 type="submit"
                 disabled={loading || !formData.firstName}
-                className="flex-1 h-11 bg-primary text-black hover:bg-white font-black italic tracking-tighter text-lg rounded-lg transition-all uppercase neon-glow z-20 group"
+                className="flex-1 h-11 bg-primary text-black hover:bg-white font-black tracking-tighter text-lg rounded-lg transition-all uppercase neon-glow z-20 group"
               >
-                {loading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
+                {loading ? (
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                ) : null}
                 {loading ? "Saving..." : "Add Member"}
               </Button>
             </div>
@@ -381,26 +417,33 @@ export default function AddMemberPage() {
         </div>
 
         {/* RIGHT: MEMBER PREVIEW */}
-        <div className="space-y-8 sticky top-[94px]">
+        <div className="space-y-4 md:space-y-8 sticky top-[94px]">
           {/* Preview Card */}
-          <div className="bento-item p-1 border-primary/20 relative overflow-hidden group">
+          <div className="bento-item border-primary/20 relative overflow-hidden group">
             {/* Background HUD elements */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:bg-primary/10 transition-all duration-700"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -ml-32 -mb-32"></div>
 
-            <div className="relative p-8 space-y-8 glass-premium border-border dark:bg-slate-950/90 rounded-2xl overflow-hidden">
-            
+            <div className="relative p-4 md:p-8 space-y-4 md:space-y-8 glass-premium border-border dark:bg-slate-950/90 rounded-2xl overflow-hidden">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic block">Live Preview</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] block">
+                      Live Preview
+                    </span>
                   </div>
-                  <h3 className="text-4xl font-black italic tracking-tighter text-foreground uppercase break-all leading-none">
-                    {formData.firstName || "---"}_<span className="text-primary">{formData.lastName || "---"}</span>
+                  <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-foreground uppercase break-all leading-none">
+                    {formData.firstName || "---"}_
+                    <span className="text-primary">
+                      {formData.lastName || "---"}
+                    </span>
                   </h3>
                   <div className="flex items-center gap-2 text-[8px] font-bold text-slate-500 uppercase tracking-widest">
-                    <span>ID: GF-{Math.random().toString(36).substr(2, 6).toUpperCase()}</span>
+                    <span>
+                      ID: GF-
+                      {Math.random().toString(36).substr(2, 6).toUpperCase()}
+                    </span>
                     <span className="w-1 h-1 bg-slate-800 rounded-full"></span>
                     <span>{new Date().toLocaleTimeString()}</span>
                   </div>
@@ -413,7 +456,7 @@ export default function AddMemberPage() {
                   {/* Outer Orbitals */}
                   <div className="absolute inset-0 border border-primary/10 rounded-full animate-spin-slow"></div>
                   <div className="absolute inset-2 border-t-2 border-primary/40 rounded-full animate-reverse-spin-slow"></div>
-                  
+
                   {/* Viewfinder Brackets */}
                   <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-primary group-hover:scale-110 transition-transform duration-500"></div>
                   <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-primary group-hover:scale-110 transition-transform duration-500"></div>
@@ -422,25 +465,43 @@ export default function AddMemberPage() {
 
                   <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-slate-900 shadow-[0_0_50px_rgba(76,255,0,0.1)] relative z-10 bg-slate-950 flex items-center justify-center">
                     {photoPreview ? (
-                      <img src={photoPreview || "/placeholder.svg"} className="w-full h-full object-cover grayscale brightness-110 contrast-125" alt="HUD Preview" />
+                      <img
+                        src={photoPreview || "/placeholder.svg"}
+                        className="w-full h-full object-cover grayscale brightness-110 contrast-125"
+                        alt="HUD Preview"
+                      />
                     ) : (
                       <div className="flex flex-col items-center gap-2">
                         <Users className="w-16 h-16 text-slate-800" />
-                        <span className="text-[8px] font-black text-slate-700 tracking-[0.3em] uppercase">No Signal</span>
+                        <span className="text-[8px] font-black text-slate-700 tracking-[0.3em] uppercase">
+                          No Signal
+                        </span>
                       </div>
                     )}
-                    
+
                     {/* HUD Overlays */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                     <div className="absolute inset-0 border-[20px] border-black/20 rounded-full pointer-events-none"></div>
-                    
+
                     {/* Scanning Overlay */}
                     <div className="absolute inset-0 bg-[radial-gradient(circle,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
                     <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-primary/40 animate-scan pointer-events-none shadow-[0_0_15px_rgba(76,255,0,0.5)]"></div>
-                    
+
                     {/* Circular Stats HUD */}
-                    <svg className="absolute inset-0 w-full h-full -rotate-90 opacity-30" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-primary" strokeDasharray="4 4" />
+                    <svg
+                      className="absolute inset-0 w-full h-full -rotate-90 opacity-30"
+                      viewBox="0 0 100 100"
+                    >
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="48"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="0.5"
+                        className="text-primary"
+                        strokeDasharray="4 4"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -452,7 +513,9 @@ export default function AddMemberPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-1 h-3 bg-primary/50"></div>
-                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic block">Contact Node</span>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block">
+                        Contact Node
+                      </span>
                     </div>
                     <p className="text-xs font-bold text-slate-400 tracking-widest truncate flex items-center gap-2">
                       <span className="w-1 h-1 bg-primary/30 rounded-full"></span>
@@ -468,7 +531,9 @@ export default function AddMemberPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-1 h-3 bg-primary/50"></div>
-                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic block">Registry Info</span>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block">
+                        Registry Info
+                      </span>
                     </div>
                     <p className="text-xs font-bold text-slate-400 tracking-widest uppercase flex items-center gap-2">
                       <span className="w-1 h-1 bg-primary/30 rounded-full"></span>
@@ -476,7 +541,10 @@ export default function AddMemberPage() {
                     </p>
                     <p className="text-xs font-bold text-slate-400 tracking-widest mt-1 uppercase flex items-center gap-2 truncate">
                       <span className="w-1 h-1 bg-primary/30 rounded-full"></span>
-                      {(formData.planId && store.plans.find(p => p.id === formData.planId)?.name) || "NO PLAN"}
+                      {(formData.planId &&
+                        store.plans.find((p) => p.id === formData.planId)
+                          ?.name) ||
+                        "NO PLAN"}
                     </p>
                   </div>
                 </div>
@@ -487,13 +555,18 @@ export default function AddMemberPage() {
                 <div className="absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover/status:translate-x-[100%] transition-transform duration-1000"></div>
                 <div className="flex justify-between items-end mb-3">
                   <div className="space-y-1">
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Profile Completion</span>
-                    <div className="text-lg font-black italic text-foreground leading-none">
-                      {Math.round(progress)}<span className="text-primary">%</span>
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                      Profile Completion
+                    </span>
+                    <div className="text-lg font-black text-foreground leading-none">
+                      {Math.round(progress)}
+                      <span className="text-primary">%</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-[9px] font-black text-primary uppercase tracking-widest italic animate-pulse">System Secured</span>
+                    <span className="text-[9px] font-black text-primary uppercase tracking-widest animate-pulse">
+                      System Secured
+                    </span>
                   </div>
                 </div>
                 <div className="h-1.5 w-full bg-slate-900/50 rounded-full overflow-hidden p-[1px]">
@@ -512,11 +585,15 @@ export default function AddMemberPage() {
           {/* Information Box */}
           <div className="bento-item p-6 bg-primary/5 border-primary/20 space-y-4">
             <div className="flex gap-4 items-start">
-              <AlertCircle className="w-5 h-5 text-primary mt-1" />
+              <AlertCircle className="hidden md:block w-5 h-5 text-primary mt-1" />
               <div>
-                <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">Privacy Notice</h4>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed mt-1">
-                  Please ensure all member details are accurate before proceeding. Member information is stored securely according to privacy standards.
+                <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">
+                  Privacy Notice
+                </h4>
+                <p className="text-[10px] text-slate-400 font-normal md:font-bold uppercase tracking-wider leading-relaxed md:mt-1">
+                  Please ensure all member details are accurate before
+                  proceeding. Member information is stored securely according to
+                  privacy standards.
                 </p>
               </div>
             </div>

@@ -62,7 +62,7 @@ export function Sidebar() {
                 <Building2 className="w-6 h-6 text-black" />
               </div>
               {(!sidebarCollapsed || mobileMenuOpen) && (
-                <span className="font-black text-xl tracking-tighter italic text-white animate-in fade-in slide-in-from-left-2 duration-300">
+                <span className="font-black text-xl tracking-tighter text-white animate-in fade-in slide-in-from-left-2 duration-300">
                   GYM<span className="text-primary">FLOW</span>
                 </span>
               )}

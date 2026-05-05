@@ -162,7 +162,7 @@ export function Navbar() {
         {!isAdmin && (
           <div className="flex items-center gap-2 px-3 md:px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 neon-glow overflow-hidden">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse flex-shrink-0" />
-            <span className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest italic truncate max-w-[80px] md:max-w-none">{gymName}</span>
+            <span className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest truncate max-w-[80px] md:max-w-none">{gymName}</span>
           </div>
         )}
         {/* Search Bar - Subtler */}
@@ -283,7 +283,7 @@ export function Navbar() {
           <DropdownMenuTrigger asChild>
             <div data-tour="navbar-profile" className="flex items-center gap-3 pl-2 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-xl transition-all group">
               <div className="text-right hidden sm:block">
-                <p className="text-xs font-black text-foreground uppercase tracking-wider italic leading-none">{userName}</p>
+                <p className="text-xs font-black text-foreground uppercase tracking-wider leading-none">{userName}</p>
                 <p className="text-[9px] text-primary mt-1 uppercase font-black tracking-[0.15em]">{userRole.replace("_", " ")}</p>
               </div>
               <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-black text-sm neon-glow group-hover:scale-105 transition-transform">
@@ -299,7 +299,7 @@ export function Navbar() {
             <DropdownMenuSeparator className="bg-white/5" />
             <DropdownMenuItem
               onClick={() => router.push("/settings")}
-              className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
+              className="rounded-lg text-[10px] font-black uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
             >
               <User className="w-4 h-4" />
               My Profile
@@ -307,7 +307,7 @@ export function Navbar() {
             {!isTrainer && (
               <DropdownMenuItem
                 onClick={() => router.push("/settings")}
-                className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
+                className="rounded-lg text-[10px] font-black uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
               >
                 <SettingsIcon className="w-4 h-4" />
                 Gym Configuration
@@ -315,7 +315,7 @@ export function Navbar() {
             )}
             <DropdownMenuItem
               onClick={() => router.push("/security")}
-              className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
+              className="rounded-lg text-[10px] font-black uppercase tracking-widest gap-3 py-2.5 focus:bg-primary focus:text-black"
             >
               <ShieldCheck className="w-4 h-4" />
               Security Settings
@@ -323,7 +323,7 @@ export function Navbar() {
             <DropdownMenuSeparator className="bg-white/5" />
             <DropdownMenuItem
               onClick={() => signOut({ callbackUrl: "/login" })}
-              className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-2.5 focus:bg-red-500 focus:text-white"
+              className="rounded-lg text-[10px] font-black uppercase tracking-widest gap-3 py-2.5 focus:bg-red-500 focus:text-white"
             >
               <LogOut className="w-4 h-4" />
               Logout

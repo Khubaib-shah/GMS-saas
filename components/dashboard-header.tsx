@@ -34,7 +34,7 @@ export function DashboardHeader({
         <div>
           {subtitle && (
             <div className="flex items-center gap-4 md:mb-2">
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic whitespace-nowrap">
+              <span className="text-[10px] font-medium md:font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">
                 {subtitle}
               </span>
               <div className="h-px flex-1 md:w-24 bg-white/5"></div>
@@ -45,7 +45,7 @@ export function DashboardHeader({
               <div className="h-px w-24 bg-white/5"></div>
             </div>
           )}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-tight md:leading-none">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tighter uppercase leading-tight md:leading-none">
             {title} {highlight && <span className="text-primary neon-text">{highlight}</span>}
           </h1>
           {description && (

@@ -151,11 +151,9 @@ export function AttendanceScanner() {
   // Update UI to include Flip Camera button
   return (
     <div className="glass-premium space-y-4 p-4 border rounded-lg bg-card">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Scan className="w-5 h-5" /> Quick Scan
-        </h3>
-        <div className="flex gap-2">
+      <div className="flex flex-col md:flex-row justify-start md:justify-between items-start md:items-center gap-2 mb-2">
+        <h3 className="text-sm md:text-lg font-normal md:font-semibold  tracking-widest">Quick Scan</h3>
+        <div className="flex ml-auto gap-2">
           <Button
             variant={useCamera ? "default" : "outline"}
             size="sm"
@@ -179,7 +177,7 @@ export function AttendanceScanner() {
           checked={isCheckout}
           onCheckedChange={(checked) => setIsCheckout(checked as boolean)}
         />
-        <Label htmlFor="scanner-checkout-mode">Mark as Check-out</Label>
+        <Label htmlFor="scanner-checkout-mode" className="font-normal md:font-semibold">Mark as Check-out</Label>
       </div>
 
       {useCamera ? (
@@ -234,7 +232,7 @@ export function AttendanceScanner() {
               {loading ? "..." : "Enter"}
             </Button>
           </form>
-          <div className="flex justify-between mt-2">
+          <div className="flex flex-col md:flex-row justify-between mt-2">
             <p className="text-xs text-muted-foreground mt-2">
               {useCamera
                 ? "Allow camera access when prompted."
@@ -243,6 +241,7 @@ export function AttendanceScanner() {
             <Button
               variant="ghost"
               size="sm"
+              className="ml-auto"
               onClick={() => inputRef.current?.focus()}
             >
               <RotateCcw className="w-4 h-4 mr-1" /> Refocus Input

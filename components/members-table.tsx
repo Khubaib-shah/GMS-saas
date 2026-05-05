@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PremiumButton } from "@/components/ui/premium-button";
+import { LucideEye } from "lucide-react";
 
 export function MembersTable({ 
   trainerOnly = false, 
@@ -100,23 +101,23 @@ export function MembersTable({
   }, [relevantMembers, store.subscriptions, store.searchQuery, mode]);
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-slate-950/20 backdrop-blur-xl overflow-hidden relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/10 after:to-transparent">
+    <div className="glass-premium bg-card rounded-2xl border border-white/5 overflow-hidden relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/10 after:to-transparent">
       <Table className="!text-xs md:text-sm">
         <TableHeader className="bg-white/[0.02]">
           <TableRow className="border-b border-white/5 hover:bg-transparent [&_th]:py-3 [&_th]:md:py-6 [&_th]:px-3 [&_th]:md:px-6">
-            <TableHead className="text-left font-black text-slate-500 italic uppercase tracking-[0.2em] text-[11px] h-auto">
+            <TableHead className="text-left font-medium md:font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
               Member Name
             </TableHead>
-            <TableHead className="hidden lg:table-cell text-left font-black text-slate-500 italic uppercase tracking-[0.2em] text-[11px] h-auto">
+            <TableHead className="hidden lg:table-cell text-left font-medium md:font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
               Join Date
             </TableHead>
-            <TableHead className="hidden sm:table-cell text-left font-black text-slate-500 italic uppercase tracking-[0.2em] text-[11px] h-auto">
+            <TableHead className="hidden sm:table-cell text-left font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
               Renewal Date
             </TableHead>
-            <TableHead className="text-left font-black text-slate-500 italic uppercase tracking-[0.2em] text-[11px] h-auto">
+            <TableHead className="text-left font-medium md:font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
               Status
             </TableHead>
-            <TableHead className="text-center font-black text-slate-500 italic uppercase tracking-[0.2em] text-[11px] h-auto">
+            <TableHead className="text-center font-medium md:font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
               Action
             </TableHead>
           </TableRow>
@@ -126,9 +127,9 @@ export function MembersTable({
             displayMembers.map((item) => (
               <TableRow
                 key={item.member.id}
-                className="[&_td]:py-3 [&_td]:md:py-6 [&_td]:px-3 [&_td]:md:px-6 border-white/5 hover:bg-white/[0.02] transition-colors group/row"
+                className="[&_td]:py-2 [&_td]:md:py-6 [&_td]:px-3 [&_td]:md:px-6 border-white/5 hover:bg-white/[0.02] transition-colors group/row"
               >
-                <TableCell className="font-black italic tracking-tighter text-base">
+                <TableCell className="font-medium md:font-black  tracking-tighter text-base">
                   {item.member.firstName} {item.member.lastName || ""}
                 </TableCell>
                 <TableCell className="hidden lg:table-cell text-slate-500 font-mono text-[10px] uppercase">
@@ -139,13 +140,13 @@ export function MembersTable({
                     ? formatDate(item.subscription.endDate)
                     : "—"}
                 </TableCell>
-                <TableCell>
+                <TableCell className="flex justify-center items-center md:block">
                   <StatusBadge status={item.status as any} />
                 </TableCell>
                 <TableCell className="text-center">
                   <Link href={`/members/${item.member.id}`}>
                     <PremiumButton>
-                      {trainerOnly ? "View" : "Renew"}
+                      {trainerOnly ? "View" : <div className="flex items-center gap-2"><span className="md:hidden"><LucideEye/></span><span className="hidden md:block">Renew</span></div>}
                     </PremiumButton>
                   </Link>
                 </TableCell>
@@ -155,7 +156,7 @@ export function MembersTable({
             <TableRow>
               <TableCell
                 colSpan={5}
-                className="py-8 text-center text-[10px] font-black italic uppercase tracking-widest text-slate-500"
+                className="py-8 text-center text-[10px] font-black uppercase tracking-widest text-slate-500"
               >
                 No members found.
               </TableCell>

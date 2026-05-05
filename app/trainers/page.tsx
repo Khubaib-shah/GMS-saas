@@ -52,7 +52,7 @@ export default function TrainersPage() {
 
 
   return (
-    <div className="space-y-10 animate-fade-up">
+    <div className="space-y-4 md:space-y-10 animate-fade-up">
       <DashboardHeader
         title="Our"
         highlight="Trainers"
@@ -61,10 +61,10 @@ export default function TrainersPage() {
       />
 
       {/* Search & Filter HUD */}
-      <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-10 backdrop-blur-md">
+      <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-4 md:mb-10 backdrop-blur-md">
         <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
           <Filter className="w-3.5 h-3.5 text-primary/50" />
-          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+          <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
             Filter
           </span>
         </div>
@@ -77,14 +77,14 @@ export default function TrainersPage() {
             value={search}
             onChange={(val) => setSearch(val)}
             leadingIcon={<Search className="w-4 h-4" />}
-            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all focus:border-none focus:ring-0"
             containerClassName="w-full"
           />
         </div>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="glass-premium p-8 border-border dark:bg-slate-950/40 animate-pulse flex flex-col items-center">
               <div className="w-24 h-24 rounded-2xl bg-white/5 mb-6" />
@@ -109,19 +109,19 @@ export default function TrainersPage() {
           <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
             <User className="w-8 h-8 text-slate-700" />
           </div>
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-relaxed">
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] leading-relaxed">
             No trainers found<br />
             <span className="text-[8px] tracking-widest mt-2 block opacity-60">Add staff with the "Trainer" role in Settings</span>
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
           {filteredTrainers.map((trainer) => (
-            <div key={trainer._id} className="glass-premium p-8 border-border dark:bg-slate-950/40 transition-all flex flex-col items-center text-center">
-              <div className="relative mb-6">
-                <Avatar className="w-24 h-24 transition-transform">
+            <div key={trainer._id} className="glass-premium p-6 md:p-8 border-border dark:bg-slate-950/40 transition-all flex flex-col items-center text-center group/card">
+              <div className="relative mb-4 md:mb-6">
+                <Avatar className="w-20 h-20 md:w-24 md:h-24 transition-transform group-hover/card:scale-105">
                   <AvatarImage src={trainer.photo} alt={trainer.fullName} className="object-cover" />
-                  <AvatarFallback className="text-2xl font-black italic bg-primary/10 text-primary">
+                  <AvatarFallback className="text-xl md:text-2xl font-black bg-primary/10 text-primary">
                     {trainer.fullName
                       .split(" ")
                       .map((n) => n[0])
@@ -129,63 +129,63 @@ export default function TrainersPage() {
                       .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-2 -right-2 bg-primary text-black p-1.5 rounded-lg shadow-lg">
-                  <Award className="w-4 h-4" />
+                <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 bg-primary text-black p-1.5 rounded-lg shadow-lg">
+                  <Award className="w-3 h-3 md:w-4 md:h-4" />
                 </div>
               </div>
 
-              <h3 className="text-xl font-black italic tracking-tighter text-foreground uppercase mb-1">
+              <h3 className="text-lg md:text-xl font-medium md:font-black tracking-tighter text-foreground uppercase mb-1">
                 {trainer.fullName}
               </h3>
 
-              <div className="flex items-center gap-2 text-[10px] font-black tracking-widest text-slate-500 uppercase italic mb-6">
+              <div className="flex items-center gap-2 text-[9px] md:text-[10px] font-black tracking-widest text-slate-500 uppercase mb-4 md:mb-6">
                 <Mail className="w-3 h-3 text-primary/50" />
-                {trainer.email}
+                <span className="truncate max-w-[150px] md:max-w-none">{trainer.email}</span>
               </div>
 
               {trainer.bio && (
-                <p className="text-xs text-slate-400 font-medium leading-relaxed italic line-clamp-3 mb-8 px-2">
+                <p className="text-[11px] md:text-xs text-slate-400 font-medium leading-relaxed line-clamp-2 md:line-clamp-3 mb-6 md:mb-8 px-2">
                   "{trainer.bio}"
                 </p>
               )}
 
-              <div className="flex flex-wrap gap-2 justify-center mb-8">
+              <div className="flex flex-wrap gap-1.5 md:gap-2 justify-center mb-6 md:mb-8">
                 {trainer.specialties?.slice(0, 3).map((spec, i) => (
-                  <Badge key={i} className="bg-primary/5 text-primary border-primary/20 text-[9px] font-black italic tracking-widest uppercase px-3 py-1">
+                  <Badge key={i} className="bg-primary/5 text-primary border-primary/20 text-[8px] md:text-[9px] font-black tracking-widest uppercase px-2 md:px-3 py-0.5 md:py-1">
                     {spec}
                   </Badge>
                 ))}
                 {trainer.specialties && trainer.specialties.length > 3 && (
-                  <Badge className="bg-white/5 text-slate-500 border-white/10 text-[9px] font-black italic tracking-widest uppercase px-3 py-1">
+                  <Badge className="bg-white/5 text-slate-500 border-white/10 text-[8px] md:text-[9px] font-black tracking-widest uppercase px-2 md:px-3 py-0.5 md:py-1">
                     +{trainer.specialties.length - 3}
                   </Badge>
                 )}
               </div>
 
               {/* Stats Box */}
-              <div className="w-full grid grid-cols-2 gap-4 mt-auto">
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center">
-                  <Users className="w-4 h-4 text-primary mb-1" />
-                  <span className="font-black italic tracking-tighter text-lg">{trainer.memberCount || 0}</span>
-                  <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Clients</span>
+              <div className="w-full grid grid-cols-2 gap-3 md:gap-4 mt-auto">
+                <div className="p-3 md:p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center">
+                  <Users className="w-3.5 h-3.5 text-primary mb-1" />
+                  <span className="font-medium md:font-black tracking-tighter text-base md:text-lg">{trainer.memberCount || 0}</span>
+                  <span className="text-[7px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest">Clients</span>
                 </div>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center">
-                  <ShieldAlert className="w-4 h-4 text-slate-500 mb-1" />
-                  <span className="font-black italic tracking-tighter text-lg">PRO</span>
-                  <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Level</span>
+                <div className="p-3 md:p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center">
+                  <ShieldAlert className="w-3.5 h-3.5 text-slate-500 mb-1" />
+                  <span className="font-medium md:font-black tracking-tighter text-base md:text-lg">PRO</span>
+                  <span className="text-[7px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest">Level</span>
                 </div>
               </div>
 
-              <div className="w-full mt-8">
+              <div className="w-full mt-6 md:mt-8">
                 <Link href={`/trainers/${trainer._id}`} className="block">
-                  <button className="group relative w-full h-12 bg-white/5 border border-white/10 text-white font-black italic text-[10px] tracking-widest uppercase rounded-xl overflow-hidden transition-all">
-                    {/* Expanding background icon container - now using app primary color */}
-                    <div className="absolute right-1.5 top-1.5 h-9 w-9 bg-primary rounded-lg flex items-center justify-center transition-all duration-300 group-hover:w-[calc(100%-12px)] shadow-[0_0_20px_rgba(var(--primary),0.3)] z-10">
+                  <button className="group relative w-full h-11 md:h-12 bg-white/5 border border-white/10 text-white font-medium md:font-black text-[9px] md:text-[10px] tracking-widest uppercase rounded-xl overflow-hidden transition-all">
+                    {/* Expanding background icon container */}
+                    <div className="absolute right-1.5 top-1.5 h-8 w-8 md:h-9 md:w-9 bg-primary rounded-lg flex items-center justify-center transition-all duration-300 group-hover:w-[calc(100%-12px)] shadow-[0_0_20px_rgba(var(--primary),0.3)] z-10">
                       <ArrowRight className="w-4 h-4 text-black transition-transform duration-300 group-hover:translate-x-1" />
                     </div>
 
                     {/* Button Text */}
-                    <span className="relative z-20 pl-6 pr-12 flex items-center h-full transition-colors duration-300 group-hover:text-black">
+                    <span className="relative z-20 pl-4 md:pl-6 pr-10 md:pr-12 flex items-center h-full transition-colors duration-300 group-hover:text-black">
                       View Profile
                     </span>
                   </button>

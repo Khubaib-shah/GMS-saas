@@ -30,14 +30,14 @@ export function StatsCard({ title, value, icon, trend, className, isLoading, per
         {isLoading ? (
           <Skeleton className="h-8 w-24 mb-1" />
         ) : (
-          <h3 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-foreground uppercase truncate" title={String(value)}>
+          <h3 className="text-2xl sm:text-3xl font-black tracking-tighter text-foreground uppercase truncate" title={String(value)}>
             {value}
           </h3>
         )}
         {isLoading ? (
           <Skeleton className="h-3 w-32 mt-2" />
         ) : trend && (
-          <div className="flex items-center gap-1 mt-1 text-[9px] font-black italic tracking-widest uppercase">
+          <div className="flex items-center gap-1 mt-1 text-[9px] font-black tracking-widest uppercase">
             <span className={cn(trend.isPositive ? "text-primary" : "text-red-500")}>
               {trend.isPositive ? "↑" : "↓"} {trend.value}%
             </span>

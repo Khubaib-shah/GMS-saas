@@ -73,7 +73,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     return (
       <Field className={cn("w-full relative", containerClassName)}>
         {label && !hideLabel && (
-          <FieldLabel className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 italic">
+          <FieldLabel className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
             {label} {required && <span className="text-primary">*</span>}
           </FieldLabel>
         )}
@@ -129,7 +129,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
         {description && <FieldDescription className="text-[9px] text-slate-500 font-bold pl-[5px] !mt-px">{description}</FieldDescription>}
 
         {error && !hideLabel && (
-          <FieldError className="text-[10px] font-bold italic tracking-wider mt-1 text-destructive animate-fade-in absolute top-full left-1">
+          <FieldError className="text-[10px] font-bold tracking-wider mt-1 text-destructive animate-fade-in absolute top-full left-1">
             {error}
           </FieldError>
         )}

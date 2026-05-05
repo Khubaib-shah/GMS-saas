@@ -172,7 +172,7 @@ export function ChartCardSkeleton({ title, subtitle, type = "bar" }: { title?: s
       <div className="flex justify-between items-start mb-8">
         <div className="space-y-2">
           {title ? (
-             <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] italic">{title}</h3>
+             <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">{title}</h3>
           ) : (
             <Skeleton className="h-4 w-32 bg-white/5" />
           )}

@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 import { useAppStore } from "@/lib/store"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { formatCurrency } from "@/lib/utils/file-utils"
 import { ChartSkeleton, ChartCardSkeleton } from "@/components/ui/skeleton-components"
 import { DateRange } from "react-day-picker"
@@ -13,6 +13,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
   if (isLoading) return <ChartCardSkeleton title="Revenue Trend" />
 
   const store = useAppStore()
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const data = useMemo<{ name: string; value: number; date?: Date }[]>(() => {
     if (dateRange?.from && dateRange?.to) {
@@ -60,16 +61,16 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
     <Card className="p-4 md:p-6 glass-premium border-border h-full flex flex-col overflow-hidden">
       <div className="mb-6 flex justify-between items-start">
         <div>
-          <h3 className="text-lg font-bold text-foreground">Revenue Trend</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="text-md md:text-lg font-bold md:font-black tracking-tighter text-foreground">Revenue Trend</h3>
+          <p className="text-[10px] font-medium md:font-bold text-slate-500 tracking-widest -mt-1">
             {dateRange?.from && dateRange?.to
               ? `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd, yyyy")}`
               : `Monthly revenue for ${new Date().getFullYear()}`}
           </p>
         </div>
         <div className="text-right">
-          <p className="text-xs font-black uppercase tracking-widest text-primary italic">Total Revenue</p>
-          <p className="text-2xl font-black italic tracking-tighter leading-none mt-1">
+          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-primary">Total Revenue</p>
+          <p className="text-md md:text-2xl font-black tracking-tighter leading-none -mt-px">
             {formatCurrency(data.reduce((sum, d) => sum + d.value, 0))}
           </p>
         </div>
@@ -77,8 +78,8 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
 
       <div className="flex-1 min-h-[300px] w-full pb-4 overflow-x-auto scrollbar-hide group/scroll">
         <div
-          className="flex items-end justify-between gap-0.5 h-full pt-8 pb-2"
-          style={{ minWidth: "100%" }}
+          className="flex items-end justify-between gap-1 h-full pt-8 pb-2"
+          style={{ minWidth: data.length > 12 ? `${data.length * 20}px` : "100%" }}
         >
           {data.map((item, i) => {
             const height = (item.value / maxValue) * 100;
@@ -93,12 +94,22 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
             }
 
             return (
-              <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative px-1">
+              <div 
+                key={i} 
+                className="flex-1 flex flex-col items-center h-full justify-end group relative px-1 cursor-pointer"
+                onClick={() => setActiveIndex(activeIndex === i ? null : i)}
+              >
                 {/* Column Hover Background */}
-                <div className="absolute inset-x-0 top-0 bottom-8 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
+                <div className={cn(
+                  "absolute inset-x-0 top-0 bottom-8 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg",
+                  activeIndex === i && "opacity-100 bg-white/10"
+                )} />
 
                 {/* Tooltip */}
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight pointer-events-none">
+                <div className={cn(
+                  "absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight pointer-events-none",
+                  activeIndex === i && "opacity-100 -top-6"
+                )}>
                   {formatCurrency(item.value)}
                 </div>
 
@@ -125,10 +136,10 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
 
                 <div className="h-6 w-full flex items-center justify-center mt-2 relative">
                   <span className={cn(
-                    "text-[9px] whitespace-nowrap text-slate-500 font-black uppercase tracking-widest italic transition-all duration-300 absolute",
+                    "text-[9px] whitespace-nowrap text-slate-500 font-black uppercase tracking-widest transition-all duration-300 absolute",
                     "group-hover:text-primary group-hover:opacity-100 group-hover:translate-y-0",
-                    showLabel ? "opacity-100" : "opacity-0 -translate-y-1",
-                    "max-md:opacity-0 max-md:-translate-y-1 max-md:group-hover:opacity-100 max-md:group-hover:translate-y-0"
+                    (showLabel || activeIndex === i) ? "opacity-100" : "opacity-0 -translate-y-1",
+                    activeIndex === i && "text-primary translate-y-0"
                   )}>
                     {item.name}
                   </span>
@@ -194,8 +205,8 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
   return (
     <Card className="p-4 md:p-6 glass-premium border-border h-full flex flex-col overflow-hidden">
       <div className="mb-6">
-        <h3 className="text-lg font-bold text-foreground">Subscriptions</h3>
-        <p className="text-sm text-muted-foreground">
+        <h3 className="text-md md:text-lg font-bold md:font-black tracking-tighter text-foreground">Membership Plans</h3>
+        <p className="text-[10px] font-medium md:font-bold text-slate-500 tracking-widest -mt-1">
           {dateRange?.from && dateRange?.to
             ? `New plans: ${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd")}`
             : "Distribution by plan"}
@@ -227,13 +238,13 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
         >
           <div className="absolute inset-0 m-[1.2rem] rounded-full bg-[#0e1016dd] flex items-center justify-center shadow-inner">
             <div className="text-center group-hover/donut:scale-110 transition-transform duration-500">
-              <span className="text-4xl font-black italic tracking-tighter block leading-none">{total}</span>
-              <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest italic mt-1 block">Total</span>
+              <span className="text-4xl font-black tracking-tighter block leading-none">{total}</span>
+              <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1 block">Total</span>
             </div>
           </div>
         </div>
 
-        <div className="w-full mt-8 space-y-3">
+        <div className="w-full mt-8 space-y-1.5 md:space-y-3">
           {stats.length === 0 && (
             <p className="text-center text-sm text-muted-foreground">No active subscriptions found.</p>
           )}
@@ -293,10 +304,10 @@ export function MembershipStatusChart({ isLoading }: { isLoading?: boolean }) {
   const total = stats.reduce((acc, curr) => acc + curr.value, 0)
 
   return (
-    <Card className="p-8 glass-premium border-border h-full flex flex-col">
-      <div className="mb-8">
-        <h3 className="text-lg font-black italic tracking-tighter text-foreground uppercase">Membership Health</h3>
-        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Current membership statuses</p>
+    <Card className="p-4 md:p-8 glass-premium border-border h-full flex flex-col">
+      <div className="mb-4 md:mb-8">
+        <h3 className="text-md md:text-lg font-bold md:font-black tracking-tighter text-foreground">Membership Health</h3>
+        <p className="text-[10px] font-medium md:font-bold text-slate-500 tracking-widest -mt-1">Current membership statuses</p>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center">
@@ -322,18 +333,18 @@ export function MembershipStatusChart({ isLoading }: { isLoading?: boolean }) {
         >
           <div className="absolute inset-0 m-[1.2rem] rounded-full bg-[#0e1016dd] flex items-center justify-center shadow-inner">
             <div className="text-center group-hover/donut:scale-110 transition-transform duration-500">
-              <span className="text-4xl font-black italic tracking-tighter block leading-none">{total}</span>
-              <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest italic mt-1 block">Members</span>
+              <span className="text-4xl font-black tracking-tighter block leading-none">{total}</span>
+              <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1 block">Members</span>
             </div>
           </div>
         </div>
 
-        <div className="w-full mt-10 space-y-4">
+        <div className="w-full mt-10 space-y-2 md:space-y-4">
           {stats.map((stat, i) => (
-            <div key={i} className="flex items-center justify-between group/row cursor-pointer">
+            <div key={i} className="flex items-center justify-between group/row md:cursor-pointer">
               <div className="flex items-center gap-3">
-                <div className={`w-2.5 h-2.5 rounded-full ${stat.color} shadow-[0_0_10px_rgba(255,255,255,0.1)] group-hover/row:scale-150 transition-transform`} />
-                <span className="text-[11px] font-black italic tracking-widest uppercase text-slate-400 group-hover:text-foreground transition-colors">{stat.name}</span>
+                <div className={`w-2.5 h-2.5 rounded-full ${stat.color} shadow-[0_0_10px_rgba(255,255,255,0.1)] md:group-hover/row:scale-150 transition-transform`} />
+                <span className="text-[11px] font-black  tracking-widest uppercase text-slate-400 group-hover:text-foreground transition-colors">{stat.name}</span>
               </div>
               <span className="text-[11px] font-mono font-bold text-foreground group-hover:text-primary transition-colors">
                 {stat.value} {total > 0 && `(${Math.round(stat.value / total * 100)}%)`}
@@ -350,6 +361,7 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
   if (isLoading) return <ChartCardSkeleton title="Attendance" />
 
   const store = useAppStore()
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const data = useMemo<{ name: string; value: number; date?: Date }[]>(() => {
     if (dateRange?.from && dateRange?.to) {
@@ -407,7 +419,7 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
         </div>
         <div className="text-right">
           <p className="text-xs font-black uppercase tracking-widest text-emerald-500 italic">Total Check-ins</p>
-          <p className="text-2xl font-black italic tracking-tighter leading-none mt-1">
+          <p className="text-2xl font-black tracking-tighter leading-none mt-1">
             {data.reduce((sum, d) => sum + d.value, 0)}
           </p>
         </div>
@@ -415,8 +427,8 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
 
       <div className="flex-1 min-h-[300px] w-full pb-4 overflow-x-auto scrollbar-hide">
         <div
-          className="flex items-end justify-between gap-0.5 h-full pt-8 pb-2"
-          style={{ minWidth: "100%" }}
+          className="flex items-end justify-between gap-1 h-full pt-8 pb-2"
+          style={{ minWidth: data.length > 12 ? `${data.length * 20}px` : "100%" }}
         >
           {data.map((item, i) => {
             const height = (item.value / maxValue) * 100;
@@ -431,12 +443,22 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
             }
 
             return (
-              <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative px-1">
+              <div 
+                key={i} 
+                className="flex-1 flex flex-col items-center h-full justify-end group relative px-1 cursor-pointer"
+                onClick={() => setActiveIndex(activeIndex === i ? null : i)}
+              >
                 {/* Column Hover Background */}
-                <div className="absolute inset-x-0 top-0 bottom-8 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
+                <div className={cn(
+                  "absolute inset-x-0 top-0 bottom-8 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg",
+                  activeIndex === i && "opacity-100 bg-white/10"
+                )} />
 
                 {/* Tooltip */}
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight pointer-events-none">
+                <div className={cn(
+                  "absolute -top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded-md shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 border border-white/10 font-bold tracking-tight pointer-events-none",
+                  activeIndex === i && "opacity-100 -top-6"
+                )}>
                   {item.value} Check-ins
                 </div>
 
@@ -463,10 +485,10 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
 
                 <div className="h-6 w-full flex items-center justify-center mt-2 relative">
                   <span className={cn(
-                    "text-[9px] whitespace-nowrap text-slate-500 font-black uppercase tracking-widest italic transition-all duration-300 absolute",
+                    "text-[9px] whitespace-nowrap text-slate-500 font-black uppercase tracking-widest transition-all duration-300 absolute",
                     "group-hover:text-emerald-500 group-hover:opacity-100 group-hover:translate-y-0",
-                    showLabel ? "opacity-100" : "opacity-0 -translate-y-1",
-                    "max-md:opacity-0 max-md:-translate-y-1 max-md:group-hover:opacity-100 max-md:group-hover:translate-y-0"
+                    (showLabel || activeIndex === i) ? "opacity-100" : "opacity-0 -translate-y-1",
+                    activeIndex === i && "text-emerald-500 translate-y-0"
                   )}>
                     {item.name}
                   </span>

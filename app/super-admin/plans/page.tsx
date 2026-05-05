@@ -174,7 +174,7 @@ export default function PlansPage() {
                             setEditingId(null);
                             setShowForm(true);
                         }}
-                        className="h-[38px] flex justify-center items-center px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2"
+                        className="h-[38px] flex justify-center items-center px-8 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter neon-glow transition-all group gap-2"
                     >
                         <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                         NEW PLAN

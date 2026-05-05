@@ -229,7 +229,7 @@ export default function PaymentsPage() {
   }
 
   return (
-    <div className="space-y-10 animate-fade-up">
+    <div className="space-y-4 md:space-y-10 animate-fade-up">
       <DashboardHeader
         title="PAYMENT"
         highlight="HISTORY"
@@ -249,7 +249,7 @@ export default function PaymentsPage() {
       <div className="flex flex-col md:flex-row items-center gap-4 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-md">
         <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
           <Filter className="w-3.5 h-3.5 text-primary/50" />
-          <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+          <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
             Filter
           </span>
         </div>
@@ -265,7 +265,7 @@ export default function PaymentsPage() {
               store.setSearchQuery(val)
             }}
             leadingIcon={<Search className="w-4 h-4" />}
-            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+            className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all focus:border-none focus:ring-0"
             containerClassName="flex-1"
           />
 
@@ -273,7 +273,7 @@ export default function PaymentsPage() {
 
           <div className="flex items-center gap-4">
             <DateRangePicker
-              btnClass="!h-10 border-none bg-transparent hover:bg-white/5 text-[10px] font-black uppercase tracking-widest italic rounded-lg"
+              btnClass="!h-10 border-none bg-transparent hover:bg-white/5 text-[10px] font-black uppercase tracking-widest rounded-lg"
               date={dateRange}
               onDateChange={setDateRange}
             />
@@ -282,7 +282,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <StatsCard
           title="Total Revenue"
           value={formatCurrency(totalRevenue)}
@@ -312,7 +312,7 @@ export default function PaymentsPage() {
         {/* Main Revenue Area Chart */}
         <div className="glass-premium p-6 border-border lg:col-span-3">
           <div className="flex flex-col gap-2 mb-6">
-            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-primary" />
               Revenue Timeline
             </h3>
@@ -366,7 +366,7 @@ export default function PaymentsPage() {
             </ChartContainer>
           ) : (
             <div className="h-[250px] w-full flex items-center justify-center border border-dashed border-white/5 rounded-xl">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No chart data available</p>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">No chart data available</p>
             </div>
           )}
         </div>
@@ -374,7 +374,7 @@ export default function PaymentsPage() {
         {/* Payment Methods Pie Chart */}
         <div className="glass-premium p-6 border-border lg:col-span-1">
           <div className="flex flex-col gap-2 mb-6">
-            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-emerald-500" />
               Methods
             </h3>
@@ -425,7 +425,7 @@ export default function PaymentsPage() {
             </ChartContainer>
           ) : (
             <div className="h-[250px] w-full flex items-center justify-center border border-dashed border-white/5 rounded-xl">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No data</p>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">No data</p>
             </div>
           )}
         </div>
@@ -433,7 +433,7 @@ export default function PaymentsPage() {
         {/* Top Members Bar Chart */}
         <div className="glass-premium p-6 border-border lg:col-span-2">
           <div className="flex flex-col gap-2 mb-6">
-            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+            <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-amber-500" />
               Top 5 Contributors
             </h3>
@@ -479,7 +479,7 @@ export default function PaymentsPage() {
             </ChartContainer>
           ) : (
             <div className="h-[250px] w-full flex items-center justify-center border border-dashed border-white/5 rounded-xl">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No data</p>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">No data</p>
             </div>
           )}
         </div>
@@ -508,7 +508,7 @@ export default function PaymentsPage() {
             <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
               <DollarSign className="w-8 h-8 text-slate-700" />
             </div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No payments found</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">No payments found</p>
           </div>
         )}
       </div>

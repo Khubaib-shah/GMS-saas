@@ -13,7 +13,7 @@ export const createColumns = (members: Member[]): ColumnDef<PaymentColumn>[] => 
         accessorKey: "memberName",
         header: "Member",
         cell: ({ row }) => (
-            <span className="text-foreground font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
+            <span className="text-foreground font-medium md:font-black tracking-tighter text-base block group-hover/row:text-primary transition-colors">
                 {row.original.memberName}
             </span>
         ),
@@ -40,7 +40,7 @@ export const createColumns = (members: Member[]): ColumnDef<PaymentColumn>[] => 
         accessorKey: "method",
         header: "Method",
         cell: ({ row }) => (
-            <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[9px] font-black tracking-widest italic group-hover/row:border-primary/20 transition-all">
+            <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-[9px] font-black tracking-widest group-hover/row:border-primary/20 transition-all">
                 {row.original.method.toUpperCase()}
             </div>
         ),

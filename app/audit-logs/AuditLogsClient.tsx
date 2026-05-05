@@ -151,7 +151,7 @@ export default function AuditlogsClient() {
   };
 
   return (
-    <div className="space-y-10 animate-fade-up">
+    <div className="space-y-4 md:space-y-10 animate-fade-up">
       <DashboardHeader
         title="ACTIVITY"
         highlight="HISTORY"
@@ -163,7 +163,7 @@ export default function AuditlogsClient() {
             variant="outline"
             onClick={fetchLogs}
             disabled={loading}
-            className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+            className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black tracking-tighter transition-all"
           >
             <RefreshCw
               className={cn("h-4 w-4 mr-2", loading && "animate-spin")}
@@ -172,7 +172,7 @@ export default function AuditlogsClient() {
           </Button>
           <Button
             variant="outline"
-            className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+            className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black tracking-tighter transition-all"
           >
             <Download className="h-4 w-4 mr-2" />
             EXPORT
@@ -181,26 +181,25 @@ export default function AuditlogsClient() {
       </DashboardHeader>
 
 
-      <div className="glass-premium p-6 border-white/5 bg-slate-950/20 backdrop-blur-xl rounded-xl border-t-0 -mt-1 relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/20 after:to-transparent">
+      <div className="glass-premium p-4 md:p-6 border-white/5 bg-slate-950/20 backdrop-blur-xl rounded-xl border-t-0 -mt-1 relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/20 after:to-transparent">
         <DataTable
           columns={columns(setSelectedLog)}
           data={logs}
           isLoading={loading}
 
           filter={
-            <div className="flex w-full md:col-span-2 gap-4">
+            <div className="flex w-full md:col-span-2 gap-2 md:gap-4">
               {/* Resource Filter */}
               <div className="space-y-1.5 w-full">
-                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Resource</span>
                 <Select value={resource} onValueChange={setResource}>
-                  <SelectTrigger className="!w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0 px-4">
+                  <SelectTrigger className="!w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all focus:ring-0 px-4">
                     <span className="text-slate-500 mr-2 hidden lg:inline">Resource:</span>
                     <SelectValue placeholder="All" />
                   </SelectTrigger>
                   <SelectContent className="glass-premium border-white/10 bg-slate-950/98 backdrop-blur-2xl">
-                    <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Types</SelectItem>
+                    <SelectItem value="all" className="text-[10px] font-bold uppercase">All Types</SelectItem>
                     {RESOURCES.map((r) => (
-                      <SelectItem key={r} value={r} className="text-[10px] font-bold italic uppercase">{r}</SelectItem>
+                      <SelectItem key={r} value={r} className="text-[10px] font-bold uppercase">{r}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -208,16 +207,15 @@ export default function AuditlogsClient() {
 
               {/* Action Filter */}
               <div className="space-y-1.5 w-full">
-                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest pl-1 lg:hidden">Action</span>
                 <Select value={action} onValueChange={setAction}>
-                  <SelectTrigger className="w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0 px-4">
+                  <SelectTrigger className="w-full h-10 md:h-9 bg-white/5 md:bg-transparent border-white/5 md:border-none hover:bg-white/10 rounded-xl md:rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all focus:ring-0 px-4">
                     <span className="text-slate-500 mr-2 hidden lg:inline">Action:</span>
                     <SelectValue placeholder="All" />
                   </SelectTrigger>
                   <SelectContent className="glass-premium border-white/10 bg-slate-950/98 backdrop-blur-2xl">
-                    <SelectItem value="all" className="text-[10px] font-bold italic uppercase">All Actions</SelectItem>
+                    <SelectItem value="all" className="text-[10px] font-bold uppercase">All Actions</SelectItem>
                     {ACTIONS.map((a) => (
-                      <SelectItem key={a} value={a} className="text-[10px] font-bold italic uppercase">{a.replace("_", " ")}</SelectItem>
+                      <SelectItem key={a} value={a} className="text-[10px] font-bold uppercase">{a.replace("_", " ")}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -245,7 +243,7 @@ export default function AuditlogsClient() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div>
-                    <DialogTitle className="text-xl font-black italic uppercase tracking-tighter text-white leading-none mb-1.5">
+                    <DialogTitle className="text-xl font-black uppercase tracking-tighter text-white leading-none mb-1.5">
                       LOG <span className="text-primary">DETAILS</span>
                     </DialogTitle>
                     <DialogDescription className="font-mono text-[9px] text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
@@ -256,7 +254,7 @@ export default function AuditlogsClient() {
                 </div>
                 {selectedLog && (
                   <Badge variant="outline" className={cn(
-                    "h-6 px-3 text-[10px] font-black italic uppercase tracking-widest border-primary/20 bg-primary/5 text-primary",
+                    "h-6 px-3 text-[10px] font-black uppercase tracking-widest border-primary/20 bg-primary/5 text-primary",
                     getActionColor(selectedLog.action)
                   )}>
                     {selectedLog.action.replace("_", ":")}
@@ -273,25 +271,25 @@ export default function AuditlogsClient() {
                   <div className="p-4 bg-slate-950/40 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
                     <Calendar className="w-4 h-4 text-primary/60 mt-1" />
                     <div>
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">TIME</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">TIME</h4>
                       <p className="font-mono text-xs text-slate-200">{format(new Date(selectedLog.createdAt), "MMM d, yyyy // HH:mm:ss")}</p>
                     </div>
                   </div>
                   <div className="p-4 bg-slate-950/60 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
                     <Globe className="w-4 h-4 text-primary/60 mt-1" />
                     <div>
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">IP ADDRESS</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">IP ADDRESS</h4>
                       <p className="font-mono text-xs text-slate-200">{selectedLog.ipAddress || "SYSTEM_INTERNAL"}</p>
                     </div>
                   </div>
                   <div className="p-4 bg-slate-950/60 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
                     <User className="w-4 h-4 text-primary/60 mt-1" />
                     <div>
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">USER</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">USER</h4>
                       <div className="flex items-center gap-2 mb-0.5">
-                        <p className="font-black italic uppercase text-xs text-slate-200">{selectedLog.userName}</p>
+                        <p className="font-black uppercase text-xs text-slate-200">{selectedLog.userName}</p>
                         {(selectedLog as any).userRole && (
-                          <Badge variant="outline" className="text-[8px] h-4 px-1 border-primary/20 text-primary/80 font-black italic uppercase tracking-tighter">
+                          <Badge variant="outline" className="text-[8px] h-4 px-1 border-primary/20 text-primary/80 font-black uppercase tracking-tighter">
                             {(selectedLog as any).userRole}
                           </Badge>
                         )}
@@ -302,8 +300,8 @@ export default function AuditlogsClient() {
                   <div className="p-4 bg-slate-950/40 backdrop-blur-sm flex gap-4 items-start hover:bg-white/[0.02] transition-colors">
                     <Layers className="w-4 h-4 text-primary/60 mt-1" />
                     <div>
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-1">RESOURCE</h4>
-                      <p className="font-black italic uppercase text-xs text-slate-200 mb-0.5">{selectedLog.resource}</p>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">RESOURCE</h4>
+                      <p className="font-black uppercase text-xs text-slate-200 mb-0.5">{selectedLog.resource}</p>
                       <p className="font-mono text-[9px] text-slate-500 truncate max-w-[150px]">ID: {selectedLog.resourceId}</p>
                     </div>
                   </div>
@@ -314,7 +312,7 @@ export default function AuditlogsClient() {
                   <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 relative overflow-hidden group">
                     <div className="flex items-center gap-2 mb-2 relative z-10">
                       <Terminal className="w-3.5 h-3.5 text-primary/50" />
-                      <h4 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">DETAILS</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">DETAILS</h4>
                     </div>
                     <p className="text-[10px] font-mono text-slate-400 break-all leading-relaxed relative z-10 opacity-70 group-hover:opacity-100 transition-opacity">
                       {selectedLog.userAgent}
@@ -328,7 +326,7 @@ export default function AuditlogsClient() {
                   <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2">
                       <Box className="w-4 h-4 text-primary" />
-                      <h4 className="text-[12px] font-black italic uppercase tracking-tighter text-white">
+                      <h4 className="text-[12px] font-black uppercase tracking-tighter text-white">
                         DATA <span className="text-primary">CHANGES</span>
                       </h4>
                     </div>
@@ -358,7 +356,7 @@ export default function AuditlogsClient() {
             <Button
               variant="ghost"
               onClick={() => setSelectedLog(null)}
-              className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white"
+              className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white"
             >
               Close Log
             </Button>

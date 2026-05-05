@@ -44,10 +44,10 @@ export function WorkoutHistory() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-1">
+                    <h2 className="text-3xl font-black tracking-tighter uppercase leading-none mb-1">
                         WORKOUT <span className="text-primary/40">HISTORY</span>
                     </h2>
-                    <p className="text-[10px] text-slate-500 font-black italic uppercase tracking-widest">Historical Workout Logs</p>
+                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Historical Workout Logs</p>
                 </div>
             </div>
 
@@ -59,7 +59,7 @@ export function WorkoutHistory() {
                 value={search}
                 onChange={(val) => setSearch(val)}
                 leadingIcon={<Search className="w-4 h-4" />}
-                className="h-12 bg-white/5 border-white/5 rounded-2xl font-black italic uppercase tracking-widest text-[10px]"
+                className="h-12 bg-white/5 border-white/5 rounded-2xl font-black uppercase tracking-widest text-[10px]"
             />
 
             {/* Log List */}
@@ -74,21 +74,21 @@ export function WorkoutHistory() {
                             <div className="flex items-center justify-between relative">
                                 <div className="flex items-center gap-6">
                                     <div className="w-12 h-12 rounded-2xl bg-white/5 flex flex-col items-center justify-center border border-white/5 group-hover:border-primary/30 transition-colors">
-                                        <span className="text-[10px] font-black italic text-primary leading-none">
+                                        <span className="text-[10px] font-black text-primary leading-none">
                                             {new Date(log.date).toLocaleDateString("en-US", { day: "2-digit" })}
                                         </span>
-                                        <span className="text-[8px] font-black italic text-slate-500 uppercase">
+                                        <span className="text-[8px] font-black text-slate-500 uppercase">
                                             {new Date(log.date).toLocaleDateString("en-US", { month: "short" })}
                                         </span>
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
-                                            <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[8px] font-black italic px-2">COMPLETED</Badge>
-                                            <span className="text-[9px] font-black italic text-slate-500 uppercase tracking-widest">
+                                            <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[8px] font-black px-2">COMPLETED</Badge>
+                                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
                                                 {new Date(log.date).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
                                             </span>
                                         </div>
-                                        <h4 className="text-lg font-black italic uppercase tracking-tight group-hover:text-primary transition-colors leading-none">
+                                        <h4 className="text-lg font-medium md:font-black uppercase tracking-tight group-hover:text-primary transition-colors leading-none">
                                             {log.exercises.length} Exercises
                                         </h4>
                                     </div>
@@ -111,7 +111,7 @@ export function WorkoutHistory() {
                 ) : (
                     <div className="py-20 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl space-y-4">
                         <Database className="w-12 h-12 text-slate-800" />
-                        <p className="text-[10px] font-black italic text-slate-500 uppercase tracking-widest">No workout history found</p>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">No workout history found</p>
                     </div>
                 )}
             </div>

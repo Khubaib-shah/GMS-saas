@@ -150,21 +150,21 @@ export default function MembersPage() {
             size="sm"
             onClick={() => setShowTrash(!showTrash)}
             className={cn(
-              "!h-[38px] px-8 rounded-xl font-black italic tracking-tighter transition-all",
+              "!h-[38px] px-4 md:px-8 rounded-xl font-medium md:font-black tracking-tighter transition-all",
               showTrash
                 ? "bg-destructive text-white shadow-lg shadow-destructive/20"
                 : "border-white/10 bg-white/5 text-slate-400 hover:text-white"
             )}
           >
-            <Trash2 className="w-5 h-5 mr-2" />
-            {showTrash ? "Exit Trash" : "View Trash"}
+            <Trash2 className="w-5 h-5 md:mr-2" />
+            <span className="hidden md:inline">{showTrash ? "Exit Trash" : "View Trash"}</span>
           </Button>
 
           {((session?.user as any)?.role !== 'trainer') && !showTrash && (
             <Link href="/members/add">
-              <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group">
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                Add Member
+              <Button className="!h-[38px] px-4 md:px-8 rounded-xl bg-primary text-black hover:bg-white font-medium md:font-black tracking-tighter neon-glow transition-all group">
+                <Plus className="w-5 h-5 md:mr-2 group-hover:rotate-90 transition-transform" />
+                <span className="hidden md:inline">Add Member</span>
               </Button>
             </Link>
           )}
@@ -210,14 +210,14 @@ export default function MembersPage() {
                   setFilterStatus(value as "all" | "active" | "expired")
                 }
               >
-                <SelectTrigger className="!h-[41px] w-full md:w-56 bg-white/5 border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+                <SelectTrigger className="!h-[41px] !w-full md:w-56 bg-white/5 border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all focus:ring-0">
                   <span className="text-slate-500 mr-2">Status:</span>
                   <SelectValue placeholder="All Members" />
                 </SelectTrigger>
                 <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-                  <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">All Members</SelectItem>
-                  <SelectItem value="active" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Active Members</SelectItem>
-                  <SelectItem value="expired" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Expired Members</SelectItem>
+                  <SelectItem value="all" className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">All Members</SelectItem>
+                  <SelectItem value="active" className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">Active Members</SelectItem>
+                  <SelectItem value="expired" className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">Expired Members</SelectItem>
                 </SelectContent>
               </Select>
             }
@@ -230,7 +230,7 @@ export default function MembersPage() {
             <div className="w-16 h-16 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mx-auto mb-6">
               <Users className="w-8 h-8 text-slate-700" />
             </div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">No members found</p>
+            <p className="text-[10px] font-medium md:font-black text-slate-500 uppercase tracking-[0.4em]">No members found</p>
           </div>
         )}
       </div>

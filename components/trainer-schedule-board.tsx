@@ -97,8 +97,8 @@ export function TrainerScheduleBoard({ trainerId, canManage, onBookSlot }: Train
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col md:flex-row gap-2 md:gap-4 md:items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:gap-2">
             <h3 className="text-xl font-bold">Weekly Schedule</h3>
             <span className="text-muted-foreground text-sm">
                 ({format(weekStart, "MMM d")} - {format(addDays(weekStart, 6), "MMM d, yyyy")})

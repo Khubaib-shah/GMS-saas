@@ -45,7 +45,7 @@ export function AttendanceResult({ data, isCheckout, onClose }: AttendanceResult
                     </div>
                     <div>
                         <h4 className="text-sm font-black uppercase text-slate-500 tracking-widest">{isCheckout ? "Check-out" : "Check-in"} Successful</h4>
-                        <p className="text-xl font-black italic tracking-tighter uppercase text-foreground">{member.fullName}</p>
+                        <p className="text-xl font-black tracking-tighter uppercase text-foreground">{member.fullName}</p>
                     </div>
                 </div>
                 <button 

@@ -14,10 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Save, Mail, Edit2, Users, Calendar, Award, DollarSign, Clock, BarChart3, Settings2 } from "lucide-react";
+import { ArrowLeft, Save, Mail, Edit2, Users, Calendar, Award, DollarSign, Clock, BarChart3, Settings2, Eye, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
-import { formatDate } from "@/lib/utils/file-utils";
 import Link from "next/link";
 import { TrainerScheduleBoard } from "@/components/trainer-schedule-board";
 import { AvailabilityManager } from "@/components/availability-manager";
@@ -177,29 +176,30 @@ export default function TrainerDetailPage({
   if (!loading && !trainer) return <div className="p-8 text-center">Trainer not found</div>;
 
   return (
-    <div className="container mx-auto p-6 space-y-8 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto space-y-4 md:space-y-8 animate-in fade-in duration-500">
+      <div className="flex gap-2 md:gap-4 items-start md:items-center justify-between">
         <Button variant="ghost" onClick={() => router.push("/trainers")} className="-ml-2">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Trainers
+          Go Back
         </Button>
         <div className="flex gap-2">
           {canManage && (
-            <Button variant="outline" className="border-red-500/20 text-red-500 hover:bg-red-500/10" onClick={() => setIsResetModalOpen(true)}>
-              Reset Password
+            <Button variant="outline" className="h-10 w-10 md:w-auto md:px-4 border-red-500/20 text-red-500 hover:bg-red-500/10" onClick={() => setIsResetModalOpen(true)}>
+              <KeyRound className="w-4 h-4 md:mr-2" />
+              <span className="hidden md:inline">Reset Password</span>
             </Button>
           )}
           {canEdit && !isEditing && (
-            <Button onClick={() => setIsEditing(true)}>
-              <Edit2 className="w-4 h-4 mr-2" />
-              Edit Profile
+            <Button onClick={() => setIsEditing(true)} className="h-10 w-10 md:w-auto md:px-4">
+              <Edit2 className="w-4 h-4 md:mr-2" />
+              <span className="hidden md:inline">Edit Profile</span>
             </Button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-        <div className="lg:col-span-1 space-y-6">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 md:gap-8">
+        <div className="lg:col-span-1 space-y-4 md:space-y-6">
           <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm">
             <CardHeader className="text-center pb-2">
               <div className="mx-auto mb-4 relative">
@@ -305,7 +305,7 @@ export default function TrainerDetailPage({
 
         <div className="lg:col-span-3">
           {isEditing ? (
-            <Card className="border-none shadow-xl">
+            <Card>
               <CardHeader>
                 <CardTitle>Edit Profile</CardTitle>
                 <CardDescription>Update your professional biography and scheduling details.</CardDescription>
@@ -373,7 +373,7 @@ export default function TrainerDetailPage({
               </CardContent>
             </Card>
           ) : (
-            <Tabs defaultValue="schedule" className="space-y-6">
+            <Tabs defaultValue="schedule" className="space-y-2 md:space-y-6">
               <TabsList className="bg-muted/50 p-1">
                 <TabsTrigger value="schedule" className="flex items-center gap-2"><Calendar className="w-4 h-4" /> Schedule</TabsTrigger>
                 <TabsTrigger value="availability" className="flex items-center gap-2"><Settings2 className="w-4 h-4" /> Availability</TabsTrigger>
@@ -402,7 +402,7 @@ export default function TrainerDetailPage({
               </TabsContent>
 
               <TabsContent value="clients">
-                <Card className="border-none shadow-lg">
+                <Card>
                   <CardHeader>
                     <CardTitle>My Clients</CardTitle>
                   </CardHeader>
@@ -424,15 +424,20 @@ export default function TrainerDetailPage({
                         </TableHeader>
                         <TableBody>
                           {trainer?.members?.map((m: { _id: string; firstName: string; lastName: string }) => (
-                            <TableRow key={m._id}>
-                              <TableCell className="font-medium underline decoration-primary/20">
-                                <Link href={`/members/${m._id}`}>{m.firstName} {m.lastName}</Link>
-                              </TableCell>
-                              <TableCell><Badge variant="outline">Active</Badge></TableCell>
-                              <TableCell className="text-right">
-                                <Button variant="ghost" size="sm" asChild><Link href={`/members/${m._id}`}>Profile</Link></Button>
-                              </TableCell>
-                            </TableRow>
+                              <TableRow key={m._id}>
+                                <TableCell className="font-medium">
+                                  <Link href={`/members/${m._id}`} className="hover:text-primary transition-colors">{m.firstName} {m.lastName}</Link>
+                                </TableCell>
+                                <TableCell><Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest">Active</Badge></TableCell>
+                                <TableCell className="text-right">
+                                  <Button variant="ghost" size="sm" asChild className="h-8 w-8 md:w-auto md:px-3">
+                                    <Link href={`/members/${m._id}`}>
+                                      <Eye className="w-4 h-4 md:mr-2" />
+                                      <span className="hidden md:inline">Profile</span>
+                                    </Link>
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
                           ))}
                         </TableBody>
                       </Table>
@@ -453,7 +458,7 @@ export default function TrainerDetailPage({
                         <Skeleton className="h-4 w-[90%]" />
                         <Skeleton className="h-4 w-[80%]" />
                       </div>
-                    ) : trainer?.bio ? <p className="leading-relaxed text-muted-foreground">{trainer.bio}</p> : <p className="italic text-muted-foreground">No biography provided.</p>}
+                    ) : trainer?.bio ? <p className="leading-relaxed text-muted-foreground">{trainer.bio}</p> : <p className="text-muted-foreground">No biography provided.</p>}
                   </CardContent>
                 </Card>
               </TabsContent>

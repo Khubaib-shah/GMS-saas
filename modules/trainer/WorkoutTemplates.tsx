@@ -74,7 +74,7 @@ export function WorkoutTemplates() {
                 <div className="flex items-center gap-3">
                     <Button
                         onClick={() => setBuilderOpen(true)}
-                        className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+                        className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter shadow-lg transition-all active:scale-95"
                     >
                         <Plus className="mr-2 w-5 h-5" />
                         Create New Template
@@ -86,7 +86,7 @@ export function WorkoutTemplates() {
             <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-6 backdrop-blur-md">
                 <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
                     <Filter className="w-3.5 h-3.5 text-primary/50" />
-                    <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+                    <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
                         FILTER
                     </span>
                 </div>
@@ -99,21 +99,21 @@ export function WorkoutTemplates() {
                         value={search}
                         onChange={(val) => setSearch(val)}
                         leadingIcon={<Search className="w-4 h-4" />}
-                        className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+                        className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all focus:border-none focus:ring-0"
                         containerClassName="flex-1"
                     />
 
                     <div className="h-6 w-px bg-white/5 hidden md:block self-center" />
 
                     <Select value={frequencyFilter} onValueChange={setFrequencyFilter}>
-                        <SelectTrigger className="h-10 w-full md:w-48 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+                        <SelectTrigger className="h-10 w-full md:w-48 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all focus:ring-0">
                             <span className="text-slate-500 mr-2">DAYS:</span>
                             <SelectValue placeholder="All" />
                         </SelectTrigger>
                         <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-                            <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">All Frequencies</SelectItem>
+                            <SelectItem value="all" className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">All Frequencies</SelectItem>
                             {[1, 2, 3, 4, 5, 6, 7].map((days) => (
-                                <SelectItem key={days} value={days.toString()} className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">
+                                <SelectItem key={days} value={days.toString()} className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">
                                     {days} {days === 1 ? 'Day' : 'Days'} Per Week
                                 </SelectItem>
                             ))}
@@ -136,24 +136,24 @@ export function WorkoutTemplates() {
                             <div className="flex items-start justify-between relative">
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3">
-                                        <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[9px] font-black italic tracking-[0.2em]">{template.schedule?.length || 0} Day Plan</Badge>
+                                        <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[9px] font-black tracking-[0.2em]">{template.schedule?.length || 0} Day Plan</Badge>
                                         {!template.isPublicWithinGym && (
-                                            <Badge variant="outline" className="bg-slate-800 text-slate-400 border-none text-[9px] font-black italic tracking-[0.2em]">Private</Badge>
+                                            <Badge variant="outline" className="bg-slate-800 text-slate-400 border-none text-[9px] font-black tracking-[0.2em]">Private</Badge>
                                         )}
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl font-black italic tracking-tighter text-foreground group-hover:text-primary transition-colors uppercase leading-none mb-1">
+                                        <h3 className="text-2xl font-black tracking-tighter text-foreground group-hover:text-primary transition-colors uppercase leading-none mb-1">
                                             {template.name}
                                         </h3>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] italic">{template.description || "General Wellness"}</p>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em]">{template.description || "General Wellness"}</p>
                                     </div>
 
                                     <div className="flex items-center gap-6 pt-2">
-                                        <div className="flex items-center gap-2 text-[10px] font-black italic text-slate-400">
+                                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400">
                                             <Calendar className="w-3.5 h-3.5 text-primary" />
                                             Frequency: {template.schedule?.length || 0}x/week
                                         </div>
-                                        <div className="flex items-center gap-2 text-[10px] font-black italic text-slate-400">
+                                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400">
                                             <Layers className="w-3.5 h-3.5 text-primary" />
                                             INTENSITY: MODERATE
                                         </div>
@@ -173,21 +173,21 @@ export function WorkoutTemplates() {
                                                     setEditingPlan(template);
                                                     setBuilderOpen(true);
                                                 }}
-                                                className="h-10 rounded-lg text-[11px] font-black italic uppercase tracking-widest focus:bg-primary focus:text-black gap-3 cursor-pointer"
+                                                className="h-10 rounded-lg text-[11px] font-black uppercase tracking-widest focus:bg-primary focus:text-black gap-3 cursor-pointer"
                                             >
                                                 <Layout className="w-4 h-4" />
                                                 Edit Template
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => duplicateWorkoutPlan(template._id || template.id)}
-                                                className="h-10 rounded-lg text-[11px] font-black italic uppercase tracking-widest focus:bg-primary focus:text-black gap-3 cursor-pointer"
+                                                className="h-10 rounded-lg text-[11px] font-black uppercase tracking-widest focus:bg-primary focus:text-black gap-3 cursor-pointer"
                                             >
                                                 <Copy className="w-4 h-4" />
                                                 Duplicate Template
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => deleteWorkoutPlan(template._id || template.id)}
-                                                className="h-10 rounded-lg text-[11px] font-black italic uppercase tracking-widest focus:bg-red-500 focus:text-white gap-3 cursor-pointer"
+                                                className="h-10 rounded-lg text-[11px] font-black uppercase tracking-widest focus:bg-red-500 focus:text-white gap-3 cursor-pointer"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                                 Delete Template
@@ -207,8 +207,8 @@ export function WorkoutTemplates() {
                 ) : (
                     <div className="col-span-full py-20 flex flex-col items-center justify-center space-y-4 border border-dashed border-white/10 rounded-3xl">
                         <Layout className="w-12 h-12 text-slate-700" />
-                        <p className="text-sm font-black italic text-slate-500 uppercase tracking-widest">No templates found</p>
-                        <Button onClick={() => setBuilderOpen(true)} className="mt-4 bg-primary text-black font-black italic px-8 h-12 rounded-xl shadow-lg">Create your first template</Button>
+                        <p className="text-sm font-black text-slate-500 uppercase tracking-widest">No templates found</p>
+                        <Button onClick={() => setBuilderOpen(true)} className="mt-4 bg-primary text-black font-black px-8 h-12 rounded-xl shadow-lg">Create your first template</Button>
                     </div>
                 )}
             </div>

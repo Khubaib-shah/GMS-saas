@@ -222,7 +222,7 @@ export default function SettingsPage() {
   ].filter((t) => t.show)
 
   return (
-    <div className="animate-fade-up space-y-10">
+    <div className="space-y-4 md:space-y-10 animate-fade-in">
       <DashboardHeader
         title="ACCOUNT"
         highlight="SETTINGS"
@@ -231,9 +231,9 @@ export default function SettingsPage() {
       />
 
       {/* Mobile Tab Select */}
-      <div className="md:hidden mb-8">
+      <div className="md:hidden mb-4 md:mb-8">
         <Select value={activeTab} onValueChange={(v: any) => setActiveTab(v)}>
-          <SelectTrigger className="w-full h-12 bg-white/5 border-white/10 text-white font-black italic tracking-widest uppercase rounded-xl px-6">
+          <SelectTrigger className="w-full h-12 bg-white/5 border-white/10 text-white font-black tracking-widest uppercase rounded-xl px-6">
             <SelectValue placeholder="Navigate Settings" />
           </SelectTrigger>
           <SelectContent className="glass-premium border-border p-2">
@@ -241,7 +241,7 @@ export default function SettingsPage() {
               <SelectItem
                 key={tab.id}
                 value={tab.id}
-                className="rounded-lg text-[10px] font-black italic uppercase tracking-widest gap-3 py-3 focus:bg-primary focus:text-black"
+                className="rounded-lg text-[10px] font-black uppercase tracking-widest gap-3 py-3 focus:bg-primary focus:text-black"
               >
                 <div className="flex items-center gap-3">
                   <div className="text-primary">{tab.icon}</div>
@@ -254,12 +254,12 @@ export default function SettingsPage() {
       </div>
 
       {/* Desktop Tab Navigation */}
-      <div className="hidden md:flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto no-scrollbar">
+      <div className="hidden md:flex gap-2 mb-4 md:mb-8 border-b border-white/5 pb-4 overflow-x-auto no-scrollbar">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-3 font-black text-[11px] uppercase tracking-[0.15em] italic border-b-2 transition-all flex items-center gap-2 ${activeTab === tab.id
+            className={`px-4 py-3 font-black text-[11px] uppercase tracking-[0.15em] border-b-2 transition-all flex items-center gap-2 ${activeTab === tab.id
               ? "text-primary border-primary neon-text"
               : "text-slate-500 border-transparent hover:text-foreground hover:border-white/10"
               }`}
@@ -294,7 +294,7 @@ export default function SettingsPage() {
                 <label htmlFor="trainer-photo-upload" className="relative group/avatar cursor-pointer">
                   <Avatar className="w-24 h-24 overflow-hidden">
                     <AvatarImage src={trainerData.photo} className="object-cover" />
-                    <AvatarFallback className="bg-slate-900 font-black italic text-slate-500">TRAINER</AvatarFallback>
+                    <AvatarFallback className="bg-slate-900 font-black text-slate-500">TRAINER</AvatarFallback>
                   </Avatar>
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center pointer-events-none rounded-full">
                     <Plus className="w-6 h-6 text-primary animate-pulse" />
@@ -304,9 +304,9 @@ export default function SettingsPage() {
                 <div className="flex-1 space-y-3">
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-loose">
                     Update your public presence. <br />
-                    <span className="text-primary/60 italic font-black">Recommended: Square PNG/JPG</span>
+                    <span className="text-primary/60 font-black">Recommended: Square PNG/JPG</span>
                   </p>
-                  <label className="group inline-flex items-center h-10 px-6 rounded-xl bg-white/5 border border-white/10 text-[11px] font-black italic uppercase tracking-widest text-white hover:bg-primary hover:text-black cursor-pointer transition-all active:scale-95">
+                  <label className="group inline-flex items-center h-10 px-6 rounded-xl bg-white/5 border border-white/10 text-[11px] font-black uppercase tracking-widest text-white hover:bg-primary hover:text-black cursor-pointer transition-all active:scale-95">
                     <Plus className="w-4 h-4 mr-2 transition-transform duration-500 group-hover:rotate-180" />
                     Upload New Photo
                     <input
@@ -336,7 +336,7 @@ export default function SettingsPage() {
 
             {/* Bio Section */}
             <div className="space-y-3">
-              <Label className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+              <Label className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                 Personal Bio
               </Label>
               <Textarea
@@ -344,7 +344,7 @@ export default function SettingsPage() {
                 onChange={(e) => setTrainerData({ ...trainerData, bio: e.target.value })}
                 rows={4}
                 placeholder="Share your experience, philosophy, and background with members..."
-                className="bg-white/5 border-white/5 focus:border-primary/50 text-white font-medium italic rounded-2xl p-6 transition-all min-h-[140px]"
+                className="bg-white/5 border-white/5 focus:border-primary/50 text-white font-medium rounded-2xl p-6 transition-all min-h-[140px]"
               />
             </div>
 
@@ -361,7 +361,7 @@ export default function SettingsPage() {
             <div className="pt-6 border-t border-white/5">
               <Button
                 onClick={handleUpdateProfile}
-                className="h-12 px-10 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95 group"
+                className="h-12 px-10 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter shadow-lg transition-all active:scale-95 group"
               >
                 <Save className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
                 Save Profile Changes
@@ -376,12 +376,12 @@ export default function SettingsPage() {
         <div className=" space-y-6 animate-fade-in">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4 flex-1">
-              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic flex-shrink-0">Staff Members</h3>
+              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest flex-shrink-0">Staff Members</h3>
               <div className="h-px flex-1 bg-white/5"></div>
             </div>
             <Dialog open={isParamsOpen} onOpenChange={setIsParamsOpen}>
               <DialogTrigger asChild>
-                <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group ml-4"><Plus className="w-4 h-4 mr-2" /> Add Staff</Button>
+                <Button className="!h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter neon-glow transition-all group ml-4"><Plus className="w-4 h-4 mr-2" /> Add Staff</Button>
               </DialogTrigger>
               <DialogContent className="glass-premium border-border bg-card">
                 <form onSubmit={handleAddStaff}>
@@ -444,11 +444,11 @@ export default function SettingsPage() {
             <Table className="w-full text-[11px] font-bold tracking-widest uppercase">
               <TableHeader>
                 <TableRow className="border-b border-white/5 bg-white/[0.02] hover:bg-transparent">
-                  <TableHead className="py-6 px-4 md:px-6 font-black text-slate-500 italic h-auto">Name</TableHead>
-                  <TableHead className="hidden md:table-cell py-6 px-6 font-black text-slate-500 italic h-auto">Email</TableHead>
-                  <TableHead className="py-6 px-4 md:px-6 font-black text-slate-500 italic h-auto">Role</TableHead>
-                  <TableHead className="hidden lg:table-cell py-6 px-6 font-black text-slate-500 italic h-auto">Joined</TableHead>
-                  <TableHead className="py-6 px-4 md:px-6 font-black text-slate-500 italic text-right h-auto">Actions</TableHead>
+                  <TableHead className="py-6 px-4 md:px-6 font-black text-slate-500 h-auto">Name</TableHead>
+                  <TableHead className="hidden md:table-cell py-6 px-6 font-black text-slate-500 h-auto">Email</TableHead>
+                  <TableHead className="py-6 px-4 md:px-6 font-black text-slate-500 h-auto">Role</TableHead>
+                  <TableHead className="hidden lg:table-cell py-6 px-6 font-black text-slate-500 h-auto">Joined</TableHead>
+                  <TableHead className="py-6 px-4 md:px-6 font-black text-slate-500 text-right h-auto">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -459,12 +459,12 @@ export default function SettingsPage() {
                 ) : (
                   staff.map((s) => (
                     <TableRow key={s.id || s._id} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                      <TableCell className="py-6 px-4 md:px-6 font-black italic text-foreground tracking-tighter">
+                      <TableCell className="py-6 px-4 md:px-6 font-black text-foreground tracking-tighter">
                         <span className="text-base">{s.fullName}</span>
                       </TableCell>
                       <TableCell className="hidden md:table-cell py-6 px-6 font-mono text-slate-400 lowercase">{s.email}</TableCell>
                       <TableCell className="py-6 px-4 md:px-6">
-                        <span className="bg-primary/10 text-primary border border-primary/20 px-2 md:px-3 py-1 rounded-lg text-[8px] md:text-[9px] font-black italic tracking-widest uppercase">{s.role}</span>
+                        <span className="bg-primary/10 text-primary border border-primary/20 px-2 md:px-3 py-1 rounded-lg text-[8px] md:text-[9px] font-black tracking-widest uppercase">{s.role}</span>
                       </TableCell>
                       <TableCell className="hidden lg:table-cell py-6 px-6 text-slate-500 font-mono text-[10px]">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell className="py-6 px-4 md:px-6 text-right">

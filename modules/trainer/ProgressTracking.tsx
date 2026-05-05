@@ -144,15 +144,15 @@ export function ProgressTracking() {
             <DashboardHeader
                 title="Member"
                 highlight="Performance"
-                subtitle="Analytics Overview"
-                description="Track strength progression and monitor training compliance."
+                subtitle="Progress Summary"
+                description="Track strength progress and see how often they train."
                 descriptionIconColor="primary"
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Member Sidebar */}
                 <Card className="lg:col-span-1 glass-premium border-border bg-card dark:bg-slate-950/40 p-6 h-fit space-y-6">
-                    <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500">Active Members</h3>
+                    <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Active Members</h3>
                     <InputField
                         hideLabel
                         validateType="text"
@@ -174,11 +174,11 @@ export function ProgressTracking() {
                                 )}
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-black italic">
+                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-black">
                                         {member.firstName[0]}{member.lastName?.[0] || ""}
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-xs font-black italic uppercase tracking-tight group-hover:text-primary transition-colors leading-none mb-1">
+                                        <p className="text-xs font-black uppercase tracking-tight group-hover:text-primary transition-colors leading-none mb-1">
                                             {member.firstName} {member.lastName}
                                         </p>
                                         <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest underline decoration-primary/20">Status: Active</p>
@@ -187,7 +187,7 @@ export function ProgressTracking() {
                                 <Activity className={cn("w-3.5 h-3.5", selectedMemberId === member.id ? "text-primary" : "text-slate-800")} />
                             </div>
                         )) : (
-                            <p className="text-[10px] text-slate-500 font-bold uppercase italic text-center py-4">No members found</p>
+                             <p className="text-[10px] text-slate-500 font-bold uppercase text-center py-4">No members found</p>
                         )}
                     </div>
                 </Card>
@@ -197,8 +197,8 @@ export function ProgressTracking() {
                     {!selectedMemberId ? (
                         <div className="flex flex-col items-center justify-center h-[500px] border border-dashed border-white/10 rounded-3xl bg-white/1">
                             <TrendingUp className="w-16 h-16 text-slate-800 mb-6" />
-                            <h3 className="text-lg font-black italic uppercase tracking-widest text-slate-500">Awaiting Member Selection</h3>
-                            <p className="text-[10px] text-slate-600 mt-2 font-medium italic uppercase">Select a member from the list to view their training logs.</p>
+                            <h3 className="text-lg font-black uppercase tracking-widest text-slate-500">Awaiting Member Selection</h3>
+                            <p className="text-[10px] text-slate-600 mt-2 font-medium uppercase">Select a member from the list to view their training logs.</p>
                         </div>
                     ) : (
                         <>
@@ -211,14 +211,14 @@ export function ProgressTracking() {
 
                             {/* Performance Chart */}
                             <Card className="glass-premium border-border bg-card dark:bg-slate-950/40 p-8 relative overflow-hidden group">
-                                <div className="flex items-center justify-between mb-10">
-                                    <h3 className="text-sm font-black italic uppercase tracking-widest flex items-center gap-3">
+                                 <div className="flex items-center justify-between mb-10">
+                                    <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-3">
                                         <TrendingUp className="w-4 h-4 text-primary" />
                                         Strength <span className="text-primary/40">Progression</span> Curve
                                     </h3>
                                     <div className="flex items-center gap-2">
-                                        <Badge className="bg-primary/20 text-primary border-none text-[8px] font-black italic">Compound Volume</Badge>
-                                        <Badge className="bg-white/5 text-slate-500 border-none text-[8px] font-black italic">Last 10 Sessions</Badge>
+                                        <Badge className="bg-primary/20 text-primary border-none text-[8px] font-black">Compound Volume</Badge>
+                                        <Badge className="bg-white/5 text-slate-500 border-none text-[8px] font-black">Last 10 Sessions</Badge>
                                     </div>
                                 </div>
 
@@ -262,16 +262,16 @@ export function ProgressTracking() {
                                         </AreaChart>
                                     </ChartContainer>
                                 ) : (
-                                    <div className="h-64 flex flex-col items-center justify-center border border-dashed border-white/5 rounded-2xl bg-black/5">
+                                     <div className="h-64 flex flex-col items-center justify-center border border-dashed border-white/5 rounded-2xl bg-black/5">
                                         <Activity className="w-8 h-8 text-slate-800 mb-2" />
-                                        <p className="text-[10px] font-black text-slate-600 uppercase italic tracking-widest text-center">No workout data found for charting</p>
+                                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest text-center">No workout data found for charting</p>
                                     </div>
                                 )}
                             </Card>
 
                             {/* Recent Logs List */}
-                            <div className="space-y-4">
-                                <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 pl-2">Training Logs</h3>
+                             <div className="space-y-4">
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 pl-2">Training Logs</h3>
                                 {logs.length > 0 ? logs.map(log => {
                                     let sessionVolume = 0;
                                     log.exercises?.forEach((ex: any) => {
@@ -281,23 +281,23 @@ export function ProgressTracking() {
 
                                     return (
                                         <Card key={log.id} className="glass-premium border-border bg-card dark:bg-slate-950/40 p-6 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group cursor-pointer">
-                                            <div className="flex items-center justify-between">
+                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-6">
                                                     <div className="flex flex-col">
-                                                        <span className="text-[9px] font-black italic text-primary uppercase tracking-widest">{formatDate(logDate).toUpperCase()}</span>
-                                                        <span className="text-base font-black italic uppercase tracking-tight group-hover:text-primary transition-colors">
+                                                        <span className="text-[9px] font-black text-primary uppercase tracking-widest">{formatDate(logDate).toUpperCase()}</span>
+                                                        <span className="text-base font-black uppercase tracking-tight group-hover:text-primary transition-colors">
                                                             {log.planId?.name || "Training Session"}
                                                         </span>
                                                     </div>
                                                     <div className="h-10 w-px bg-white/5" />
-                                                    <div className="flex items-center gap-8">
+                                                     <div className="flex items-center gap-8">
                                                         <div>
                                                             <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest leading-none mb-1">VOLUME</p>
-                                                            <p className="text-xs font-bold italic">{sessionVolume.toLocaleString()} KG</p>
+                                                            <p className="text-xs font-bold">{sessionVolume.toLocaleString()} KG</p>
                                                         </div>
                                                         <div>
                                                             <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest leading-none mb-1">EXERCISES</p>
-                                                            <p className="text-xs font-bold italic">{log.exercises?.length || 0} ITEMS</p>
+                                                            <p className="text-xs font-bold">{log.exercises?.length || 0} ITEMS</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -308,12 +308,12 @@ export function ProgressTracking() {
                                         </Card>
                                     );
                                 }) : (
-                                    <div className="p-12 text-center border border-dashed border-white/5 rounded-3xl bg-black/5">
-                                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">No session logs recorded yet</p>
+                                     <div className="p-12 text-center border border-dashed border-white/5 rounded-3xl bg-black/5">
+                                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">No session logs recorded yet</p>
                                     </div>
                                 )}
                                 {logs.length > 5 && (
-                                    <Button className="w-full h-12 bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] font-black italic uppercase tracking-[0.3em] text-slate-500 hover:text-white rounded-xl">
+                                    <Button className="w-full h-12 bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-white rounded-xl">
                                         Load Archive
                                     </Button>
                                 )}

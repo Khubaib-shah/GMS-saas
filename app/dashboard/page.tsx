@@ -113,7 +113,7 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="space-y-10 animate-fade-up">
+    <div className="space-y-4 md:space-y-10 animate-fade-up">
       <DashboardHeader
         title={isTrainer ? "Trainer" : "Admin"}
         highlight="Dashboard"
@@ -134,7 +134,7 @@ export default function DashboardPage() {
               <Button
                 variant="outline"
                 onClick={() => router.push('/trainer/exercises')}
-                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black tracking-tighter transition-all"
               >
                 <Dumbbell className="mr-2 w-4 h-4" />
                 Exercises
@@ -142,14 +142,14 @@ export default function DashboardPage() {
               <Button
                 variant="outline"
                 onClick={() => router.push('/trainer/templates')}
-                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black italic tracking-tighter transition-all"
+                className="h-12 px-6 rounded-xl bg-white/5 border-white/10 text-slate-400 hover:text-primary hover:border-primary/50 font-black tracking-tighter transition-all"
               >
                 <Plus className="mr-2 w-4 h-4" />
                 Templates
               </Button>
               <Button
                 onClick={() => router.push('/trainer/deploy')}
-                className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+                className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter shadow-lg transition-all active:scale-95"
               >
                 <Send className="mr-2 w-4 h-4" />
                 Assign Plan
@@ -160,7 +160,7 @@ export default function DashboardPage() {
       </DashboardHeader>
 
       {/* Stats Grid */}
-      <div data-tour="dashboard-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div data-tour="dashboard-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <StatsCard
           title={dateRange?.from ? "New Members" : "Total Members"}
           // value={totalMembers.toString()}
@@ -195,7 +195,7 @@ export default function DashboardPage() {
 
       {/* Charts Section - Only for Managers/Owners */}
       {!isTrainer && (
-        <div className="space-y-6 md:space-y-8">
+        <div className="space-y-4 md:space-y-8">
           <div data-tour="dashboard-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8 items-stretch">
             <div className="lg:col-span-2">
               <RevenueChart isLoading={loading} dateRange={dateRange} />
@@ -218,8 +218,8 @@ export default function DashboardPage() {
 
       {/* Members Table */}
       <div data-tour="dashboard-members" className="relative">
-        <div className="flex items-center gap-4 mb-8">
-          <h2 className="text-2xl font-black italic tracking-tighter text-foreground uppercase">
+        <div className="flex items-center gap-4 mb-4 md:mb-8">
+          <h2 className="text-xl md:text-2xl font-black tracking-tighter text-foreground uppercase">
             {isTrainer ? 'My Members' : 'Recent Members'}
           </h2>
           <div className="h-px flex-1 bg-black/5 dark:bg-white/5 shadow-[0_1px_0_rgba(255,255,255,0.05)]"></div>
@@ -236,12 +236,12 @@ export default function DashboardPage() {
 
       {!isTrainer && (
         <div className="relative">
-          <div className="flex items-center gap-4 mb-8">
-            <h2 className="text-2xl font-black italic tracking-tighter text-red-500 uppercase">
+          <div className="flex flex-col md:flex-row items-start md:items-center md:gap-4 mb-4 md:mb-8">
+            <h2 className="text-xl md:text-2xl font-black tracking-tighter text-red-500 uppercase">
               Expiring & Expired
             </h2>
-            <div className="h-px flex-1 bg-black/5 dark:bg-white/5"></div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Memberships needing immediate renewal</p>
+            <div className="hidden md:block h-px flex-1 bg-black/5 dark:bg-white/5"></div>
+            <p className="text-[10px] font-medium md:font-black text-slate-500 uppercase tracking-widest -mt-1 md:mt-0">Memberships needing immediate renewal</p>
           </div>
 
           <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">

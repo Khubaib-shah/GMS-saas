@@ -168,14 +168,14 @@ export default function MemberDashboardPage() {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6">
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <p className="text-red-500 font-black uppercase italic tracking-widest text-xl">UNABLE TO LOAD DASHBOARD</p>
+                    <p className="text-red-500 font-black uppercase tracking-widest text-xl">UNABLE TO LOAD DASHBOARD</p>
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Failed to load member data.</p>
                     <p className="text-[10px] text-slate-700 font-mono mt-2 uppercase tracking-tight">Please try logging in again.</p>
                 </div>
                 <div className="flex gap-4">
                     <Button
                         onClick={fetchDashboard}
-                        className="bg-white/5 hover:bg-white/10 text-white border border-white/5 font-black italic uppercase tracking-widest rounded-xl gap-2"
+                        className="bg-white/5 hover:bg-white/10 text-white border border-white/5 font-black uppercase tracking-widest rounded-xl gap-2"
                     >
                         <RefreshCcw className="w-4 h-4" />
                         RETRY
@@ -186,7 +186,7 @@ export default function MemberDashboardPage() {
                             localStorage.removeItem("memberData");
                             router.push("/member/login");
                         }}
-                        className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-widest rounded-xl"
+                        className="bg-primary text-black hover:bg-white font-black uppercase tracking-widest rounded-xl"
                     >
                         RETURN TO LOGIN
                     </Button>
@@ -207,7 +207,7 @@ export default function MemberDashboardPage() {
                             <Zap className="h-7 w-7 text-primary-foreground" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">
+                            <h1 className="text-xl font-black tracking-tighter uppercase leading-none">
                                 Welcome, <span className="text-primary">{member.firstName}</span>
                             </h1>
                             <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Membership Status: Active</p>
@@ -218,7 +218,7 @@ export default function MemberDashboardPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => router.push("/member/settings")}
-                            className="text-slate-400 hover:text-primary hover:bg-white/5 font-black uppercase italic text-[10px] tracking-widest rounded-xl"
+                            className="text-slate-400 hover:text-primary hover:bg-white/5 font-black uppercase text-[10px] tracking-widest rounded-xl"
                         >
                             <User className="h-4 w-4 mr-2" />
                             PROFILE
@@ -227,7 +227,7 @@ export default function MemberDashboardPage() {
                             variant="ghost"
                             size="sm"
                             onClick={handleLogout}
-                            className="text-slate-400 hover:text-red-500 hover:bg-red-500/10 font-black uppercase italic text-[10px] tracking-widest rounded-xl"
+                            className="text-slate-400 hover:text-red-500 hover:bg-red-500/10 font-black uppercase text-[10px] tracking-widest rounded-xl"
                         >
                             <LogOut className="h-4 w-4 mr-2" />
                             LOGOUT
@@ -244,7 +244,7 @@ export default function MemberDashboardPage() {
                                 <Flame className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-black italic uppercase text-red-500 tracking-tighter">Your membership is expiring soon!</h3>
+                                <h3 className="text-lg font-black uppercase text-red-500 tracking-tighter">Your membership is expiring soon!</h3>
                                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Only {subscription.daysUntilExpiry} days remaining. Renew at the reception to avoid interruption.</p>
                             </div>
                         </div>
@@ -262,7 +262,7 @@ export default function MemberDashboardPage() {
                             <div className="space-y-3">
                                 <div className="flex items-end gap-2">
                                     <span className={cn(
-                                        "text-4xl font-black italic line-height-1",
+                                        "text-4xl font-black line-height-1",
                                         subscription.daysUntilExpiry <= 3 ? "text-red-500" : "text-foreground"
                                     )}>
                                         {subscription.daysUntilExpiry}
@@ -293,7 +293,7 @@ export default function MemberDashboardPage() {
                                 )}
                             </div>
                         ) : (
-                            <p className="text-muted-foreground font-bold italic text-sm">No Active Subscription</p>
+                            <p className="text-muted-foreground font-bold text-sm">No Active Subscription</p>
                         )}
                     </div>
 
@@ -304,13 +304,13 @@ export default function MemberDashboardPage() {
                         </div>
                         {plan ? (
                             <div>
-                                <div className="text-2xl font-black italic uppercase text-foreground truncate mb-1">{plan.name}</div>
+                                <div className="text-2xl font-black uppercase text-foreground truncate mb-1">{plan.name}</div>
                                 <p className="text-[10px] font-black text-blue-500 tracking-widest uppercase italic">
                                     {plan.price} PKR / {plan.duration} DAYS
                                 </p>
                             </div>
                         ) : (
-                            <p className="text-muted-foreground font-bold italic text-sm">No active plan detected</p>
+                            <p className="text-muted-foreground font-bold text-sm">No active plan detected</p>
                         )}
                     </div>
 
@@ -320,7 +320,7 @@ export default function MemberDashboardPage() {
                             <Flame className="h-4 w-4 text-orange-500" />
                         </div>
                         <div className="flex items-end gap-2">
-                            <span className="text-4xl font-black italic text-orange-500">{member.attendanceStreak}</span>
+                            <span className="text-4xl font-black text-orange-500">{member.attendanceStreak}</span>
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest pb-1">Days</span>
                         </div>
                         <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-2 italic">Consistent attendance</p>
@@ -331,7 +331,7 @@ export default function MemberDashboardPage() {
                             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Check-Ins</p>
                             <CalendarCheck className="h-4 w-4 text-green-500" />
                         </div>
-                        <div className="text-4xl font-black italic text-foreground mb-2">{member.totalCheckIns}</div>
+                        <div className="text-4xl font-black text-foreground mb-2">{member.totalCheckIns}</div>
                         <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest italic">Since {new Date(member.joinDate).toLocaleDateString()}</p>
                     </div>
                 </div>
@@ -341,7 +341,7 @@ export default function MemberDashboardPage() {
                     <div className="lg:col-span-1">
                         <div className="glass-premium p-8 flex flex-col items-center justify-center text-center">
                             <div className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-6">Membership QR</div>
-                            <h3 className="text-2xl font-black italic uppercase text-foreground mb-8 tracking-tighter">Membership QR Code</h3>
+                            <h3 className="text-2xl font-black uppercase text-foreground mb-8 tracking-tighter">Membership QR Code</h3>
 
                             <div ref={qrRef} className="bg-white p-6 rounded-2xl shadow-[0_0_50px_-10px_rgba(0,0,0,0.1)] mb-8 transition-transform hover:scale-105 duration-500">
                                 <QRCode
@@ -356,7 +356,7 @@ export default function MemberDashboardPage() {
                                 {member.qrCode || member.id}
                             </p>
 
-                            <Button className="w-full bg-white text-black hover:bg-primary py-6 rounded-xl font-black italic transition-all gap-3" onClick={() => {
+                            <Button className="w-full bg-white text-black hover:bg-primary py-6 rounded-xl font-black transition-all gap-3" onClick={() => {
                                 const svg = qrRef.current?.querySelector("svg");
                                 if (svg) {
                                     const svgData = new XMLSerializer().serializeToString(svg);
@@ -389,19 +389,19 @@ export default function MemberDashboardPage() {
                         <div className="glass-card h-full flex flex-col">
                             <Tabs defaultValue="attendance" className="flex-1 flex flex-col">
                                 <TabsList className="grid w-full grid-cols-4 bg-white/5 border-b border-white/10 rounded-t-2xl overflow-hidden p-0 h-16">
-                                    <TabsTrigger value="attendance" className="data-[state=active]:bg-primary data-[state=active]:text-black rounded-none font-black italic text-[11px] uppercase tracking-widest transition-all h-full">
+                                    <TabsTrigger value="attendance" className="data-[state=active]:bg-primary data-[state=active]:text-black rounded-none font-black text-[11px] uppercase tracking-widest transition-all h-full">
                                         <History className="w-4 h-4 mr-2 hidden sm:block" />
                                         RECENT ATTENDANCE
                                     </TabsTrigger>
-                                    <TabsTrigger value="workouts" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-none font-black italic text-[11px] uppercase tracking-widest transition-all h-full">
+                                    <TabsTrigger value="workouts" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-none font-black text-[11px] uppercase tracking-widest transition-all h-full">
                                         <Dumbbell className="w-4 h-4 mr-2 hidden sm:block" />
                                         WORKOUTS
                                     </TabsTrigger>
-                                    <TabsTrigger value="payments" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-none font-black italic text-[11px] uppercase tracking-widest transition-all h-full">
+                                    <TabsTrigger value="payments" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-none font-black text-[11px] uppercase tracking-widest transition-all h-full">
                                         <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
                                         PAYMENTS
                                     </TabsTrigger>
-                                    <TabsTrigger value="pauses" className="data-[state=active]:bg-amber-500 data-[state=active]:text-black rounded-none font-black italic text-[11px] uppercase tracking-widest transition-all h-full">
+                                    <TabsTrigger value="pauses" className="data-[state=active]:bg-amber-500 data-[state=active]:text-black rounded-none font-black text-[11px] uppercase tracking-widest transition-all h-full">
                                         <Pause className="w-4 h-4 mr-2 hidden sm:block" />
                                         PAUSES
                                     </TabsTrigger>
@@ -410,7 +410,7 @@ export default function MemberDashboardPage() {
                                 <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
                                     <TabsContent value="attendance" className="mt-0 space-y-3">
                                         {attendance.length === 0 ? (
-                                            <div className="py-20 text-center opacity-20 italic text-foreground">No attendance records found</div>
+                                            <div className="py-20 text-center opacity-20 text-foreground">No attendance records found</div>
                                         ) : (
                                             attendance.map((record) => (
                                                 <div key={record.id} className="flex items-center justify-between p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border group hover:border-primary/30 transition-all">
@@ -419,7 +419,7 @@ export default function MemberDashboardPage() {
                                                             <CalendarCheck className="h-6 w-6" />
                                                         </div>
                                                         <div>
-                                                            <p className="font-black italic uppercase text-sm text-foreground">{new Date(record.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                                                            <p className="font-black uppercase text-sm text-foreground">{new Date(record.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
                                                             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
                                                                 {new Date(record.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                                 {record.checkOutTime && ` → ${new Date(record.checkOutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
@@ -438,14 +438,14 @@ export default function MemberDashboardPage() {
                                                 <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-slate-500">
                                                     <Dumbbell className="w-8 h-8" />
                                                 </div>
-                                                <div className="opacity-40 font-black italic text-foreground uppercase tracking-widest">No Workout Plan Assigned</div>
+                                                <div className="opacity-40 font-black text-foreground uppercase tracking-widest">No Workout Plan Assigned</div>
                                                 <p className="text-[10px] text-muted-foreground mt-2 uppercase tracking-widest">Contact your trainer to assign a workout plan.</p>
                                             </div>
                                         ) : (
                                             <div className="space-y-6">
                                                 <div className="flex items-center justify-between">
                                                     <div>
-                                                        <h3 className="text-xl font-black italic uppercase text-foreground">{data.workoutPlan.name}</h3>
+                                                        <h3 className="text-xl font-black uppercase text-foreground">{data.workoutPlan.name}</h3>
                                                         <p className="text-[10px] font-black text-purple-500 uppercase tracking-widest italic">{data.workoutPlan.schedule.length} Active Days</p>
                                                     </div>
                                                 </div>
@@ -460,7 +460,7 @@ export default function MemberDashboardPage() {
                                                                 </div>
                                                                 <Button
                                                                     onClick={() => router.push("/member/workout")}
-                                                                    className="bg-purple-500 text-white hover:bg-white hover:text-black font-black italic text-[10px] uppercase tracking-widest px-6 h-10 rounded-xl neon-glow transition-all"
+                                                                    className="bg-purple-500 text-white hover:bg-white hover:text-black font-black text-[10px] uppercase tracking-widest px-6 h-10 rounded-xl neon-glow transition-all"
                                                                 >
                                                                     <Zap className="w-3.5 h-3.5 mr-2" />
                                                                     START WORKOUT
@@ -480,7 +480,7 @@ export default function MemberDashboardPage() {
                                                                                 </div>
                                                                             )}
                                                                             <div className="flex-1 min-w-0">
-                                                                                <h4 className="font-black italic text-sm text-foreground uppercase truncate">{ex.exercise?.name || "Unknown Exercise"}</h4>
+                                                                                <h4 className="font-black text-sm text-foreground uppercase truncate">{ex.exercise?.name || "Unknown Exercise"}</h4>
                                                                                 <div className="flex flex-wrap gap-2 mt-2">
                                                                                     <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 text-[9px] font-bold uppercase tracking-widest border-0">
                                                                                         {ex.sets} SETS
@@ -489,7 +489,7 @@ export default function MemberDashboardPage() {
                                                                                         {ex.reps} REPS
                                                                                     </Badge>
                                                                                     {ex.notes && (
-                                                                                        <span className="text-[9px] text-slate-500 italic truncate max-w-full">NOTE: {ex.notes}</span>
+                                                                                        <span className="text-[9px] text-slate-500 truncate max-w-full">NOTE: {ex.notes}</span>
                                                                                     )}
                                                                                 </div>
                                                                             </div>
@@ -506,7 +506,7 @@ export default function MemberDashboardPage() {
 
                                     <TabsContent value="payments" className="mt-0 space-y-3">
                                         {payments.length === 0 ? (
-                                            <div className="py-20 text-center opacity-20 italic text-foreground">No payment history found</div>
+                                            <div className="py-20 text-center opacity-20 text-foreground">No payment history found</div>
                                         ) : (
                                             payments.map((payment) => (
                                                 <div key={payment.id} className="flex items-center justify-between p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border group hover:border-blue-500/30 transition-all">
@@ -515,7 +515,7 @@ export default function MemberDashboardPage() {
                                                             <TrendingUp className="h-6 w-6" />
                                                         </div>
                                                         <div>
-                                                            <p className="font-black italic text-lg text-foreground">{payment.amount} PKR</p>
+                                                            <p className="font-black text-lg text-foreground">{payment.amount} PKR</p>
                                                             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
                                                                 {new Date(payment.date).toLocaleDateString()} • {payment.method}
                                                             </p>
@@ -531,7 +531,7 @@ export default function MemberDashboardPage() {
 
                                     <TabsContent value="pauses" className="mt-0 space-y-3">
                                         {(!subscription?.pauseHistory || subscription.pauseHistory.length === 0) ? (
-                                            <div className="py-20 text-center opacity-20 italic text-foreground">No subscription pauses found</div>
+                                            <div className="py-20 text-center opacity-20 text-foreground">No subscription pauses found</div>
                                         ) : (
                                             subscription.pauseHistory.map((pause, index) => (
                                                 <div key={index} className="flex items-start gap-5 p-5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border group hover:border-amber-500/30 transition-all">
@@ -541,14 +541,14 @@ export default function MemberDashboardPage() {
                                                     <div className="flex-1">
                                                         <div className="flex justify-between items-start mb-2">
                                                             <div>
-                                                                <p className="font-black italic uppercase text-sm text-foreground">Subscription Paused</p>
+                                                                <p className="font-black uppercase text-sm text-foreground">Subscription Paused</p>
                                                                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
                                                                     {new Date(pause.startDate).toLocaleDateString()}
                                                                     {pause.endDate ? ` — ${new Date(pause.endDate).toLocaleDateString()}` : " (ONGOING)"}
                                                                 </p>
                                                             </div>
                                                             {pause.endDate && (
-                                                                <Badge variant="outline" className="text-amber-500 border-amber-500/30 font-black italic text-[9px]">
+                                                                <Badge variant="outline" className="text-amber-500 border-amber-500/30 font-black text-[9px]">
                                                                     {(() => {
                                                                         const days = Math.floor((new Date(pause.endDate).getTime() - new Date(pause.startDate).getTime()) / (1000 * 60 * 60 * 24));
                                                                         return days > 0 ? `${days} DAYS` : "< 1 DAY";
@@ -581,7 +581,7 @@ export default function MemberDashboardPage() {
                                 <Pause className="h-8 w-8 text-black" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black italic uppercase text-amber-500 mb-2 tracking-tighter">SUBSCRIPTION PAUSED</h3>
+                                <h3 className="text-2xl font-black uppercase text-amber-500 mb-2 tracking-tighter">SUBSCRIPTION PAUSED</h3>
                                 <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest leading-relaxed">
                                     Your subscription is currently paused. Contact administration to resume it.
                                     {subscription.totalPausedDays > 0 && (

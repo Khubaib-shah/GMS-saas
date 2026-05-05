@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div className="text-primary font-black italic animate-pulse tracking-widest uppercase text-xs">Loading Workout Plans...</div>}>
+    <Suspense fallback={<div className="text-primary font-black animate-pulse tracking-widest uppercase text-xs">Loading Workout Plans...</div>}>
       <WorkoutPlansClient />
     </Suspense>
   );

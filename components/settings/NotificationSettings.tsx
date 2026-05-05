@@ -79,7 +79,7 @@ export function NotificationSettings() {
         <Card className="glass-premium border-white/5 bg-slate-950/20 backdrop-blur-xl overflow-hidden rounded-2xl border-t-0 relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/20 after:to-transparent max-w-2xl animate-fade-up">
             <div className="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
                 <div>
-                    <h3 className="text-xl font-black italic uppercase tracking-tighter text-white flex items-center gap-2">
+                    <h3 className="text-xl font-black uppercase tracking-tighter text-white flex items-center gap-2">
                         NOTIFICATION <span className="text-primary">SETTINGS</span>
                     </h3>
                     <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">
@@ -87,7 +87,7 @@ export function NotificationSettings() {
                     </p>
                 </div>
                 <div className={cn(
-                    "px-2 py-1 rounded-md text-[8px] font-black italic uppercase tracking-widest border transition-all duration-500",
+                    "px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-widest border transition-all duration-500",
                     loading ? "border-amber-500/20 bg-amber-500/5 text-amber-500 animate-pulse" : "border-emerald-500/20 bg-emerald-500/5 text-emerald-500"
                 )}>
                     {loading ? "Loading..." : "Saved"}
@@ -102,7 +102,7 @@ export function NotificationSettings() {
                             <Bell className="w-4 h-4" />
                         </div>
                         <div>
-                            <Label className="text-[11px] font-black italic uppercase tracking-wider text-white">Expiry Reminders</Label>
+                            <Label className="text-[11px] font-black uppercase tracking-wider text-white">Expiry Reminders</Label>
                             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Auto-notify members before sub ends</p>
                         </div>
                     </div>
@@ -123,7 +123,7 @@ export function NotificationSettings() {
                             <Zap className="w-4 h-4" />
                         </div>
                         <div>
-                            <Label className="text-[11px] font-black italic uppercase tracking-wider text-white">Invoice Emails</Label>
+                            <Label className="text-[11px] font-black uppercase tracking-wider text-white">Invoice Emails</Label>
                             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Digital receipts after every payment</p>
                         </div>
                     </div>
@@ -145,7 +145,7 @@ export function NotificationSettings() {
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <Label className="text-[11px] font-black italic uppercase tracking-wider text-white">SMS Notifications</Label>
+                                <Label className="text-[11px] font-black uppercase tracking-wider text-white">SMS Notifications</Label>
                                 <span className="bg-amber-500/10 text-amber-500 text-[8px] font-black px-1.5 py-0.5 rounded border border-amber-500/20 tracking-tighter">COMING SOON</span>
                             </div>
                             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Critical alerts via SMS gateway</p>
@@ -169,7 +169,7 @@ export function NotificationSettings() {
                     <Button 
                         onClick={handleSave} 
                         disabled={saving || loading}
-                        className="h-11 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-xs rounded-lg neon-glow flex items-center gap-2"
+                        className="h-11 px-8 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter transition-all uppercase text-xs rounded-lg neon-glow flex items-center gap-2"
                     >
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         SAVE CHANGES

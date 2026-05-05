@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 import { Edit2, Plus, Trash2, PauseCircle, PlayCircle, Eye, Search, Loader2 } from "lucide-react";
@@ -40,6 +40,7 @@ import {
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import Link from "next/link";
 import { PlanSkeleton } from "@/components/plan-skeleton";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export default function SubscriptionsPage() {
   const { data: session, status } = useSession();
@@ -113,6 +114,86 @@ export default function SubscriptionsPage() {
         .catch((err) => console.error("Failed to fetch gyms", err));
     }
   }, [isAdmin, queryGymId]);
+
+  const planColumns = React.useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: "gymId",
+      header: "Gym Name",
+      cell: ({ row }) => {
+        const gym = gyms.find(g => g._id === row.original.gymId);
+        return <span className="font-medium md:font-black tracking-tighter">{gym?.name || "Unknown Gym"}</span>;
+      }
+    },
+    {
+      accessorKey: "name",
+      header: "Plan Name",
+      cell: ({ row }) => (
+        <div className="md:flex flex-col">
+          <span className="font-black text-foreground">{row.original.name}</span>
+          <span className="hidden md:block text-[9px] font-mono text-slate-500">ID: {row.original.id.slice(-8)}</span>
+        </div>
+      )
+    },
+    {
+      accessorKey: "price",
+      header: "Price",
+      cell: ({ row }) => <span className="font-mono text-primary">{formatCurrency(row.original.price)}</span>
+    },
+    {
+      accessorKey: "duration",
+      header: "Duration",
+      cell: ({ row }) => <span className="font-mono text-slate-500">{row.original.duration} DAYS</span>
+    },
+    {
+      id: "members",
+      header: "Members",
+      meta: { align: "center" },
+      cell: ({ row }) => {
+        const memberCount = store.subscriptions.filter((s) => s.planId === row.original.id).length;
+        return (
+          <StatusBadge status="active">
+            {memberCount} ACTIVE
+          </StatusBadge>
+        );
+      }
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      meta: { align: "right" },
+      cell: ({ row }) => {
+        const plan = row.original;
+        return (
+          <div className="flex justify-end gap-2">
+            {canEditPlans && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelectedPlan(plan);
+                  setEditFormData({ ...plan, price: plan.price });
+                  setShowEditModal(true);
+                }}
+                className="h-8 w-8 rounded-xl border border-white/5 bg-white/5 text-slate-400 hover:text-primary hover:border-primary/50 transition-all opacity-0 group-hover/row:opacity-100"
+              >
+                <Edit2 className="w-4 h-4" />
+              </Button>
+            )}
+            {canDeletePlans && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/row:opacity-100"
+                onClick={() => setPlanToDelete(plan.id)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        );
+      }
+    }
+  ], [gyms, store.subscriptions, canEditPlans, canDeletePlans]);
 
   const handlePlanAdd = async () => {
     if (!addFormData.id || !addFormData.name) {
@@ -260,16 +341,16 @@ export default function SubscriptionsPage() {
         const sub = row.original;
         return (
           <div className="flex items-center gap-3">
-            <Avatar className="flex justify-center items-center w-8 h-8 rounded-xl border border-white/5 grayscale group-hover/row:grayscale-0 transition-all overflow-hidden">
-              <AvatarFallback className="bg-primary/10 text-primary font-black italic text-[10px] w-full h-full flex items-center justify-center">
+            <Avatar className="hidden md:flex justify-center items-center w-8 h-8 rounded-xl border border-white/5 grayscale group-hover/row:grayscale-0 transition-all overflow-hidden">
+              <AvatarFallback className="bg-primary/10 text-primary font-black text-[10px] w-full h-full flex items-center justify-center">
                 {sub.member?.firstName?.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div>
-              <span className="font-black italic text-foreground tracking-tighter block group-hover/row:text-primary transition-colors text-sm">
+              <span className="font-medium md:font-black text-foreground tracking-tighter block group-hover/row:text-primary transition-colors text-sm">
                 {sub.member?.firstName} {sub.member?.lastName || ""}
               </span>
-              <span className="text-[9px] font-mono text-slate-500">ID: {sub.memberId?.slice(-8)}</span>
+              <span className="hidden md:block text-[9px] font-mono text-slate-500">ID: {sub.memberId?.slice(-8)}</span>
             </div>
           </div>
         );
@@ -311,7 +392,7 @@ export default function SubscriptionsPage() {
         return (
           <div className="flex flex-col gap-1">
             <div className={cn(
-              "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest w-fit",
+              "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black tracking-widest w-fit",
               isPaused
                 ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
                 : isActive
@@ -391,7 +472,7 @@ export default function SubscriptionsPage() {
         description="Create and update plans for your members"
       >
         {(canCreatePlans || status === "loading") && (
-          <Button onClick={() => setShowAddModal(true)} className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" disabled={status === "loading"}>
+          <Button onClick={() => setShowAddModal(true)} className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-medium md:font-black tracking-tighter neon-glow transition-all group gap-2" disabled={status === "loading"}>
             <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
             {status === "loading" ? "Loading..." : "Add Plan"}
           </Button>
@@ -400,100 +481,23 @@ export default function SubscriptionsPage() {
 
 
       {/* Plans Section */}
-      <div className="mb-12">
+      <div className="space-y-4 md:space-y-8 ">
         <div className="flex items-center gap-4 mb-6">
-          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Available Plans</h3>
+          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Available Plans</h3>
           <div className="h-px flex-1 bg-white/5"></div>
         </div>
 
-        {loading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{Array.from({ length: 3 }).map((_, i) => (
+        {loading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">{Array.from({ length: 3 }).map((_, i) => (
           <PlanSkeleton key={i} />
         ))}</div> : isAdmin ? (
-          <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
-            <div className="overflow-x-auto">
-              <table className="w-full text-[11px] font-bold tracking-widest uppercase">
-                <thead>
-                  <tr className="border-b border-white/5 bg-white/[0.02]">
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Gym Name</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Plan Name</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Price</th>
-                    <th className="text-left py-6 px-6 font-black text-slate-500 italic">Duration</th>
-                    <th className="text-center py-6 px-6 font-black text-slate-500 italic">Members</th>
-                    {(canEditPlans || canDeletePlans) && <th className="text-right py-6 px-6 font-black text-slate-500 italic">Actions</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPlans.length > 0 ? (
-                    filteredPlans.map((plan) => {
-                      const gym = gyms.find(g => g._id === plan.gymId);
-                      const memberCount = store.subscriptions.filter(
-                        (s) => s.planId === plan.id
-                      ).length;
-
-                      return (
-                        <tr key={plan.mongoId || `${plan.gymId}-${plan.id}`} className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row">
-                          <td className="py-6 px-6 font-black italic text-foreground tracking-tighter">
-                            {gym?.name || "Unknown Gym"}
-                          </td>
-                          <td className="py-6 px-6">
-                            <div className="flex flex-col">
-                              <span className="font-black text-foreground">{plan.name}</span>
-                              <span className="text-[9px] font-mono text-slate-500">ID: {plan.id.slice(-8)}</span>
-                            </div>
-                          </td>
-                          <td className="py-6 px-6 font-mono text-primary">{formatCurrency(plan.price)}</td>
-                          <td className="py-6 px-6 font-mono text-slate-500">{plan.duration} DAYS</td>
-                          <td className="py-6 px-6 text-center">
-                            <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest border border-primary/20">
-                              {memberCount} ACTIVE
-                            </span>
-                          </td>
-                          {(canEditPlans || canDeletePlans) && (
-                            <td className="py-6 px-6 text-right">
-                              <div className="flex justify-end gap-2">
-                                {canEditPlans && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      setSelectedPlan(plan);
-                                      setEditFormData({
-                                        ...plan,
-                                        price: plan.price,
-                                      });
-                                      setShowEditModal(true);
-                                    }}
-                                    className="h-8 w-8 rounded-xl border border-white/5 bg-white/5 text-slate-400 hover:text-primary hover:border-primary/50 transition-all opacity-0 group-hover/row:opacity-100"
-                                  >
-                                    <Edit2 className="w-4 h-4" />
-                                  </Button>
-                                )}
-                                {canDeletePlans && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 rounded-xl border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover/row:opacity-100"
-                                    onClick={() => setPlanToDelete(plan.id)}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                )}
-                              </div>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan={(canEditPlans || canDeletePlans) ? 6 : 5} className="py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
-                        No plans created yet.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40 rounded-3xl">
+              <DataTable
+                isLoading={loading}
+                columns={planColumns}
+                data={store.plans}
+                searchKey={["name", "id"]}
+                searchPlaceholder="Search plans..."
+              />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -509,7 +513,7 @@ export default function SubscriptionsPage() {
                   <div>
                     {/* Title + Duration */}
                     <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/5">
-                      <h3 className="text-lg font-black italic tracking-tighter uppercase">{plan.name}</h3>
+                      <h3 className="text-lg font-black tracking-tighter uppercase">{plan.name}</h3>
                       <span className="text-[9px] bg-primary/10 text-primary px-2 py-1 rounded-md font-black tracking-widest uppercase border border-primary/20">
                         {plan.duration} days
                       </span>
@@ -532,7 +536,7 @@ export default function SubscriptionsPage() {
 
                     {/* Members */}
                     <div className="p-4 mb-2 text-center flex gap-4 items-center justify-center border-t border-white/5">
-                      <p className="text-3xl font-black italic tracking-tighter text-foreground">{memberCount}</p>
+                      <p className="text-3xl font-black tracking-tighter text-foreground">{memberCount}</p>
                       <div className="text-left">
                         <p className="text-[9px] font-black tracking-widest uppercase text-slate-500">Active</p>
                         <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Members</p>
@@ -545,7 +549,7 @@ export default function SubscriptionsPage() {
                       {canEditPlans && (
                         <Button
                           variant="outline"
-                          className="flex-1 rounded-xl font-black italic tracking-tighter !h-[38px] border-white/10 bg-white/5 text-slate-400 hover:text-white transition-all text-xs uppercase"
+                          className="flex-1 rounded-xl font-medium md:font-black tracking-tighter !h-[38px] border-white/10 bg-white/5 text-slate-400 hover:text-white transition-all text-xs uppercase"
                           onClick={() => {
                             setSelectedPlan(plan);
                             setEditFormData({
@@ -563,7 +567,7 @@ export default function SubscriptionsPage() {
                       {canDeletePlans && (
                         <Button
                           variant="ghost"
-                          className="flex-1 rounded-xl font-black italic tracking-tighter !h-[38px] border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-400 hover:text-white transition-all text-xs"
+                          className="flex-1 rounded-xl font-medium md:font-black tracking-tighter !h-[38px] border border-red-500/10 bg-red-500/5 text-red-500 hover:bg-red-400 hover:text-white transition-all text-xs"
                           onClick={() => setPlanToDelete(plan.id)}
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -582,7 +586,7 @@ export default function SubscriptionsPage() {
       {/* Subscriptions Table */}
       <div>
         <div className="flex items-center gap-4 mb-6">
-          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Member Subscriptions ({memberSubscriptions.length})</h3>
+          <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Member Subscriptions ({memberSubscriptions.length})</h3>
           <div className="h-px flex-1 bg-white/5"></div>
         </div>
 
@@ -596,15 +600,15 @@ export default function SubscriptionsPage() {
                 value={subFilterStatus}
                 onValueChange={(value) => setSubFilterStatus(value as any)}
               >
-                <SelectTrigger className="!h-[41px] w-full md:w-56 bg-white/5 border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+                <SelectTrigger className="!h-[41px] w-full md:w-56 bg-white/5 border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all focus:ring-0">
                   <span className="text-slate-500 mr-2">Status:</span>
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-                  <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">All Status</SelectItem>
-                  <SelectItem value="active" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Active</SelectItem>
-                  <SelectItem value="paused" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Paused</SelectItem>
-                  <SelectItem value="expired" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Expired</SelectItem>
+                  <SelectItem value="all" className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">All Status</SelectItem>
+                  <SelectItem value="active" className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">Active</SelectItem>
+                  <SelectItem value="paused" className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">Paused</SelectItem>
+                  <SelectItem value="expired" className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">Expired</SelectItem>
                 </SelectContent>
               </Select>
             }
@@ -748,7 +752,7 @@ export default function SubscriptionsPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-slate-500 ml-2 italic font-bold" >Description</Label>
+              <Label htmlFor="description" className="text-slate-500 ml-2 font-bold" >Description</Label>
               <Textarea
                 id="description"
                 value={addFormData.description}

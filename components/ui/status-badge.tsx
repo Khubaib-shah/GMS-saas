@@ -9,9 +9,10 @@ interface StatusBadgeProps {
   status: StatusType
   className?: string
   variant?: "default" | "icon"
+  children?: React.ReactNode
 }
 
-export function StatusBadge({ status, className, variant = "default" }: StatusBadgeProps) {
+export function StatusBadge({ status, className, variant = "default", children }: StatusBadgeProps) {
   const config = {
     active: {
       label: "Active",
@@ -50,8 +51,8 @@ export function StatusBadge({ status, className, variant = "default" }: StatusBa
   if (variant === "icon") {
     return (
       <div className={cn("inline-flex items-center justify-center group/status relative", className)}>
-        <Icon className={cn("w-5 h-5", color.split(" ")[0])} />
-        <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest italic rounded opacity-0 group-hover/status:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-xl z-50">
+        <Icon className={cn("w-3 h-3 md:w-5 md:h-5", color.split(" ")[0])} />
+        <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded opacity-0 group-hover/status:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-xl z-50">
           {label}
         </span>
       </div>
@@ -60,12 +61,12 @@ export function StatusBadge({ status, className, variant = "default" }: StatusBa
 
   return (
     <div className={cn(
-      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest italic border",
+      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
       color,
       className
     )}>
       <Icon className="w-3.5 h-3.5 md:w-3 md:h-3" />
-      <span className="hidden md:inline">{label}</span>
+      <span className="hidden md:inline">{children || label}</span>
     </div>
   )
 }
