@@ -183,10 +183,10 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                     <div className="absolute top-0 right-0 w-48 h-full bg-primary/5 -skew-x-12 translate-x-10 opacity-50" />
                     <div className="relative">
                         <div className="flex items-center gap-3 mb-2">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">Plan Builder</span>
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] leading-none">Plan Builder</span>
                             <div className="h-px w-16 bg-primary/20"></div>
                         </div>
-                        <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase text-foreground leading-none flex items-baseline gap-2">
+                        <DialogTitle className="text-3xl font-black tracking-tighter uppercase text-foreground leading-none flex items-baseline gap-2">
                             Workout <span className="text-primary">Planner</span>
                         </DialogTitle>
                     </div>
@@ -205,12 +205,12 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                 className="h-9 rounded-lg"
                             />
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic block">Objective</label>
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Objective</label>
                                 <Textarea
                                     placeholder="Plan objective..."
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="bg-white/5 max-h-24 border-transparent focus:border-primary/50 font-medium italic min-h-[60px] rounded-lg text-xs py-2"
+                                    className="bg-white/5 max-h-24 border-transparent focus:border-primary/50 font-medium min-h-[60px] rounded-lg text-xs py-2"
                                 />
                             </div>
                         </div>
@@ -234,7 +234,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                         onClick={() => handleAddExercise(activeTab, ex)}
                                     >
                                         <div className="min-w-0">
-                                            <span className="text-[10px] font-black italic block truncate group-hover:text-primary transition-colors">{ex.name}</span>
+                                            <span className="text-[10px] font-black block truncate group-hover:text-primary transition-colors">{ex.name}</span>
                                             <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none">{ex.muscleGroup}</span>
                                         </div>
                                         <Plus className="w-3 h-3 text-slate-500 group-hover:text-primary transition-colors shrink-0 ml-2" />
@@ -254,7 +254,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                             key={day.id}
                                             value={day.id}
                                             className={cn(
-                                                "h-8 px-4 rounded-lg text-[9px] font-black italic transition-all border border-white/10 shrink-0",
+                                                "h-8 px-4 rounded-lg text-[9px] font-black transition-all border border-white/10 shrink-0",
                                                 "data-[state=active]:bg-primary data-[state=active]:text-black data-[state=active]:shadow-lg data-[state=active]:border-primary",
                                                 "data-[state=inactive]:hover:bg-white/5 data-[state=inactive]:text-slate-500"
                                             )}
@@ -274,11 +274,11 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                     <Calendar className="w-4 h-4" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-lg font-black italic uppercase tracking-tighter text-foreground leading-none">{day.label} Session</h4>
-                                                    <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest italic">Sequence Builder</span>
+                                                    <h4 className="text-lg font-black uppercase tracking-tighter text-foreground leading-none">{day.label} Session</h4>
+                                                    <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">Sequence Builder</span>
                                                 </div>
                                             </div>
-                                            <div className="px-3 py-1 rounded-full bg-slate-950/50 border border-white/5 text-[9px] font-black italic tracking-widest text-slate-400">
+                                            <div className="px-3 py-1 rounded-full bg-slate-950/50 border border-white/5 text-[9px] font-black tracking-widest text-slate-400">
                                                 {schedule.find(d => d.day === day.id)?.exercises.length || 0} Exercises
                                             </div>
                                         </div>
@@ -291,11 +291,11 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                     <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-2 mb-0.5">
-                                                                <span className="text-[10px] font-black italic text-slate-500 font-mono">#{String(idx + 1).padStart(2, '0')}</span>
-                                                                <h5 className="text-sm font-black italic uppercase tracking-tighter text-foreground group-hover:text-primary transition-colors truncate">{ex.name}</h5>
+                                                                <span className="text-[10px] font-black text-slate-500 font-mono">#{String(idx + 1).padStart(2, '0')}</span>
+                                                                <h5 className="text-sm font-black uppercase tracking-tighter text-foreground group-hover:text-primary transition-colors truncate">{ex.name}</h5>
                                                             </div>
                                                             <input
-                                                                className="w-full bg-transparent border-none text-[10px] text-slate-500 focus:outline-none font-medium italic"
+                                                                className="w-full bg-transparent border-none text-[10px] text-slate-500 focus:outline-none font-medium"
                                                                 placeholder="Notes..."
                                                                 value={ex.notes}
                                                                 onChange={(e) => handleUpdateExercise(day.id, idx, { notes: e.target.value })}
@@ -307,7 +307,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                                 label="Sets"
                                                                 validateType="number"
                                                                 containerClassName="w-12"
-                                                                className="h-8 bg-white/5 border-white/5 font-black text-center italic rounded-lg text-xs"
+                                                                className="h-8 bg-white/5 border-white/5 font-black text-center rounded-lg text-xs"
                                                                 value={ex.sets.toString()}
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { sets: val })}
                                                             />
@@ -315,7 +315,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                                 label="Reps"
                                                                 validateType="text"
                                                                 containerClassName="w-16"
-                                                                className="h-8 bg-white/5 border-white/5 font-black text-center italic rounded-lg text-xs"
+                                                                className="h-8 bg-white/5 border-white/5 font-black text-center rounded-lg text-xs"
                                                                 value={ex.reps}
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { reps: val })}
                                                             />
@@ -323,7 +323,7 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                                 label="Rest"
                                                                 validateType="number"
                                                                 containerClassName="w-16    "
-                                                                className="h-8 bg-white/5 border-white/5 font-black text-center italic rounded-lg text-xs"
+                                                                className="h-8 bg-white/5 border-white/5 font-black text-center rounded-lg text-xs"
                                                                 value={ex.restSeconds.toString()}
                                                                 onChange={(val) => handleUpdateExercise(day.id, idx, { restSeconds: val })}
                                                             />
@@ -345,8 +345,8 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                                                     <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-3">
                                                         <Dumbbell className="w-6 h-6 text-slate-700" />
                                                     </div>
-                                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">No exercises</p>
-                                                    <p className="text-[9px] text-slate-500 mt-1 font-medium italic">Assign exercises from the left panel</p>
+                                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">No exercises</p>
+                                                    <p className="text-[9px] text-slate-500 mt-1 font-medium">Assign exercises from the left panel</p>
                                                 </div>
                                             )}
                                         </div>
@@ -361,18 +361,18 @@ export function WorkoutPlanBuilder({ open, onOpenChange, initialData }: WorkoutB
                     <div className="w-full flex flex-col md:flex-row gap-4 items-center justify-between">
                         <div className="flex items-center gap-4 px-4 py-2.5 rounded-xl bg-white/5 border border-white/5 group">
                             <Info className="w-4 h-4 text-primary shrink-0" />
-                            <p className="text-[10px] text-slate-400 font-bold italic leading-tight">
+                            <p className="text-[10px] text-slate-400 font-bold leading-tight">
                                 Plans sync in real-time. Ensure proper rest between sets.
                             </p>
                         </div>
                         <div className="flex gap-3 w-full md:w-auto shrink-0">
-                            <Button variant="ghost" onClick={() => onOpenChange(false)} className="flex-1 md:flex-none h-9 px-8 rounded-lg text-[10px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white transition-all bg-white/5">
+                            <Button variant="ghost" onClick={() => onOpenChange(false)} className="flex-1 md:flex-none h-9 px-8 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-all bg-white/5">
                                 Cancel
                             </Button>
                             <Button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="flex-1 md:flex-none h-9 px-10 rounded-lg bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+                                className="flex-1 md:flex-none h-9 px-10 rounded-lg bg-primary text-black hover:bg-white font-medium md:font-black tracking-tighter shadow-lg transition-all active:scale-95"
                             >
                                 {isSaving ? "Saving..." : (initialData ? "Update" : "Save")}
                                 <Save className="ml-2 w-4 h-4" />

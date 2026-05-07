@@ -135,7 +135,7 @@ export default function GymsPage() {
                         <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20 shadow-[0_0_15px_rgba(var(--indigo-500),0.1)] group-hover/row:bg-indigo-500/20 transition-colors">
                             <Building2 className="w-5 h-5 text-indigo-400" />
                         </div>
-                        <span className="text-foreground font-black italic tracking-tighter text-base block group-hover/row:text-primary transition-colors">
+                        <span className="text-foreground font-black tracking-tighter text-base block group-hover/row:text-primary transition-colors">
                             {gym.name}
                         </span>
                     </div>
@@ -149,7 +149,7 @@ export default function GymsPage() {
                 const gym = row.original;
                 return (
                     <div>
-                        <p className="text-foreground font-black italic tracking-tighter text-sm mb-0.5">{gym.ownerName}</p>
+                        <p className="text-foreground font-black tracking-tighter text-sm mb-0.5">{gym.ownerName}</p>
                         <p className="text-[9px] text-slate-500 font-mono tracking-widest lowercase">{gym.ownerEmail}</p>
                     </div>
                 );
@@ -158,12 +158,12 @@ export default function GymsPage() {
         {
             accessorKey: "city",
             header: "City",
-            cell: ({ row }) => <span className="text-slate-500 font-black italic tracking-widest text-[10px]">{row.original.city || "—"}</span>
+            cell: ({ row }) => <span className="text-slate-500 font-black tracking-widest text-[10px]">{row.original.city || "—"}</span>
         },
         {
             accessorKey: "planName",
             header: "Plan",
-            cell: ({ row }) => <span className="text-[10px] font-black italic tracking-widest text-indigo-400">{row.original.planName}</span>
+            cell: ({ row }) => <span className="text-[10px] font-black tracking-widest text-indigo-400">{row.original.planName}</span>
         },
         {
             accessorKey: "subscriptionStatus",
@@ -174,7 +174,7 @@ export default function GymsPage() {
                 return (
                     <span
                         className={cn(
-                            "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest",
+                            "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black tracking-widest",
                             badge.class
                         )}
                     >
@@ -190,14 +190,14 @@ export default function GymsPage() {
             cell: ({ row }) => (
                 <div className="flex items-center gap-2 text-slate-300">
                     <Users className="w-4 h-4 text-slate-500" />
-                    <span className="text-base font-black italic tracking-tighter">{row.original.totalMembers}</span>
+                    <span className="text-base font-black tracking-tighter">{row.original.totalMembers}</span>
                 </div>
             )
         },
         {
             accessorKey: "totalRevenue",
             header: "Revenue",
-            cell: ({ row }) => <span className="text-base font-black italic tracking-tighter text-emerald-400">{formatPKR(row.original.totalRevenue)}</span>
+            cell: ({ row }) => <span className="text-base font-black tracking-tighter text-emerald-400">{formatPKR(row.original.totalRevenue)}</span>
         },
         {
             accessorKey: "branchCount",
@@ -256,7 +256,7 @@ export default function GymsPage() {
             >
                 <Button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2"
+                    className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter neon-glow transition-all group gap-2"
                 >
                     <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                     REGISTER NEW GYM
@@ -294,7 +294,7 @@ export default function GymsPage() {
                             <Button
                                 variant="ghost"
                                 className={cn(
-                                    "h-[38px] px-6 rounded-xl border font-black italic tracking-tighter text-[10px] uppercase group transition-all",
+                                    "h-[38px] px-6 rounded-xl border font-black tracking-tighter text-[10px] uppercase group transition-all",
                                     !showDeleted
                                         ? "bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20"
                                         : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"

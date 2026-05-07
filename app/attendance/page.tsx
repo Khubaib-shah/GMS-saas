@@ -25,8 +25,6 @@ export default function AttendancePage() {
     const [reports, setReports] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingReports, setLoadingReports] = useState(false);
-    const [search, setSearch] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
 
     useEffect(() => {
@@ -49,9 +47,7 @@ export default function AttendancePage() {
         }
     }, [activeTab, store.gymProfile?._id]);
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [search]);
+
 
     const fetchReports = async () => {
         if (!store.gymProfile?._id) return;
@@ -73,19 +69,10 @@ export default function AttendancePage() {
         }
     };
 
-    const filteredReports = useMemo(() => {
-        return reports.filter(r =>
-            `${r.memberId?.firstName || ""} ${r.memberId?.lastName || ""}`.toLowerCase().includes(search.toLowerCase())
-        );
-    }, [reports, search]);
 
-    const paginatedReports = useMemo(() => {
-        const start = (currentPage - 1) * pageSize;
-        return filteredReports.slice(start, start + pageSize);
-    }, [filteredReports, currentPage]);
 
     return (
-        <div className="space-y-10 animate-fade-up">
+        <div className="space-y-4 md:space-y-10 animate-fade-up">
             <DashboardHeader
                 title="Gym"
                 highlight="Attendance"
@@ -96,17 +83,17 @@ export default function AttendancePage() {
             <AttendanceStats />
 
             <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
-                <div className="glass-premium p-2 mb-8 border-border w-max mx-auto md:mx-0">
+                <div className="glass-premium p-2 mb-8 border-border w-full md:w-max mx-auto md:mx-0">
                     <TabsList className="bg-transparent h-auto p-0 gap-2 flex">
                         <TabsTrigger
                             value="mark"
-                            className="h-10 px-6 rounded-lg text-[10px] font-black uppercase italic tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+                            className="h-10 px-6 rounded-lg text-[10px] font-normal md:font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
                         >
                             Mark Attendance
                         </TabsTrigger>
                         <TabsTrigger
                             value="reports"
-                            className="h-10 px-6 rounded-lg text-[10px] font-black uppercase italic tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+                            className="h-10 px-6 rounded-lg text-[10px] font-normal md:font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
                         >
                             Daily Report
                         </TabsTrigger>
@@ -145,38 +132,20 @@ export default function AttendancePage() {
 
                 <TabsContent value="reports" className="mt-0">
                     <div className="flex items-center gap-4 mb-6">
-                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Today's Activity</h3>
+                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Today's Activity</h3>
                         <div className="h-px flex-1 bg-white/5"></div>
                     </div>
 
                     {/* Search & Filter HUD */}
-                    <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-8 backdrop-blur-md">
-                        <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
-                            <Search className="w-3.5 h-3.5 text-primary/50" />
-                            <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
-                                Search
-                            </span>
-                        </div>
 
-                        <div className="flex-1 w-full">
-                            <InputField
-                                hideLabel
-                                validateType="text"
-                                placeholder="Search check-ins by member name..."
-                                value={search}
-                                onChange={(val) => setSearch(val)}
-                                leadingIcon={<Search className="w-4 h-4" />}
-                                className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
-                                containerClassName="w-full"
-                            />
-                        </div>
-                    </div>
 
                     <div className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40 rounded-3xl">
                             <DataTable
                                 isLoading={loadingReports}
                                 columns={columns}
-                                data={filteredReports.map((record: any) => ({
+                                searchKey="memberName"
+                                searchPlaceholder="Search check-ins by member name..."
+                                data={reports.map((record: any) => ({
                                     id: record.id,
                                     memberName: `${record.memberId?.firstName || ""} ${record.memberId?.lastName || ""}`,
                                     memberId: record.memberId?.id,
@@ -186,9 +155,9 @@ export default function AttendancePage() {
                                 }))}
                             />
 
-                        {filteredReports.length === 0 && !loadingReports && (
+                        {reports.length === 0 && !loadingReports && (
                             <div className="text-center py-24 bg-white/[0.01]">
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">
                                     No records found for today.
                                 </p>
                             </div>

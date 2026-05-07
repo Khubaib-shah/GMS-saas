@@ -17,7 +17,7 @@ const dashboardSteps = [
             <div className="space-y-3">
                 <div className="flex items-center gap-2">
                     <Rocket className="w-5 h-5 text-primary" />
-                    <h3 className="font-black text-lg italic tracking-tight">Welcome to GymFlow!</h3>
+                    <h3 className="font-black text-lg tracking-tight">Welcome to GymFlow!</h3>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     This is your <strong>command center</strong> for managing everything about your gym. Let's take a quick tour to get you started!
@@ -29,7 +29,7 @@ const dashboardSteps = [
         selector: '[data-tour="sidebar-nav"]',
         content: () => (
             <div className="space-y-3">
-                <h3 className="font-black text-lg italic tracking-tight">Navigation Hub</h3>
+                <h3 className="font-black text-lg tracking-tight">Navigation Hub</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     Access all your gym management modules from here — <strong>Members, Attendance, Subscriptions, Payments, Trainers</strong>, and more. Each section is built for speed and precision.
                 </p>
@@ -40,7 +40,7 @@ const dashboardSteps = [
         selector: '[data-tour="navbar-search"]',
         content: () => (
             <div className="space-y-3">
-                <h3 className="font-black text-lg italic tracking-tight">Quick Search</h3>
+                <h3 className="font-black text-lg tracking-tight">Quick Search</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     Need to find a member fast? Use the <strong>search bar</strong> to instantly filter through your records across the system.
                 </p>
@@ -52,7 +52,7 @@ const dashboardSteps = [
         selector: '[data-tour="navbar-notifications"]',
         content: () => (
             <div className="space-y-3">
-                <h3 className="font-black text-lg italic tracking-tight">Live Alerts</h3>
+                <h3 className="font-black text-lg tracking-tight">Live Alerts</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     Stay on top of your gym with <strong>real-time notifications</strong> — expiring subscriptions, new members, and recent payments all appear here.
                 </p>
@@ -63,7 +63,7 @@ const dashboardSteps = [
         selector: '[data-tour="navbar-profile"]',
         content: () => (
             <div className="space-y-3">
-                <h3 className="font-black text-lg italic tracking-tight">Your Profile</h3>
+                <h3 className="font-black text-lg tracking-tight">Your Profile</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     Your identity and role are displayed here. You can manage your account from <strong>Settings</strong> in the sidebar.
                 </p>
@@ -74,7 +74,7 @@ const dashboardSteps = [
         selector: '[data-tour="dashboard-stats"]',
         content: () => (
             <div className="space-y-3">
-                <h3 className="font-black text-lg italic tracking-tight">Key Metrics</h3>
+                <h3 className="font-black text-lg tracking-tight">Key Metrics</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     Your <strong>most important KPIs</strong> at a glance — total members, active subscriptions, expiring plans, and monthly revenue.
                 </p>
@@ -85,7 +85,7 @@ const dashboardSteps = [
         selector: '[data-tour="dashboard-charts"]',
         content: () => (
             <div className="space-y-3">
-                <h3 className="font-black text-lg italic tracking-tight">Analytics & Trends</h3>
+                <h3 className="font-black text-lg tracking-tight">Analytics & Trends</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     Visual breakdowns of your <strong>revenue trends</strong> and <strong>subscription distribution</strong>. Track growth over time and make data-driven decisions.
                 </p>
@@ -96,7 +96,7 @@ const dashboardSteps = [
         selector: '[data-tour="dashboard-members"]',
         content: () => (
             <div className="space-y-3">
-                <h3 className="font-black text-lg italic tracking-tight">Recent Members</h3>
+                <h3 className="font-black text-lg tracking-tight">Recent Members</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     Quick view of your <strong>latest member registrations</strong>. Click on any member to view their full profile, subscription, and payment history.
                 </p>
@@ -107,7 +107,7 @@ const dashboardSteps = [
         selector: '[data-tour="sidebar-logout"]',
         content: () => (
             <div className="space-y-3">
-                <h3 className="font-black text-lg italic tracking-tight">You're All Set! 🎉</h3>
+                <h3 className="font-black text-lg tracking-tight">You're All Set! 🎉</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                     That's the basics! Start by <strong>adding members</strong>, creating <strong>plans</strong>, and managing <strong>subscriptions</strong>. You can replay this tour anytime from the help button.
                 </p>

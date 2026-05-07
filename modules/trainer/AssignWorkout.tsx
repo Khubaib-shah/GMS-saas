@@ -122,11 +122,11 @@ export function AssignWorkout() {
                                 <Users className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black italic uppercase tracking-widest leading-none mb-1">Select Members</h3>
+                                <h3 className="text-sm font-black uppercase tracking-widest leading-none mb-1">Select Members</h3>
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest underline decoration-primary/30">Step 01</p>
                             </div>
                         </div>
-                        <Badge variant="outline" className="bg-white/5 border-white/10 text-[10px] font-black italic px-4 py-1">
+                        <Badge variant="outline" className="bg-white/5 border-white/10 text-[10px] font-black px-4 py-1">
                             {selectedMembers.length} Members Selected
                         </Badge>
                     </div>
@@ -163,20 +163,20 @@ export function AssignWorkout() {
                                         )}>
                                             {selectedMembers.includes(m.id) && <Check className="w-4 h-4 text-black font-black" />}
                                         </div>
-                                        <div>
-                                            <p className="font-black italic uppercase tracking-tight text-sm group-hover:text-primary transition-colors leading-none mb-1">
+                                         <div>
+                                            <p className="font-black uppercase tracking-tight text-sm group-hover:text-primary transition-colors leading-none mb-1">
                                                 {m.firstName} {m.lastName}
                                             </p>
                                             <p className="text-[10px] text-slate-500 font-bold tracking-widest">{m.email}</p>
                                         </div>
                                     </div>
                                     {selectedMembers.includes(m.id) && (
-                                        <Badge variant="outline" className="bg-primary/20 text-primary border-none text-[8px] font-black italic">SELECTED</Badge>
+                                        <Badge variant="outline" className="bg-primary/20 text-primary border-none text-[8px] font-black">SELECTED</Badge>
                                     )}
                                 </div>
                             ))
                         ) : (
-                            <div className="py-10 text-center text-[10px] font-black italic text-slate-500 uppercase">No members found</div>
+                            <div className="py-10 text-center text-[10px] font-black text-slate-500 uppercase">No members found</div>
                         )}
                     </div>
                 </Card>
@@ -189,7 +189,7 @@ export function AssignWorkout() {
                                 <Layout className="w-5 h-5" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black italic uppercase tracking-widest leading-none mb-1">Select Template</h3>
+                                <h3 className="text-sm font-black uppercase tracking-widest leading-none mb-1">Select Template</h3>
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest underline decoration-primary/30">Step 02</p>
                             </div>
                         </div>
@@ -210,7 +210,7 @@ export function AssignWorkout() {
                                         )}
                                     >
                                         <div>
-                                            <h4 className="font-black italic uppercase tracking-tighter text-lg leading-none mb-1">{t.name}</h4>
+                                            <h4 className="font-black uppercase tracking-tighter text-lg leading-none mb-1">{t.name}</h4>
                                             <p className={cn(
                                                 "text-[10px] font-bold uppercase tracking-[0.2em]",
                                                 selectedTemplate === (t._id || t.id) ? "text-black/60" : "text-slate-500"
@@ -223,10 +223,10 @@ export function AssignWorkout() {
                                 ))
                             ) : (
                                 <div className="p-8 text-center border-2 border-dashed border-white/5 rounded-2xl space-y-4">
-                                    <p className="text-[10px] font-black italic text-slate-500 uppercase tracking-widest leading-relaxed">
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-relaxed">
                                         No workout templates found for your gym.
                                     </p>
-                                    <Button asChild className="h-10 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all group gap-2">
+                                    <Button asChild className="h-10 px-6 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter transition-all group gap-2">
                                         <Link href="/workout-plans?create=true">
                                             <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
                                             Create Template
@@ -244,8 +244,8 @@ export function AssignWorkout() {
                                 <Send className="w-6 h-6" />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-base font-black italic uppercase tracking-widest leading-none mb-1">Complete Assignment</h3>
-                                <p className="text-[11px] text-slate-400 font-medium italic leading-relaxed">
+                                <h3 className="text-base font-black uppercase tracking-widest leading-none mb-1">Complete Assignment</h3>
+                                <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
                                     Assign the selected plan to the chosen members.
                                 </p>
                             </div>
@@ -254,7 +254,7 @@ export function AssignWorkout() {
                         <Button
                             disabled={submitting || !selectedTemplate || selectedMembers.length === 0}
                             onClick={handleAssign}
-                            className="w-full h-16 rounded-2xl bg-primary text-black hover:bg-white font-black italic text-lg tracking-tighter shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:grayscale"
+                            className="w-full h-16 rounded-2xl bg-primary text-black hover:bg-white font-black text-lg tracking-tighter shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:grayscale"
                         >
                             {submitting ? (
                                 <>

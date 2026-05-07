@@ -25,7 +25,7 @@ export default async function AuditLogsPage() {
   }
 
   return (
-    <Suspense fallback={<div className="text-primary font-black italic animate-pulse tracking-widest uppercase text-xs">Loading Audit Logs...</div>}>
+    <Suspense>
       <AuditLogsClient />
     </Suspense>
   );

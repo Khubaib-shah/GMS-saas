@@ -18,16 +18,16 @@ export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const search = searchParams.get("search");
+        const showDeleted = searchParams.get("showDeleted") === "true";
 
         const gymId = session.user.gymId;
         const branchId = session.user.branchId;
         const role = (session.user as any).role;
         const trainerId = role === 'trainer' ? (session.user as any).id : null;
 
-        // Generate a deterministic cache key based on query parameters and user scope
-        const cacheKey = `members:list:gym:${gymId}:branch:${branchId || 'all'}:trainer:${trainerId || 'all'}:search:${search || 'none'}`;
+        // Deterministic cache key
+        const cacheKey = `members:list:v2:gym:${gymId}:branch:${branchId || 'all'}:trainer:${trainerId || 'all'}:del:${showDeleted}:q:${search || 'none'}`;
 
-        // Attempt to fetch from Redis first (Cache-First)
         const cachedData = await getCache<any[]>(cacheKey);
         if (cachedData) {
             console.log(`[Redis HIT] ${cacheKey}`);
@@ -37,11 +37,8 @@ export async function GET(req: Request) {
         console.log(`[Redis MISS] ${cacheKey} - Fetching from DB`);
         await connectDB();
 
-        // Build query using helper for legacy/branch support
-        const showDeleted = searchParams.get("showDeleted") === "true";
-        const query = buildGymQuery(session, showDeleted ? { deletedAt: { $ne: null } } : {});
+        const query = buildGymQuery(session, showDeleted ? { deletedAt: { $ne: null } } : { deletedAt: null });
 
-        // Add search filter if present
         if (search) {
             const searchFilter = {
                 $or: [
@@ -50,10 +47,7 @@ export async function GET(req: Request) {
                     { email: { $regex: search, $options: "i" } }
                 ]
             };
-
             if (query.$or) {
-                // If query already has an $or (unlikely now with buildGymQuery fix, but good for safety),
-                // combine them using $and to avoid overwriting.
                 query.$and = [{ $or: query.$or }, searchFilter];
                 delete query.$or;
             } else {
@@ -61,32 +55,41 @@ export async function GET(req: Request) {
             }
         }
 
-        const members = await Member.find(query)
-            .sort({ createdAt: -1 })
-            .populate("trainerId", "fullName photo")
-            .lean();
+        const [members, settings] = await Promise.all([
+            Member.find(query)
+                .sort({ createdAt: -1 })
+                .select("-photoBase64 -portalPassword -portalPin")
+                .populate("trainerId", "fullName photo")
+                .lean(),
+            GymSettings.findOne({ gymId }).lean()
+        ]);
 
-        // Bulk fetch active subscriptions for status injection
         const memberIds = members.map((m: any) => m._id.toString());
         const subscriptionQuery: any = {
             memberId: { $in: memberIds },
             status: { $in: ["active", "paused"] },
             deletedAt: null
         };
-        // For non-super admins, restrict to their gym
         if (gymId) subscriptionQuery.gymId = gymId;
 
         const activeSubs = await Subscription.find(subscriptionQuery).lean();
-        const settings = await GymSettings.findOne({ gymId }).lean();
         const graceDays = (settings as any)?.business?.gracePeriodDays || 0;
 
-        // Map members and inject status info
+        // O(1) Map lookup
+        const subMap = new Map();
+        activeSubs.forEach(s => {
+            const mId = s.memberId.toString();
+            if (isSubscriptionActive(s.endDate, s.status, graceDays)) {
+                const existing = subMap.get(mId);
+                if (!existing || new Date(s.endDate) > new Date(existing.endDate)) {
+                    subMap.set(mId, s);
+                }
+            }
+        });
+
         const mappedMembers = members.map((m: any) => {
             const mId = m._id.toString();
-            const mySubs = activeSubs.filter(s => s.memberId === mId);
-
-            // Find current active one (respecting grace period)
-            const currentSub = mySubs.find(s => isSubscriptionActive(s.endDate, s.status, graceDays));
+            const currentSub = subMap.get(mId);
 
             return {
                 ...m,
@@ -99,8 +102,7 @@ export async function GET(req: Request) {
             };
         });
 
-        // Store in Redis with a 15-minute TTL (900 seconds)
-        await setCache(cacheKey, mappedMembers, 900);
+        await setCache(cacheKey, mappedMembers, 1800);
 
         return NextResponse.json(mappedMembers);
     } catch (error) {

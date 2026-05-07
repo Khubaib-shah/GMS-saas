@@ -67,7 +67,7 @@ function LoginForm() {
   return (
     <div className="w-full max-w-sm glass-card p-10 selection:bg-primary selection:text-black">
       <div className="mb-10 text-center">
-        <h2 className="text-3xl font-black italic text-white mb-2 uppercase tracking-tight">
+        <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">
           Welcome <span className="text-primary">Back</span>
         </h2>
         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Sign in to access your dashboard</p>
@@ -119,7 +119,7 @@ function LoginForm() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
+          className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black text-lg rounded-xl neon-glow transition-all"
         >
           {loading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
           {loading ? "Logging in..." : "Login"}
@@ -168,7 +168,7 @@ function LoginForm() {
             </Button>
             <Button
               onClick={() => window.open("https://wa.me/923149784156?text=Hello%2C%20I%20am%20having%20issues%20with%20my%20suspended%20account.", "_blank")}
-              className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider rounded-xl"
+              className="bg-primary text-black hover:bg-white font-black uppercase tracking-wider rounded-xl"
             >
               Contact Support
             </Button>
@@ -202,7 +202,7 @@ function LoginForm() {
             </Button>
             <Button
               onClick={() => window.open("https://wa.me/923149784156?text=Hello%2C%20I%20would%20like%20to%20renew%20my%20gym%20subscription.", "_blank")}
-              className="bg-primary text-black hover:bg-white font-black italic uppercase tracking-wider rounded-xl"
+              className="bg-primary text-black hover:bg-white font-black uppercase tracking-wider rounded-xl"
             >
               Renew Subscription
             </Button>
@@ -236,12 +236,12 @@ export default function LoginPage() {
             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center neon-glow">
               <Zap className="w-8 h-8 text-black" />
             </div>
-            <span className="text-4xl font-black italic tracking-tighter text-white uppercase">
+            <span className="text-4xl font-black tracking-tighter text-white uppercase">
               GYM<span className="text-primary neon-text">FLOW</span>
             </span>
           </div>
 
-          <h1 className="text-7xl font-black mb-6 italic text-white leading-[0.9] tracking-tighter uppercase">
+          <h1 className="text-7xl font-black mb-6 text-white leading-[0.9] tracking-tighter uppercase">
             Dominate <br />
             The Every <br />
             <span className="text-primary neon-text">Rep.</span>
@@ -268,7 +268,7 @@ export default function LoginPage() {
 
       {/* Right Side - Login Form area */}
       <div className="w-full lg:w-2/5 flex items-center justify-center p-8 relative z-10">
-        <Suspense fallback={<div className="text-primary font-black italic animate-pulse tracking-widest uppercase text-xs">Loading application...</div>}>
+        <Suspense fallback={<div className="text-primary font-black animate-pulse tracking-widest uppercase text-xs">Loading application...</div>}>
           <LoginForm />
         </Suspense>
       </div>

@@ -78,7 +78,7 @@ export function BusinessSettings() {
         <Card className="glass-premium border-white/5 bg-slate-950/20 backdrop-blur-xl overflow-hidden rounded-2xl border-t-0 relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/20 after:to-transparent max-w-2xl animate-fade-up">
             <div className="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
                 <div>
-                    <h3 className="text-xl font-black italic uppercase tracking-tighter text-white flex items-center gap-2">
+                    <h3 className="text-xl font-black uppercase tracking-tighter text-white flex items-center gap-2">
                         BUSINESS <span className="text-primary">SETTINGS</span>
                     </h3>
                     <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">
@@ -86,7 +86,7 @@ export function BusinessSettings() {
                     </p>
                 </div>
                 <div className={cn(
-                    "px-2 py-1 rounded-md text-[8px] font-black italic uppercase tracking-widest border transition-all duration-500",
+                    "px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-widest border transition-all duration-500",
                     loading ? "border-amber-500/20 bg-amber-500/5 text-amber-500 animate-pulse" : "border-emerald-500/20 bg-emerald-500/5 text-emerald-500"
                 )}>
                     {loading ? "Loading..." : "Saved"}
@@ -148,7 +148,7 @@ export function BusinessSettings() {
                     <Button 
                         onClick={handleSave} 
                         disabled={saving || loading}
-                        className="h-11 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-xs rounded-lg neon-glow flex items-center gap-2"
+                        className="h-11 px-8 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter transition-all uppercase text-xs rounded-lg neon-glow flex items-center gap-2"
                     >
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         SAVE CHANGES

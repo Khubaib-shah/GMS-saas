@@ -94,9 +94,9 @@ export default function BillingPage() {
                             <kpi.icon className="w-5 h-5" />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic mb-1">{kpi.title}</p>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">{kpi.title}</p>
                             <p className={cn(
-                                "text-2xl font-black italic tracking-tighter",
+                                "text-2xl font-black tracking-tighter",
                                 kpi.color === "emerald" ? "text-emerald-400" :
                                 kpi.color === "amber" ? "text-amber-400" :
                                 "text-indigo-400"
@@ -126,7 +126,7 @@ export default function BillingPage() {
                         <thead>
                             <tr className="border-b border-white/5 bg-white/[0.02]">
                                 {["Gym", "Plan", "Amount", "Method", "Date", "Expiry", "Notes", "Admin"].map((h) => (
-                                    <th key={h} className="px-6 py-6 text-left font-black text-slate-500 italic tracking-widest">{h}</th>
+                                    <th key={h} className="px-6 py-6 text-left font-black text-slate-500 tracking-widest">{h}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -158,16 +158,16 @@ export default function BillingPage() {
                                                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 group-hover/row:bg-indigo-500/20 transition-colors">
                                                     <Building2 className="w-4 h-4 text-indigo-400" />
                                                 </div>
-                                                <span className="text-foreground font-black italic tracking-tighter text-sm group-hover/row:text-primary transition-colors">{p.gymName}</span>
+                                                <span className="text-foreground font-black tracking-tighter text-sm group-hover/row:text-primary transition-colors">{p.gymName}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-6 font-black italic tracking-widest text-indigo-400/80">{p.planName || "—"}</td>
-                                        <td className="px-6 py-6 text-base font-black italic tracking-tighter text-emerald-400">{formatPKR(p.amountPKR)}</td>
+                                        <td className="px-6 py-6 font-black tracking-widest text-indigo-400/80">{p.planName || "—"}</td>
+                                        <td className="px-6 py-6 text-base font-black tracking-tighter text-emerald-400">{formatPKR(p.amountPKR)}</td>
                                         <td className="px-6 py-6 text-[10px] text-slate-400 uppercase tracking-widest">{p.paymentMethod?.replace("_", " ")}</td>
                                         <td className="px-6 py-6 font-mono text-[10px] text-slate-500">{new Date(p.paymentDate).toLocaleDateString("en-PK").toUpperCase()}</td>
                                         <td className="px-6 py-6 font-mono text-[10px] text-slate-500">{new Date(p.expiryDate).toLocaleDateString("en-PK").toUpperCase()}</td>
-                                        <td className="px-6 py-6 text-[10px] font-medium text-slate-500 italic max-w-[200px] truncate">{p.notes || "—"}</td>
-                                        <td className="px-6 py-6 text-[10px] font-black italic tracking-widest text-slate-400">{p.enteredByName}</td>
+                                        <td className="px-6 py-6 text-[10px] font-medium text-slate-500 max-w-[200px] truncate">{p.notes || "—"}</td>
+                                        <td className="px-6 py-6 text-[10px] font-black tracking-widest text-slate-400">{p.enteredByName}</td>
                                     </tr>
                                 ))
                             )}

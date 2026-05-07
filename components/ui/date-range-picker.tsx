@@ -75,13 +75,13 @@ export function DateRangePicker({
             <CalendarIcon className="w-4 h-4 text-primary" />
             <div className="flex flex-col items-start leading-none gap-1">
               {activePreset ? (
-                <span className="text-sm font-black italic tracking-tighter uppercase">{activePreset.label}</span>
+                <span className="text-sm font-black tracking-tighter uppercase">{activePreset.label}</span>
               ) : date?.from ? (
-                <span className="text-sm font-black italic tracking-tighter uppercase">
+                <span className="text-sm font-black tracking-tighter uppercase">
                   {format(date.from, "MMM dd")} - {date.to ? format(date.to, "MMM dd") : "..."}
                 </span>
               ) : (
-                <span className="text-sm font-black italic tracking-tighter uppercase">{placeholder}</span>
+                <span className="text-sm font-black tracking-tighter uppercase">{placeholder}</span>
               )}
             </div>
             <ChevronDown className={cn("ml-auto w-4 h-4 opacity-30 transition-transform", open && "rotate-180")} />

@@ -16,6 +16,17 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer";
+import { useIsMobile } from "@/components/ui/use-mobile";
+import {
     Table,
     TableBody,
     TableCell,
@@ -23,7 +34,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash2, Edit2, Shield, Loader2, Lock, Activity, Search } from "lucide-react";
+import { Plus, Trash2, Edit2, Loader2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,6 +57,7 @@ export function RoleManagement() {
     const [formData, setFormData] = useState({ name: "", description: "", permissions: [] as string[] });
     const [saving, setSaving] = useState(false);
     const [roleToDelete, setRoleToDelete] = useState<RoleData | null>(null);
+    const isMobile = useIsMobile();
 
     // Cache key
     const CACHE_KEY = "gms_roles_cache";
@@ -193,7 +205,7 @@ export function RoleManagement() {
         <div className="space-y-6 animate-fade-up">
             <div className="flex flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h3 className="text-xl font-black italic uppercase tracking-tighter text-white flex items-center gap-2">
+                    <h3 className="text-xl font-black uppercase tracking-tighter text-white flex items-center gap-2">
                         ROLE <span className="text-primary">MANAGEMENT</span>
                     </h3>
                     <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">
@@ -202,28 +214,18 @@ export function RoleManagement() {
                 </div>
                 <div className="flex items-center gap-3">
 
-                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button
-                                onClick={openCreate}
-                                className="h-10 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-xs rounded-lg neon-glow flex items-center gap-2"
-                            >
-                                <Plus className="w-4 h-4" /> NEW ROLE
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[90vh] glass-premium border-white/10 bg-slate-950/90 backdrop-blur-2xl p-0 overflow-hidden">
-                            <DialogHeader className="p-6 border-b border-white/5 bg-white/[0.02]">
-                                <DialogTitle className="text-xl font-black italic uppercase tracking-tighter text-white">
-                                    {editingRole ? "EDIT" : "CREATE"} <span className="text-primary">ROLE</span>
-                                </DialogTitle>
-                                <DialogDescription className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">
-                                    {editingRole?.isSystemRole
-                                        ? "System Role: You can only change permissions"
-                                        : "Custom Role: Set name and permissions"}
-                                </DialogDescription>
-                            </DialogHeader>
+                    {/* Role Creation/Edit Dialog/Drawer */}
+                    {(() => {
+                        const Root = isMobile ? Drawer : Dialog;
+                        const Content = isMobile ? DrawerContent : DialogContent;
+                        const Header = isMobile ? DrawerHeader : DialogHeader;
+                        const Title = isMobile ? DrawerTitle : DialogTitle;
+                        const Description = isMobile ? DrawerDescription : DialogDescription;
+                        const Footer = isMobile ? DrawerFooter : DialogFooter;
+                        const Trigger = isMobile ? DrawerTrigger : DialogTrigger;
 
-                            <div className="p-6 space-y-6 overflow-y-auto max-h-[60vh] custom-scrollbar">
+                        const formFields = (
+                            <>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <InputField
                                         label="Role Name"
@@ -245,18 +247,17 @@ export function RoleManagement() {
                                     />
                                 </div>
 
-                                {/* Permission Matrix */}
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2">
                                         <div className="w-1 h-4 bg-primary rounded-full"></div>
-                                        <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Permissions</Label>
+                                        <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Permissions</Label>
                                     </div>
 
                                     {editingRole?.name === "owner" ? (
                                         <div className="p-6 rounded-2xl bg-primary/5 border border-primary/20 flex items-center gap-4">
                                             <Lock className="w-8 h-8 text-primary animate-pulse" />
                                             <div>
-                                                <p className="text-[11px] font-black italic text-white uppercase tracking-tighter">FULL ACCESS</p>
+                                                <p className="text-[11px] font-black text-white uppercase tracking-tighter">FULL ACCESS</p>
                                                 <p className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-1">The Owner role has full access to all system modules.</p>
                                             </div>
                                         </div>
@@ -264,7 +265,7 @@ export function RoleManagement() {
                                         <div className="space-y-4">
                                             {Object.entries(groupedPermissions).map(([category, perms]) => (
                                                 <div key={category} className="space-y-3 p-4 rounded-2xl bg-white/[0.02] border border-white/5 group/cat hover:border-white/10 transition-colors">
-                                                    <p className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 group-hover/cat:text-primary transition-colors">{category}</p>
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover/cat:text-primary transition-colors">{category}</p>
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                         {perms.map(perm => (
                                                             <label key={perm} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] cursor-pointer transition-all active:scale-95 group/perm">
@@ -284,27 +285,62 @@ export function RoleManagement() {
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </>
+                        );
 
-                            <DialogFooter className="p-6 border-t border-white/5 bg-white/[0.01]">
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => setDialogOpen(false)}
-                                    className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white"
-                                >
-                                    CANCEL
-                                </Button>
-                                <Button
-                                    onClick={handleSave}
-                                    disabled={saving || editingRole?.name === "owner"}
-                                    className="h-10 px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter transition-all uppercase text-xs neon-glow"
-                                >
-                                    {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                                    SAVE ROLE
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                        return (
+                            <Root open={dialogOpen} onOpenChange={setDialogOpen}>
+                                <Trigger asChild>
+                                    <Button
+                                        onClick={openCreate}
+                                        className="h-10 px-6 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter transition-all uppercase text-xs neon-glow flex items-center gap-2"
+                                    >
+                                        <Plus className="w-4 h-4" /> NEW ROLE
+                                    </Button>
+                                </Trigger>
+                                <Content className={cn(
+                                    "glass-premium bg-card  p-0 overflow-hidden",
+                                    !isMobile && "max-w-2xl max-h-[90vh]"
+                                )}>
+                                    <Header className={cn("p-6 border-b border-white/5 bg-white/[0.02]", isMobile && "text-left")}>
+                                        <Title className="text-xl font-black uppercase tracking-tighter text-white">
+                                            {editingRole ? "EDIT" : "CREATE"} <span className="text-primary">ROLE</span>
+                                        </Title>
+                                        <Description className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                                            {editingRole?.isSystemRole
+                                                ? "System Role: You can only change permissions"
+                                                : "Custom Role: Set name and permissions"}
+                                        </Description>
+                                    </Header>
+
+                                    <div className={cn(
+                                        "p-6 space-y-6 overflow-y-auto custom-scrollbar",
+                                        isMobile ? "max-h-[70vh]" : "max-h-[60vh]"
+                                    )}>
+                                        {formFields}
+                                    </div>
+
+                                    <Footer className={cn("p-6 border-t border-white/5 bg-white/[0.01]", isMobile && "flex-col-reverse gap-2")}>
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() => setDialogOpen(false)}
+                                            className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white"
+                                        >
+                                            CANCEL
+                                        </Button>
+                                        <Button
+                                            onClick={handleSave}
+                                            disabled={saving || editingRole?.name === "owner"}
+                                            className="h-10 px-8 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter transition-all uppercase text-xs neon-glow w-full md:w-auto"
+                                        >
+                                            {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                                            SAVE ROLE
+                                        </Button>
+                                    </Footer>
+                                </Content>
+                            </Root>
+                        );
+                    })()}
                 </div>
             </div>
 
@@ -312,10 +348,10 @@ export function RoleManagement() {
                 <Table>
                     <TableHeader className="bg-white/[0.02]">
                         <TableRow className="border-b border-white/5 hover:bg-transparent">
-                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14 pl-6">Role Name</TableHead>
-                            <TableHead className="hidden md:table-cell text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14">Type</TableHead>
-                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14">Permissions</TableHead>
-                            <TableHead className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 h-14 text-right pr-6">Actions</TableHead>
+                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500 h-14 pl-6">Role Name</TableHead>
+                            <TableHead className="hidden md:table-cell text-[10px] font-black uppercase tracking-widest text-slate-500 h-14">Type</TableHead>
+                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500 h-14">Permissions</TableHead>
+                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500 h-14 text-right pr-6">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -339,17 +375,17 @@ export function RoleManagement() {
                                 <TableRow key={role.id} className="border-b border-white/5 hover:bg-white/[0.02] group/row transition-colors">
                                     <TableCell className="py-5 pl-6">
                                         <div className="flex flex-col">
-                                            <span className="text-[11px] font-black italic text-white uppercase tracking-tighter">{role.name}</span>
+                                            <span className="text-[11px] font-black text-white uppercase tracking-tighter">{role.name}</span>
                                             {role.description && <span className="hidden md:inline-flex text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-0.5">{role.description}</span>}
                                         </div>
                                     </TableCell>
                                     <TableCell className="hidden md:table-cell">
                                         {role.isSystemRole ? (
-                                            <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[8px] font-black italic uppercase tracking-widest">
+                                            <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[8px] font-black uppercase tracking-widest">
                                                 <Lock className="w-2.5 h-2.5 mr-1" /> SYSTEM
                                             </div>
                                         ) : (
-                                            <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary text-[8px] font-black italic uppercase tracking-widest">
+                                            <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary text-[8px] font-black uppercase tracking-widest">
                                                 CUSTOM
                                             </div>
                                         )}
@@ -357,7 +393,7 @@ export function RoleManagement() {
                                     <TableCell>
                                         <span className="text-[10px] font-mono text-slate-400">
                                             {role.name === "owner" ? (
-                                                <span className="text-primary italic font-black uppercase">FULL ACCESS</span>
+                                                <span className="text-primary font-black uppercase">FULL ACCESS</span>
                                             ) : (
                                                 <span className="uppercase tracking-tighter font-bold">{role.permissions.length} PERMISSIONS</span>
                                             )}

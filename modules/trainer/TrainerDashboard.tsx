@@ -88,13 +88,13 @@ export function TrainerDashboard() {
                 title="TRAINER"
                 highlight="DASHBOARD"
                 subtitle="Trainer Profile"
-                description="Manage your assigned members and monitor compliance."
+                description="Manage your assigned members and track their progress."
                 descriptionIconColor="primary"
             >
                 <div className="flex items-center gap-3">
                     <Button
                         onClick={() => router.push("/trainer/deploy")}
-                        className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+                        className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-medium md:font-black tracking-tighter shadow-lg transition-all active:scale-95"
                     >
                         <Send className="mr-2 w-5 h-5" />
                         Assign Workout
@@ -130,7 +130,7 @@ export function TrainerDashboard() {
                 {/* Assigned Members List */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center gap-4 mb-2">
-                        <h2 className="text-2xl font-black italic tracking-tighter text-foreground uppercase">
+                        <h2 className="text-2xl font-black tracking-tighter text-foreground uppercase">
                             Assigned Members
                         </h2>
                         <div className="h-px flex-1 bg-black/5 dark:bg-white/5 shadow-[0_1px_0_rgba(255,255,255,0.05)]"></div>
@@ -142,7 +142,7 @@ export function TrainerDashboard() {
                     </div>
                     <Card className="glass-premium p-0 border-border overflow-hidden bg-card dark:bg-slate-950/40">
                         <div className="p-6 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <h3 className="text-sm font-black italic uppercase tracking-widest flex items-center gap-3">
+                            <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-3">
                                 <Users className="w-4 h-4 text-primary" />
                                 Assigned <span className="text-primary/40">Members</span>
                             </h3>
@@ -169,7 +169,7 @@ export function TrainerDashboard() {
                                 <tbody>
                                     {filteredMembers.length === 0 ? (
                                         <tr>
-                                            <td colSpan={3} className="px-6 py-12 text-center text-slate-500 italic text-sm">
+                                            <td colSpan={3} className="px-6 py-12 text-center text-slate-500 text-sm">
                                                 No members found matching your search.
                                             </td>
                                         </tr>
@@ -182,7 +182,7 @@ export function TrainerDashboard() {
                                                             <UserCircle className="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors" />
                                                         </div>
                                                         <div>
-                                                            <p className="text-xs font-black uppercase italic tracking-tight">{m.fullName}</p>
+                                                            <p className="text-xs font-black uppercase tracking-tight">{m.fullName}</p>
                                                             <div className="flex items-center gap-2 mt-1">
                                                                 <Phone className="w-2.5 h-2.5 text-slate-600" />
                                                                 <span className="text-[9px] text-slate-500 font-bold tracking-widest">{m.phone || "No Phone"}</span>
@@ -196,7 +196,7 @@ export function TrainerDashboard() {
                                                             "w-1.5 h-1.5 rounded-full",
                                                             m.workoutPlanName !== "No Plan" ? "bg-primary" : "bg-red-500 animate-pulse"
                                                         )}></div>
-                                                        <span className="text-[10px] font-black uppercase italic tracking-tight text-foreground">{m.workoutPlanName}</span>
+                                                        <span className="text-[10px] font-black uppercase tracking-tight text-foreground">{m.workoutPlanName}</span>
                                                     </div>
                                                     <p className="text-[9px] text-slate-500 uppercase font-bold mt-1 tracking-widest">
                                                         Membership: <span className={m.subscriptionStatus === "active" ? "text-emerald-500" : "text-destructive"}>{m.subscriptionStatus}</span>
@@ -206,7 +206,7 @@ export function TrainerDashboard() {
                                                     <div className="flex flex-col items-end gap-1">
                                                         <div className="flex items-center gap-2">
                                                             <TrendingUp className="w-3 h-3 text-emerald-500" />
-                                                            <span className="text-xs font-black italic">{m.attendanceStreak} Day Streak</span>
+                                                            <span className="text-xs font-black">{m.attendanceStreak} Day Streak</span>
                                                         </div>
                                                         <p className="text-[9px] text-slate-500 uppercase font-bold tracking-widest">
                                                             {m.lastCheckIn ? `Last seen ${formatDistanceToNow(new Date(m.lastCheckIn))} ago` : "Never checked in"}
@@ -230,7 +230,7 @@ export function TrainerDashboard() {
                         </div>
                         <div className="p-8 space-y-6 relative">
                             <div>
-                                <h3 className="text-sm font-black italic uppercase tracking-[0.2em] text-primary mb-2">Management Console</h3>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-2">Management Console</h3>
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
                                     Manage workout plans and templates for your assigned roster.
                                 </p>
@@ -239,7 +239,7 @@ export function TrainerDashboard() {
                             <div className="space-y-3">
                                 <Button
                                     onClick={() => router.push("/trainer/exercises")}
-                                    className="w-full h-[38px] bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 text-[11px] font-black italic uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all"
+                                    className="w-full h-[38px] bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 text-[11px] font-black uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all"
                                 >
                                     <span className="flex items-center gap-3">
                                         <Dumbbell className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
@@ -250,7 +250,7 @@ export function TrainerDashboard() {
 
                                 <Button
                                     onClick={() => router.push("/trainer/templates")}
-                                    className="w-full h-[38px] bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 text-[11px] font-black italic uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all"
+                                    className="w-full h-[38px] bg-white/5 border border-white/10 hover:border-primary/40 hover:bg-white/10 text-[11px] font-black uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all"
                                 >
                                     <span className="flex items-center gap-3">
                                         <Plus className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
@@ -261,7 +261,7 @@ export function TrainerDashboard() {
 
                                 <Button
                                     onClick={() => router.push("/trainer/deploy")}
-                                    className="w-full h-[38px] bg-primary text-black hover:bg-white text-[11px] font-black italic uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all shadow-lg"
+                                    className="w-full h-[38px] bg-primary text-black hover:bg-white text-[11px] font-black uppercase tracking-[0.2em] justify-between px-6 rounded-2xl group transition-all shadow-lg"
                                 >
                                     <span className="flex items-center gap-3">
                                         <Send className="w-4 h-4 group-hover:scale-110 transition-transform" />
@@ -274,7 +274,7 @@ export function TrainerDashboard() {
                     </Card>
 
                     <Card className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40">
-                        <h3 className="text-[10px] font-black italic uppercase tracking-widest text-slate-500 mb-4">Quick Alerts</h3>
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Quick Alerts</h3>
                         <div className="space-y-4">
                             {(stats?.membersWithoutPlans || 0) > 0 && (
                                 <div className="flex items-start gap-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10 grayscale hover:grayscale-0 transition-all cursor-pointer" onClick={() => setSearchTerm("")}>

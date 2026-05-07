@@ -77,7 +77,7 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -128,7 +128,7 @@ export function AvailabilityManager({ trainerId, availabilities, onRefresh }: Av
             value={String(newAvail.slotDurationMinutes)}
             onChange={(val) => setNewAvail({ ...newAvail, slotDurationMinutes: Number(val) })}
           />
-          <Button className="w-full h-10 font-bold uppercase italic tracking-widest rounded-xl" onClick={handleAdd} disabled={loading}>
+          <Button className="w-full h-10 font-bold uppercase tracking-widest rounded-xl" onClick={handleAdd} disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

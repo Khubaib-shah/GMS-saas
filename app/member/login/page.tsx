@@ -101,7 +101,7 @@ export default function MemberLoginPage() {
                     <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6 neon-glow">
                         <Zap className="w-10 h-10 text-black" />
                     </div>
-                    <h2 className="text-4xl font-black italic text-white mb-2 uppercase tracking-tighter">
+                    <h2 className="text-4xl font-black text-white mb-2 uppercase tracking-tighter">
                         MEMBER <span className="text-primary">PORTAL</span>
                     </h2>
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic">Access your member portal</p>
@@ -112,13 +112,13 @@ export default function MemberLoginPage() {
                         <TabsList className="grid w-full grid-cols-2 bg-white/5 border-b border-border rounded-t-xl overflow-hidden p-0 h-[38px]">
                             <TabsTrigger
                                 value="password"
-                                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none font-black italic text-xs uppercase tracking-widest transition-all h-full"
+                                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none font-black text-xs uppercase tracking-widest transition-all h-full"
                             >
                                 PASSWORD
                             </TabsTrigger>
                             <TabsTrigger
                                 value="pin"
-                                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none font-black italic text-xs uppercase tracking-widest transition-all h-full"
+                                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none font-black text-xs uppercase tracking-widest transition-all h-full"
                             >
                                 FAST PIN
                             </TabsTrigger>
@@ -158,7 +158,7 @@ export default function MemberLoginPage() {
                                     </div>
                                     <Button
                                         type="submit"
-                                        className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
+                                        className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black text-lg rounded-xl neon-glow transition-all"
                                         disabled={isLoading}
                                     >
                                         {isLoading ? "Logging in..." : "Login"}
@@ -201,7 +201,7 @@ export default function MemberLoginPage() {
                                     </div>
                                     <Button
                                         type="submit"
-                                        className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black italic text-lg rounded-xl neon-glow transition-all"
+                                        className="w-full bg-primary text-black hover:bg-white py-6 h-auto font-black text-lg rounded-xl neon-glow transition-all"
                                         disabled={isLoading}
                                     >
                                         {isLoading ? "Verifying PIN..." : "Login with PIN"}

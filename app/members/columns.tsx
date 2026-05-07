@@ -30,7 +30,7 @@ export const createColumns = (
             cell: ({ row }) => {
                 const member = row.original;
                 return (
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 ">
                         <div className="relative">
                             {member.photoBase64 ? (
                                 <img
@@ -48,7 +48,7 @@ export const createColumns = (
                             </div>
                         </div>
                         <div>
-                            <span className="text-foreground font-black italic tracking-tighter text-sm md:text-lg block group-hover/row:text-primary transition-colors text-nowrap">
+                            <span className="text-foreground font-medium md:font-black tracking-tighter text-sm md:text-lg block group-hover/row:text-primary transition-colors text-nowrap">
                                 {member.firstName} <span className="hidden md:inline">{member.lastName || ""}</span>
                             </span>
                             <span className="hidden md:block text-[9px] text-slate-500 font-mono tracking-widest mt-0.5 uppercase">
@@ -98,8 +98,9 @@ export const createColumns = (
         {
             accessorKey: "joinDate",
             header: "Join Date",
+            meta: { className: "hidden md:table-cell" },
             cell: ({ row }) => (
-                <div className="text-slate-500 font-mono text-[10px] text-nowrap hidden md:table-cell">
+                <div className="text-slate-500 font-mono text-[10px] text-nowrap">
                     {formatDate(row.original.joinDate).toUpperCase()}
                 </div>
             ),
@@ -130,10 +131,11 @@ export const createColumns = (
                                 size="sm"
                                 disabled={isProcessingRestore}
                                 onClick={() => onRestoreClick(member.id)}
-                                className="h-9 px-4 rounded-xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all font-black italic text-[10px] tracking-tighter"
+                                className="h-9 px-3 md:px-4 rounded-xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all font-medium md:font-black text-[10px] tracking-tighter"
                             >
-                                {isProcessingRestore ? <Loader2 className="w-3 h-3 mr-2 animate-spin" /> : null}
-                                {isProcessingRestore ? "Restoring" : "Restore"}
+                                {isProcessingRestore ? <Loader2 className="w-3 h-3 md:mr-2 animate-spin" /> : null}
+                                <span className="hidden md:inline">{isProcessingRestore ? "Restoring" : "Restore"}</span>
+                                {!isProcessingRestore && <span className="md:hidden">Restore</span>}
                             </Button>
                         )}
 
@@ -142,11 +144,11 @@ export const createColumns = (
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="h-9 w-[110px] px-0 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary transition-all overflow-hidden relative"
+                                    className="h-9 w-9 md:w-[110px] px-0 rounded-xl border-white/5 bg-white/5 text-white font-medium md:font-black text-[10px] tracking-tighter hover:bg-primary transition-all overflow-hidden relative"
                                 >
                                     <div className="flex items-center justify-center w-full h-full relative">
-                                        <Eye className="w-4 h-4 transition-all duration-500 group-hover:scale-125 group-hover:translate-x-[35px] relative z-10" />
-                                        <span className="ml-2 transition-all duration-500 group-hover:opacity-0 group-hover:translate-x-10 whitespace-nowrap">
+                                        <Eye className="w-4 h-4 transition-all duration-500 md:group-hover:scale-125 md:group-hover:translate-x-[35px] relative z-10" />
+                                        <span className="hidden md:block ml-2 transition-all duration-500 group-hover:opacity-0 group-hover:translate-x-10 whitespace-nowrap">
                                             View Profile
                                         </span>
                                     </div>

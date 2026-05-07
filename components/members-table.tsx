@@ -12,6 +12,17 @@ import {
 } from "@/lib/utils/file-utils";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { PremiumButton } from "@/components/ui/premium-button";
+import { LucideEye } from "lucide-react";
 
 export function MembersTable({ 
   trainerOnly = false, 
@@ -90,88 +101,69 @@ export function MembersTable({
   }, [relevantMembers, store.subscriptions, store.searchQuery, mode]);
 
   return (
-    <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/5 bg-white/[0.02]">
-              <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
-                Member Name
-              </th>
-              <th className="hidden lg:table-cell text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
-                Join Date
-              </th>
-              <th className="hidden sm:table-cell text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
-                Renewal Date
-              </th>
-              <th className="text-left py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
-                Status
-              </th>
-              <th className="text-center py-6 px-6 font-black text-slate-500 italic uppercase tracking-widest text-[11px]">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayMembers.length > 0 ? (
-              displayMembers.map((item) => (
-                <tr
-                  key={item.member.id}
-                  className="border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group/row"
-                >
-                  <td className="py-6 px-6 font-black italic tracking-tighter text-base">
-                    {item.member.firstName} {item.member.lastName || ""}
-                  </td>
-                  <td className="hidden lg:table-cell py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
-                    {formatDate(item.member.joinDate)}
-                  </td>
-                  <td className="hidden sm:table-cell py-6 px-6 text-slate-500 font-mono text-[10px] uppercase">
-                    {item.subscription
-                      ? formatDate(item.subscription.endDate)
-                      : "—"}
-                  </td>
-                  <td className="py-6 px-6">
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[9px] font-black italic tracking-widest uppercase",
-                        item.status === "active"
-                          ? "bg-primary/10 border-primary/20 text-primary"
-                          : item.status === "expiring"
-                            ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
-                            : item.status === "paused"
-                              ? "bg-blue-500/10 border-blue-500/20 text-blue-500"
-                              : "bg-rose-500/10 border-rose-500/20 text-rose-500"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-1 h-1 rounded-full",
-                        item.status === "active" ? "bg-primary" : item.status === "expiring" ? "bg-amber-500" : item.status === "paused" ? "bg-blue-500" : "bg-rose-500"
-                      )} />
-                      {item.status === "active" ? "Active" : item.status === "expiring" ? "Exp Soon" : item.status === "paused" ? "Paused" : "Expired"}
-                    </span>
-                  </td>
-                  <td className="py-6 px-6 text-center">
-                    <Link href={`/members/${item.member.id}`}>
-                      <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary hover:text-black transition-all uppercase">
-                        {trainerOnly ? "View" : "Renew"}
-                      </Button>
-                    </Link>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="py-8 text-center text-muted-foreground"
-                >
-                  No members found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+    <div className="glass-premium bg-card rounded-2xl border border-white/5 overflow-hidden relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/10 after:to-transparent">
+      <Table className="!text-xs md:text-sm">
+        <TableHeader className="bg-white/[0.02]">
+          <TableRow className="border-b border-white/5 hover:bg-transparent [&_th]:py-3 [&_th]:md:py-6 [&_th]:px-3 [&_th]:md:px-6">
+            <TableHead className="text-left font-medium md:font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
+              Member Name
+            </TableHead>
+            <TableHead className="hidden lg:table-cell text-left font-medium md:font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
+              Join Date
+            </TableHead>
+            <TableHead className="hidden sm:table-cell text-left font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
+              Renewal Date
+            </TableHead>
+            <TableHead className="text-left font-medium md:font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
+              Status
+            </TableHead>
+            <TableHead className="text-center font-medium md:font-black text-slate-500 uppercase tracking-[0.2em] text-[11px] h-auto">
+              Action
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {displayMembers.length > 0 ? (
+            displayMembers.map((item) => (
+              <TableRow
+                key={item.member.id}
+                className="[&_td]:py-2 [&_td]:md:py-6 [&_td]:px-3 [&_td]:md:px-6 border-white/5 hover:bg-white/[0.02] transition-colors group/row"
+              >
+                <TableCell className="font-medium md:font-black  tracking-tighter text-base">
+                  {item.member.firstName} {item.member.lastName || ""}
+                </TableCell>
+                <TableCell className="hidden lg:table-cell text-slate-500 font-mono text-[10px] uppercase">
+                  {formatDate(item.member.joinDate)}
+                </TableCell>
+                <TableCell className="hidden sm:table-cell text-slate-500 font-mono text-[10px] uppercase">
+                  {item.subscription
+                    ? formatDate(item.subscription.endDate)
+                    : "—"}
+                </TableCell>
+                <TableCell className="flex justify-center items-center md:block">
+                  <StatusBadge status={item.status as any} />
+                </TableCell>
+                <TableCell className="text-center">
+                  <Link href={`/members/${item.member.id}`}>
+                    <PremiumButton>
+                      {trainerOnly ? "View" : <div className="flex items-center gap-2"><span className="md:hidden"><LucideEye/></span><span className="hidden md:block">Renew</span></div>}
+                    </PremiumButton>
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={5}
+                className="py-8 text-center text-[10px] font-black uppercase tracking-widest text-slate-500"
+              >
+                No members found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }

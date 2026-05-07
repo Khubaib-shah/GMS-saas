@@ -75,7 +75,7 @@ export function ManualEntry() {
 
   return (
     <div className="glass-premium space-y-4 p-4 border rounded-lg bg-card">
-      <h3 className="text-lg font-semibold">Manual Entry</h3>
+      <h3 className="text-sm  md:text-lg font-medium md:font-semibold">Manual Entry</h3>
 
       <div className="flex items-center space-x-2 mb-4">
         <Checkbox
@@ -83,7 +83,7 @@ export function ManualEntry() {
           checked={isCheckout}
           onCheckedChange={(checked) => setIsCheckout(checked as boolean)}
         />
-        <Label htmlFor="checkout-mode">Mark as Check-out</Label>
+        <Label htmlFor="checkout-mode" className="font-normal">Mark as Check-out</Label>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -105,7 +105,7 @@ export function ManualEntry() {
             className="p-0"
             style={{ width: "var(--radix-popover-trigger-width)" }}
           >
-            <Command>
+            <Command className="glass-premium">
               <CommandInput
                 placeholder="Search member name..."
                 className="border-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none"

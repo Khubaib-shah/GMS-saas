@@ -52,8 +52,8 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
         return (
             <div className="flex flex-col items-center justify-center min-vh-[400px] space-y-4">
                 <Target className="w-16 h-16 text-slate-700" />
-                <h2 className="text-2xl font-black italic uppercase tracking-tighter text-foreground">Plan Not Found</h2>
-                <Button onClick={() => router.back()} className="mt-4 bg-primary text-black font-black italic rounded-xl">Go Back</Button>
+                <h2 className="text-2xl font-black uppercase tracking-tighter text-foreground">Plan Not Found</h2>
+                <Button onClick={() => router.back()} className="mt-4 bg-primary text-black font-black rounded-xl">Go Back</Button>
             </div>
         );
     }
@@ -73,7 +73,7 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                     className="h-12 px-4 rounded-xl hover:bg-white/5 group"
                 >
                     <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-black italic uppercase tracking-widest text-[10px]">BACK_TO_PLANS</span>
+                    <span className="font-black uppercase tracking-widest text-[10px]">BACK_TO_PLANS</span>
                 </Button>
             </div>
 
@@ -83,21 +83,21 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                 <div className="relative flex flex-col md:flex-row md:items-start justify-between gap-8">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[10px] font-black italic tracking-[0.2em] px-3 py-1">
+                            <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[10px] font-black tracking-[0.2em] px-3 py-1">
                                 {plan.schedule?.length || 0}_DAY_SPLIT
                             </Badge>
                             {!plan.isPublicWithinGym && (
-                                <Badge variant="outline" className="bg-slate-800 text-slate-400 border-none text-[10px] font-black italic tracking-[0.2em] px-3 py-1">
+                                <Badge variant="outline" className="bg-slate-800 text-slate-400 border-none text-[10px] font-black tracking-[0.2em] px-3 py-1">
                                     PRIVATE_PLAN
                                 </Badge>
                             )}
                         </div>
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-foreground uppercase leading-tight">
+                            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground uppercase leading-tight">
                                 {plan.name}
                             </h1>
-                            <p className="text-slate-400 font-medium italic mt-2 max-w-2xl leading-relaxed">
-                                {plan.description || "No specific objective defined for this training protocol."}
+                            <p className="text-slate-400 font-medium mt-2 max-w-2xl leading-relaxed">
+                                {plan.description || "No specific goal defined for this workout plan."}
                             </p>
                         </div>
                     </div>
@@ -131,7 +131,7 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                     <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
                         <Layers className="w-4 h-4" />
                     </div>
-                    <h2 className="text-2xl font-black italic uppercase tracking-tighter text-foreground">TRAINING_SCHEDULE</h2>
+                    <h2 className="text-2xl font-black uppercase tracking-tighter text-foreground">TRAINING_SCHEDULE</h2>
                 </div>
 
                 <div className="space-y-8">
@@ -143,13 +143,13 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                             <div className="p-6 md:p-8 space-y-6">
                                 <div className="flex items-center justify-between border-b border-white/5 pb-4">
                                     <div>
-                                        <h3 className="text-xl font-black italic uppercase tracking-tight text-foreground flex items-center gap-3">
+                                        <h3 className="text-xl font-black uppercase tracking-tight text-foreground flex items-center gap-3">
                                             <span className="text-primary">{day.day.substring(0, 3)}</span>
                                             <span className="text-slate-300">-</span>
                                             {day.title || `${day.day} Session`}
                                         </h3>
                                     </div>
-                                    <div className="px-3 py-1 rounded-full bg-white/5 text-[10px] font-black italic uppercase tracking-widest text-slate-400">
+                                    <div className="px-3 py-1 rounded-full bg-white/5 text-[10px] font-black uppercase tracking-widest text-slate-400">
                                         {day.exercises.length} Exercises
                                     </div>
                                 </div>
@@ -164,18 +164,18 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                                                     {/* Exercise Info */}
                                                     <div className="flex-1 flex gap-4">
                                                         <div className="w-12 h-12 rounded-xl border border-white/10 bg-slate-900 flex flex-col items-center justify-center shrink-0 shadow-inner">
-                                                            <span className="text-[9px] font-black text-slate-500 italic uppercase">SEQ</span>
+                                                            <span className="text-[9px] font-black text-slate-500 uppercase">SEQ</span>
                                                             <span className="text-sm font-black text-foreground">{String(exIdx + 1).padStart(2, '0')}</span>
                                                         </div>
                                                         <div>
-                                                            <h4 className="text-lg font-black italic uppercase text-foreground group-hover:text-primary transition-colors leading-tight mb-1">
+                                                            <h4 className="text-lg font-black uppercase text-foreground group-hover:text-primary transition-colors leading-tight mb-1">
                                                                 {ex.name}
                                                             </h4>
                                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded-md">
                                                                 {fullEx?.muscleGroup || "Compound"}
                                                             </span>
                                                             {ex.notes && (
-                                                                <p className="text-xs text-slate-500 italic mt-2 flex items-start gap-2">
+                                                                <p className="text-xs text-slate-500 mt-2 flex items-start gap-2">
                                                                     <Info className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
                                                                     {ex.notes}
                                                                 </p>
@@ -189,7 +189,7 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                                                             <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-1">SETS</span>
                                                             <div className="flex items-center justify-center gap-1.5 text-primary">
                                                                 <Repeat className="w-4 h-4" />
-                                                                <span className="text-xl font-black italic leading-none">{ex.sets}</span>
+                                                                <span className="text-xl font-black leading-none">{ex.sets}</span>
                                                             </div>
                                                         </div>
 
@@ -197,7 +197,7 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                                                             <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-1">REPS</span>
                                                             <div className="flex items-center justify-center gap-1.5 text-blue-400">
                                                                 <Activity className="w-4 h-4" />
-                                                                <span className="text-xl font-black italic leading-none uppercase">{ex.reps}</span>
+                                                                <span className="text-xl font-black leading-none uppercase">{ex.reps}</span>
                                                             </div>
                                                         </div>
 
@@ -205,7 +205,7 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                                                             <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] block mb-1">REST</span>
                                                             <div className="flex items-center justify-center gap-1.5 text-emerald-400">
                                                                 <Clock className="w-4 h-4" />
-                                                                <span className="text-xl font-black italic leading-none">{ex.restSeconds}</span><span className="text-xs font-bold text-slate-400 mt-1">s</span>
+                                                                <span className="text-xl font-black leading-none">{ex.restSeconds}</span><span className="text-xs font-bold text-slate-400 mt-1">s</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -216,7 +216,7 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                                     ) : (
                                         <div className="py-12 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-2xl bg-white/[0.01]">
                                             <Dumbbell className="w-8 h-8 text-slate-600 mb-3" />
-                                            <p className="text-xs font-black text-slate-500 uppercase tracking-widest italic">REST_DAY</p>
+                                            <p className="text-xs font-black text-slate-500 uppercase tracking-widest">REST_DAY</p>
                                         </div>
                                     )}
                                 </div>
@@ -227,7 +227,7 @@ export default function WorkoutPlanDetailsPage({ params }: { params: Promise<{ i
                     {(!plan.schedule || plan.schedule.length === 0) && (
                         <div className="py-20 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl">
                             <Calendar className="w-12 h-12 text-slate-600 mb-4" />
-                            <p className="text-sm font-black text-slate-500 uppercase tracking-widest italic">NO_SCHEDULE_DEFINED</p>
+                            <p className="text-sm font-black text-slate-500 uppercase tracking-widest">NO_SCHEDULE_DEFINED</p>
                         </div>
                     )}
                 </div>

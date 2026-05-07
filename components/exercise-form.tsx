@@ -139,10 +139,10 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                     <div className="absolute top-0 right-0 w-32 h-full bg-primary/5 -skew-x-12 translate-x-10 opacity-50" />
                     <div className="relative">
                         <div className="flex items-center gap-3 mb-2">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">Exercise Details</span>
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] leading-none">Exercise Details</span>
                             <div className="h-px w-20 bg-primary/20"></div>
                         </div>
-                        <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase text-white leading-none">
+                        <DialogTitle className="text-3xl font-black tracking-tighter uppercase text-white leading-none">
                             {isViewMode ? "Exercise" : isEditMode ? "Edit" : "New"} <span className="text-primary">Exercise</span>
                         </DialogTitle>
                     </div>
@@ -165,7 +165,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                             />
 
                             <div className="space-y-1.5 w-full">
-                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                     <Activity className="w-3 h-3 text-primary" />
                                     Target Muscle
                                 </Label>
@@ -179,7 +179,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                                     </SelectTrigger>
                                     <SelectContent className="bg-card border-white/10 text-white backdrop-blur-xl">
                                         {MUSCLE_GROUPS.map((group) => (
-                                            <SelectItem key={group} value={group} className="font-bold italic text-[10px] focus:bg-primary focus:text-black">
+                                            <SelectItem key={group} value={group} className="font-bold text-[10px] focus:bg-primary focus:text-black">
                                                 {group}
                                             </SelectItem>
                                         ))}
@@ -202,7 +202,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                         {/* Additional Info */}
                         <div className="space-y-4">
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
+                                <Label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                     Difficulty Level
                                 </Label>
                                 <div className="grid grid-cols-3 gap-1.5">
@@ -213,7 +213,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                                             variant="outline"
                                             onClick={() => !isViewMode && setFormData({ ...formData, difficulty: d })}
                                             className={cn(
-                                                "h-10 rounded-xl border-white/5 text-[9px] font-black italic uppercase transition-all",
+                                                "h-10 rounded-xl border-white/5 text-[9px] font-black uppercase transition-all",
                                                 formData.difficulty === d
                                                     ? "bg-primary text-primary border-primary neon-glow"
                                                     : "bg-white/5 text-white hover:bg-white/10"
@@ -226,13 +226,13 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic block">Exercise Description</label>
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Exercise Description</label>
                                 <Textarea
                                     disabled={isViewMode}
                                     placeholder="Detailed instructions..."
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="bg-white/5 border-white/5 focus:border-primary/50 text-white font-medium italic min-h-[100px] rounded-xl text-xs py-3"
+                                    className="bg-white/5 border-white/5 focus:border-primary/50 text-white font-medium min-h-[100px] rounded-xl text-xs py-3"
                                 />
                             </div>
                         </div>
@@ -247,7 +247,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                                 {formData.isPublicWithinGym ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                             </div>
                             <div>
-                                <p className="text-xs font-black italic tracking-tight text-white leading-none mb-1">
+                                <p className="text-xs font-black tracking-tight text-white leading-none mb-1">
                                     {formData.isPublicWithinGym ? "Shared Access" : "Private"}
                                 </p>
                                 <p className="text-[9px] text-slate-500 font-bold tracking-widest leading-none">
@@ -267,7 +267,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                 <DialogFooter className="p-6 pt-0 flex-col sm:flex-row gap-3">
                     <div className="flex-1 flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/5">
                         <Info className="w-3.5 h-3.5 text-primary shrink-0" />
-                        <p className="text-[9px] text-slate-500 font-bold italic leading-tight uppercase">
+                        <p className="text-[9px] text-slate-500 font-bold leading-tight uppercase">
                             Accurate descriptions help members perform exercises safely.
                         </p>
                     </div>
@@ -276,7 +276,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                             type="button"
                             variant="ghost"
                             onClick={() => onOpenChange(false)}
-                            className="h-[34px] px-6 rounded-xl text-[10px] font-black italic uppercase tracking-widest text-slate-500 hover:text-white transition-all"
+                            className="h-[34px] px-6 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-all"
                         >
                             Cancel
                         </Button>
@@ -284,7 +284,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                             onClick={handleSubmit}
                             disabled={loading || isViewMode}
                             className={cn(
-                                "h-[34px] px-8 rounded-xl font-black italic tracking-tighter shadow-lg transition-all min-w-[140px]",
+                                "h-[34px] px-8 rounded-xl font-black tracking-tighter shadow-lg transition-all min-w-[140px]",
                                 isViewMode ? "hidden" : "bg-primary text-black hover:bg-white active:scale-95"
                             )}
                         >

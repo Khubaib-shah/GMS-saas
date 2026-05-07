@@ -48,7 +48,7 @@ export default function PlatformSettingsPage() {
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="h-[38px] flex items-center justify-center px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2 disabled:opacity-50"
+                    className="h-[38px] flex items-center justify-center px-8 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter neon-glow transition-all group gap-2 disabled:opacity-50"
                 >
                     {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                     {saving ? "SAVING..." : "SAVE CHANGES"}

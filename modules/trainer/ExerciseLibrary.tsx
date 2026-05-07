@@ -128,7 +128,7 @@ export function ExerciseLibrary() {
                             setMode("add");
                             setFormOpen(true);
                         }}
-                        className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter shadow-lg transition-all active:scale-95"
+                        className="h-12 px-6 rounded-xl bg-primary text-black hover:bg-white font-black tracking-tighter shadow-lg transition-all active:scale-95"
                     >
                         <Plus className="mr-2 w-5 h-5" />
                         Add Exercise
@@ -140,7 +140,7 @@ export function ExerciseLibrary() {
             <div className="flex flex-col md:flex-row items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-6 backdrop-blur-md">
                 <div className="flex items-center gap-2 px-3 border-r border-white/10 hidden md:flex">
                     <Filter className="w-3.5 h-3.5 text-primary/50" />
-                    <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+                    <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
                         FILTER
                     </span>
                 </div>
@@ -153,21 +153,21 @@ export function ExerciseLibrary() {
                         value={search}
                         onChange={(val) => setSearch(val)}
                         leadingIcon={<Search className="w-4 h-4" />}
-                        className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase italic tracking-wider transition-all focus:border-none focus:ring-0"
+                        className="h-10 bg-transparent border-none hover:bg-white/5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all focus:border-none focus:ring-0"
                         containerClassName="flex-1"
                     />
 
                     <div className="h-6 w-px bg-white/5 hidden md:block self-center" />
 
                     <Select value={muscleFilter} onValueChange={setMuscleFilter}>
-                        <SelectTrigger className="h-10 w-full md:w-48 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+                        <SelectTrigger className="h-10 w-full md:w-48 bg-transparent border-none hover:bg-white/5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all focus:ring-0">
                             <span className="text-slate-500 mr-2">Target Muscle:</span>
                             <SelectValue placeholder="All" />
                         </SelectTrigger>
                         <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-                            <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">All Muscles</SelectItem>
+                            <SelectItem value="all" className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">All Muscles</SelectItem>
                             {MUSCLE_GROUPS.map((group) => (
-                                <SelectItem key={group} value={group.toLowerCase()} className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">
+                                <SelectItem key={group} value={group.toLowerCase()} className="text-[10px] font-bold uppercase focus:bg-primary focus:text-black">
                                     {group.toUpperCase()}
                                 </SelectItem>
                             ))}
@@ -190,13 +190,13 @@ export function ExerciseLibrary() {
                             <div className="flex items-start justify-between relative">
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2">
-                                        <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[8px] font-black italic tracking-widest">{ex.muscleGroup.toUpperCase()}</Badge>
+                                        <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[8px] font-black tracking-widest">{ex.muscleGroup.toUpperCase()}</Badge>
                                         {!ex.isPublicWithinGym && (
-                                            <Badge variant="outline" className="bg-slate-800 text-slate-400 border-none text-[8px] font-black italic tracking-widest">PRIVATE</Badge>
+                                            <Badge variant="outline" className="bg-slate-800 text-slate-400 border-none text-[8px] font-black tracking-widest">PRIVATE</Badge>
                                         )}
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-black italic tracking-tighter text-foreground group-hover:text-primary transition-colors uppercase truncate max-w-[200px]">
+                                        <h3 className="text-xl font-black tracking-tighter text-foreground group-hover:text-primary transition-colors uppercase truncate max-w-[200px]">
                                             {ex.name}
                                         </h3>
                                         <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">{ex.equipment || "Standard Equipment"}</p>
@@ -215,13 +215,13 @@ export function ExerciseLibrary() {
                                         <DropdownMenuContent align="end" className="bg-card border-white/10 text-slate-300 backdrop-blur-xl">
                                             <DropdownMenuItem
                                                 onClick={() => handleAction(ex, "edit")}
-                                                className="text-[11px] font-black italic uppercase tracking-widest focus:bg-primary focus:text-black"
+                                                className="text-[11px] font-black uppercase tracking-widest focus:bg-primary focus:text-black"
                                             >
                                                 Edit
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 onClick={() => handleAction(ex, "delete")}
-                                                className="text-[11px] font-black italic uppercase tracking-widest focus:bg-destructive focus:text-destructive-foreground"
+                                                className="text-[11px] font-black uppercase tracking-widest focus:bg-destructive focus:text-destructive-foreground"
                                             >
                                                 Delete
                                             </DropdownMenuItem>
@@ -230,7 +230,7 @@ export function ExerciseLibrary() {
                                 </div>
                             </div>
 
-                            <div className="mt-6 flex items-center justify-between text-[10px] font-black italic tracking-widest">
+                            <div className="mt-6 flex items-center justify-between text-[10px] font-black tracking-widest">
                                 <span className="text-slate-500 uppercase flex items-center gap-2">
                                     <Layers className="w-3 h-3" />
                                     Difficulty: {ex.difficulty.toUpperCase()}
@@ -238,10 +238,9 @@ export function ExerciseLibrary() {
 
 
                                 <Button
-
                                     onClick={() => handleAction(ex, "view")}
-                                    size="icon" asChild className="h-8 w-8  rounded-full bg-white/5 border border-white/10 text-primary group-hover:bg-primary group-hover:text-black transition-all duration-300 shadow-xl shadow-black/20">
-                                    <ChevronRight className="w-4 h-4 hover:translate-x-1 transition-transform" />
+                                    size="icon" asChild className="h-8 w-8 rounded-full bg-white/5 border border-white/10 text-primary group-hover:bg-primary group-hover:text-black transition-all duration-300 shadow-xl shadow-black/20">
+                                    <ChevronRight className="w-4 h-4 transition-transform" />
                                 </Button>
                             </div>
                         </Card>
@@ -249,8 +248,8 @@ export function ExerciseLibrary() {
                 ) : (
                     <div className="col-span-full py-20 flex flex-col items-center justify-center space-y-4 border border-dashed border-white/10 rounded-3xl">
                         <Layers className="w-12 h-12 text-slate-700" />
-                        <p className="text-sm font-black italic text-slate-500 uppercase tracking-widest">No exercises match your search</p>
-                        <Button variant="ghost" onClick={() => setSearch("")} className="text-primary text-[11px] font-black italic">Reset Filters</Button>
+                        <p className="text-sm font-black text-slate-500 uppercase tracking-widest">No exercises match your search</p>
+                        <Button variant="ghost" onClick={() => setSearch("")} className="text-primary text-[11px] font-black">Reset Filters</Button>
                     </div>
                 )}
             </div>

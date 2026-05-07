@@ -172,7 +172,7 @@ export default function MemberSettingsPage() {
                             <ArrowLeft className="h-5 w-5" />
                         </Button>
                         <div>
-                            <h1 className="text-xl font-black italic tracking-tighter uppercase leading-none">
+                            <h1 className="text-xl font-black tracking-tighter uppercase leading-none">
                                 ACCOUNT <span className="text-primary">SETTINGS</span>
                             </h1>
                             <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mt-1">Manage your profile and security settings</p>
@@ -184,11 +184,11 @@ export default function MemberSettingsPage() {
             <main className="container mx-auto px-6 pt-10 max-w-2xl">
                 <Tabs defaultValue="personal" className="space-y-8">
                     <TabsList className="bg-white/5 border border-white/5 p-1 rounded-xl w-full grid grid-cols-2">
-                        <TabsTrigger value="personal" className="data-[state=active]:bg-primary data-[state=active]:text-black font-black uppercase italic text-xs py-2.5 rounded-lg transition-all tracking-widest leading-none">
+                        <TabsTrigger value="personal" className="data-[state=active]:bg-primary data-[state=active]:text-black font-black uppercase text-xs py-2.5 rounded-lg transition-all tracking-widest leading-none">
                             <User className="w-4 h-4 mr-2" />
                             PERSONAL
                         </TabsTrigger>
-                        <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-black font-black uppercase italic text-xs py-2.5 rounded-lg transition-all tracking-widest leading-none">
+                        <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-black font-black uppercase text-xs py-2.5 rounded-lg transition-all tracking-widest leading-none">
                             <ShieldCheck className="w-4 h-4 mr-2" />
                             SECURITY
                         </TabsTrigger>
@@ -234,7 +234,7 @@ export default function MemberSettingsPage() {
                             <Button
                                 type="submit"
                                 disabled={isSaving}
-                                className="w-full bg-primary text-black hover:bg-white font-black italic uppercase tracking-widest py-6 rounded-xl transition-all shadow-lg shadow-primary/20"
+                                className="w-full bg-primary text-black hover:bg-white font-black uppercase tracking-widest py-6 rounded-xl transition-all shadow-lg shadow-primary/20"
                             >
                                 {isSaving ? "SAVING..." : "SAVE PROFILE"}
                                 <Save className="ml-2 w-5 h-5" />
@@ -292,7 +292,7 @@ export default function MemberSettingsPage() {
                             <Button
                                 type="submit"
                                 disabled={isSaving}
-                                className="w-full bg-primary text-black hover:bg-white font-black italic uppercase tracking-widest py-6 rounded-xl transition-all shadow-lg shadow-primary/20"
+                                className="w-full bg-primary text-black hover:bg-white font-black uppercase tracking-widest py-6 rounded-xl transition-all shadow-lg shadow-primary/20"
                             >
                                 {isSaving ? "SAVING..." : "UPDATE SECURITY"}
                                 <Lock className="ml-2 w-5 h-5" />
@@ -304,7 +304,7 @@ export default function MemberSettingsPage() {
                                 <ShieldCheck className="w-6 h-6 text-primary" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black italic tracking-tight uppercase">Security & Data Protection</h3>
+                                <h3 className="text-sm font-black tracking-tight uppercase">Security & Data Protection</h3>
                                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight mt-1">Your personal information is secure and encrypted.</p>
                             </div>
                         </div>

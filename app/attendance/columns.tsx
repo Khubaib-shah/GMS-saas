@@ -20,7 +20,7 @@ export const columns: ColumnDef<AttendanceColumn>[] = [
         accessorKey: "memberName",
         header: "Member",
         cell: ({ row }) => (
-            <span className="font-black italic text-foreground tracking-tighter">
+            <span className="font-medium md:font-black text-foreground tracking-tighter">
                 {row.original.memberName}
             </span>
         ),
@@ -47,7 +47,7 @@ export const columns: ColumnDef<AttendanceColumn>[] = [
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => (
-            <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-[9px] font-black italic tracking-widest border border-primary/20">
+            <span className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-[9px] font-black tracking-widest border border-primary/20">
                 {row.original.status.toUpperCase()}
             </span>
         ),

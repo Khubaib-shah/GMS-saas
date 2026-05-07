@@ -184,10 +184,10 @@ export default function EditMemberPage({
         <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary neon-glow"></div>
         <div>
           <div className="flex items-center gap-4 mb-2">
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic leading-none">MEMBER PROFILE MANAGEMENT</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] leading-none">MEMBER PROFILE MANAGEMENT</span>
             <div className="h-px w-24 bg-black/5 dark:bg-white/5"></div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-black text-foreground italic tracking-tighter uppercase leading-none">
+          <h1 className="text-5xl md:text-6xl font-black text-foreground tracking-tighter uppercase leading-none">
             EDIT <span className="text-primary neon-text">MEMBER</span>
           </h1>
           <div className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
@@ -208,7 +208,7 @@ export default function EditMemberPage({
         {/* LEFT: MEMBER DETAILS FORM */}
         <div className="glass-premium p-8 border-border dark:bg-slate-950/40 space-y-8">
           <div className="flex items-center gap-4 mb-2">
-            <h2 className="text-xl font-black italic tracking-tighter text-foreground uppercase">Member Details</h2>
+            <h2 className="text-xl font-black tracking-tighter text-foreground uppercase">Member Details</h2>
             <div className="h-px flex-1 bg-white/5"></div>
           </div>
 
@@ -239,7 +239,7 @@ export default function EditMemberPage({
                       />
                       <div className="absolute inset-0 border-2 border-primary/20 rounded-2xl pointer-events-none group-hover:border-primary/50 transition-all"></div>
                     </div>
-                    <p className="text-[10px] font-black text-primary uppercase tracking-widest italic animate-pulse">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">
                       Update Photo
                     </p>
                   </div>
@@ -248,7 +248,7 @@ export default function EditMemberPage({
                     <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                       <Upload className="w-6 h-6 text-slate-500 group-hover:text-primary transition-colors" />
                     </div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic group-hover:text-slate-300 transition-colors">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] group-hover:text-slate-300 transition-colors">
                       Click or drag to upload photo
                     </p>
                   </div>
@@ -305,7 +305,7 @@ export default function EditMemberPage({
             {/* Gender Plan & Assign Trainner */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Field>
-                <FieldLabel className="mb-1 italic text-slate-500 ml-2">
+                <FieldLabel className="mb-1 text-slate-500 ml-2">
                   Gender
                 </FieldLabel>
                 <Select
@@ -329,7 +329,7 @@ export default function EditMemberPage({
               </Field>
 
               <Field>
-                <FieldLabel className="mb-1 italic text-slate-500 ml-2">
+                <FieldLabel className="mb-1 text-slate-500 ml-2">
                   Membership Plan <span className="text-primary">*</span>
                 </FieldLabel>
                 <Select
@@ -352,7 +352,7 @@ export default function EditMemberPage({
               </Field>
 
               <Field>
-                <FieldLabel className="mb-1 italic text-slate-500 ml-2">
+                <FieldLabel className="mb-1 text-slate-500 ml-2">
                   Assign Trainer
                 </FieldLabel>
                 <Select
@@ -378,7 +378,7 @@ export default function EditMemberPage({
 
             {/* Notes */}
             <Field>
-              <FieldLabel className="mb-2 italic text-slate-500 ml-2">
+              <FieldLabel className="mb-2 text-slate-500 ml-2">
                 Additional Notes
               </FieldLabel>
               <textarea
@@ -396,7 +396,7 @@ export default function EditMemberPage({
               <Button
                 type="submit"
                 disabled={loading || !formData.firstName}
-                className="flex-1 h-11 bg-primary text-black hover:bg-white font-black italic tracking-tighter text-lg rounded-lg transition-all uppercase neon-glow z-20 group"
+                className="flex-1 h-11 bg-primary text-black hover:bg-white font-black tracking-tighter text-lg rounded-lg transition-all uppercase neon-glow z-20 group"
               >
                 {loading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : null}
                 {loading ? "Saving..." : "Update Member"}
@@ -419,9 +419,9 @@ export default function EditMemberPage({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] italic block">Live Preview</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] block">Live Preview</span>
                   </div>
-                  <h3 className="text-4xl font-black italic tracking-tighter text-foreground uppercase break-all leading-none">
+                  <h3 className="text-4xl font-black tracking-tighter text-foreground uppercase break-all leading-none">
                     {formData.firstName || "---"}_<span className="text-primary">{formData.lastName || "---"}</span>
                   </h3>
                   <div className="flex items-center gap-2 text-[8px] font-bold text-slate-500 uppercase tracking-widest">
@@ -477,7 +477,7 @@ export default function EditMemberPage({
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-1 h-3 bg-primary/50"></div>
-                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic block">Contact Node</span>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block">Contact Node</span>
                     </div>
                     <p className="text-xs font-bold text-slate-400 tracking-widest truncate flex items-center gap-2">
                       <span className="w-1 h-1 bg-primary/30 rounded-full"></span>
@@ -493,7 +493,7 @@ export default function EditMemberPage({
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-1 h-3 bg-primary/50"></div>
-                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic block">Registry Info</span>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block">Registry Info</span>
                     </div>
                     <p className="text-xs font-bold text-slate-400 tracking-widest uppercase flex items-center gap-2">
                       <span className="w-1 h-1 bg-primary/30 rounded-full"></span>
@@ -513,12 +513,12 @@ export default function EditMemberPage({
                 <div className="flex justify-between items-end mb-3">
                   <div className="space-y-1">
                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Profile Completion</span>
-                    <div className="text-lg font-black italic text-foreground leading-none">
+                    <div className="text-lg font-black text-foreground leading-none">
                       {Math.round(progress)}<span className="text-primary">%</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-[9px] font-black text-primary uppercase tracking-widest italic animate-pulse">System Secured</span>
+                    <span className="text-[9px] font-black text-primary uppercase tracking-widest animate-pulse">System Secured</span>
                   </div>
                 </div>
                 <div className="h-1.5 w-full bg-slate-900/50 rounded-full overflow-hidden p-[1px]">

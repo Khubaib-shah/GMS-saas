@@ -80,7 +80,7 @@ export default function WorkoutPlansClient() {
                 subtitle="MANAGEMENT: WORKOUT_PLANS"
                 description="Create and manage training programs for your clients."
             >
-                <Button className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-black italic tracking-tighter neon-glow transition-all group gap-2" onClick={() => {
+                <Button className="h-[38px] px-8 rounded-xl bg-primary text-black hover:bg-white font-medium md:font-black tracking-tighter neon-glow transition-all group gap-2" onClick={() => {
                     setEditingPlan(null);
                     setIsBuilderOpen(true);
                 }}>
@@ -143,10 +143,10 @@ export default function WorkoutPlansClient() {
                                 </div>
 
                                 <div>
-                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-foreground leading-tight group-hover:text-primary transition-colors">
+                                    <h3 className="text-2xl font-black uppercase tracking-tighter text-foreground leading-tight group-hover:text-primary transition-colors">
                                         {plan.name}
                                     </h3>
-                                    <p className="text-sm text-muted-foreground line-clamp-2 mt-2 italic font-medium">
+                                    <p className="text-sm text-muted-foreground line-clamp-2 mt-2 font-medium">
                                         {plan.description || "No description provided for this plan."}
                                     </p>
                                 </div>
@@ -168,7 +168,7 @@ export default function WorkoutPlansClient() {
                                     </div>
                                 </div>
 
-                                <Button className="w-full h-12 rounded-xl bg-foreground/5 hover:bg-primary hover:text-primary-foreground border-none text-xs font-black uppercase tracking-widest transition-all italic group/btn" asChild>
+                                <Button className="w-full h-12 rounded-xl bg-foreground/5 hover:bg-primary hover:text-primary-foreground border-none text-xs font-black uppercase tracking-widest transition-all group/btn" asChild>
                                     <Link href={`/workout-plans/${plan._id || plan.id}`}>
                                         VIEW PLAN DETAILS
                                         <ChevronRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
@@ -183,8 +183,8 @@ export default function WorkoutPlansClient() {
                     <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mb-6">
                         <Dumbbell className="w-10 h-10 text-muted-foreground/50" />
                     </div>
-                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-foreground mb-2">No Plans Found</h3>
-                    <p className="text-muted-foreground max-w-sm mb-8 italic">
+                    <h3 className="text-2xl font-black uppercase tracking-tighter text-foreground mb-2">No Plans Found</h3>
+                    <p className="text-muted-foreground max-w-sm mb-8">
                         You haven't created any workout plans yet. Start by creating a new plan for your clients.
                     </p>
                     <Button className="h-12 px-8 rounded-xl" onClick={() => setIsBuilderOpen(true)}>
@@ -203,7 +203,7 @@ export default function WorkoutPlansClient() {
                     </div>
                     <div>
                         <p className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-1">Trainer Notice</p>
-                        <p className="text-sm text-foreground/80 italic font-medium">
+                        <p className="text-sm text-foreground/80 font-medium">
                             Assigned plans are automatically synced to member dashboards. Use the <strong>Assign</strong> module to deploy specific plans to clients.
                         </p>
                     </div>

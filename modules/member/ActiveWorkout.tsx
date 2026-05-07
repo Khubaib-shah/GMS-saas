@@ -102,15 +102,15 @@ export function ActiveWorkout() {
     if (loading) return (
         <div className="flex flex-col items-center justify-center p-20 space-y-4">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            <p className="text-[10px] font-black italic text-slate-500 uppercase tracking-widest">Retrieving Training Protocol...</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Loading Workout Plan...</p>
         </div>
     );
 
     if (!data) return (
         <Card className="bg-slate-950/20 border-white/5 p-12 text-center">
             <Dumbbell className="w-12 h-12 text-slate-800 mx-auto mb-6" />
-            <h3 className="text-xl font-black italic uppercase tracking-tighter text-slate-400">No Assigned Workout Plans</h3>
-            <p className="text-[10px] text-slate-500 mt-2 font-black italic uppercase tracking-widest">Please contact your trainer to assign a workout protocol.</p>
+            <h3 className="text-xl font-black uppercase tracking-tighter text-slate-400">No Assigned Workout Plans</h3>
+            <p className="text-[10px] text-slate-500 mt-2 font-black uppercase tracking-widest">Please contact your trainer to assign a workout plan.</p>
         </Card>
     );
 
@@ -123,16 +123,16 @@ export function ActiveWorkout() {
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[8px] font-black italic tracking-[0.2em] mb-2 uppercase">
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-none text-[8px] font-black tracking-[0.2em] mb-2 uppercase">
                             Day {data.currentDay.dayNumber} Session
                         </Badge>
-                        <h2 className="text-3xl font-black italic tracking-tighter uppercase leading-none">
+                        <h2 className="text-3xl font-black tracking-tighter uppercase leading-none">
                             {data.currentDay.title}
                         </h2>
                     </div>
                     <div className="text-right">
-                        <span className="text-[9px] font-black italic text-slate-500 uppercase tracking-widest">Estimated Duration</span>
-                        <div className="flex items-center gap-2 text-foreground font-black italic">
+                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Estimated Duration</span>
+                        <div className="flex items-center gap-2 text-foreground font-black">
                             <Clock className="w-4 h-4 text-primary" />
                             45_MIN
                         </div>
@@ -140,7 +140,7 @@ export function ActiveWorkout() {
                 </div>
 
                 <div className="space-y-2">
-                    <div className="flex justify-between text-[9px] font-black italic uppercase tracking-widest text-slate-400">
+                    <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-400">
                         <span>Training Progress</span>
                         <span>{Math.round(progress)}%</span>
                     </div>
@@ -153,7 +153,7 @@ export function ActiveWorkout() {
                 {totalExercises === 0 ? (
                     <Card className="bg-slate-950/20 border-white/5 border-dashed p-12 text-center text-slate-500">
                         <Dumbbell className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <h3 className="text-xl font-black italic uppercase tracking-widest text-slate-400">Rest Day</h3>
+                        <h3 className="text-xl font-black uppercase tracking-widest text-slate-400">Rest Day</h3>
                         <p className="text-[10px] uppercase font-bold tracking-widest mt-2">No physical sessions scheduled for today.</p>
                     </Card>
                 ) : (
@@ -180,12 +180,12 @@ export function ActiveWorkout() {
 
                                     <div className="flex-1">
                                         <h4 className={cn(
-                                            "text-lg font-black italic uppercase tracking-tight leading-none mb-1",
+                                            "text-lg font-black uppercase tracking-tight leading-none mb-1",
                                             isDone ? "text-primary transition-colors" : "text-foreground"
                                         )}>
                                             {ex.exerciseId.name}
                                         </h4>
-                                        <p className="text-[10px] font-black italic text-slate-500 uppercase tracking-widest">
+                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                                             {ex.sets} SETS // {ex.reps} REPS // {ex.restSeconds}S REST
                                         </p>
                                     </div>
@@ -197,7 +197,7 @@ export function ActiveWorkout() {
 
                                 {ex.notes && (
                                     <div className="px-5 pb-4 border-t border-white/5 pt-3">
-                                        <p className="text-[10px] text-slate-500 font-medium italic italic">
+                                        <p className="text-[10px] text-slate-500 font-medium">
                                             <span className="text-primary/50 font-black mr-2 uppercase tracking-widest">Technical Notes:</span>
                                             {ex.notes}
                                         </p>
@@ -213,7 +213,7 @@ export function ActiveWorkout() {
             <Button
                 disabled={logging || (totalExercises > 0 && completedExercises.length === 0)}
                 onClick={handleFinish}
-                className="w-full h-16 rounded-2xl bg-primary text-black hover:bg-white font-black italic text-xl tracking-tighter neon-glow transition-all active:scale-95 disabled:grayscale disabled:opacity-50"
+                className="w-full h-16 rounded-2xl bg-primary text-black hover:bg-white font-medium md:font-black text-xl tracking-tighter neon-glow transition-all active:scale-95 disabled:grayscale disabled:opacity-50"
             >
                 {logging ? (
                     <>

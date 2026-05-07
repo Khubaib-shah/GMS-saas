@@ -75,10 +75,10 @@ export function ConfirmModal({
                     {Icon && (
                         <Icon className={cn("w-12 h-12 mb-4 mx-auto", iconColor)} />
                     )}
-                    <AlertDialogTitle className="text-2xl font-black italic uppercase tracking-tighter text-white text-center flex items-center justify-center gap-2">
+                    <AlertDialogTitle className="text-2xl font-black uppercase tracking-tighter text-white text-center flex items-center justify-center gap-2">
                         {title} {highlight && <span className={highlightColor}>{highlight}</span>}
                     </AlertDialogTitle>
-                    <div className="text-slate-400 text-center font-medium italic">
+                    <div className="text-slate-400 text-center font-medium">
                         {description}
                     </div>
                 </AlertDialogHeader>
@@ -100,7 +100,7 @@ export function ConfirmModal({
                                         if (onConfirm) onConfirm();
                                     }}
                                     disabled={loading}
-                                    className={cn("rounded-xl font-black italic uppercase tracking-widest", buttonClass)}
+                                    className={cn("rounded-xl font-black uppercase tracking-widest", buttonClass)}
                                 >
                                     {loading ? (
                                         <>

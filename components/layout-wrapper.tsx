@@ -38,15 +38,15 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   }, [gymName, pathname])
 
   useEffect(() => {
-    // We only load if not in login page or member portal
-    if (pathname !== "/login" && !pathname?.startsWith("/member")) {
+    // Only load core data if authenticated and not on login/public pages
+    if (session?.user && pathname !== "/login" && !pathname?.startsWith("/member")) {
       loadGymProfile()
       loadMembers()
       loadPlans()
       loadSubscriptions()
       loadPayments()
     }
-  }, [pathname, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
+  }, [session?.user?.id, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
 
   const isLandingPage = pathname === "/"
   const isLoginPage = pathname === "/login"

@@ -25,7 +25,7 @@ export function PaginationHUD({
   return (
     <div className={cn("p-4 border-t border-white/5 bg-white/[0.02] flex flex-col sm:flex-row items-center justify-between gap-4", className)}>
       <div className="flex items-center gap-4">
-        <span className="text-[10px] font-black italic tracking-widest text-slate-500 uppercase">
+        <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
           Showing <span className="text-primary">{Math.min(totalItems, (currentPage - 1) * pageSize + 1)}</span> - <span className="text-primary">{Math.min(totalItems, currentPage * pageSize)}</span> of {totalItems}
         </span>
       </div>
@@ -36,7 +36,7 @@ export function PaginationHUD({
           size="sm"
           disabled={currentPage === 1}
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-          className="h-8 px-4 rounded-lg border border-white/5 bg-white/5 text-[10px] font-black italic tracking-tighter uppercase transition-all hover:bg-primary hover:text-black disabled:opacity-30 disabled:grayscale"
+          className="h-8 px-4 rounded-lg border border-white/5 bg-white/5 text-[10px] font-black tracking-tighter uppercase transition-all hover:bg-primary hover:text-black disabled:opacity-30 disabled:grayscale"
         >
           Previous
         </Button>
@@ -55,7 +55,7 @@ export function PaginationHUD({
                   key={pageNum}
                   onClick={() => onPageChange(pageNum)}
                   className={cn(
-                    "w-8 h-8 rounded-lg text-[10px] font-black italic transition-all",
+                    "w-8 h-8 rounded-lg text-[10px] font-black transition-all",
                     currentPage === pageNum
                       ? "bg-primary text-black shadow-lg shadow-primary/20"
                       : "text-slate-500 hover:text-white hover:bg-white/5"
@@ -79,7 +79,7 @@ export function PaginationHUD({
           size="sm"
           disabled={currentPage === totalPages}
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-          className="h-8 px-4 rounded-lg border border-white/5 bg-white/5 text-[10px] font-black italic tracking-tighter uppercase transition-all hover:bg-primary hover:text-black disabled:opacity-30 disabled:grayscale"
+          className="h-8 px-4 rounded-lg border border-white/5 bg-white/5 text-[10px] font-black tracking-tighter uppercase transition-all hover:bg-primary hover:text-black disabled:opacity-30 disabled:grayscale"
         >
           Next
         </Button>

@@ -35,7 +35,7 @@ export const columns = (onViewDetails: (log: AuditLogEntry) => void): ColumnDef<
         header: "User",
         cell: ({ row }) => (
             <div className="flex flex-col">
-                <span className="font-black text-[10px] uppercase italic tracking-tight text-foreground">
+                <span className="font-black text-[10px] uppercase tracking-tight text-foreground">
                     {row.original.userName || "System"}
                 </span>
                 <span className="text-[9px] font-mono text-slate-500 truncate max-w-[100px]">

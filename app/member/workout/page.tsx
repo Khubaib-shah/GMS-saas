@@ -41,7 +41,7 @@ export default function MemberWorkoutPage() {
                             <Dumbbell className="h-6 w-6 text-black" />
                         </div>
                         <div>
-                            <h1 className="text-lg font-black italic tracking-tighter uppercase leading-none">
+                            <h1 className="text-lg font-black tracking-tighter uppercase leading-none">
                                 WORKOUT <span className="text-primary">CENTER</span>
                             </h1>
                             <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-1">ACTIVE WORKOUT</p>
@@ -56,14 +56,14 @@ export default function MemberWorkoutPage() {
                         <TabsList className="bg-white/5 border border-white/10 p-1 rounded-2xl h-[38px]">
                             <TabsTrigger
                                 value="active"
-                                className="px-8 font-black italic text-[11px] uppercase tracking-widest rounded-xl data-[state=active]:bg-primary data-[state=active]:text-black transition-all"
+                                className="px-8 font-black text-[11px] uppercase tracking-widest rounded-xl data-[state=active]:bg-primary data-[state=active]:text-black transition-all"
                             >
                                 <Zap className="w-4 h-4 mr-3" />
                                 LIVE SESSION
                             </TabsTrigger>
                             <TabsTrigger
                                 value="history"
-                                className="px-8 font-black italic text-[11px] uppercase tracking-widest rounded-xl data-[state=active]:bg-white/10 data-[state=active]:text-white transition-all"
+                                className="px-8 font-black text-[11px] uppercase tracking-widest rounded-xl data-[state=active]:bg-white/10 data-[state=active]:text-white transition-all"
                             >
                                 <History className="w-4 h-4 mr-3" />
                                 LOG HISTORY

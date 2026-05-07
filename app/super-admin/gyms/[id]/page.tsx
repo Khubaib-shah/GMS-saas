@@ -146,7 +146,7 @@ export default function GymDetailPage() {
                 </Button>
                 <div className="flex-1">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-3xl font-black italic tracking-tighter text-foreground uppercase">{gym.name}</h1>
+                        <h1 className="text-3xl font-black tracking-tighter text-foreground uppercase">{gym.name}</h1>
                         <Button
                             variant="ghost"
                             size="icon"
@@ -156,13 +156,13 @@ export default function GymDetailPage() {
                         >
                             <Edit2 className="w-3.5 h-3.5" />
                         </Button>
-                        <span className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[10px] font-black italic tracking-widest uppercase", badge.cls)}>
+                        <span className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-lg border text-[10px] font-black tracking-widest uppercase", badge.cls)}>
                             <div className="w-1.5 h-1.5 rounded-full bg-current shadow-[0_0_8px_currentColor]" />
                             {badge.label}
                         </span>
                     </div>
                     <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Registry Instance:</span>
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Registry Instance:</span>
                         <code className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded uppercase">{gym.id}</code>
                     </div>
                 </div>
@@ -173,7 +173,7 @@ export default function GymDetailPage() {
                 {/* Basic Info */}
                 <div className="glass-premium p-8 border-border bg-card dark:bg-slate-950/40 space-y-8">
                     <div className="flex items-center gap-4">
-                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Gym Details</h3>
+                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Gym Details</h3>
                         <div className="h-px flex-1 bg-white/5"></div>
                     </div>
                     <div className="space-y-5">
@@ -190,7 +190,7 @@ export default function GymDetailPage() {
                 {/* Subscription Info */}
                 <div className="glass-premium p-8 border-border bg-card dark:bg-slate-950/40 space-y-8">
                     <div className="flex items-center gap-4">
-                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Subscription</h3>
+                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Subscription</h3>
                         <div className="h-px flex-1 bg-white/5"></div>
                     </div>
                     <div className="space-y-5">
@@ -208,7 +208,7 @@ export default function GymDetailPage() {
                 {/* Stats */}
                 <div className="glass-premium p-8 border-border bg-card dark:bg-slate-950/40 space-y-8">
                     <div className="flex items-center gap-4">
-                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Performance Stats</h3>
+                        <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Performance Stats</h3>
                         <div className="h-px flex-1 bg-white/5"></div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -218,8 +218,8 @@ export default function GymDetailPage() {
                         <StatCard label="Branches" value={stats.branchCount} icon={Building2} />
                     </div>
                     <div className="pt-6 border-t border-white/5">
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 italic">Total Gym Revenue Pool</p>
-                        <p className="text-3xl font-black italic tracking-tighter text-emerald-400">{formatPKR(stats.totalRevenue)}</p>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Total Gym Revenue Pool</p>
+                        <p className="text-3xl font-black tracking-tighter text-emerald-400">{formatPKR(stats.totalRevenue)}</p>
                     </div>
                 </div>
             </div>
@@ -227,7 +227,7 @@ export default function GymDetailPage() {
             {/* Actions */}
             <div className="glass-premium p-8 border-border bg-card dark:bg-slate-950/40 space-y-6">
                 <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Administrative Control Panel</h3>
+                    <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Administrative Control Panel</h3>
                     <div className="h-px flex-1 bg-white/5"></div>
                 </div>
                 <div className="flex flex-wrap gap-4 items-center">
@@ -306,7 +306,7 @@ export default function GymDetailPage() {
                                         }
                                     }}
                                 >
-                                    <SelectTrigger className="glass-premium h-11 border-white/10 bg-white/5 px-4 w-full text-slate-300 font-black italic tracking-widest text-[10px] uppercase transition-all hover:bg-white/10">
+                                    <SelectTrigger className="glass-premium h-11 border-white/10 bg-white/5 px-4 w-full text-slate-300 font-black tracking-widest text-[10px] uppercase transition-all hover:bg-white/10">
                                         <SelectValue placeholder="Change Tier..." />
                                     </SelectTrigger>
                                     <SelectContent className="bg-slate-900 border-white/10 text-white z-[70] max-h-60 overflow-y-auto custom-scrollbar">
@@ -334,7 +334,7 @@ export default function GymDetailPage() {
             {/* Feature Management */}
             <div className="glass-premium p-8 border-border bg-card dark:bg-slate-950/40 space-y-8 animate-fade-up">
                 <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest italic">Feature Management & Overrides</h3>
+                    <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Feature Management & Overrides</h3>
                     <div className="h-px flex-1 bg-white/5"></div>
                 </div>
 
@@ -351,7 +351,7 @@ export default function GymDetailPage() {
                                         : "bg-white/[0.02] border-white/5 text-slate-500"
                                 )}
                             >
-                                <span className={cn("text-[10px] font-black uppercase tracking-widest italic", isEnabled && "text-emerald-400")}>{f.label}</span>
+                                <span className={cn("text-[10px] font-black uppercase tracking-widest", isEnabled && "text-emerald-400")}>{f.label}</span>
                                 <button
                                     onClick={() => doAction("toggleFeature", { featureKey: f.key })}
                                     disabled={actionLoading === "toggleFeature" || actionLoading !== ""}
@@ -371,7 +371,7 @@ export default function GymDetailPage() {
             {/* Payment History */}
             <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                    <h3 className="text-2xl font-black italic tracking-tighter text-foreground uppercase flex items-center gap-3">
+                    <h3 className="text-2xl font-black tracking-tighter text-foreground uppercase flex items-center gap-3">
                         <CreditCard className="w-6 h-6 text-primary" />
                         Platform Payment History
                     </h3>
@@ -381,7 +381,7 @@ export default function GymDetailPage() {
                 <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40 font-bold tracking-widest uppercase">
                     {platformPayments?.length === 0 ? (
                         <div className="p-12 text-center opacity-50 underline underline-offset-8 decoration-primary/30">
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic">No platform payments recorded for this instance</p>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">No platform payments recorded for this instance</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
@@ -389,22 +389,22 @@ export default function GymDetailPage() {
                                 <thead>
                                     <tr className="border-b border-white/5 bg-white/[0.02]">
                                         {["Amount", "Method", "Payment Date", "Expiry Date", "Notes"].map((h) => (
-                                            <th key={h} className="px-6 py-6 text-left font-black text-slate-500 italic uppercase tracking-widest">{h}</th>
+                                            <th key={h} className="px-6 py-6 text-left font-black text-slate-500 uppercase tracking-widest">{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {(platformPayments || []).map((p: any) => (
                                         <tr key={p._id} className="border-b border-white/5 transition-colors hover:bg-white/[0.02]">
-                                            <td className="px-6 py-6 text-emerald-400 font-black italic tracking-tighter text-base">{formatPKR(p.amountPKR)}</td>
-                                            <td className="px-6 py-6 font-black italic tracking-widest text-[10px] text-foreground">
+                                            <td className="px-6 py-6 text-emerald-400 font-black tracking-tighter text-base">{formatPKR(p.amountPKR)}</td>
+                                            <td className="px-6 py-6 font-black tracking-widest text-[10px] text-foreground">
                                                 <span className="bg-white/5 px-2 py-1 rounded">
                                                     {p.paymentMethod?.replace("_", " ")}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-6 text-slate-500 font-mono text-[10px]">{new Date(p.paymentDate).toLocaleDateString("en-PK").toUpperCase()}</td>
                                             <td className="px-6 py-6 text-slate-500 font-mono text-[10px]">{new Date(p.expiryDate).toLocaleDateString("en-PK").toUpperCase()}</td>
-                                            <td className="px-6 py-6 text-slate-400 font-medium italic normal-case text-xs lowercase max-w-[200px] truncate">{p.notes || "—"}</td>
+                                            <td className="px-6 py-6 text-slate-400 font-medium normal-case text-xs lowercase max-w-[200px] truncate">{p.notes || "—"}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -675,9 +675,9 @@ function InfoRow({ icon: Icon, label, value, highlight, error }: any) {
                 <Icon className="w-5 h-5" />
             </div>
             <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">{label}</p>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{label}</p>
                 <p className={cn(
-                    "text-base font-black italic tracking-tighter truncate uppercase",
+                    "text-base font-black tracking-tighter truncate uppercase",
                     error ? "text-red-400" : highlight ? "text-primary" : "text-foreground"
                 )}>
                     {value}
@@ -691,8 +691,8 @@ function StatCard({ label, value, icon: Icon }: any) {
     return (
         <div className="glass-premium bg-white/5 border border-white/5 p-6 text-center group/stat hover:bg-white/10 transition-all cursor-default">
             <Icon className="w-5 h-5 text-slate-500 mx-auto mb-2 group-hover/stat:text-primary transition-colors" />
-            <p className="text-2xl font-black italic tracking-tighter text-foreground uppercase truncate group-hover/stat:scale-110 transition-transform duration-300">{value}</p>
-            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic mt-1">{label}</p>
+            <p className="text-2xl font-black tracking-tighter text-foreground uppercase truncate group-hover/stat:scale-110 transition-transform duration-300">{value}</p>
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-1">{label}</p>
         </div>
     );
 }
@@ -713,7 +713,7 @@ function ActionButton({ icon: Icon, label, color, loading, onClick }: any) {
             disabled={loading}
             variant="ghost"
             className={cn(
-                "h-11 flex items-center gap-3 px-6 rounded-xl border text-[10px] font-black italic tracking-widest uppercase transition-all shadow-lg active:scale-95",
+                "h-11 flex items-center gap-3 px-6 rounded-xl border text-[10px] font-black tracking-widest uppercase transition-all shadow-lg active:scale-95",
                 colors[color] || colors.blue,
                 loading && "opacity-50 cursor-not-allowed"
             )}
