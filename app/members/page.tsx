@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Search, Plus, Trash2, QrCode, Sparkles, Users, Filter, Eye, AlertTriangle, CircleCheckBigIcon, AlertCircle, Loader2 } from "lucide-react";
+import { Plus, Trash2, Users } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { MemberQrDialog } from "@/components/member-qr-dialog";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,6 @@ import { createColumns } from "./columns";
 
 export default function MembersPage() {
   const { data: session } = useSession();
-  const isPremium = (session?.user as any)?.isPremium;
   const store = useAppStore();
   const canScan = !!(store.gymProfile?.enabledFeatures?.includes("qrAttendance"));
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,13 +102,6 @@ export default function MembersPage() {
     return result;
   }, [store.members, store.subscriptions, store.searchQuery, searchTerm, filterStatus, session]);
 
-  const paginatedData = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filtered.slice(start, start + pageSize);
-  }, [filtered, currentPage, pageSize]);
-
-  const totalPages = Math.ceil(filtered.length / pageSize);
-
   const handleDelete = async (id: string) => {
     try {
       setIsProcessingDelete(true);
@@ -173,57 +165,57 @@ export default function MembersPage() {
 
       {/* Members Table */}
       <div className="glass-premium p-6 border-border bg-card dark:bg-slate-950/40 rounded-3xl">
-          <DataTable
-            isLoading={loading}
-            columns={createColumns(
-              canScan,
-              (id, name) => setQrMember({ id, name }),
-              (id) => setDeleteId(id),
-              handleRestore,
-              showTrash,
-              isProcessingRestore,
-              (session?.user as any)?.role
-            )}
-            data={filtered.map(member => {
-              const graceDays = store.businessSettings.gracePeriodDays || 0;
-              const subs = store.subscriptions.filter(s => s.memberId === member.id);
-              let activeSub = subs.find(s => isSubscriptionActive(s.endDate, s.status, graceDays));
-              if (!activeSub && (member as any).activeSubscription) {
-                activeSub = (member as any).activeSubscription;
-              }
-              const isActive = !!activeSub;
-              const isPaused = activeSub?.status === "paused" || subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate, "active", graceDays));
-              const isGrace = !!(isActive && activeSub && new Date(activeSub.endDate) < new Date());
-
-              return {
-                ...member,
-                isActive,
-                isPaused,
-                isGrace,
-                activeSub
-              };
-            })}
-            filter={
-              <Select
-                value={filterStatus}
-                onValueChange={(value) =>
-                  setFilterStatus(value as "all" | "active" | "expired")
-                }
-              >
-                <SelectTrigger className="!h-[41px] w-full md:w-56 bg-white/5 border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
-                  <span className="text-slate-500 mr-2">Status:</span>
-                  <SelectValue placeholder="All Members" />
-                </SelectTrigger>
-                <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
-                  <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">All Members</SelectItem>
-                  <SelectItem value="active" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Active Members</SelectItem>
-                  <SelectItem value="expired" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Expired Members</SelectItem>
-                </SelectContent>
-              </Select>
+        <DataTable
+          isLoading={loading}
+          columns={createColumns(
+            canScan,
+            (id, name) => setQrMember({ id, name }),
+            (id) => setDeleteId(id),
+            handleRestore,
+            showTrash,
+            isProcessingRestore,
+            (session?.user as any)?.role
+          )}
+          data={filtered.map(member => {
+            const graceDays = store.businessSettings.gracePeriodDays || 0;
+            const subs = store.subscriptions.filter(s => s.memberId === member.id);
+            let activeSub = subs.find(s => isSubscriptionActive(s.endDate, s.status, graceDays));
+            if (!activeSub && (member as any).activeSubscription) {
+              activeSub = (member as any).activeSubscription;
             }
-            searchKey="firstName"
-            searchPlaceholder="Filter by first name..."
-          />
+            const isActive = !!activeSub;
+            const isPaused = activeSub?.status === "paused" || subs.some(s => s.status === "paused" && isSubscriptionActive(s.endDate, "active", graceDays));
+            const isGrace = !!(isActive && activeSub && new Date(activeSub.endDate) < new Date());
+
+            return {
+              ...member,
+              isActive,
+              isPaused,
+              isGrace,
+              activeSub
+            };
+          })}
+          filter={
+            <Select
+              value={filterStatus}
+              onValueChange={(value) =>
+                setFilterStatus(value as "all" | "active" | "expired")
+              }
+            >
+              <SelectTrigger className="!h-[41px] w-full md:w-56 bg-white/5 border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-bold uppercase italic tracking-wider transition-all focus:ring-0">
+                <span className="text-slate-500 mr-2">Status:</span>
+                <SelectValue placeholder="All Members" />
+              </SelectTrigger>
+              <SelectContent className="glass-premium border-white/10 bg-slate-950/95">
+                <SelectItem value="all" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">All Members</SelectItem>
+                <SelectItem value="active" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Active Members</SelectItem>
+                <SelectItem value="expired" className="text-[10px] font-bold italic uppercase focus:bg-primary focus:text-black">Expired Members</SelectItem>
+              </SelectContent>
+            </Select>
+          }
+          searchKey="firstName"
+          searchPlaceholder="Filter by first name..."
+        />
 
         {filtered.length === 0 && !loading && (
           <div className="text-center py-24 bg-white/[0.01]">

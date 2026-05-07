@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Save, Mail, Edit2, Users, Calendar, Award, DollarSign, Clock, BarChart3, Settings2 } from "lucide-react";
+import { ArrowLeft, Save, Mail, Edit2, Users, Calendar, Award, DollarSign, Clock, BarChart3, Settings2, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
 import { formatDate } from "@/lib/utils/file-utils";
@@ -199,7 +199,7 @@ export default function TrainerDetailPage({
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-        <div className="lg:col-span-1 space-y-6">
+        <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24 self-start">
           <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm">
             <CardHeader className="text-center pb-2">
               <div className="mx-auto mb-4 relative">
@@ -419,7 +419,7 @@ export default function TrainerDetailPage({
                           <TableRow>
                             <TableHead>Member</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Action</TableHead>
+                            <TableHead className="text-right pr-7">Action</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -430,7 +430,20 @@ export default function TrainerDetailPage({
                               </TableCell>
                               <TableCell><Badge variant="outline">Active</Badge></TableCell>
                               <TableCell className="text-right">
-                                <Button variant="ghost" size="sm" asChild><Link href={`/members/${m._id}`}>Profile</Link></Button>
+                                <Link href={`/members/${m._id}`}>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="group h-9 w-[110px] px-0 rounded-xl border-white/5 bg-white/5 text-white font-black italic text-[10px] tracking-tighter hover:bg-primary transition-all duration-500 overflow-hidden relative"
+                                  >
+                                    <div className="flex items-center justify-center w-full h-full relative">
+                                      <Eye className="w-4 h-4 transition-all duration-500 group-hover:scale-110 group-hover:translate-x-[32px] relative z-10" />
+                                      <span className="ml-2 transition-all duration-500 group-hover:opacity-0 group-hover:translate-x-4 whitespace-nowrap">
+                                        View Profile
+                                      </span>
+                                    </div>
+                                  </Button>
+                                </Link>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -481,6 +494,6 @@ export default function TrainerDetailPage({
         description={<>Are you sure you want to reset this trainer's password? The new password will be hardcoded to <span className="font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">password123</span>.</>}
         confirmText="Confirm Reset"
       />
-    </div>
+    </div >
   );
 }

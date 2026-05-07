@@ -137,7 +137,7 @@ function getMonthlyDates(startDate: Date): Date[] {
     const dates = [];
     const current = new Date(startDate);
     const now = new Date();
-    
+
     while (current <= now) {
         dates.push(new Date(current));
         current.setMonth(current.getMonth() + 1);
@@ -323,22 +323,25 @@ async function seed() {
             const plans = await Plan.insertMany([
                 { id: "basic-monthly", gymId: gym._id, name: "Basic Monthly", price: 3000, duration: 30, description: "Full gym access" },
                 { id: "standard-quarterly", gymId: gym._id, name: "Standard Quarterly", price: 7500, duration: 90, description: "Save with 3 months access" },
-                { id: "premium-yearly", gymId: gym._id, name: "Premium Yearly", price: 25000, duration: 365, description: "VIP access with locker" }
+                { id: "premium-yearly", gymId: gym._id, name: "Premium Yearly", price: 25000, duration: 365, description: "VIP access with locker" },
+                { id: "student-monthly", gymId: gym._id, name: "Student Monthly", price: 2000, duration: 30, description: "Discounted for students" },
+                { id: "family-quarterly", gymId: gym._id, name: "Family Quarterly", price: 18000, duration: 90, description: "Access for up to 3 family members" },
+                { id: "weekend-only", gymId: gym._id, name: "Weekend Warrior", price: 1500, duration: 30, description: "Saturday & Sunday access only" }
             ] as any);
 
             // 8. Members
-            const memberCount = 20; // Increased count
+            const memberCount = 65; // Increased count
             const mDocs = [];
             for (let m = 0; m < memberCount; m++) {
                 const mName = getRandomName();
                 const plan = plans[m % plans.length];
                 const trainer = createdTrainers[m % createdTrainers.length];
-                const joinDate = getRandomDate(3, 0); // Past 3 months
+                const joinDate = getRandomDate(1, 0); // Past 1 month (Latest dates)
 
                 mDocs.push({
                     firstName: mName.first,
                     lastName: mName.last,
-                    email: `${mName.first.toLowerCase()}.${mName.last.toLowerCase()}${m + 1}@gmail.com`,
+                    email: `${mName.first.toLowerCase()}.${mName.last.toLowerCase()}.${i}-${m + 1}@gmail.com`,
                     phone: getRandomPhone(),
                     gender: mName.gender,
                     gymId: gym._id,
@@ -359,7 +362,7 @@ async function seed() {
                 const joinDate = new Date(member.joinDate);
                 const paymentDates = getMonthlyDates(joinDate);
                 const plan = plans.find(p => p.id === member.planId);
-                
+
                 // 9.1 Monthly Payments
                 for (const pDate of paymentDates) {
                     await Payment.create({
@@ -391,7 +394,7 @@ async function seed() {
                 const now = new Date();
                 const diffTime = Math.abs(now.getTime() - joinDate.getTime());
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
+
                 // Average 4-5 days a week
                 for (let d = 0; d < diffDays; d++) {
                     if (Math.random() > 0.4) { // 60% attendance rate
@@ -507,7 +510,7 @@ async function seed() {
             await PlatformPayment.create({
                 gymId: gym._id,
                 amountPKR: 5000,
-                paymentDate: getRandomDate(1, 0),
+                paymentDate: getRandomDate(0.5, 0),
                 expiryDate: getRandomDate(0, 1),
                 enteredBy: owner._id,
                 planName: "Professional",
