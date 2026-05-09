@@ -28,6 +28,11 @@ export function RestTimerDrawer({ open, onOpenChange, exercise, onComplete }: Re
   const [timeLeft, setTimeLeft] = useState(60);
   const [timerActive, setTimerActive] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [restElapsed, setRestElapsed] = useState(0);
+
+  // Per-set timing for anti-cheat
+  const setStartTimeRef = useRef<Date | null>(null);
+  const completedSetsRef = useRef<any[]>([]);
 
   // Track the last exercise ID so we only reset for a genuinely NEW exercise
   const lastExerciseIdRef = useRef<string | null>(null);
@@ -36,6 +41,7 @@ export function RestTimerDrawer({ open, onOpenChange, exercise, onComplete }: Re
   const restDuration = exercise?.restSeconds || 60;
   const mediaUrl = exercise?.exerciseId?.videoUrl || exercise?.exerciseId?.svgUrl || "";
   const isVideo = !!exercise?.exerciseId?.videoUrl;
+  const SKIP_LOCK_SECONDS = 10;
 
   // Only reset state when a DIFFERENT exercise is opened — not on close/reopen
   useEffect(() => {
@@ -48,6 +54,9 @@ export function RestTimerDrawer({ open, onOpenChange, exercise, onComplete }: Re
       setTimeLeft(exercise.restSeconds || 60);
       setTimerActive(false);
       setShowPreview(false);
+      setRestElapsed(0);
+      setStartTimeRef.current = null;
+      completedSetsRef.current = [];
     }
   }, [open, exercise]);
 
@@ -64,17 +73,19 @@ export function RestTimerDrawer({ open, onOpenChange, exercise, onComplete }: Re
     if (phase === "resting" && timerActive && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => prev - 1);
+        setRestElapsed((prev) => prev + 1);
       }, 1000);
     } else if (phase === "resting" && timerActive && timeLeft === 0) {
       // Rest finished — move to next set
       setTimerActive(false);
+      setRestElapsed(0);
       if (currentSet < totalSets) {
         setCurrentSet((prev) => prev + 1);
         setTimeLeft(restDuration);
         setPhase("performing");
+        setStartTimeRef.current = new Date();
       } else {
-        onComplete();
-        onOpenChange(false);
+        finishExercise();
       }
     }
     return () => clearInterval(interval);
@@ -83,36 +94,80 @@ export function RestTimerDrawer({ open, onOpenChange, exercise, onComplete }: Re
   const handleStart = () => {
     setPhase("performing");
     setShowPreview(false);
+    setStartTimeRef.current = new Date();
+    persistCompletion("in_progress");
   };
 
   const handleSetDone = () => {
+    // Record set timing
+    const now = new Date();
+    const startedAt = setStartTimeRef.current || now;
+    const durationSeconds = Math.round((now.getTime() - startedAt.getTime()) / 1000);
+    completedSetsRef.current.push({
+      setNumber: currentSet,
+      startedAt: startedAt.toISOString(),
+      completedAt: now.toISOString(),
+      durationSeconds,
+      reps: exercise?.reps,
+    });
+
     if (currentSet < totalSets) {
       setPhase("resting");
       setTimerActive(true);
       setTimeLeft(restDuration);
+      setRestElapsed(0);
       setShowPreview(false);
+      persistCompletion("in_progress");
     } else {
-      // Final set — complete & reset ref so opening again starts fresh
-      lastExerciseIdRef.current = null;
-      onComplete();
-      onOpenChange(false);
+      finishExercise();
     }
   };
 
   const handleSkipRest = () => {
     setTimerActive(false);
+    setRestElapsed(0);
     if (currentSet < totalSets) {
       setCurrentSet((prev) => prev + 1);
       setTimeLeft(restDuration);
       setPhase("performing");
+      setStartTimeRef.current = new Date();
     } else {
-      lastExerciseIdRef.current = null;
-      onComplete();
-      onOpenChange(false);
+      finishExercise();
+    }
+  };
+
+  const finishExercise = () => {
+    persistCompletion("completed");
+    lastExerciseIdRef.current = null;
+    onComplete();
+    onOpenChange(false);
+  };
+
+  const persistCompletion = async (status: "in_progress" | "completed") => {
+    try {
+      const exId = exercise?.exerciseId?._id || exercise?.exerciseId?.id;
+      if (!exId) return;
+      const token = localStorage.getItem("memberToken");
+      const headers: any = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      await fetch("/api/exercise-completion", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          exerciseId: exId,
+          planId: exercise?.planId || "",
+          sets: completedSetsRef.current,
+          totalSets,
+          status,
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to persist completion:", err);
     }
   };
 
   const progress = restDuration > 0 ? (timeLeft / restDuration) * 100 : 0;
+  const canSkipRest = restElapsed >= SKIP_LOCK_SECONDS;
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -441,11 +496,17 @@ export function RestTimerDrawer({ open, onOpenChange, exercise, onComplete }: Re
                 {timerActive ? "Pause" : "Resume"}
               </Button>
               <Button
-                className="flex-1 h-14 rounded-2xl bg-slate-100 text-black hover:bg-white font-black tracking-tighter"
+                className={cn(
+                  "flex-1 h-14 rounded-2xl font-black tracking-tighter transition-all",
+                  canSkipRest
+                    ? "bg-slate-100 text-black hover:bg-white"
+                    : "bg-white/5 text-slate-600 cursor-not-allowed"
+                )}
                 onClick={handleSkipRest}
+                disabled={!canSkipRest}
               >
                 <SkipForward className="w-4 h-4 mr-2" />
-                Skip Rest
+                {canSkipRest ? "Skip Rest" : `Wait ${SKIP_LOCK_SECONDS - restElapsed}s`}
               </Button>
             </>
           )}

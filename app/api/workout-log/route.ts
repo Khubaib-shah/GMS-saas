@@ -44,6 +44,26 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Access denied" }, { status: 403 });
         }
 
+        // ── Dedup: Prevent logging same workout multiple times per day ──
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const existingLog = await WorkoutLog.findOne({
+            gymId: session.user.gymId,
+            memberId: plan.memberId,
+            planId,
+            date: { $gte: startOfDay, $lte: endOfDay }
+        });
+
+        if (existingLog) {
+            return NextResponse.json(
+                { error: "Workout already logged for today. You can only log once per day." },
+                { status: 409 }
+            );
+        }
+
         const log = await WorkoutLog.create({
             gymId: session.user.gymId,
             memberId: plan.memberId,

@@ -23,9 +23,9 @@ const ExerciseSchema = new mongoose.Schema({
 ExerciseSchema.index({ gymId: 1, name: 1 });
 ExerciseSchema.index({ gymId: 1, muscleGroup: 1 });
 
-// Force schema refresh in development
-if (mongoose.models.Exercise) {
+// Force schema refresh in development only (HMR support)
+if (process.env.NODE_ENV === "development" && mongoose.models.Exercise) {
     delete mongoose.models.Exercise;
 }
 
-export default mongoose.model("Exercise", ExerciseSchema);
+export default mongoose.models.Exercise || mongoose.model("Exercise", ExerciseSchema);
