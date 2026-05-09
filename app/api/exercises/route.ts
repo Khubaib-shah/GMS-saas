@@ -47,14 +47,16 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { name, muscleGroup, equipment, description, difficulty, tips, svgUrl, thumbnailUrl, isPublicWithinGym } = body;
+        console.log("Exercise POST body:", body);
+        const { name, muscleGroup, equipment, description, difficulty, tips, svgUrl, videoUrl, thumbnailUrl, isPublicWithinGym } = body;
 
         if (!name || !muscleGroup) {
             return NextResponse.json({ error: "Name and Muscle Group are required" }, { status: 400 });
         }
 
         await connectDB();
-        const exercise = await Exercise.create({
+        
+        const exercise = new Exercise({
             gymId: session.user.gymId,
             createdByTrainerId: session.user.id,
             name,
@@ -64,9 +66,13 @@ export async function POST(req: Request) {
             difficulty,
             tips,
             svgUrl,
+            videoUrl,
             thumbnailUrl,
             isPublicWithinGym: isPublicWithinGym ?? true
         });
+
+        await exercise.save();
+        console.log("Created Exercise with Media:", { id: exercise._id, video: exercise.videoUrl, svg: exercise.svgUrl });
 
         // Log audit
         await logAudit(

@@ -89,14 +89,17 @@ export function AssignWorkout() {
                 })
             });
 
-            if (!res.ok) throw new Error("Assignment failed");
-
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.message || data.error || "Assignment failed");
+            }
+            
             const data = await res.json();
             toast.success(data.message);
             setSelectedMembers([]);
             setSelectedTemplate(null);
-        } catch (err) {
-            toast.error("Failed to assign plans");
+        } catch (err: any) {
+            toast.error(err.message || "Failed to assign plans");
         } finally {
             setSubmitting(false);
         }

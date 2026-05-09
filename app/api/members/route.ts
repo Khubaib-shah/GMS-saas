@@ -39,6 +39,11 @@ export async function GET(req: Request) {
 
         const query = buildGymQuery(session, showDeleted ? { deletedAt: { $ne: null } } : { deletedAt: null });
 
+        // If trainer, only show members assigned to them
+        if (role === 'trainer' && trainerId) {
+            query.trainerId = trainerId;
+        }
+
         if (search) {
             const searchFilter = {
                 $or: [

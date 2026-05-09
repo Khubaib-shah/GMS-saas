@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { attachTenantContext } from "@/lib/api-middleware";
 import connectDB from "@/lib/db";
 import AssignedWorkoutPlan from "@/models/AssignedWorkoutPlan";
@@ -20,8 +21,8 @@ export async function GET(req: Request) {
 
         // 1. Find active assigned plan
         const plan = await AssignedWorkoutPlan.findOne({
-            gymId: session.user.gymId,
-            memberId: session.user.id,
+            gymId: new mongoose.Types.ObjectId(session.user.gymId),
+            memberId: new mongoose.Types.ObjectId(session.user.id),
             status: "active"
         });
 
@@ -40,19 +41,25 @@ export async function GET(req: Request) {
         }
 
         // 3. Rolling Day Logic
-        // Determine the current day of the week since the member's schedule follows Monday-Sunday
+        const { searchParams } = new URL(req.url);
+        const requestedDay = searchParams.get("day")?.toLowerCase();
+
         const today = new Date();
         const daysMap = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
         const todayStr = daysMap[today.getDay()];
+        
+        // Use requested day if valid, otherwise fallback to current day of week
+        const finalDayStr = requestedDay && daysMap.includes(requestedDay) ? requestedDay : todayStr;
+        const finalDayIndex = daysMap.indexOf(finalDayStr);
 
         // 4. Extract current day data
-        let currentDay = template.schedule.find((d: any) => d.day === todayStr);
+        let currentDay = template.schedule.find((d: any) => d.day === finalDayStr);
 
         // If no exercises for today but plan exists, just return empty exercises to show "Rest Day"
         if (!currentDay) {
             currentDay = {
-                day: todayStr,
-                title: `${todayStr.charAt(0).toUpperCase() + todayStr.slice(1)} Session`,
+                day: finalDayStr,
+                title: `${finalDayStr.charAt(0).toUpperCase() + finalDayStr.slice(1)} Session`,
                 exercises: []
             };
         }
@@ -61,14 +68,14 @@ export async function GET(req: Request) {
             planId: plan._id,
             templateName: template.name,
             currentDay: {
-                dayNumber: today.getDay(), // 0 = Sun
-                title: currentDay.title || `${todayStr.toUpperCase()} PLAN`,
+                dayNumber: finalDayIndex, // 0 = Sun
+                title: currentDay.title || `${finalDayStr.toUpperCase()} PLAN`,
                 exercises: currentDay.exercises || []
             },
             scheduleInfo: {
                 startDate: plan.startDate,
                 daysPerWeek: template.schedule.length,
-                currentCycleDay: today.getDay()
+                currentCycleDay: finalDayIndex
             }
         });
 

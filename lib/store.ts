@@ -760,7 +760,7 @@ export const useAppStore = create<AppState>()(
 
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error || "Failed to assign workout plan");
+            throw new Error(errorData.message || errorData.error || "Failed to assign workout plan");
           }
 
           // Optimistic update of the member's workoutPlanId in the store

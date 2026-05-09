@@ -9,7 +9,10 @@ import {
     Play,
     Info,
     Check,
-    Loader2
+    Loader2,
+    ChevronUp,
+    ChevronDown,
+    X
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { RestTimerDrawer } from "@/components/workout/rest-timer-drawer";
 
 interface Exercise {
     exerciseId: {
@@ -25,6 +29,8 @@ interface Exercise {
         name: string;
         muscleGroup: string;
         svgUrl?: string;
+        videoUrl?: string;
+        description?: string;
     } | null;
     sets: number;
     reps: string;
@@ -47,13 +53,21 @@ export function ActiveWorkout() {
     const [loading, setLoading] = useState(true);
     const [completedExercises, setCompletedExercises] = useState<string[]>([]);
     const [logging, setLogging] = useState(false);
+    const [timerOpen, setTimerOpen] = useState(false);
+    const [activeTimerEx, setActiveTimerEx] = useState<any>(null);
+    const [viewingExercise, setViewingExercise] = useState<Exercise | null>(null);
 
     useEffect(() => {
         const token = localStorage.getItem("memberToken");
         const headers: any = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        fetch("/api/member/active-workout", { headers })
+        // Support manual day selection via URL params
+        const params = new URLSearchParams(window.location.search);
+        const day = params.get("day");
+        const url = day ? `/api/member/active-workout?day=${day}` : "/api/member/active-workout";
+
+        fetch(url, { headers })
             .then(res => res.json())
             .then(d => {
                 if (d.planId) setData(d);
@@ -161,6 +175,7 @@ export function ActiveWorkout() {
                         if (!ex.exerciseId) return null; // Handle deleted exercises gracefully
                         const exId = ex.exerciseId._id || ex.exerciseId.id;
                         const isDone = completedExercises.includes(exId);
+                        const isViewing = viewingExercise === ex;
 
                         return (
                             <Card key={idx} className={cn(
@@ -169,10 +184,19 @@ export function ActiveWorkout() {
                             )}>
                                 <div className="p-5 flex items-center gap-4">
                                     <div
-                                        onClick={() => toggleComplete(exId)}
+                                        onClick={() => {
+                                            if (isDone) {
+                                                toggleComplete(exId);
+                                            } else {
+                                                setActiveTimerEx(ex);
+                                                setTimerOpen(true);
+                                            }
+                                        }}
                                         className={cn(
                                             "w-12 h-12 rounded-2xl flex items-center justify-center cursor-pointer transition-all border-2",
-                                            isDone ? "bg-primary border-primary text-black" : "bg-white/5 border-white/5 text-slate-600 hover:border-primary/30"
+                                            isDone 
+                                                ? "bg-primary border-primary text-black shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" 
+                                                : "bg-white/5 border-white/5 text-slate-600 hover:border-primary/30"
                                         )}
                                     >
                                         {isDone ? <Check className="w-6 h-6 stroke-[3px]" /> : <Play className="w-5 h-5 ml-1" />}
@@ -190,12 +214,83 @@ export function ActiveWorkout() {
                                         </p>
                                     </div>
 
-                                    <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-700 hover:text-white">
-                                        <Info className="w-5 h-5" />
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setViewingExercise(isViewing ? null : ex)}
+                                        className={cn(
+                                            "h-10 w-10 transition-all",
+                                            isViewing ? "text-primary bg-primary/10" : "text-slate-700 hover:text-white"
+                                        )}
+                                    >
+                                        {isViewing ? <X className="w-5 h-5" /> : <Info className="w-5 h-5" />}
                                     </Button>
                                 </div>
 
-                                {ex.notes && (
+                                {/* Media & Details View */}
+                                {isViewing && (
+                                    <div className="px-5 pb-5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="space-y-4 pt-4 border-t border-white/5">
+                                            {/* Media Display */}
+                                            {ex.exerciseId.svgUrl ? (
+                                                <div className="relative w-full aspect-video bg-white/2 rounded-2xl flex items-center justify-center overflow-hidden border border-white/10 group">
+                                                    <img
+                                                        src={ex.exerciseId.svgUrl}
+                                                        alt={ex.exerciseId.name}
+                                                        className="max-w-[70%] max-h-[70%] object-contain drop-shadow-2xl"
+                                                    />
+                                                    <div className="absolute top-3 left-3 bg-primary/20 backdrop-blur-md px-2 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5">
+                                                        <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
+                                                        <span className="text-[7px] font-black text-primary uppercase tracking-wider">Illustration Demo</span>
+                                                    </div>
+                                                </div>
+                                            ) : ex.exerciseId.videoUrl ? (
+                                                <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl group">
+                                                    {ex.exerciseId.videoUrl.includes("youtube.com") || ex.exerciseId.videoUrl.includes("youtu.be") ? (
+                                                        <iframe
+                                                            className="w-full h-full"
+                                                            src={ex.exerciseId.videoUrl.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+                                                            title="Exercise Demo"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            allowFullScreen
+                                                        ></iframe>
+                                                    ) : (
+                                                        <video
+                                                            src={ex.exerciseId.videoUrl}
+                                                            controls
+                                                            className="w-full h-full object-contain"
+                                                            autoPlay
+                                                            muted
+                                                            loop
+                                                            playsInline
+                                                        />
+                                                    )}
+                                                    <div className="absolute top-3 left-3 bg-primary/20 backdrop-blur-md px-2 py-0.5 rounded-full border border-primary/30 flex items-center gap-1.5 z-10">
+                                                        <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
+                                                        <span className="text-[7px] font-black text-primary uppercase tracking-wider">Video Demonstration</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="w-full aspect-video bg-white/2 rounded-2xl flex flex-col items-center justify-center border border-dashed border-white/5">
+                                                    <Dumbbell className="w-10 h-10 text-slate-800 mb-2" />
+                                                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">No Visual Demo Available</p>
+                                                </div>
+                                            )}
+
+                                            {/* Instructions */}
+                                            {ex.exerciseId.description && (
+                                                <div className="space-y-2">
+                                                    <h5 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Instructions:</h5>
+                                                    <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                                                        {ex.exerciseId.description}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {ex.notes && !isViewing && (
                                     <div className="px-5 pb-4 border-t border-white/5 pt-3">
                                         <p className="text-[10px] text-slate-500 font-medium">
                                             <span className="text-primary/50 font-black mr-2 uppercase tracking-widest">Technical Notes:</span>
@@ -210,23 +305,33 @@ export function ActiveWorkout() {
             </div>
 
             {/* Complete Button */}
-            <Button
-                disabled={logging || (totalExercises > 0 && completedExercises.length === 0)}
+            <Button 
                 onClick={handleFinish}
-                className="w-full h-16 rounded-2xl bg-primary text-black hover:bg-white font-medium md:font-black text-xl tracking-tighter neon-glow transition-all active:scale-95 disabled:grayscale disabled:opacity-50"
+                disabled={logging || completedExercises.length === 0}
+                className="w-full h-16 rounded-3xl bg-primary text-black hover:bg-white font-black tracking-tighter text-base shadow-[0_10px_30px_rgba(var(--primary-rgb),0.3)] transition-all active:scale-95"
             >
                 {logging ? (
                     <>
-                        <Loader2 className="mr-3 w-6 h-6 animate-spin" />
-                        Saving Progress...
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        LOGGING SESSION...
                     </>
                 ) : (
-                    <>
-                        Complete Workout
-                        <CheckCircle2 className="ml-3 w-6 h-6" />
-                    </>
+                    "FINISH WORKOUT SESSION"
                 )}
             </Button>
+
+            <RestTimerDrawer 
+                open={timerOpen}
+                onOpenChange={setTimerOpen}
+                exercise={activeTimerEx}
+                onComplete={() => {
+                    if (activeTimerEx?.exerciseId) {
+                        const id = activeTimerEx.exerciseId._id || activeTimerEx.exerciseId.id;
+                        toggleComplete(id);
+                        toast.success("Exercise completed!");
+                    }
+                }}
+            />
         </div>
     );
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import connectDB from "@/lib/db";
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
         };
 
         if (session.user.role === "trainer") {
-            memberQuery.trainerId = session.user.id;
+            memberQuery.trainerId = new mongoose.Types.ObjectId(session.user.id);
         }
 
         const validMembers = await Member.find(memberQuery).select("_id firstName lastName");
@@ -58,15 +59,35 @@ export async function POST(req: Request) {
             const invalidIds = memberIds.filter(id => !validMemberIds.includes(id));
             return NextResponse.json({
                 error: "One or more members are invalid or not assigned to you",
-                invalidIds
+                invalidIds,
+                message: "Ensure all selected members are assigned to you and are active."
             }, { status: 403 });
         }
 
-        // 3. Create assignments (Loop preventing dual active plans)
+        // 3. Filter out members who already have this EXACT plan active
+        const existingAssignments = await AssignedWorkoutPlan.find({
+            gymId: session.user.gymId,
+            memberId: { $in: validMemberIds },
+            templateId: templateId,
+            status: "active"
+        }).select("memberId");
+
+        const alreadyAssignedIds = existingAssignments.map(a => a.memberId.toString());
+        const finalMemberIdsToAssign = validMemberIds.filter(id => !alreadyAssignedIds.includes(id));
+
+        if (finalMemberIdsToAssign.length === 0 && validMemberIds.length > 0) {
+            return NextResponse.json({
+                message: "This plan is already active for the selected member(s).",
+                count: 0,
+                skipped: alreadyAssignedIds.length
+            });
+        }
+
+        // 4. Create assignments (Loop preventing dual active plans)
         const assignmentsCreated = [];
         const start = startDate ? new Date(startDate) : new Date();
 
-        for (const memberId of validMemberIds) {
+        for (const memberId of finalMemberIdsToAssign) {
             // Deactivate existing active plans if any
             await AssignedWorkoutPlan.updateMany(
                 { gymId: session.user.gymId, memberId, status: "active" },
@@ -103,9 +124,10 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({
-            message: `Successfully assigned protocol to ${validMembers.length} members`,
-            count: validMembers.length,
-            assignments: assignmentsCreated
+            message: `Successfully assigned plan to ${assignmentsCreated.length} member(s)${alreadyAssignedIds.length > 0 ? ` (${alreadyAssignedIds.length} already had this plan active)` : ""}`,
+            count: assignmentsCreated.length,
+            assignments: assignmentsCreated,
+            skipped: alreadyAssignedIds.length
         });
 
     } catch (error: any) {

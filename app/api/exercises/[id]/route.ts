@@ -46,6 +46,7 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
 
     try {
         const body = await req.json();
+        console.log("Exercise PUT body:", body);
         await connectDB();
 
         const exercise = await Exercise.findOne({
@@ -62,8 +63,21 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
             return NextResponse.json({ error: "Permission denied — you can only edit your own exercises" }, { status: 403 });
         }
 
+        const { name, muscleGroup, equipment, description, difficulty, tips, svgUrl, videoUrl, thumbnailUrl, isPublicWithinGym } = body;
+
         const oldData = exercise.toObject();
-        Object.assign(exercise, body);
+        
+        if (name !== undefined) exercise.name = name;
+        if (muscleGroup !== undefined) exercise.muscleGroup = muscleGroup;
+        if (equipment !== undefined) exercise.equipment = equipment;
+        if (description !== undefined) exercise.description = description;
+        if (difficulty !== undefined) exercise.difficulty = difficulty;
+        if (tips !== undefined) exercise.tips = tips;
+        if (svgUrl !== undefined) exercise.svgUrl = svgUrl;
+        if (videoUrl !== undefined) exercise.videoUrl = videoUrl;
+        if (thumbnailUrl !== undefined) exercise.thumbnailUrl = thumbnailUrl;
+        if (isPublicWithinGym !== undefined) exercise.isPublicWithinGym = isPublicWithinGym;
+
         await exercise.save();
 
         // Log audit

@@ -93,12 +93,28 @@ export default function AddMemberPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const loadingToast = toast.loading("Processing photo...");
     try {
-      const base64 = await fileToBase64(file);
-      setPhotoBase64(base64);
-      setPhotoPreview(base64);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "profiles/members");
+      formData.append("resourceType", "image");
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      
+      if (data.url) {
+        setPhotoBase64(data.url);
+        setPhotoPreview(data.url);
+        toast.success("Photo processed", { id: loadingToast });
+      } else {
+        throw new Error(data.error);
+      }
     } catch (error) {
-      toast.error("Failed to read image");
+      toast.error("Photo upload failed", { id: loadingToast });
     }
   };
 

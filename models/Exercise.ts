@@ -11,6 +11,7 @@ const ExerciseSchema = new mongoose.Schema({
 
     // Media
     svgUrl: { type: String }, // URL to SVG file (Cloudinary/S3)
+    videoUrl: { type: String }, // URL to Video file (YouTube/Cloudinary)
     thumbnailUrl: { type: String },
     gifUrl: { type: String }, // Backwards compatibility for now
 
@@ -22,4 +23,9 @@ const ExerciseSchema = new mongoose.Schema({
 ExerciseSchema.index({ gymId: 1, name: 1 });
 ExerciseSchema.index({ gymId: 1, muscleGroup: 1 });
 
-export default mongoose.models.Exercise || mongoose.model("Exercise", ExerciseSchema);
+// Force schema refresh in development
+if (mongoose.models.Exercise) {
+    delete mongoose.models.Exercise;
+}
+
+export default mongoose.model("Exercise", ExerciseSchema);

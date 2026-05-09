@@ -314,18 +314,35 @@ export default function SettingsPage() {
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e: any) => {
+                      onChange={async (e: any) => {
                         const file = (e?.target as HTMLInputElement).files?.[0];
                         if (file) {
                           if (file.size > 4 * 1024 * 1024) {
                             toast.error("Image size too large (max 4MB)");
                             return;
                           }
-                          const reader = new FileReader();
-                          reader.onloadend = () => {
-                            setTrainerData(prev => ({ ...prev, photo: reader.result as string }));
-                          };
-                          reader.readAsDataURL(file);
+                          
+                          const loadingToast = toast.loading("Uploading photo...");
+                          try {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            formData.append("folder", "profiles/trainers");
+                            formData.append("resourceType", "image");
+
+                            const res = await fetch("/api/upload", {
+                              method: "POST",
+                              body: formData
+                            });
+                            const data = await res.json();
+                            if (data.url) {
+                              setTrainerData(prev => ({ ...prev, photo: data.url }));
+                              toast.success("Photo uploaded", { id: loadingToast });
+                            } else {
+                              throw new Error(data.error);
+                            }
+                          } catch (err) {
+                            toast.error("Upload failed", { id: loadingToast });
+                          }
                         }
                       }}
                     />

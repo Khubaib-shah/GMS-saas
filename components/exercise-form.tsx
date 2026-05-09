@@ -32,6 +32,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { MediaUpload } from "@/components/media-upload";
 
 export interface Exercise {
     id?: string;
@@ -41,6 +42,8 @@ export interface Exercise {
     equipment?: string;
     difficulty: string;
     description?: string;
+    svgUrl?: string;
+    videoUrl?: string;
     isPublicWithinGym: boolean;
 }
 
@@ -66,6 +69,8 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
         equipment: "",
         difficulty: "Beginner",
         description: "",
+        svgUrl: "",
+        videoUrl: "",
         isPublicWithinGym: true
     });
 
@@ -78,6 +83,8 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                 equipment: exercise.equipment || "",
                 difficulty: exercise.difficulty || "Beginner",
                 description: exercise.description || "",
+                svgUrl: exercise.svgUrl || "",
+                videoUrl: exercise.videoUrl || "",
                 isPublicWithinGym: exercise.isPublicWithinGym ?? true
             });
         } else {
@@ -87,10 +94,18 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                 equipment: "",
                 difficulty: "Beginner",
                 description: "",
+                svgUrl: "",
+                videoUrl: "",
                 isPublicWithinGym: true
             });
         }
     }, [exercise, open]);
+
+    useEffect(() => {
+        if (formData.videoUrl || formData.svgUrl) {
+            console.log("Media state updated:", { video: formData.videoUrl, svg: formData.svgUrl });
+        }
+    }, [formData.videoUrl, formData.svgUrl]);
 
     const isViewMode = mode === "view";
     const isEditMode = mode === "edit";
@@ -106,13 +121,17 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
             const url = isEditMode ? `/api/exercises/${formData.id}` : "/api/exercises";
             const method = isEditMode ? "PUT" : "POST";
 
+            console.log("SUBMITTING FORM DATA:", formData);
             const res = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             });
 
-            if (!res.ok) throw new Error(`Failed to ${isEditMode ? "update" : "create"} exercise`);
+            const data = await res.json();
+            console.log("Exercise save response:", data);
+
+            if (!res.ok) throw new Error(data.error || `Failed to ${isEditMode ? "update" : "create"} exercise`);
 
             toast.success("Exercise saved successfully");
             onOpenChange(false);
@@ -122,6 +141,8 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                 equipment: "",
                 difficulty: "Beginner",
                 description: "",
+                svgUrl: "",
+                videoUrl: "",
                 isPublicWithinGym: true
             });
             if (onSuccess) onSuccess();
@@ -134,7 +155,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[650px] bg-background border-white/5 p-0 shadow-2xl overflow-hidden">
+            <DialogContent className="sm:max-w-[700px] bg-background border-white/5 p-0 shadow-2xl overflow-hidden">
                 <DialogHeader className="p-6 pb-4 border-b border-white/5 bg-white/2 relative shrink-0">
                     <div className="absolute top-0 right-0 w-32 h-full bg-primary/5 -skew-x-12 translate-x-10 opacity-50" />
                     <div className="relative">
@@ -148,7 +169,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                     </div>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Primary Info */}
                         <div className="space-y-4">
@@ -158,7 +179,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                                 disabled={isViewMode}
                                 placeholder="e.g., Barbell Bench Press"
                                 value={formData.name}
-                                onChange={(val) => setFormData({ ...formData, name: val })}
+                                onChange={(val) => setFormData(prev => ({ ...prev, name: val }))}
                                 leadingIcon={<Clipboard className="w-3 h-3" />}
                                 required
                                 className="font-bold tracking-tight h-10 rounded-xl"
@@ -172,7 +193,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                                 <Select
                                     disabled={isViewMode}
                                     value={formData.muscleGroup}
-                                    onValueChange={(val) => setFormData({ ...formData, muscleGroup: val })}
+                                    onValueChange={(val) => setFormData(prev => ({ ...prev, muscleGroup: val }))}
                                 >
                                     <SelectTrigger className="w-full bg-white/5 border-white/5 focus:border-primary/50 text-white font-bold h-10 rounded-xl">
                                         <SelectValue placeholder="Select Muscle Group" />
@@ -193,7 +214,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                                 disabled={isViewMode}
                                 placeholder="e.g., Barbell, Dumbbell"
                                 value={formData.equipment}
-                                onChange={(val) => setFormData({ ...formData, equipment: val })}
+                                onChange={(val) => setFormData(prev => ({ ...prev, equipment: val }))}
                                 leadingIcon={<Dumbbell className="w-3 h-3" />}
                                 className="font-bold h-10 rounded-xl"
                             />
@@ -211,7 +232,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                                             key={d}
                                             type="button"
                                             variant="outline"
-                                            onClick={() => !isViewMode && setFormData({ ...formData, difficulty: d })}
+                                            onClick={() => !isViewMode && setFormData(prev => ({ ...prev, difficulty: d }))}
                                             className={cn(
                                                 "h-10 rounded-xl border-white/5 text-[9px] font-black uppercase transition-all",
                                                 formData.difficulty === d
@@ -231,10 +252,36 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                                     disabled={isViewMode}
                                     placeholder="Detailed instructions..."
                                     value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                                     className="bg-white/5 border-white/5 focus:border-primary/50 text-white font-medium min-h-[100px] rounded-xl text-xs py-3"
                                 />
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Media Section */}
+                    <div className="space-y-4 pt-4 border-t border-white/5">
+                        <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] leading-none">Media Demonstrations</span>
+                            <div className="h-px flex-1 bg-white/5"></div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 gap-6">
+                            <MediaUpload
+                                label="Media Demonstration (SVG or Video)"
+                                folder="exercises/media"
+                                disabled={isViewMode}
+                                value={formData.svgUrl || formData.videoUrl}
+                                onChange={(url, type) => {
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        videoUrl: type === "video" ? url : "",
+                                        svgUrl: type === "image" ? url : ""
+                                    }));
+                                }}
+                                onRemove={() => setFormData(prev => ({ ...prev, svgUrl: "", videoUrl: "" }))}
+                                description="Select an SVG illustration or an MP4/MOV video from your device"
+                            />
                         </div>
                     </div>
 
@@ -258,7 +305,7 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                         <Switch
                             disabled={isViewMode}
                             checked={formData.isPublicWithinGym}
-                            onCheckedChange={(val) => setFormData({ ...formData, isPublicWithinGym: val })}
+                            onCheckedChange={(val) => setFormData(prev => ({ ...prev, isPublicWithinGym: val }))}
                             className="data-[state=checked]:bg-primary scale-90"
                         />
                     </div>

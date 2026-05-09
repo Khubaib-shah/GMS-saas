@@ -459,7 +459,7 @@ export default function MemberDashboardPage() {
                                                                     <h4 className="text-sm font-black text-white uppercase tracking-wider italic">{day.title}</h4>
                                                                 </div>
                                                                 <Button
-                                                                    onClick={() => router.push("/member/workout")}
+                                                                    onClick={() => router.push(`/member/workout?day=${day.day.toLowerCase()}`)}
                                                                     className="bg-purple-500 text-white hover:bg-white hover:text-black font-black text-[10px] uppercase tracking-widest px-6 h-10 rounded-xl neon-glow transition-all"
                                                                 >
                                                                     <Zap className="w-3.5 h-3.5 mr-2" />

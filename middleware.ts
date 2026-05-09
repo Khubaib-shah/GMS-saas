@@ -18,7 +18,9 @@ export default async function proxy(req: NextRequest) {
 
     const isAuth = !!token;
     const isLoginPage = req.nextUrl.pathname.startsWith("/login");
-    const isMemberPortal = req.nextUrl.pathname.match(/^\/member($|\/)/) || req.nextUrl.pathname.match(/^\/api\/member-portal($|\/)/);
+    const isMemberPortal = req.nextUrl.pathname.match(/^\/member($|\/)/) || 
+                           req.nextUrl.pathname.match(/^\/api\/member-portal($|\/)/) ||
+                           req.nextUrl.pathname.match(/^\/api\/member($|\/)/);
     const isLandingPage = req.nextUrl.pathname === "/";
     const isSignupPage = req.nextUrl.pathname.startsWith("/signup");
     const isSignupApi = req.nextUrl.pathname.startsWith("/api/auth/signup");
