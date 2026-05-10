@@ -52,6 +52,7 @@ export function ActiveWorkout() {
     const [data, setData] = useState<ActiveWorkoutData | null>(null);
     const [loading, setLoading] = useState(true);
     const [completedExercises, setCompletedExercises] = useState<string[]>([]);
+    const [completions, setCompletions] = useState<any[]>([]);
     const [logging, setLogging] = useState(false);
     const [timerOpen, setTimerOpen] = useState(false);
     const [activeTimerEx, setActiveTimerEx] = useState<any>(null);
@@ -67,13 +68,26 @@ export function ActiveWorkout() {
         const day = params.get("day");
         const url = day ? `/api/member/active-workout?day=${day}` : "/api/member/active-workout";
 
-        fetch(url, { headers })
-            .then(res => res.json())
-            .then(d => {
-                if (d.planId) setData(d);
-            })
-            .catch(err => console.error(err))
-            .finally(() => setLoading(false));
+        // Fetch workout plan AND today's completions in parallel
+        Promise.all([
+            fetch(url, { headers }).then(res => res.json()),
+            fetch("/api/exercise-completion", { headers }).then(res => res.json()).catch(() => [])
+        ]).then(([workoutData, completionsData]) => {
+            if (workoutData.planId) setData(workoutData);
+            setCompletions(completionsData);
+            
+            // Pre-mark exercises that were completed today
+            if (Array.isArray(completionsData)) {
+                const doneIds = completionsData
+                    .filter((c: any) => c.status === "completed")
+                    .map((c: any) => c.exerciseId?._id || c.exerciseId);
+                if (doneIds.length > 0) {
+                    const uniqueIds = Array.from(new Set(doneIds.map(id => id.toString()))) as string[];
+                    setCompletedExercises(uniqueIds);
+                }
+            }
+        }).catch(err => console.error(err))
+          .finally(() => setLoading(false));
     }, []);
 
     const toggleComplete = (exerciseId: string) => {
@@ -185,12 +199,18 @@ export function ActiveWorkout() {
                                 <div className="p-5 flex items-center gap-4">
                                     <div
                                         onClick={() => {
-                                            if (isDone) {
-                                                toggleComplete(exId);
-                                            } else {
-                                                setActiveTimerEx(ex);
-                                                setTimerOpen(true);
+                                            const exCompletions = completions.filter(c => 
+                                                (c.exerciseId?._id || c.exerciseId) === exId
+                                            );
+                                            const completedCount = exCompletions.filter(c => c.status === "completed").length;
+                                            
+                                            if (completedCount >= 2) {
+                                                toast.error("Max attempts reached for today (2/2)");
+                                                return;
                                             }
+
+                                            setActiveTimerEx({ ...ex, planId: data.planId });
+                                            setTimerOpen(true);
                                         }}
                                         className={cn(
                                             "w-12 h-12 rounded-2xl flex items-center justify-center cursor-pointer transition-all border-2",
@@ -199,7 +219,14 @@ export function ActiveWorkout() {
                                                 : "bg-white/5 border-white/5 text-slate-600 hover:border-primary/30"
                                         )}
                                     >
-                                        {isDone ? <Check className="w-6 h-6 stroke-[3px]" /> : <Play className="w-5 h-5 ml-1" />}
+                                        {isDone ? (
+                                            <div className="flex flex-col items-center">
+                                                <Check className="w-5 h-5 stroke-[3px]" />
+                                                <span className="text-[6px] font-black uppercase mt-0.5">
+                                                    {completions.filter(c => (c.exerciseId?._id || c.exerciseId) === exId && c.status === "completed").length}/2
+                                                </span>
+                                            </div>
+                                        ) : <Play className="w-5 h-5 ml-1" />}
                                     </div>
 
                                     <div className="flex-1">
@@ -324,11 +351,31 @@ export function ActiveWorkout() {
                 open={timerOpen}
                 onOpenChange={setTimerOpen}
                 exercise={activeTimerEx}
-                onComplete={() => {
+                onComplete={async () => {
                     if (activeTimerEx?.exerciseId) {
                         const id = activeTimerEx.exerciseId._id || activeTimerEx.exerciseId.id;
-                        toggleComplete(id);
-                        toast.success("Exercise completed!");
+                        
+                        // Refresh completions
+                        const token = localStorage.getItem("memberToken");
+                        const headers: any = {};
+                        if (token) headers["Authorization"] = `Bearer ${token}`;
+                        
+                        try {
+                            const res = await fetch("/api/exercise-completion", { headers });
+                            const completionsData = await res.json();
+                            setCompletions(completionsData);
+                            
+                            const doneIds = completionsData
+                                .filter((c: any) => c.status === "completed")
+                                .map((c: any) => c.exerciseId?._id || c.exerciseId);
+                            
+                            const uniqueIds = Array.from(new Set(doneIds.map((id: any) => id.toString()))) as string[];
+                            setCompletedExercises(uniqueIds);
+                            
+                            toast.success("Exercise completion saved!");
+                        } catch (err) {
+                            console.error(err);
+                        }
                     }
                 }}
             />
