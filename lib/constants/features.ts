@@ -13,6 +13,7 @@ export const SYSTEM_FEATURES = [
     { key: "advancedReports", label: "Advanced Analytics" },
     { key: "trainersModule", label: "Trainers/Staff" },
     { key: "branches", label: "Multi-Branch Support" },
+    { key: "selling", label: "Commerce & Selling" },
     { key: "memberPortal", label: "Customer Portal" },
     { key: "api_access", label: "External API" },
     // "multipleTrainers" was found in plans but is likely covered by maxTrainers or trainersModule.

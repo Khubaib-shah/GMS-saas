@@ -4,6 +4,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 import connectDB from "@/lib/db";
 import Exercise from "@/models/Exercise";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
+import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 
 /**
  * GET /api/exercises
@@ -17,17 +18,26 @@ export async function GET(req: Request) {
     const { session } = authResult;
 
     try {
+        const gymId = session.user.gymId;
+        const trainerId = session.user.id;
+        // Key includes trainerId because trainers might see different private exercises
+        const cacheKey = `exercises:list:gym:${gymId}:trainer:${trainerId}`;
+
+        const cached = await getCache<any[]>(cacheKey);
+        if (cached) return NextResponse.json(cached);
+
         await connectDB();
 
         // Logical filter: Public within gym OR created by the current trainer
         const exercises = await Exercise.find({
-            gymId: session.user.gymId,
+            gymId,
             $or: [
                 { isPublicWithinGym: true },
-                { createdByTrainerId: session.user.id }
+                { createdByTrainerId: trainerId }
             ]
-        }).sort({ name: 1 });
+        }).sort({ name: 1 }).lean();
 
+        await setCache(cacheKey, exercises, 3600);
         return NextResponse.json(exercises);
     } catch (error: any) {
         console.error("Fetch exercises error:", error);
@@ -72,6 +82,10 @@ export async function POST(req: Request) {
         });
 
         await exercise.save();
+        
+        // Invalidate Cache
+        await invalidatePattern(`exercises:list:gym:${session.user.gymId}*`);
+
         console.log("Created Exercise with Media:", { id: exercise._id, video: exercise.videoUrl, svg: exercise.svgUrl });
 
         // Log audit

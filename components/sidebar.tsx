@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
-import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Dumbbell, ShieldCheck, Building2, UserCheck, ClipboardList, Zap, Send, TrendingUp } from "lucide-react"
+import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Dumbbell, ShieldCheck, Building2, UserCheck, ClipboardList, Zap, Send, TrendingUp, ShoppingBag } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface NavItem {
@@ -35,7 +35,10 @@ export function Sidebar() {
       { label: "Reports", href: "/trainer/analytics", icon: <TrendingUp className="w-5 h-5" /> },
     ] : []),
     ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
-    ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [{ label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> }] : []),
+    ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [
+      { label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> },
+      { label: "Selling", href: "/selling", icon: <ShoppingBag className="w-5 h-5" /> }
+    ] : []),
     { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
   ]
 

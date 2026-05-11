@@ -4,6 +4,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 import connectDB from "@/lib/db";
 import WorkoutTemplate from "@/models/WorkoutTemplate";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
+import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 
 /**
  * GET /api/workout-templates
@@ -16,18 +17,26 @@ export async function GET(req: Request) {
     const { session } = authResult;
 
     try {
+        const gymId = session.user.gymId;
+        const trainerId = session.user.id;
+        const cacheKey = `workout:templates:gym:${gymId}:trainer:${trainerId}`;
+
+        const cached = await getCache<any[]>(cacheKey);
+        if (cached) return NextResponse.json(cached);
+
         await connectDB();
 
         // Filter: Public OR created by me
         const templates = await WorkoutTemplate.find({
-            gymId: session.user.gymId,
+            gymId,
             active: true,
             $or: [
                 { isPublicWithinGym: true },
-                { createdByTrainerId: session.user.id }
+                { createdByTrainerId: trainerId }
             ]
-        }).sort({ createdAt: -1 });
+        }).sort({ createdAt: -1 }).lean();
 
+        await setCache(cacheKey, templates, 3600);
         return NextResponse.json(templates);
     } catch (error: any) {
         return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
@@ -62,6 +71,9 @@ export async function POST(req: Request) {
             days,
             isPublicWithinGym: isPublicWithinGym ?? true
         });
+
+        // Invalidate Cache
+        await invalidatePattern(`workout:templates:gym:${session.user.gymId}*`);
 
         // Log audit
         await logAudit(

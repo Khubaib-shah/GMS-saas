@@ -5,6 +5,7 @@ import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import connectDB from "@/lib/db";
 import WorkoutLog from "@/models/WorkoutLog";
 import AssignedWorkoutPlan from "@/models/AssignedWorkoutPlan";
+import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 
 /**
  * POST /api/workout-log
@@ -86,6 +87,9 @@ export async function POST(req: Request) {
             )
         );
 
+        // Invalidate Cache
+        await invalidatePattern(`workout:logs:gym:${session.user.gymId}:member:${plan.memberId}*`);
+
         return NextResponse.json(log, { status: 201 });
     } catch (error: any) {
         console.error("Log error:", error);
@@ -105,6 +109,10 @@ export async function GET(req: Request) {
     const memberId = searchParams.get("memberId") || session.user.id;
 
     try {
+        const cacheKey = `workout:logs:gym:${session.user.gymId}:member:${memberId}`;
+        const cached = await getCache<any[]>(cacheKey);
+        if (cached) return NextResponse.json(cached);
+
         await connectDB();
 
         // Authorization check
@@ -121,8 +129,10 @@ export async function GET(req: Request) {
             memberId
         }).sort({ date: -1 })
         .populate("exercises.exerciseId", "name muscleGroup")
-        .populate("planId", "name");
+        .populate("planId", "name")
+        .lean();
 
+        await setCache(cacheKey, logs, 1800); // 30 min cache
         return NextResponse.json(logs);
     } catch (error: any) {
         return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });

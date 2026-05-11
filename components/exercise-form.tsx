@@ -9,7 +9,9 @@ import {
     Activity,
     Lock,
     Unlock,
-    Info
+    Info,
+    Video,
+    Plus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
@@ -32,7 +34,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { MediaUpload } from "@/components/media-upload";
+import { uploadToCloudinary } from "@/lib/upload-utils";
+import { AssetPicker } from "@/components/gallery/asset-picker";
 
 export interface Exercise {
     id?: string;
@@ -73,8 +76,10 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
         videoUrl: "",
         isPublicWithinGym: true
     });
+    const [selectedAsset, setSelectedAsset] = useState<any>(null);
 
     useEffect(() => {
+        setSelectedAsset(null);
         if (exercise) {
             setFormData({
                 id: exercise.id || exercise._id,
@@ -118,36 +123,36 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
 
         setLoading(true);
         try {
-            const url = isEditMode ? `/api/exercises/${formData.id}` : "/api/exercises";
+            let finalFormData = { ...formData };
+
+            // 1. Media
+            if (selectedAsset) {
+                finalFormData = {
+                    ...finalFormData,
+                    videoUrl: selectedAsset.type === "video" ? selectedAsset.url : "",
+                    svgUrl: selectedAsset.type !== "video" ? selectedAsset.url : ""
+                };
+            }
+
+            const url = isEditMode ? `/api/exercises/${finalFormData.id}` : "/api/exercises";
             const method = isEditMode ? "PUT" : "POST";
 
-            console.log("SUBMITTING FORM DATA:", formData);
+            toast.loading("Saving exercise...", { id: "ex-save" });
             const res = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(finalFormData)
             });
 
             const data = await res.json();
-            console.log("Exercise save response:", data);
 
             if (!res.ok) throw new Error(data.error || `Failed to ${isEditMode ? "update" : "create"} exercise`);
 
-            toast.success("Exercise saved successfully");
+            toast.success("Exercise saved successfully", { id: "ex-save" });
             onOpenChange(false);
-            setFormData({
-                name: "",
-                muscleGroup: "",
-                equipment: "",
-                difficulty: "Beginner",
-                description: "",
-                svgUrl: "",
-                videoUrl: "",
-                isPublicWithinGym: true
-            });
             if (onSuccess) onSuccess();
-        } catch (err) {
-            toast.error("Failed to save exercise");
+        } catch (err: any) {
+            toast.error(err.message || "Failed to save exercise", { id: "ex-save" });
         } finally {
             setLoading(false);
         }
@@ -267,20 +272,34 @@ export function ExerciseForm({ open, onOpenChange, onSuccess, exercise, mode = "
                         </div>
                         
                         <div className="grid grid-cols-1 gap-6">
-                            <MediaUpload
-                                label="Media Demonstration (SVG or Video)"
-                                folder="exercises/media"
-                                disabled={isViewMode}
-                                value={formData.svgUrl || formData.videoUrl}
-                                onChange={(url, type) => {
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        videoUrl: type === "video" ? url : "",
-                                        svgUrl: type === "image" ? url : ""
-                                    }));
-                                }}
-                                onRemove={() => setFormData(prev => ({ ...prev, svgUrl: "", videoUrl: "" }))}
-                                description="Select an SVG illustration or an MP4/MOV video from your device"
+                            <AssetPicker 
+                                onSelect={(asset) => setSelectedAsset(asset)}
+                                trigger={
+                                    <div className="group cursor-pointer">
+                                        {(selectedAsset || formData.svgUrl || formData.videoUrl) ? (
+                                            <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 bg-black/40 flex items-center justify-center">
+                                                {((selectedAsset?.type === "video") || (!selectedAsset && formData.videoUrl)) ? (
+                                                    <div className="flex flex-col items-center gap-2">
+                                                        <Video className="w-10 h-10 text-primary" />
+                                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Video Demonstration</p>
+                                                    </div>
+                                                ) : (
+                                                    <img src={selectedAsset?.url || formData.svgUrl} className="w-full h-full object-contain p-4" />
+                                                )}
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
+                                                    <Button variant="ghost" className="text-white text-[10px] font-black uppercase tracking-widest">Change Media</Button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="aspect-video rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-3 bg-white/5 hover:bg-white/10 hover:border-primary/50 transition-all group">
+                                                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:scale-110 transition-transform">
+                                                    <Plus className="w-6 h-6" />
+                                                </div>
+                                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Select Demonstration Media</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                }
                             />
                         </div>
                     </div>

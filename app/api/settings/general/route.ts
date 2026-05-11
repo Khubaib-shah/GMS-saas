@@ -4,7 +4,7 @@ import Gym from "@/models/Gym";
 import { authorize } from "@/lib/api-middleware";
 import { GeneralSettingsSchema } from "@/lib/validations";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
-import { deleteCache } from "@/lib/redis";
+import { getCache, setCache, deleteCache } from "@/lib/redis";
 
 /**
  * GET /api/settings/general — Fetch general gym profile data
@@ -28,19 +28,27 @@ export async function GET() {
         return NextResponse.json({ message: "No gym context found" }, { status: 404 });
     }
 
+    const cacheKey = `gym:profile:${gymId}`;
+    const cached = await getCache<any>(cacheKey);
+    if (cached) return NextResponse.json({ general: cached });
+
+    await connectDB();
+
     const gym = await Gym.findById(gymId).select("name address phone").lean();
 
     if (!gym) {
         return NextResponse.json({ message: "Gym not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ 
-        general: {
-            name: gym.name,
-            address: gym.address,
-            phone: gym.phone
-        } 
-    });
+    const general = {
+        name: gym.name,
+        address: gym.address,
+        phone: gym.phone
+    };
+
+    await setCache(cacheKey, general, 3600);
+
+    return NextResponse.json({ general });
 }
 
 /**

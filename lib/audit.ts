@@ -41,6 +41,12 @@ export type AuditResource =
     | 'booking'
     | 'availability'
     | 'trainer_session_log'
+    | 'product'
+    | 'product_category'
+    | 'product_brand'
+    | 'inventory_log'
+    | 'api_key'
+    | 'webhook'
     | 'member';
 
 export interface AuditLogEntry {

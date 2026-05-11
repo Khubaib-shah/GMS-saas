@@ -1,20 +1,19 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Upload, X, FileVideo, Image as ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 interface MediaUploadProps {
-    value?: string;
-    onChange: (url: string, type: "image" | "video") => void;
+    value?: string | File | null;
+    onChange: (file: File | null) => void;
     onRemove?: () => void;
     accept?: string;
-    label: string;
-    folder?: string;
+    label?: string; // Optional label
     description?: string;
     disabled?: boolean;
+    compact?: boolean;
 }
 
 export function MediaUpload({
@@ -23,80 +22,63 @@ export function MediaUpload({
     onRemove,
     accept = "video/*,.svg,image/*",
     label,
-    folder = "general",
     description,
-    disabled
+    disabled,
+    compact = false
 }: MediaUploadProps) {
-    const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-    // Helper to determine if a URL/File is a video
-    const isVideoFile = (fileOrUrl: string | File) => {
-        if (typeof fileOrUrl === "string") {
-            // Case-insensitive check for common video extensions and Cloudinary resource types
-            return (
-                fileOrUrl.match(/\.(mp4|webm|ogg|mov|m4v)$/i) || 
-                fileOrUrl.includes("/video/upload/") ||
-                fileOrUrl.includes("resource_type=video") ||
-                fileOrUrl.startsWith("data:video/")
-            );
+    // Update preview when value changes
+    useEffect(() => {
+        if (!value) {
+            setPreviewUrl(null);
+            return;
         }
-        return fileOrUrl.type.startsWith("video/");
+
+        if (typeof value === "string") {
+            setPreviewUrl(value);
+        } else if (value instanceof File) {
+            const url = URL.createObjectURL(value);
+            setPreviewUrl(url);
+            return () => URL.revokeObjectURL(url);
+        }
+    }, [value]);
+
+    const isVideo = (val: string | File | null | undefined) => {
+        if (!val) return false;
+        if (typeof val === "string") {
+            return val.match(/\.(mp4|webm|ogg|mov|m4v)$/i) || val.includes("/video/upload/");
+        }
+        return val.type.startsWith("video/");
     };
 
-    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
-
-        setUploading(true);
-        try {
-            const isVideo = isVideoFile(file);
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("folder", folder);
-            formData.append("resourceType", isVideo ? "video" : "auto");
-
-            const res = await fetch("/api/upload", {
-                method: "POST",
-                body: formData
-            });
-
-            const data = await res.json();
-
-            if (data.url) {
-                // Use the server-confirmed resourceType (video or image)
-                const detectedType = data.resourceType === "video" ? "video" : "image";
-                onChange(data.url, detectedType);
-                toast.success(`${detectedType === "video" ? "Video" : "Image"} uploaded successfully`);
-            } else {
-                throw new Error(data.error || "Upload failed");
-            }
-        } catch (error: any) {
-            console.error("Upload error:", error);
-            toast.error(error.message || "Failed to upload file.");
-        } finally {
-            setUploading(false);
-            if (fileInputRef.current) fileInputRef.current.value = "";
+        if (file) {
+            onChange(file);
         }
     };
 
     const hasValue = !!value;
-    const isValueVideo = hasValue && isVideoFile(value);
+    const isValueVideo = isVideo(value);
 
     return (
-        <div className="space-y-2.5">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">
-                {label}
-            </label>
+        <div className={cn("space-y-2.5 w-full h-full flex flex-col", compact && "space-y-0")}>
+            {label && (
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">
+                    {label}
+                </label>
+            )}
 
             <div
                 className={cn(
-                    "relative group cursor-pointer transition-all duration-500 rounded-2xl border-2 border-dashed overflow-hidden min-h-[160px] flex items-center justify-center",
+                    "relative group cursor-pointer transition-all duration-500 rounded-2xl border-2 border-dashed overflow-hidden flex-1 flex items-center justify-center",
                     hasValue
                         ? "border-primary/40 bg-primary/5"
                         : "border-white/10 bg-white/2 hover:border-primary/30 hover:bg-white/5",
-                    disabled && "opacity-50 cursor-not-allowed pointer-events-none",
-                    uploading && "pointer-events-none"
+                    compact ? "min-h-0 aspect-square" : "min-h-[160px]",
+                    disabled && "opacity-50 cursor-not-allowed pointer-events-none"
                 )}
                 onClick={() => fileInputRef.current?.click()}
             >
@@ -105,78 +87,88 @@ export function MediaUpload({
                     ref={fileInputRef}
                     className="hidden"
                     accept={accept}
-                    onChange={handleUpload}
+                    onChange={handleFileChange}
                 />
 
-                {uploading ? (
-                    <div className="flex flex-col items-center justify-center p-8 space-y-3">
-                        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Uploading to Cloud...</p>
-                    </div>
-                ) : hasValue ? (
-                    <div className="relative w-full h-full min-h-[160px] flex items-center justify-center bg-black/20">
+                {hasValue && previewUrl ? (
+                    <div className="relative w-full h-full flex items-center justify-center bg-black/20">
                         {isValueVideo ? (
                             <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4">
                                 <video
-                                    src={value}
-                                    className="w-full max-h-[140px] object-contain rounded-lg"
+                                    src={previewUrl}
+                                    className="w-full h-full object-contain rounded-lg"
                                     autoPlay
                                     muted
                                     loop
                                     playsInline
                                 />
-                                <div className="absolute top-3 left-3 bg-primary/20 backdrop-blur-md px-2.5 py-1 rounded-full border border-primary/30 flex items-center justify-center leading-none">
-                                    <span className="text-[7px] font-semibold text-primary uppercase tracking-wider">Video Preview</span>
-                                </div>
+                                {!compact && (
+                                    <div className="absolute top-3 left-3 bg-primary/20 backdrop-blur-md px-2.5 py-1 rounded-full border border-primary/30 flex items-center justify-center leading-none">
+                                        <span className="text-[7px] font-semibold text-primary uppercase tracking-wider">Video Selected</span>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="w-full h-full flex items-center justify-center p-4">
-                                <img src={value} alt="Preview" className="max-w-full max-h-[140px] object-contain drop-shadow-2xl" />
-                                <div className="absolute top-3 left-3 bg-primary/20 backdrop-blur-md px-2.5 py-1 rounded-full border border-primary/30 flex items-center justify-center leading-none">
-                                    <span className="text-[7px] font-black text-primary uppercase tracking-wider">SVG / Image</span>
-                                </div>
+                                <img src={previewUrl} alt="Preview" className="max-w-full max-h-full object-contain drop-shadow-2xl" />
+                                {!compact && (
+                                    <div className="absolute top-3 left-3 bg-primary/20 backdrop-blur-md px-2.5 py-1 rounded-full border border-primary/30 flex items-center justify-center leading-none">
+                                        <span className="text-[7px] font-black text-primary uppercase tracking-wider">Image Selected</span>
+                                    </div>
+                                )}
                             </div>
                         )}
 
                         {/* Overlay Controls */}
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-sm">
-                             <Button
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2 backdrop-blur-sm p-2">
+                            <Button
                                 size="sm"
                                 variant="ghost"
-                                className="text-[9px] font-black uppercase text-white hover:bg-white/10 h-8 rounded-lg flex items-center justify-center leading-none tracking-widest px-4"
+                                className={cn(
+                                    "font-black uppercase text-white hover:bg-white/10 rounded-lg tracking-widest",
+                                    compact ? "h-7 px-2 text-[7px]" : "h-8 px-4 text-[9px]"
+                                )}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     fileInputRef.current?.click();
                                 }}
                             >
-                                Change
+                                {compact ? "Edit" : "Change"}
                             </Button>
-                             <Button
+                            <Button
                                 size="sm"
                                 variant="ghost"
-                                className="text-[9px] font-black uppercase text-destructive hover:bg-destructive/10 h-8 rounded-lg flex items-center justify-center leading-none tracking-widest px-4"
+                                className={cn(
+                                    "font-black uppercase text-destructive hover:bg-destructive/10 rounded-lg tracking-widest",
+                                    compact ? "h-7 px-2 text-[7px]" : "h-8 px-4 text-[9px]"
+                                )}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    onRemove ? onRemove() : onChange("", "image");
+                                    onRemove ? onRemove() : onChange(null);
                                 }}
                             >
-                                <X className="w-3 h-3 mr-2 mb-0.5" />
-                                Remove
+                                <X className={cn(compact ? "w-2.5 h-2.5" : "w-3 h-3 mr-2 mb-0.5")} />
+                                {!compact && "Remove"}
                             </Button>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center p-10 space-y-4">
-                        <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 group-hover:text-primary group-hover:border-primary/20 group-hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)] transition-all">
-                            <Upload className="w-7 h-7" />
+                    <div className={cn("flex flex-col items-center justify-center text-center", compact ? "p-4 space-y-2" : "p-10 space-y-4")}>
+                        <div className={cn(
+                            "rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 group-hover:text-primary group-hover:border-primary/20 group-hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)] transition-all",
+                            compact ? "w-10 h-10" : "w-14 h-14"
+                        )}>
+                            <Upload className={cn(compact ? "w-5 h-5" : "w-7 h-7")} />
                         </div>
                         <div className="text-center">
-                            <p className="text-[10px] font-black text-white uppercase tracking-widest mb-1">
-                                Click to Upload Demo
+                            <p className={cn("font-black text-white uppercase tracking-widest mb-1", compact ? "text-[8px]" : "text-[10px]")}>
+                                {compact ? "Add Asset" : "Click to Select Media"}
                             </p>
-                            <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
-                                {description || "Supports SVG, MP4, MOV, WEBM"}
-                            </p>
+                            {!compact && (
+                                <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
+                                    {description || "Deferred upload on form submit"}
+                                </p>
+                            )}
                         </div>
                     </div>
                 )}

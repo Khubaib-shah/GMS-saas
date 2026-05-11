@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
+import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 
 // GET /api/staff - List all staff for the gym
 export async function GET() {
@@ -14,6 +15,10 @@ export async function GET() {
     let gymId = session.user.gymId;
 
     try {
+        const cacheKey = `staff:list:gym:${gymId}`;
+        const cached = await getCache<any[]>(cacheKey);
+        if (cached) return NextResponse.json(cached);
+
         await connectDB();
 
         if (session.user.role === "super_admin" && !gymId) {
@@ -36,8 +41,10 @@ export async function GET() {
             role: { $in: ["manager", "receptionist", "trainer", "accountant", "staff"] }
         })
             .select("-password")
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .lean();
 
+        await setCache(cacheKey, staff, 3600);
         return NextResponse.json(staff);
     } catch (error: any) {
         console.error("Fetch staff error:", error);
@@ -100,6 +107,9 @@ export async function POST(req: Request) {
             isActive: true
         });
 
+        // Invalidate Cache
+        await invalidatePattern(`staff:list:gym:${gymId}*`);
+
         // Audit Log
         await logAudit(
             createCrudAuditEntry(
@@ -160,6 +170,10 @@ export async function DELETE(req: Request) {
         user.deletedAt = new Date();
         user.isActive = false;
         await user.save();
+
+        // Invalidate Cache
+        await invalidatePattern(`staff:list:gym:${gymId}*`);
+        await invalidatePattern(`trainers:list:gym:${gymId}*`); // Staff could be trainers
 
         // Audit
         await logAudit(
