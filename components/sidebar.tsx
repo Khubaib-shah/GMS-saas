@@ -20,7 +20,9 @@ export function Sidebar() {
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
   const mobileMenuOpen = useAppStore((state) => state.mobileMenuOpen)
   const setMobileMenuOpen = useAppStore((state) => state.setMobileMenuOpen)
-  const role = (session?.user as any)?.role
+   const role = (session?.user as any)?.role
+  const enabledFeatures = useAppStore((state) => state.gymProfile.enabledFeatures) || []
+  const isSellingEnabled = enabledFeatures.includes("selling") || enabledFeatures.includes("commerce")
 
   const navItems: NavItem[] = [
     ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : [{ label: "My Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }]),
@@ -37,7 +39,7 @@ export function Sidebar() {
     ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
     ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [
       { label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> },
-      { label: "Selling", href: "/selling", icon: <ShoppingBag className="w-5 h-5" /> }
+      ...(isSellingEnabled ? [{ label: "Selling", href: "/selling", icon: <ShoppingBag className="w-5 h-5" /> }] : [])
     ] : []),
     { label: "Settings", href: "/settings", icon: <Settings className="w-5 h-5" /> },
   ]

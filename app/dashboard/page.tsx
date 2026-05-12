@@ -19,15 +19,24 @@ export default function DashboardPage() {
   const store = useAppStore();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 30),
-    to: new Date()
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  // Set default date range on mount to avoid hydration mismatch
+  useEffect(() => {
+    if (!dateRange) {
+      setDateRange({
+        from: subDays(new Date(), 30),
+        to: new Date()
+      });
+    }
+  }, []);
 
   const router = useRouter();
 
   useEffect(() => {
     const loadData = async () => {
+      if (!dateRange || !store.gymProfile._id) return;
+
       setLoading(true);
 
       let fetchFrom = dateRange?.from;
@@ -38,6 +47,7 @@ export default function DashboardPage() {
 
       await Promise.all([
         store.loadMembers(),
+        store.loadPlans(),
         store.loadSubscriptions(),
         store.loadPayments(),
         store.loadAttendance({
@@ -47,7 +57,9 @@ export default function DashboardPage() {
       ]);
       setLoading(false);
     };
-    loadData();
+    if (store.gymProfile._id) {
+      loadData();
+    }
   }, [dateRange, store.gymProfile._id]);
 
   const role = (session?.user as any)?.role;
@@ -68,10 +80,10 @@ export default function DashboardPage() {
     const prevRange = dateRange?.from && dateRange?.to ? getPreviousPeriod({ from: dateRange.from, to: dateRange.to }) : null;
 
     // 1. Members Trend
-    const currentNewMembers = dateRange?.from && dateRange?.to 
+    const currentNewMembers = dateRange?.from && dateRange?.to
       ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, { from: dateRange.from!, to: dateRange.to! })).length
       : totalMembers;
-    const prevNewMembers = prevRange 
+    const prevNewMembers = prevRange
       ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, prevRange)).length
       : 0;
     const membersTrend = prevRange ? calculateTrend(currentNewMembers, prevNewMembers) : undefined;
@@ -111,6 +123,10 @@ export default function DashboardPage() {
   }, [store.members, store.subscriptions, store.payments, store.attendance, isTrainer, userId, dateRange]);
 
 
+
+  if (!dateRange) {
+    return <></>
+  }
 
   return (
     <div className="space-y-4 md:space-y-10 animate-fade-up">
