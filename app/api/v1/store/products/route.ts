@@ -4,6 +4,8 @@ import connectDB from "@/lib/db";
 import Product from "@/models/Product";
 import ProductCategory from "@/models/ProductCategory";
 import ProductBrand from "@/models/ProductBrand";
+import Gym from "@/models/Gym";
+import User from "@/models/User";
 
 /**
  * GET /api/v1/store/products

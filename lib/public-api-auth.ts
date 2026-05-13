@@ -3,6 +3,7 @@ import connectDB from "@/lib/db";
 import ApiKey from "@/models/ApiKey";
 import GymSettings from "@/models/GymSettings";
 import SubscriptionPlan from "@/models/SubscriptionPlan";
+import Gym from "@/models/Gym";
 import { verifyApiKey } from "@/lib/api-key-utils";
 
 /**
