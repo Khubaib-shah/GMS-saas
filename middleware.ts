@@ -26,6 +26,7 @@ export default async function proxy(req: NextRequest) {
     const isSignupApi = req.nextUrl.pathname.startsWith("/api/auth/signup");
     const isRequestDemoApi = req.nextUrl.pathname === "/api/request-demo";
     const isPlatformPlansApi = req.nextUrl.pathname === "/api/platform/plans";
+    const isStoreApi = req.nextUrl.pathname.startsWith("/api/v1/store");
     const isAdmin = token?.role === "super_admin";
 
     // Debugging (Remove after fixing)
@@ -33,8 +34,8 @@ export default async function proxy(req: NextRequest) {
 
     const isSeedApi = req.nextUrl.pathname.startsWith("/api/seed");
 
-    // 1. Allow landing page, member portal, signup, request demo, platform plans, and seed regardless of NextAuth session
-    if (isLandingPage || isMemberPortal || isRequestDemoApi || isSignupPage || isSignupApi || isPlatformPlansApi || isSeedApi) {
+    // 1. Allow landing page, member portal, signup, request demo, platform plans, seed, and public store APIs regardless of NextAuth session
+    if (isLandingPage || isMemberPortal || isRequestDemoApi || isSignupPage || isSignupApi || isPlatformPlansApi || isSeedApi || isStoreApi) {
         return NextResponse.next();
     }
 
@@ -85,11 +86,12 @@ export const config = {
          * Match all request paths except for the ones starting with:
          * - api/register
          * - api/auth
+         * - api/v1/store
          * - _next/static
          * - _next/image
          * - favicon.ico
          * - public assets (png, svg, jpg, etc.)
          */
-        "/((?!api/seed|api/register|api/auth|api/request-demo|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)",
+        "/((?!api/seed|api/register|api/auth|api/v1/store|api/request-demo|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)",
     ],
 };

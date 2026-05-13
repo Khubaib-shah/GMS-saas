@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import ApiKey from "@/models/ApiKey";
 import GymSettings from "@/models/GymSettings";
+import SubscriptionPlan from "@/models/SubscriptionPlan";
 import { verifyApiKey } from "@/lib/api-key-utils";
 
 /**
@@ -36,9 +37,19 @@ export async function validatePublicApiKey(req: Request) {
             return { error: NextResponse.json({ error: "Invalid API Key or Secret" }, { status: 401 }) };
         }
 
-        // 3. Check if selling module is enabled for this gym
-        const settings = await GymSettings.findOne({ gymId: keyDoc.gymId });
-        if (!settings?.modules?.sellingEnabled) {
+        // 3. Check if selling module is enabled for this gym via GymSettings or SubscriptionPlan
+        const gymIdStr = keyDoc.gymId.toString();
+        const [settings, subPlan] = await Promise.all([
+            GymSettings.findOne({ $or: [{ gymId: keyDoc.gymId }, { gymId: gymIdStr }] }).lean(),
+            SubscriptionPlan.findOne({ gymId: gymIdStr, active: true }).lean()
+        ]);
+
+        const hasSellingEnabled = 
+            (settings as any)?.modules?.sellingEnabled || 
+            (subPlan as any)?.enabledFeatures?.includes("selling") || 
+            (subPlan as any)?.enabledFeatures?.includes("commerce");
+
+        if (!hasSellingEnabled) {
             return { error: NextResponse.json({ error: "Selling module is not enabled for this gym" }, { status: 403 }) };
         }
 
