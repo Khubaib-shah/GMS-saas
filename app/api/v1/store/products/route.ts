@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { validatePublicApiKey } from "@/lib/public-api-auth";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
+import ProductCategory from "@/models/ProductCategory";
+import ProductBrand from "@/models/ProductBrand";
 
 /**
  * GET /api/v1/store/products
@@ -59,6 +61,7 @@ export async function GET(req: Request) {
             }
         });
     } catch (error: any) {
+        console.error("Store API Error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
