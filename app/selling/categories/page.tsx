@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
     Dialog,
     DialogContent,
@@ -170,11 +171,11 @@ export default function CategoryManagement() {
     );
 
     return (
-        <div className="p-4 md:p-8 space-y-6 md:space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700">
             <DashboardHeader
                 title="Product"
                 highlight="Categories"
-                subtitle="Catalog Architecture"
+                subtitle="Manage Categories"
                 description="Organize your catalog for better member browsing"
             >
                 <div className="flex items-center gap-2 md:gap-3 relative z-10 w-full md:w-auto">
@@ -208,7 +209,7 @@ export default function CategoryManagement() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center p-40 space-y-4">
                     <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Accessing Catalog Architecture...</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Loading categories...</p>
                 </div>
             ) : filteredCategories.length === 0 ? (
                 <Card className="glass-premium bg-slate-950/20 border-white/5 p-40 text-center border-dashed rounded-[40px]">
@@ -271,32 +272,32 @@ export default function CategoryManagement() {
             )}
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="w-full sm:max-w-2xl h-full sm:h-auto glass-premium border-white/10 bg-slate-900 p-0 overflow-hidden sm:rounded-[32px] shadow-2xl">
+                <DialogContent className="w-full sm:max-w-2xl h-full sm:h-auto glass-premium bg-card border-white/10 p-0 overflow-hidden sm:rounded-[32px] shadow-2xl">
                     <DialogHeader className="p-6 md:p-10 pb-6 border-b border-white/5 bg-white/[0.02] relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-full bg-primary/5 -skew-x-12 translate-x-10" />
                         <div className="relative">
                             <div className="flex items-center gap-3 mb-2">
-                                <span className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] leading-none">Catalog Engine</span>
+                                <span className="text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] leading-none">Category Setup</span>
                                 <div className="h-px w-12 md:w-20 bg-primary/20"></div>
                             </div>
                             <DialogTitle className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-white">
                                 {editingCategory ? "Update" : "New"} <span className="text-primary">Category</span>
                             </DialogTitle>
                             <DialogDescription className="text-[8px] md:text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">
-                                Configure your product category details for the headless API
+                                Set up details for your product category
                             </DialogDescription>
                         </div>
                     </DialogHeader>
 
                     <div className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-                        <div className="space-y-6 md:space-y-8">
+                        <div className="space-y-2 md:space-y-4">
                             <div className="space-y-2.5 md:space-y-3">
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Category Name</label>
                                 <Input
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     placeholder="E.G. SUPPLEMENTS"
-                                    className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-black/40 border-white/10 focus:border-primary/50 font-black uppercase tracking-widest px-4 md:px-6 text-[10px] md:text-xs"
+                                    className="h-12 md:h-14 rounded-xl md:rounded-2xl tracking-wider"
                                 />
                             </div>
                             <div className="space-y-2.5 md:space-y-3">
@@ -305,12 +306,21 @@ export default function CategoryManagement() {
                                     value={formData.slug}
                                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                                     placeholder="supplements"
-                                    className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-black/40 border-white/10 focus:border-primary/50 font-mono text-[10px] text-slate-400 px-4 md:px-6"
+                                    className="h-12 md:h-14 rounded-xl md:rounded-2xl tracking-wider"
+                                />
+                            </div>
+                            <div className="space-y-2.5 md:space-y-3">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Description</label>
+                                <Textarea
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="ENTER CATEGORY DESCRIPTION..."
+                                    className="min-h-[100px] rounded-xl md:rounded-2xl bg-black/40 border-white/10 focus:border-primary/50  text-[10px] md:text-xs resize-none"
                                 />
                             </div>
                             <div className="bg-primary/5 border border-primary/20 p-4 md:p-6 rounded-2xl flex gap-3 md:gap-4">
                                 <Save className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0" />
-                                <p className="text-[8px] md:text-[10px] font-black text-primary/70 uppercase tracking-widest leading-relaxed">
+                                <p className="text-[8px] md:text-[10px] font-medium text-primary/90 uppercase tracking-widest leading-relaxed">
                                     Slugs are used in API endpoints to fetch specific product collections.
                                 </p>
                             </div>

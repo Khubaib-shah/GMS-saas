@@ -5,6 +5,8 @@ import SubscriptionPlan from "@/models/SubscriptionPlan";
 import { NextResponse } from "next/server";
 import { getCache, setCache, deleteCache } from "@/lib/redis";
 
+import GymSettings from "@/models/GymSettings";
+
 export async function GET() {
     const authResult = await requireAuth();
     if ("error" in authResult) return authResult.error;
@@ -29,21 +31,34 @@ export async function GET() {
         const cachedGym = await getCache<any>(cacheKey);
         if (cachedGym) {
             console.log(`[Redis HIT] ${cacheKey}`);
-            return NextResponse.json(cachedGym);
+            const settings = await GymSettings.findOne({ gymId }).lean();
+            const enabledFeatures = [...(cachedGym.enabledFeatures || [])];
+            if ((settings as any)?.modules?.sellingEnabled) {
+                if (!enabledFeatures.includes("selling")) enabledFeatures.push("selling");
+                if (!enabledFeatures.includes("commerce")) enabledFeatures.push("commerce");
+            }
+            return NextResponse.json({ ...cachedGym, enabledFeatures });
         }
 
-        const [gym, subPlan] = await Promise.all([
+        const [gym, subPlan, settings] = await Promise.all([
             Gym.findById(gymId),
-            SubscriptionPlan.findOne({ gymId, active: true }).lean()
+            SubscriptionPlan.findOne({ gymId, active: true }).lean(),
+            GymSettings.findOne({ gymId }).lean()
         ]);
 
         if (!gym) {
             return NextResponse.json({ message: "Gym not found" }, { status: 404 });
         }
 
+        const enabledFeatures = [...((subPlan as any)?.enabledFeatures || [])];
+        if ((settings as any)?.modules?.sellingEnabled) {
+            if (!enabledFeatures.includes("selling")) enabledFeatures.push("selling");
+            if (!enabledFeatures.includes("commerce")) enabledFeatures.push("commerce");
+        }
+
         const responseData = {
             ...gym.toObject(),
-            enabledFeatures: (subPlan as any)?.enabledFeatures || []
+            enabledFeatures
         };
 
         // Cache for 24 hours (86400 seconds) since it rarely changes

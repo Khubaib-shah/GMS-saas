@@ -57,7 +57,7 @@ export type AppState = {
 
   // Workout Plans
   workoutPlans: any[]
-  loadWorkoutPlans: () => Promise<void>
+  loadWorkoutPlans: (options?: { force?: boolean }) => Promise<void>
   addWorkoutPlan: (plan: any) => Promise<void>
   updateWorkoutPlan: (id: string, data: any) => Promise<void>
   deleteWorkoutPlan: (id: string) => Promise<void>
@@ -66,11 +66,11 @@ export type AppState = {
 
   // Attendance
   attendance: any[]
-  loadAttendance: (params?: { date?: string, month?: string, from?: string, to?: string }) => Promise<void>
+  loadAttendance: (params?: { date?: string, month?: string, from?: string, to?: string, force?: boolean }) => Promise<void>
 
   // Exercises
   exercises: any[]
-  loadExercises: () => Promise<void>
+  loadExercises: (options?: { force?: boolean }) => Promise<void>
 
   // Search
   searchQuery: string
@@ -122,7 +122,11 @@ export const useAppStore = create<AppState>()(
         const state = get();
         const now = Date.now();
         const last = state.lastLoaded?.businessSettings || 0;
-        if (!options?.force && now - last < 3600000 && state.businessSettings.joiningFee !== 0) return;
+        if (!options?.force && now - last < 3600000) return;
+
+        set((state) => ({
+          lastLoaded: { ...state.lastLoaded, businessSettings: Date.now() }
+        }));
 
         try {
           const res = await fetch("/api/settings/business");
@@ -137,6 +141,9 @@ export const useAppStore = create<AppState>()(
           }
         } catch (error) {
           console.error("Failed to load business settings", error);
+          set((state) => ({
+            lastLoaded: { ...state.lastLoaded, businessSettings: 0 }
+          }));
         }
       },
 
@@ -144,7 +151,11 @@ export const useAppStore = create<AppState>()(
         const state = get();
         const now = Date.now();
         const last = state.lastLoaded?.gymProfile || 0;
-        if (!options?.force && now - last < 3600000 && state.gymProfile._id) return;
+        if (!options?.force && now - last < 60000) return;
+
+        set((state) => ({
+          lastLoaded: { ...state.lastLoaded, gymProfile: Date.now() }
+        }));
 
         try {
           const res = await fetch("/api/gym");
@@ -164,6 +175,9 @@ export const useAppStore = create<AppState>()(
           }
         } catch (error) {
           console.error("Failed to load gym profile", error);
+          set((state) => ({
+            lastLoaded: { ...state.lastLoaded, gymProfile: 0 }
+          }));
         }
       },
 
@@ -177,14 +191,24 @@ export const useAppStore = create<AppState>()(
         const now = Date.now();
         const last = state.lastLoaded?.members || 0;
         const lastOptions = state.lastLoaded?.membersOptions || {};
-        const optionsChanged = JSON.stringify(options) !== JSON.stringify(lastOptions);
+        const normOptions = { showDeleted: !!options?.showDeleted };
+        const normLastOptions = { showDeleted: !!lastOptions?.showDeleted };
+        const optionsChanged = JSON.stringify(normOptions) !== JSON.stringify(normLastOptions);
 
-        if (!options?.force && !optionsChanged && now - last < 300000 && state.members.length > 0) {
+        if (!options?.force && !optionsChanged && now - last < 300000) {
           return;
         }
 
+        set((state) => ({
+          lastLoaded: { 
+            ...state.lastLoaded, 
+            members: Date.now(),
+            membersOptions: normOptions
+          }
+        }));
+
         try {
-          const url = options?.showDeleted ? "/api/members?showDeleted=true" : "/api/members";
+          const url = normOptions.showDeleted ? "/api/members?showDeleted=true" : "/api/members";
           const res = await fetch(url);
           const data = await res.json();
           if (Array.isArray(data)) {
@@ -193,7 +217,7 @@ export const useAppStore = create<AppState>()(
               lastLoaded: { 
                 ...state.lastLoaded, 
                 members: Date.now(),
-                membersOptions: options || {}
+                membersOptions: normOptions
               }
             }));
           } else {
@@ -201,6 +225,9 @@ export const useAppStore = create<AppState>()(
           }
         } catch (error) {
           console.error("Failed to load members", error);
+          set((state) => ({
+            lastLoaded: { ...state.lastLoaded, members: 0 }
+          }));
           set({ members: [] });
         }
       },
@@ -271,7 +298,11 @@ export const useAppStore = create<AppState>()(
         const state = get();
         const now = Date.now();
         const last = state.lastLoaded?.plans || 0;
-        if (!options?.force && now - last < 300000 && state.plans.length > 0) return;
+        if (!options?.force && now - last < 300000) return;
+
+        set((state) => ({
+          lastLoaded: { ...state.lastLoaded, plans: Date.now() }
+        }));
 
         try {
           const res = await fetch("/api/plans");
@@ -286,6 +317,9 @@ export const useAppStore = create<AppState>()(
           }
         } catch (error) {
           console.error("Failed to load plans", error);
+          set((state) => ({
+            lastLoaded: { ...state.lastLoaded, plans: 0 }
+          }));
           set({ plans: [] });
         }
       },
@@ -358,7 +392,11 @@ export const useAppStore = create<AppState>()(
         const state = get();
         const now = Date.now();
         const last = state.lastLoaded?.subscriptions || 0;
-        if (!options?.force && now - last < 300000 && state.subscriptions.length > 0) return;
+        if (!options?.force && now - last < 300000) return;
+
+        set((state) => ({
+          lastLoaded: { ...state.lastLoaded, subscriptions: Date.now() }
+        }));
 
         try {
           const res = await fetch("/api/subscriptions");
@@ -373,6 +411,9 @@ export const useAppStore = create<AppState>()(
           }
         } catch (error) {
           console.error("Failed to load subscriptions", error);
+          set((state) => ({
+            lastLoaded: { ...state.lastLoaded, subscriptions: 0 }
+          }));
           set({ subscriptions: [] });
         }
       },
@@ -569,7 +610,11 @@ export const useAppStore = create<AppState>()(
         const state = get();
         const now = Date.now();
         const last = state.lastLoaded?.payments || 0;
-        if (!options?.force && now - last < 300000 && state.payments.length > 0) return;
+        if (!options?.force && now - last < 300000) return;
+
+        set((state) => ({
+          lastLoaded: { ...state.lastLoaded, payments: Date.now() }
+        }));
 
         try {
           const res = await fetch("/api/payments");
@@ -584,6 +629,9 @@ export const useAppStore = create<AppState>()(
           }
         } catch (error) {
           console.error("Failed to load payments", error);
+          set((state) => ({
+            lastLoaded: { ...state.lastLoaded, payments: 0 }
+          }));
           set({ payments: [] });
         }
       },
@@ -648,17 +696,32 @@ export const useAppStore = create<AppState>()(
       // -------------------------
       workoutPlans: [],
 
-      loadWorkoutPlans: async () => {
+      loadWorkoutPlans: async (options) => {
+        const state = get();
+        const now = Date.now();
+        const last = state.lastLoaded?.workoutPlans || 0;
+        if (!options?.force && now - last < 300000) return;
+
+        set((state) => ({
+          lastLoaded: { ...state.lastLoaded, workoutPlans: Date.now() }
+        }));
+
         try {
           const res = await fetch("/api/workout-plans");
           const data = await res.json();
           if (Array.isArray(data)) {
-            set({ workoutPlans: data });
+            set((state) => ({ 
+              workoutPlans: data,
+              lastLoaded: { ...state.lastLoaded, workoutPlans: Date.now() }
+            }));
           } else {
             set({ workoutPlans: [] });
           }
         } catch (error) {
           console.error("Failed to load workout plans", error);
+          set((state) => ({
+            lastLoaded: { ...state.lastLoaded, workoutPlans: 0 }
+          }));
           set({ workoutPlans: [] });
         }
       },
@@ -785,6 +848,29 @@ export const useAppStore = create<AppState>()(
         const gymId = state.gymProfile._id;
         if (!gymId) return;
 
+        const now = Date.now();
+        const last = state.lastLoaded?.attendance || 0;
+        const normParams = {
+          date: params?.date,
+          month: params?.month,
+          from: params?.from ? params.from.split('T')[0] : undefined,
+          to: params?.to ? params.to.split('T')[0] : undefined,
+        };
+        const lastParams = state.lastLoaded?.attendanceParams;
+        const paramsChanged = JSON.stringify(normParams) !== JSON.stringify(lastParams);
+
+        if (!params?.force && !paramsChanged && now - last < 300000) {
+          return;
+        }
+
+        set((state) => ({
+          lastLoaded: { 
+            ...state.lastLoaded, 
+            attendance: Date.now(),
+            attendanceParams: normParams
+          }
+        }));
+
         try {
           let url = `/api/attendance/report?gymId=${gymId}`;
           if (params.date) url += `&date=${params.date}`;
@@ -795,12 +881,22 @@ export const useAppStore = create<AppState>()(
           const res = await fetch(url);
           const data = await res.json();
           if (Array.isArray(data)) {
-            set({ attendance: data });
+            set((state) => ({ 
+              attendance: data,
+              lastLoaded: { 
+                ...state.lastLoaded, 
+                attendance: Date.now(),
+                attendanceParams: normParams
+              }
+            }));
           } else {
             set({ attendance: [] });
           }
         } catch (error) {
           console.error("Failed to load attendance", error);
+          set((state) => ({
+            lastLoaded: { ...state.lastLoaded, attendance: 0 }
+          }));
           set({ attendance: [] });
         }
       },
@@ -810,17 +906,32 @@ export const useAppStore = create<AppState>()(
       // -------------------------
       exercises: [],
 
-      loadExercises: async () => {
+      loadExercises: async (options) => {
+        const state = get();
+        const now = Date.now();
+        const last = state.lastLoaded?.exercises || 0;
+        if (!options?.force && now - last < 300000) return;
+
+        set((state) => ({
+          lastLoaded: { ...state.lastLoaded, exercises: Date.now() }
+        }));
+
         try {
           const res = await fetch("/api/exercises");
           const data = await res.json();
           if (Array.isArray(data)) {
-            set({ exercises: data });
+            set((state) => ({ 
+              exercises: data,
+              lastLoaded: { ...state.lastLoaded, exercises: Date.now() }
+            }));
           } else {
             set({ exercises: [] });
           }
         } catch (error) {
           console.error("Failed to load exercises", error);
+          set((state) => ({
+            lastLoaded: { ...state.lastLoaded, exercises: 0 }
+          }));
           set({ exercises: [] });
         }
       },

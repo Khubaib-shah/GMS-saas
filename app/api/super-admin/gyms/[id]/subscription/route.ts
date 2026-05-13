@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import SubscriptionPlan from "@/models/SubscriptionPlan";
 import { requireSuperAdmin } from "@/lib/api-middleware";
+import { deleteCache } from "@/lib/redis";
 
 /**
  * GET /api/super-admin/gyms/[id]/subscription — Get gym subscription status/features
@@ -53,8 +54,12 @@ export async function PUT(
         { new: true, upsert: true }
     );
 
+    // Invalidate cache
+    await deleteCache(`gym:profile:${id}`);
+
     return NextResponse.json({ 
         message: "Subscription plan updated successfully", 
         subscriptionPlan: subPlan 
     });
 }
+

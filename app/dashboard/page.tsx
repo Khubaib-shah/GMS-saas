@@ -41,7 +41,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      if (!dateRange || !store.gymProfile._id) return;
+      if (!store.gymProfile._id) return;
 
       setLoading(true);
 
@@ -130,7 +130,7 @@ export default function DashboardPage() {
 
 
 
-  if (loading || !dateRange) {
+  if (loading) {
     return (
       <div className="space-y-4 md:space-y-10 animate-pulse">
         <PageHeaderSkeleton showButton={false} />

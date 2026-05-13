@@ -37,7 +37,7 @@ export function Sidebar() {
       { label: "Reports", href: "/trainer/analytics", icon: <TrendingUp className="w-5 h-5" /> },
     ] : []),
     ...((session?.user as any)?.role === 'trainer' ? [{ label: "My Profile", href: `/trainers/${(session?.user as any)?.id}`, icon: <UserCheck className="w-5 h-5" /> }] : [{ label: "Trainers", href: "/trainers", icon: <UserCheck className="w-5 h-5" /> }]),
-    ...((session?.user as any)?.role === 'owner' || (session?.user as any)?.role === 'gym_owner' ? [
+    ...((session?.user as any)?.role !== 'trainer' ? [
       { label: "Audit Logs", href: "/audit-logs", icon: <ClipboardList className="w-5 h-5" /> },
       ...(isSellingEnabled ? [{ label: "Selling", href: "/selling", icon: <ShoppingBag className="w-5 h-5" /> }] : [])
     ] : []),

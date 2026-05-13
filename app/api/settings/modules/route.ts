@@ -4,6 +4,8 @@ import GymSettings from "@/models/GymSettings";
 import { authorize } from "@/lib/api-middleware";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 
+import { deleteCache } from "@/lib/redis";
+
 /**
  * GET /api/settings/modules — Fetch module feature toggles
  */
@@ -67,6 +69,9 @@ export async function PUT(req: Request) {
             },
             { new: true, upsert: true }
         ).lean();
+
+        // Invalidate gym profile cache so the sidebar updates immediately
+        await deleteCache(`gym:profile:${gymId}`);
 
         // Audit log
         await logAudit({

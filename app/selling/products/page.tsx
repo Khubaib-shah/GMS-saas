@@ -84,12 +84,12 @@ export default function ProductList() {
 
     return (
         <FeatureGate feature={["selling", "commerce"]}>
-            <div className="md:p-8 space-y-6 md:space-y-8 animate-in fade-in duration-700">
+            <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700">
                 <DashboardHeader
                     title="Product"
                     highlight="Catalog"
-                    subtitle="Inventory Intelligence"
-                    description="Manage your full inventory and digital storefront"
+                    subtitle="Manage Catalog"
+                    description="Manage your store items and product catalog"
                 >
                     <div className="flex flex-wrap items-center gap-2 md:gap-3 relative z-10 w-full md:w-auto">
                         <Link href="/selling" className="flex-shrink-0">
@@ -131,7 +131,7 @@ export default function ProductList() {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center p-40 space-y-4">
                         <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Accessing Catalog Engine...</p>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Loading products...</p>
                     </div>
                 ) : filteredProducts.length === 0 ? (
                     <Card className="glass-premium bg-slate-950/20 border-white/5 p-40 text-center border-dashed rounded-[40px]">
@@ -237,7 +237,7 @@ export default function ProductList() {
                     onOpenChange={setDeleteModalOpen}
                     title="Delete"
                     highlight="Product"
-                    description="Are you sure you want to delete this product? This action cannot be undone and will remove the item from all digital storefronts."
+                    description="Are you sure you want to delete this product? This action cannot be undone and will remove the item from your store."
                     onConfirm={confirmDelete}
                     loading={deleting}
                     confirmText="Delete Product"

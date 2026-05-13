@@ -32,7 +32,7 @@ export default function SellingDashboard() {
 
     return (
         <FeatureGate feature={["selling", "commerce"]}>
-            <div className="p-4 md:p-8 space-y-6 md:space-y-10 animate-in fade-in duration-700">
+            <div className="space-y-6 md:space-y-10 animate-in fade-in duration-700">
                 <DashboardHeader
                     title="Commerce"
                     highlight="Dashboard"
@@ -100,7 +100,7 @@ export default function SellingDashboard() {
                                     <Key className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-3 text-left relative">
-                                    <h3 className="text-2xl font-black uppercase tracking-tighter text-white">Headless APIs</h3>
+                                    <h3 className="text-2xl font-black uppercase tracking-tighter text-white">API Keys</h3>
                                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] leading-relaxed max-w-[200px]">
                                         Generate secure keys to use your catalog on any website
                                     </p>

@@ -46,7 +46,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       loadSubscriptions()
       loadPayments()
     }
-  }, [session?.user?.id, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
+  }, [session?.user?.id, pathname, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
 
   const isLandingPage = pathname === "/"
   const isLoginPage = pathname === "/login"

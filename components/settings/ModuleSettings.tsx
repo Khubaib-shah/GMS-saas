@@ -16,6 +16,9 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+import { useAppStore } from "@/lib/store";
+import { Badge } from "../ui/badge";
+
 export function ModuleSettings() {
     const [modules, setModules] = useState({
         trainersEnabled: true,
@@ -44,7 +47,8 @@ export function ModuleSettings() {
                 body: JSON.stringify({ modules }),
             });
             if (res.ok) {
-                toast.success("Module settings updated. Please refresh to see changes.");
+                await useAppStore.getState().loadGymProfile({ force: true });
+                toast.success("Module settings updated successfully!");
             } else {
                 throw new Error("Failed to save");
             }

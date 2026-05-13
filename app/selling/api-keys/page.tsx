@@ -111,10 +111,10 @@ export default function ApiKeysManagement() {
     };
 
     return (
-        <div className="p-4 md:p-8 space-y-6 md:space-y-8 animate-in fade-in duration-700 max-w-5xl mx-auto">
+        <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 max-w-5xl mx-auto">
             <DashboardHeader
-                title="Headless"
-                highlight="APIs"
+                title="API"
+                highlight="Keys"
                 subtitle="Security Center"
                 description="Securely connect your gym catalog to external websites and apps"
             >
