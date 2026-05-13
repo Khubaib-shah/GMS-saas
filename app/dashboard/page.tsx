@@ -14,6 +14,12 @@ import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { getPreviousPeriod, calculateTrend, isDateInRange } from "@/lib/analytics-utils";
+import { 
+  StatsCardSkeleton, 
+  ChartCardSkeleton, 
+  TableSkeleton, 
+  PageHeaderSkeleton 
+} from "@/components/ui/skeleton-components";
 
 export default function DashboardPage() {
   const store = useAppStore();
@@ -124,8 +130,38 @@ export default function DashboardPage() {
 
 
 
-  if (!dateRange) {
-    return <></>
+  if (loading || !dateRange) {
+    return (
+      <div className="space-y-4 md:space-y-10 animate-pulse">
+        <PageHeaderSkeleton showButton={false} />
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6">
+          <StatsCardSkeleton />
+          <StatsCardSkeleton />
+          <StatsCardSkeleton />
+          <StatsCardSkeleton />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4 md:mt-10">
+          <div className="h-[300px]">
+             <ChartCardSkeleton type="bar" />
+          </div>
+          <div className="h-[300px]">
+             <ChartCardSkeleton type="bar" />
+          </div>
+          <div className="h-[300px]">
+             <ChartCardSkeleton type="pie" />
+          </div>
+          <div className="h-[300px]">
+             <ChartCardSkeleton type="pie" />
+          </div>
+        </div>
+
+        <div className="mt-4 md:mt-10">
+          <TableSkeleton columns={5} rows={5} />
+        </div>
+      </div>
+    );
   }
 
   return (

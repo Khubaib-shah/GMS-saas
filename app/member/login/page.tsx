@@ -3,10 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputField } from "@/components/ui/input-field";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Zap, Mail, Lock, Hash, ArrowRight, Eye, EyeOff } from "lucide-react";
@@ -96,18 +94,16 @@ export default function MemberLoginPage() {
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,rgba(76,255,0,0.1),transparent_70%)]"></div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-            <div className="w-full max-w-md relative z-10 transition-all duration-500">
+            <div className=" w-full  max-w-md relative z-10 transition-all duration-500">
                 <div className="text-center mb-10">
-                    <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6 neon-glow">
-                        <Zap className="w-10 h-10 text-black" />
-                    </div>
+
                     <h2 className="text-4xl font-black text-white mb-2 uppercase tracking-tighter">
                         MEMBER <span className="text-primary">PORTAL</span>
                     </h2>
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic">Access your member portal</p>
                 </div>
 
-                <div className="glass-premium p-1">
+                <div className="glass-premium bg-card p-1">
                     <Tabs defaultValue="password" className="w-full">
                         <TabsList className="grid w-full grid-cols-2 bg-white/5 border-b border-border rounded-t-xl overflow-hidden p-0 h-[38px]">
                             <TabsTrigger

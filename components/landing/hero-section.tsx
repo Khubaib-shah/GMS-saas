@@ -1,53 +1,86 @@
-"use client";
+"use client"
 
 import { ArrowRight, Play } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 
 export function HeroSection() {
   return (
-    <section className="relative pt-32 pb-20 px-6 overflow-hidden flex flex-col items-center justify-center min-h-[90vh]">
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+    <section className="relative pt-40 pb-0 px-6 overflow-hidden">
+      {/* Dot grid background */}
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+        }}
+      />
+      {/* Subtle top radial */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#c6ff00]/8 blur-[120px] rounded-full -z-10 pointer-events-none" />
 
-      <div className="max-w-4xl mx-auto text-center z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-8">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-          </span>
-          THE NEW STANDARD IN GYM MANAGEMENT
+      <div className="max-w-6xl mx-auto text-center">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/[0.04] text-white/60 text-[11px] font-medium tracking-widest uppercase mb-8">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#c6ff00] animate-pulse" />
+          Now live for gyms in Pakistan
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.1]">
-          Run Your Entire Gym <br className="hidden md:block" /> From One Platform
+        {/* Headline */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-[-0.04em] text-white leading-[1.05] mb-6">
+          Stop losing money.<br />
+          <span className="text-[#c6ff00]">Run your gym</span> smarter.
         </h1>
 
-        <p className="max-w-2xl mx-auto text-lg md:text-xl text-slate-400 mb-10 leading-relaxed">
-          Manage members, staff, payments, and operations with a single powerful system built for modern gyms. Say goodbye to spreadsheets and chaos.
+        {/* Sub */}
+        <p className="text-[15px] sm:text-[17px] text-white/50 max-w-xl mx-auto leading-relaxed mb-10">
+          Memberships, QR attendance, billing, point-of-sale, and workout tracking — all in one platform. Built for gym owners in Pakistan.
         </p>
 
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="#request-demo" className="w-full sm:w-auto">
-            <Button size="lg" className="h-[38px] px-8 text-base font-semibold rounded-lg bg-primary text-black hover:bg-primary/90 transition-all w-full flex items-center justify-center group shadow-[0_0_30px_rgba(190,255,0,0.3)]">
-              Request Demo
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
+          <Link href="/signup">
+            <button className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#c6ff00] text-black text-[14px] font-semibold hover:bg-[#d4ff33] transition-colors">
+              Start free trial
+              <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
+            </button>
           </Link>
-          <Link href="#how-it-works" className="w-full sm:w-auto">
-            <Button variant="outline" size="lg" className="h-[38px] px-8 text-base font-medium rounded-lg border-white/10 hover:bg-white/5 text-white transition-all w-full flex items-center justify-center gap-2">
-              <Play className="w-4 h-4 fill-current" />
-              See How It Works
-            </Button>
+          <Link href="#how-it-works">
+            <button className="inline-flex items-center gap-2 h-11 px-6 rounded-lg border border-white/10 text-white/70 text-[14px] hover:bg-white/[0.06] hover:text-white transition-colors">
+              <Play className="w-3.5 h-3.5 fill-current" />
+              See how it works
+            </button>
           </Link>
         </div>
-      </div>
 
-      {/* Dashboard Preview Mockup */}
-      <div className="mt-10 w-full max-w-6xl mx-auto relative z-10 group perspective-1000">
-        <Image src="/assets/dashboard.png" alt="GymFlow Dashboard Mockup" className="w-full h-auto block object-cover relative z-10" width={1000} height={1000} priority={true} />
+        {/* Browser mockup */}
+        <div className="relative mx-auto max-w-5xl">
+          {/* Browser chrome */}
+          <div className="rounded-t-xl border border-white/[0.08] border-b-0 bg-white/[0.04] px-4 py-3 flex items-center gap-2">
+            <div className="flex gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
+              <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
+              <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
+            </div>
+            <div className="flex-1 mx-4">
+              <div className="h-5 rounded bg-white/[0.06] max-w-[200px] mx-auto flex items-center justify-center">
+                <span className="text-[10px] text-white/30">app.gymflow.pk/dashboard</span>
+              </div>
+            </div>
+          </div>
+          {/* Screenshot */}
+          <div className="border border-white/[0.08] border-t-0 rounded-b-xl overflow-hidden">
+            <Image
+              src="/assets/dashboard.png"
+              alt="GymFlow Dashboard"
+              width={1200}
+              height={720}
+              className="w-full h-auto block"
+              priority
+            />
+          </div>
+          {/* Bottom fade */}
+          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+        </div>
       </div>
     </section>
   )

@@ -74,7 +74,7 @@ function SignupForm() {
             <Zap className="w-10 h-10 text-black" />
           </div>
           <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">
-            System <span className="text-primary">Signup</span>
+            Create <span className="text-primary">Account</span>
           </h2>
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Start Your {planName} Journey</p>
         </div>
@@ -116,22 +116,14 @@ function SignupForm() {
           <div className="md:col-span-2">
             <div className="relative group/password-signup">
               <InputField
-                label="Security Key (Password)"
+                label="Password"
                 validateType="password"
-                type={showPassword ? "text" : "password"}
+                type="password"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(val) => setFormData({ ...formData, password: val })}
                 required
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-[42px] -translate-y-1/2 text-slate-500 hover:text-white transition-colors z-20"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
             </div>
           </div>
 
@@ -140,7 +132,7 @@ function SignupForm() {
             disabled={loading}
             className="md:col-span-2 bg-primary text-black hover:bg-white py-6 h-auto font-black text-lg rounded-xl neon-glow transition-all mt-4"
           >
-            {loading ? "INITIALIZING ACCOUNT..." : "START SUBSCRIPTION"}
+            {loading ? "CREATING ACCOUNT..." : "START SUBSCRIPTION"}
             {!loading && <ArrowRight className="ml-2 w-5 h-5" />}
           </Button>
         </form>
@@ -149,7 +141,7 @@ function SignupForm() {
           <p className="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">
             Already have an account?{" "}
             <Link href="/login" className="text-primary hover:text-white transition-colors">
-              Initiate Access
+              Log In
             </Link>
           </p>
         </div>
@@ -159,17 +151,17 @@ function SignupForm() {
         open={showConfirm}
         onOpenChange={setShowConfirm}
         title="Confirm"
-        highlight="Identifier"
+        highlight="Email"
         icon={AlertCircle}
         variant="primary"
         description={
           <>
             You are about to register with <span className="text-white font-bold">{formData.email}</span>. 
             <br /><br />
-            <span className="text-primary/80 font-bold uppercase text-[10px] tracking-widest">Crucial Note:</span> You will <span className="text-white underline underline-offset-4 font-black italic">NOT</span> be able to change this email address later.
+            <span className="text-primary/80 font-bold uppercase text-[10px] tracking-widest">Important:</span> You will <span className="text-white underline underline-offset-4 font-black italic">NOT</span> be able to change this email address later.
           </>
         }
-        cancelText="Revise"
+        cancelText="Cancel"
         confirmText="Confirm & Pay"
         onConfirm={handleSignup}
       />
@@ -234,7 +226,7 @@ export default function SignupPage() {
 
       {/* Right Side - Signup Form area */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10">
-        <Suspense fallback={<div className="text-primary font-black animate-pulse tracking-widest uppercase text-xs">Calibrating Signup Matrix...</div>}>
+        <Suspense fallback={<div className="text-primary font-black animate-pulse tracking-widest uppercase text-xs">Loading...</div>}>
           <SignupForm />
         </Suspense>
       </div>
