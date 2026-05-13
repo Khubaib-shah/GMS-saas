@@ -6,7 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { Card } from "@/components/ui/card";
-import { Lock, Building2, User, LogOut, Users, Plus, Trash2, Save, UserCheck, Settings2, DollarSign, Bell, Shield } from "lucide-react";
+import { Lock, Building2, User, LogOut, Users, Plus, Trash2, Save, UserCheck, Settings2, DollarSign, Bell, Shield, LayoutGrid } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -40,6 +40,7 @@ import { BusinessSettings } from "@/components/settings/BusinessSettings";
 import { NotificationSettings } from "@/components/settings/NotificationSettings";
 import { EmailSettings } from "@/components/settings/EmailSettings";
 import { RoleManagement } from "@/components/settings/RoleManagement";
+import { ModuleSettings } from "@/components/settings/ModuleSettings";
 import { usePermissions } from "@/hooks/use-permissions";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
@@ -57,7 +58,7 @@ export default function SettingsPage() {
     return "general_settings"; // Default for all other roles
   };
 
-  const [activeTab, setActiveTab] = useState<"staff" | "profile" | "general_settings" | "business_settings" | "notifications" | "roles" | "config">(getDefaultTab());
+  const [activeTab, setActiveTab] = useState<"staff" | "profile" | "general_settings" | "business_settings" | "notifications" | "roles" | "config" | "modules">(getDefaultTab());
   const { can } = usePermissions();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -94,7 +95,7 @@ export default function SettingsPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab") as any;
-    const validTabs = ["staff", "profile", "general_settings", "business_settings", "notifications", "roles", "config"];
+    const validTabs = ["staff", "profile", "general_settings", "business_settings", "notifications", "roles", "config", "modules"];
 
     if (tab && validTabs.includes(tab)) {
       setActiveTab(tab);
@@ -218,6 +219,7 @@ export default function SettingsPage() {
     { id: "business_settings", label: "Business", icon: <DollarSign className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("settings:view" as any))) },
     { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("settings:view" as any))) },
     { id: "config", label: "Configuration", icon: <Settings2 className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("settings:view" as any))) },
+    { id: "modules", label: "Features", icon: <LayoutGrid className="w-4 h-4" />, show: session && (isAdmin || (session?.user as any)?.role === 'owner') },
     { id: "roles", label: "Roles", icon: <Shield className="w-3.5 h-3.5" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("roles:view" as any))) },
   ].filter((t) => t.show)
 
@@ -511,6 +513,7 @@ export default function SettingsPage() {
       {activeTab === "notifications" && <NotificationSettings />}
       {activeTab === "config" && <EmailSettings />}
       {activeTab === "roles" && <RoleManagement />}
+      {activeTab === "modules" && <ModuleSettings />}
 
       <ConfirmationModal
         isOpen={!!staffToDelete}

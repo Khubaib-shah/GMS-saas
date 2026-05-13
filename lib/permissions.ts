@@ -91,6 +91,17 @@ export const PERMISSIONS = {
     BOOKING_DELETE: 'booking:delete',
     AVAILABILITY_VIEW: 'availability:view',
     AVAILABILITY_MANAGE: 'availability:manage',
+
+    // Selling / Commerce Module
+    PRODUCTS_VIEW: 'products:view',
+    PRODUCTS_CREATE: 'products:create',
+    PRODUCTS_EDIT: 'products:edit',
+    PRODUCTS_DELETE: 'products:delete',
+    INVENTORY_VIEW: 'inventory:view',
+    INVENTORY_MANAGE: 'inventory:manage',
+    API_KEYS_MANAGE: 'api_keys:manage',
+    WEBHOOKS_MANAGE: 'webhooks:manage',
+    SELLING_ANALYTICS: 'selling:analytics',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

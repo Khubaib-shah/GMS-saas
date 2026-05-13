@@ -1,120 +1,95 @@
-import { ArrowRight, CheckCircle2, CreditCard, Activity, CalendarDays, TrendingUp } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Check } from "lucide-react"
+
+const checks = [
+  "Verify membership in under 1 second",
+  "Automatically block expired members",
+  "See peak hours and attendance trends",
+  "Prevent QR sharing with daily limits",
+]
+
+// Static QR data modules — avoids Math.sin() map (not needed in Server Component)
+const dataModules = [
+  { x: 75, y: 140 }, { x: 90, y: 130 }, { x: 105, y: 145 }, { x: 120, y: 135 },
+  { x: 140, y: 75 }, { x: 155, y: 90 }, { x: 140, y: 105 }, { x: 155, y: 120 },
+  { x: 75, y: 110 }, { x: 90, y: 120 }, { x: 110, y: 110 }, { x: 125, y: 125 },
+]
 
 export function SolutionSection() {
   return (
-    <section id="solution" className="py-24 px-6 bg-slate-950 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] opacity-50"></div>
-      
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 relative z-10">
-        <div className="flex-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6 tracking-widest uppercase">
-            THE SOLUTION
-          </div>
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-6">
-            Everything you need. <br /> In one place.
+    <section id="solution" className="py-32 px-6 border-t border-white/[0.06]">
+      {/*
+        Keyframe defined in a plain <style> tag — no styled-jsx,
+        no "use client" required. This is valid in Server Components.
+      */}
+      <style>{`
+        @keyframes qr-scan { 0%,100%{top:20%} 50%{top:78%} }
+        .qr-scan-line { animation: qr-scan 2.5s ease-in-out infinite; }
+      `}</style>
+
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        {/* Left: text */}
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">The solution</div>
+          <h2 className="text-3xl md:text-[44px] font-bold tracking-[-0.03em] text-white leading-[1.1] mb-5">
+            Know exactly who walks in — instantly
           </h2>
-          <p className="text-lg text-slate-400 mb-8 leading-relaxed">
-            GymFlow transforms chaos into automation. Move from spreadsheets and messy paper logs to a real-time smart dashboard that handles the heavy lifting for you.
+          <p className="text-[15px] text-white/40 leading-relaxed mb-8">
+            Every member gets a unique QR code. Your receptionist scans it. The system instantly checks their subscription and logs attendance. No guessing. No arguments.
           </p>
-
-          <div className="space-y-4 mb-10">
-            {[
-              "Automated billing and payment reconciliation",
-              "Real-time attendance tracking with smart access",
-              "Centralized staff scheduling and member management",
-              "Actionable financial insights and growth metrics"
-            ].map((benefit, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <CheckCircle2 className="w-6 h-6 text-primary shrink-0" />
-                <span className="text-slate-300">{benefit}</span>
-              </div>
+          <ul className="flex flex-col gap-3">
+            {checks.map((c, i) => (
+              <li key={i} className="flex items-center gap-3 text-[14px] text-white/60">
+                <div className="w-5 h-5 rounded-full border border-[#c6ff00]/30 bg-[#c6ff00]/[0.08] flex items-center justify-center shrink-0">
+                  <Check className="w-3 h-3 text-[#c6ff00]" strokeWidth={2.5} />
+                </div>
+                {c}
+              </li>
             ))}
-          </div>
-
-          <Button className="bg-white text-black hover:bg-slate-200 transition-colors rounded-lg font-semibold px-8 h-12 flex items-center justify-center gap-2 group">
-            See the Dashboard
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Button>
+          </ul>
         </div>
 
-        {/* Bento Grid Features Showcase */}
-        <div className="flex-1 w-full grid grid-cols-2 gap-4">
-          
-          {/* Top Wide Card: Payments */}
-          <div className="col-span-2 bg-slate-900 border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full"></div>
-            <div className="flex items-center justify-between mx-2 mb-6 relative z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                  <CreditCard className="w-5 h-5 text-slate-300" />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold text-sm">Automated Billing</h3>
-                  <p className="text-slate-500 text-xs">Zero dropped payments</p>
-                </div>
-              </div>
+        {/* Right: QR visual */}
+        <div className="relative rounded-xl border border-white/[0.08] bg-white/[0.02] aspect-square flex items-center justify-center overflow-hidden">
+          {/* Animated scan line — uses .qr-scan-line class defined above */}
+          <div
+            className="qr-scan-line absolute left-[15%] right-[15%] h-[1px] bg-[#c6ff00] z-10"
+            style={{ boxShadow: "0 0 12px #c6ff00, 0 0 24px #c6ff00aa" }}
+          />
+
+          {/* QR Code SVG */}
+          <svg viewBox="0 0 200 200" className="w-48 h-48 opacity-70" fill="none">
+            {/* Top-left finder pattern */}
+            <rect x="10" y="10" width="50" height="50" rx="4" stroke="#c6ff00" strokeWidth="4"/>
+            <rect x="20" y="20" width="30" height="30" rx="2" fill="#c6ff00" fillOpacity=".25"/>
+            <rect x="25" y="25" width="20" height="20" rx="1" fill="#c6ff00" fillOpacity=".5"/>
+            {/* Top-right finder pattern */}
+            <rect x="140" y="10" width="50" height="50" rx="4" stroke="#c6ff00" strokeWidth="4"/>
+            <rect x="150" y="20" width="30" height="30" rx="2" fill="#c6ff00" fillOpacity=".25"/>
+            <rect x="155" y="25" width="20" height="20" rx="1" fill="#c6ff00" fillOpacity=".5"/>
+            {/* Bottom-left finder pattern */}
+            <rect x="10" y="140" width="50" height="50" rx="4" stroke="#c6ff00" strokeWidth="4"/>
+            <rect x="20" y="150" width="30" height="30" rx="2" fill="#c6ff00" fillOpacity=".25"/>
+            <rect x="25" y="155" width="20" height="20" rx="1" fill="#c6ff00" fillOpacity=".5"/>
+            {/* Centre data module */}
+            <rect x="75" y="75" width="50" height="50" rx="3" fill="#c6ff00" fillOpacity=".1" stroke="#c6ff00" strokeWidth="2" strokeOpacity=".3"/>
+            <rect x="85" y="85" width="30" height="30" rx="2" fill="#c6ff00" fillOpacity=".3"/>
+            {/* Static data modules */}
+            {dataModules.map((m, i) => (
+              <rect key={i} x={m.x} y={m.y} width="8" height="8" rx="1" fill="#c6ff00" fillOpacity=".2"/>
+            ))}
+          </svg>
+
+          {/* Verified member badge */}
+          <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between bg-black/60 border border-white/[0.08] rounded-lg px-4 py-3 backdrop-blur-sm">
+            <div>
+              <div className="text-[12px] font-semibold text-white">Ahmed Raza Khan</div>
+              <div className="text-[11px] text-white/40">Premium Yearly · Active</div>
             </div>
-            {/* Live Payment Feed Illusion */}
-            <div className="space-y-3 relative z-10">
-              {[
-                { name: "Sarah J.", plan: "Pro Membership", amount: "$45.00" },
-                { name: "Mike T.", plan: "Elite Athlete", amount: "$80.00" },
-              ].map((payment, i) => (
-                <div key={i} className="flex items-center justify-between bg-white/5 backdrop-blur-md border border-white/5 rounded-xl p-3 pr-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(190,255,0,0.8)]"></div>
-                    </div>
-                    <div>
-                      <div className="text-white text-sm font-medium">{payment.name}</div>
-                      <div className="text-slate-500 text-xs">{payment.plan}</div>
-                    </div>
-                  </div>
-                  <div className="text-primary font-mono text-sm font-semibold">{payment.amount}</div>
-                </div>
-              ))}
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-[#c6ff00] animate-pulse" />
+              <span className="text-[11px] text-[#c6ff00] font-semibold">VERIFIED</span>
             </div>
           </div>
-
-          {/* Bottom Left Card: Smart Access */}
-          <div className="col-span-1 bg-slate-900 border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500 flex flex-col justify-between aspect-square">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-50"></div>
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 mb-auto relative z-10 text-blue-400">
-              <Activity className="w-5 h-5" />
-            </div>
-            <div className="relative z-10 mt-6">
-              <h3 className="text-white font-semibold text-lg leading-tight mb-1">Smart <br/> Access</h3>
-              <p className="text-slate-500 text-xs">QR & RFID Integration</p>
-            </div>
-            
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-blue-500/20 rounded-full blur-[30px]"></div>
-          </div>
-
-          {/* Bottom Right Card: Analytics */}
-          <div className="col-span-1 bg-gradient-to-br from-primary/10 to-slate-900 border border-primary/20 rounded-2xl p-6 relative overflow-hidden shadow-[0_0_30px_rgba(190,255,0,0.05)] group hover:-translate-y-1 transition-transform duration-500 flex flex-col justify-between aspect-square">
-            <div className="flex justify-between items-start relative z-10">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/30 text-primary">
-                <TrendingUp className="w-5 h-5" />
-              </div>
-              <div className="bg-primary/20 text-primary text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                +18%
-              </div>
-            </div>
-            
-            <div className="relative z-10 mt-6 box-border">
-              <div className="text-3xl font-bold text-white mb-1">94%</div>
-              <div className="text-slate-400 text-xs font-medium">Retention Rate</div>
-            </div>
-
-            {/* Mini Chart Lines */}
-            <div className="absolute bottom-4 right-4 flex items-end gap-1 opacity-60">
-               {[30, 50, 40, 70, 60, 100].map((h, i) => (
-                 <div key={i} className="w-1.5 bg-primary rounded-t-sm" style={{ height: `${h / 3}px` }}></div>
-               ))}
-            </div>
-          </div>
-
         </div>
       </div>
     </section>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GymFlow — The all-in-one gym management platform. Memberships, QR attendance, billing, POS, and workout tracking.">
+  <title>GymFlow — Gym Management, Simplified.</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <div class="container">
+    <a href="#" class="nav-logo">⚡ GYM<span>FLOW</span></a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#testimonials">Testimonials</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/login" class="btn btn-ghost">Sign in</a>
+      <a href="/signup" class="btn btn-primary">Get started</a>
+    </div>
+    <button class="nav-hamburger" onclick="document.querySelector('.nav-links').classList.toggle('show')">☰</button>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="container">
+    <div class="fade-up">
+      <span class="badge hero-badge">Now available for gyms in Pakistan</span>
+      <h1>Stop losing money.<br>Start <em>managing</em> your gym.</h1>
+      <p>Memberships, QR attendance, billing, point-of-sale, and workout tracking. All in one platform. Built for gym owners who want to grow.</p>
+      <div class="hero-actions">
+        <a href="/signup" class="btn btn-primary btn-lg">Start free trial →</a>
+        <a href="#how-it-works" class="btn btn-ghost btn-lg">See how it works</a>
+      </div>
+    </div>
+    <div class="hero-mockup fade-up">
+      <div class="hero-mockup-bar">
+        <div class="hero-mockup-dot"></div>
+        <div class="hero-mockup-dot"></div>
+        <div class="hero-mockup-dot"></div>
+      </div>
+      <div class="hero-mockup-body">
+        <span>[ Dashboard screenshot — replace this placeholder ]</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOCIAL PROOF STATS ── -->
+<section class="stats-bar">
+  <div class="container">
+    <div class="stats-grid fade-up">
+      <div><div class="stat-value">12,400+</div><div class="stat-label">Members managed</div></div>
+      <div><div class="stat-value">86,000+</div><div class="stat-label">Check-ins recorded</div></div>
+      <div><div class="stat-value">Rs 4.2M+</div><div class="stat-label">Revenue processed</div></div>
+      <div><div class="stat-value">99.9%</div><div class="stat-label">Uptime guarantee</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROBLEMS ── -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <div class="section-label">The problem</div>
+      <h2 class="section-title">Running a gym without software is painful</h2>
+      <p class="section-sub" style="margin:0 auto">Most gym owners still use spreadsheets, notebooks, and WhatsApp groups. It costs them money every single day.</p>
+    </div>
+    <div class="problems-grid">
+      <div class="card problem-card fade-up">
+        <div class="problem-icon">💸</div>
+        <h3>Members skip payments</h3>
+        <p>Without automated tracking, expired members keep using the gym. You lose thousands every month without even knowing.</p>
+      </div>
+      <div class="card problem-card fade-up">
+        <div class="problem-icon">📋</div>
+        <h3>Everything is manual</h3>
+        <p>Attendance in a register. Billing in Excel. Trainer schedules on WhatsApp. One mistake and your whole day is wasted.</p>
+      </div>
+      <div class="card problem-card fade-up">
+        <div class="problem-icon">📊</div>
+        <h3>Zero visibility into your business</h3>
+        <p>You cannot see which plan sells best, when members drop off, or how much revenue you actually made this month.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOLUTION (QR) ── -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="split">
+      <div class="split-text fade-up">
+        <div class="section-label">The solution</div>
+        <h2 class="section-title">Know exactly who walks in — instantly</h2>
+        <p class="section-sub">Every member gets a unique QR code. Your receptionist scans it. The system instantly checks their subscription and logs attendance. No guessing. No arguments.</p>
+        <ul>
+          <li>Verify membership status in under 1 second</li>
+          <li>Automatically block expired members</li>
+          <li>See peak hours and attendance trends</li>
+          <li>Prevent QR sharing with daily check-in limits</li>
+        </ul>
+      </div>
+      <div class="qr-visual fade-up">
+        <div class="qr-scan-line"></div>
+        <svg viewBox="0 0 160 160" fill="none"><rect x="8" y="8" width="40" height="40" rx="4" stroke="#c6ff00" stroke-width="3"/><rect x="16" y="16" width="24" height="24" rx="2" fill="#c6ff00" opacity=".3"/><rect x="112" y="8" width="40" height="40" rx="4" stroke="#c6ff00" stroke-width="3"/><rect x="120" y="16" width="24" height="24" rx="2" fill="#c6ff00" opacity=".3"/><rect x="8" y="112" width="40" height="40" rx="4" stroke="#c6ff00" stroke-width="3"/><rect x="16" y="120" width="24" height="24" rx="2" fill="#c6ff00" opacity=".3"/><rect x="56" y="56" width="48" height="48" rx="4" fill="#c6ff00" opacity=".15" stroke="#c6ff00" stroke-width="2"/><rect x="68" y="68" width="24" height="24" rx="2" fill="#c6ff00" opacity=".4"/><rect x="60" y="8" width="8" height="8" rx="1" fill="#333"/><rect x="76" y="8" width="8" height="8" rx="1" fill="#333"/><rect x="92" y="8" width="8" height="8" rx="1" fill="#333"/><rect x="60" y="24" width="8" height="8" rx="1" fill="#333"/><rect x="92" y="24" width="8" height="8" rx="1" fill="#333"/><rect x="8" y="60" width="8" height="8" rx="1" fill="#333"/><rect x="8" y="76" width="8" height="8" rx="1" fill="#333"/><rect x="8" y="92" width="8" height="8" rx="1" fill="#333"/><rect x="144" y="60" width="8" height="8" rx="1" fill="#333"/><rect x="144" y="76" width="8" height="8" rx="1" fill="#333"/><rect x="112" y="120" width="8" height="8" rx="1" fill="#333"/><rect x="128" y="112" width="8" height="8" rx="1" fill="#333"/><rect x="144" y="128" width="8" height="8" rx="1" fill="#333"/><rect x="112" y="144" width="8" height="8" rx="1" fill="#333"/><rect x="128" y="144" width="8" height="8" rx="1" fill="#333"/><rect x="144" y="144" width="8" height="8" rx="1" fill="#333"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything your gym needs. Nothing it doesn't.</h2>
+      <p class="section-sub" style="margin:0 auto">Six powerful modules working together so you can focus on your members, not your paperwork.</p>
+    </div>
+    <div class="features-grid">
+      <div class="card feature-card fade-up"><div class="feature-icon">👥</div><h3>Member Management</h3><p>Full profiles with photos, plans, trainers, and QR codes. Search, filter, and export member data in seconds.</p></div>
+      <div class="card feature-card fade-up"><div class="feature-icon">💳</div><h3>Billing & Payments</h3><p>Track every rupee. Cash, card, or bank transfer. Auto-generate receipts and see revenue breakdowns by plan type.</p></div>
+      <div class="card feature-card fade-up"><div class="feature-icon">📱</div><h3>QR Attendance</h3><p>Scan and verify in under a second. Block expired members automatically. View daily, weekly, and monthly trends.</p></div>
+      <div class="card feature-card fade-up"><div class="feature-icon">🛒</div><h3>Point of Sale</h3><p>Sell supplements, drinks, and gear from the front desk. Track inventory, log sales, and separate product revenue from subscriptions.</p></div>
+      <div class="card feature-card fade-up"><div class="feature-icon">🏋️</div><h3>Workout Tracking</h3><p>Trainers build plans. Members log sets and reps on their phones. Track progress over weeks and months with visual charts.</p></div>
+      <div class="card feature-card fade-up"><div class="feature-icon">📊</div><h3>Reports & Analytics</h3><p>Revenue trends, member growth, attendance peaks, churn rates. Export PDF reports for any date range you need.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── POS DEMO ── -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="split">
+      <div class="split-text fade-up">
+        <div class="section-label">Point of Sale</div>
+        <h2 class="section-title">Sell from the front desk in two taps</h2>
+        <p class="section-sub">Your receptionist can ring up a protein shake or a gym t-shirt without leaving the dashboard. Every sale is tracked separately from membership revenue, so your books always add up.</p>
+        <ul>
+          <li>Add products with photos, prices, and stock levels</li>
+          <li>Ring up sales instantly from the counter</li>
+          <li>Track daily product revenue separately</li>
+          <li>Low-stock alerts so you never run out</li>
+        </ul>
+      </div>
+      <div class="pos-mockup fade-up">
+        <div class="pos-header"><h4>🛒 Quick Sale</h4><span class="badge">Live</span></div>
+        <div class="pos-items">
+          <div class="pos-item"><span class="pos-item-name">🥤 Whey Protein Shake <span class="pos-item-qty">x2</span></span><span>Rs 600</span></div>
+          <div class="pos-item"><span class="pos-item-name">💧 Water Bottle <span class="pos-item-qty">x1</span></span><span>Rs 50</span></div>
+          <div class="pos-item"><span class="pos-item-name">👕 Gym T-Shirt (L) <span class="pos-item-qty">x1</span></span><span>Rs 1,200</span></div>
+        </div>
+        <div class="pos-total"><span>Total</span><span>Rs 1,850</span></div>
+        <button class="pos-btn">Charge Rs 1,850 →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">Up and running in under 10 minutes</h2>
+      <p class="section-sub" style="margin:0 auto">No installation. No training needed. Just sign up and start managing.</p>
+    </div>
+    <div class="steps">
+      <div class="step fade-up"><div class="step-number">1</div><h3>Create your gym</h3><p>Sign up, enter your gym name and location. Your dashboard is ready in 30 seconds.</p></div>
+      <div class="step fade-up"><div class="step-number">2</div><h3>Add your members</h3><p>Import existing members or add them one by one. Each member gets a unique QR code automatically.</p></div>
+      <div class="step fade-up"><div class="step-number">3</div><h3>Set up your plans</h3><p>Create monthly, quarterly, or annual plans with custom pricing. Assign plans to members with one click.</p></div>
+      <div class="step fade-up"><div class="step-number">4</div><h3>Go live</h3><p>Start scanning QR codes at the door. Track payments. Sell products. Watch your reports fill up in real time.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ROLES ── -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <div class="section-label">Built for every role</div>
+      <h2 class="section-title">One platform. Five different experiences.</h2>
+      <p class="section-sub" style="margin:0 auto">Every person in your gym sees exactly what they need. Nothing more, nothing less.</p>
+    </div>
+    <div class="roles-grid">
+      <div class="card role-card fade-up"><div class="role-icon">👑</div><h3>Owner</h3><p>Full control. Revenue reports, staff management, settings, and billing — all in one view.</p></div>
+      <div class="card role-card fade-up"><div class="role-icon">📋</div><h3>Manager</h3><p>Day-to-day operations. Add members, process payments, and handle subscriptions.</p></div>
+      <div class="card role-card fade-up"><div class="role-icon">🖥️</div><h3>Receptionist</h3><p>Front desk focus. Scan QR codes, sell products, and check member status instantly.</p></div>
+      <div class="card role-card fade-up"><div class="role-icon">💪</div><h3>Trainer</h3><p>Build workout plans, manage bookings, and track client progress over time.</p></div>
+      <div class="card role-card fade-up"><div class="role-icon">🏃</div><h3>Member</h3><p>Personal portal. View plans, log workouts, and track attendance history.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ── -->
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Simple pricing. No hidden fees.</h2>
+      <p class="section-sub" style="margin:0 auto">Start small. Upgrade when you grow. Cancel anytime.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="card pricing-card fade-up">
+        <div class="pricing-name">Starter</div>
+        <div class="pricing-price">Rs 3,000 <span>/month</span></div>
+        <div class="pricing-desc">For small gyms just getting started.</div>
+        <ul class="pricing-features">
+          <li>Up to 100 members</li><li>Manual attendance</li><li>Basic billing</li><li>1 staff account</li><li>Email support</li>
+        </ul>
+        <a href="/signup" class="btn btn-ghost" style="width:100%;justify-content:center">Get started</a>
+      </div>
+      <div class="card pricing-card featured fade-up">
+        <div class="pricing-name">Professional</div>
+        <div class="pricing-price">Rs 6,000 <span>/month</span></div>
+        <div class="pricing-desc">For growing gyms that need more power.</div>
+        <ul class="pricing-features">
+          <li>Unlimited members</li><li>QR code attendance</li><li>Full billing & invoicing</li><li>POS & inventory</li><li>Trainer module</li><li>Analytics dashboard</li><li>Up to 10 staff accounts</li>
+        </ul>
+        <a href="/signup" class="btn btn-primary" style="width:100%;justify-content:center">Start free trial →</a>
+      </div>
+      <div class="card pricing-card fade-up">
+        <div class="pricing-name">Enterprise</div>
+        <div class="pricing-price">Rs 10,000 <span>/month</span></div>
+        <div class="pricing-desc">For multi-branch chains and franchises.</div>
+        <ul class="pricing-features">
+          <li>Everything in Professional</li><li>Up to 10 branches</li><li>50 staff accounts</li><li>Workout planner</li><li>Audit logs</li><li>Priority support</li><li>Custom branding</li>
+        </ul>
+        <a href="/signup" class="btn btn-ghost" style="width:100%;justify-content:center">Contact sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="section" id="testimonials">
+  <div class="container">
+    <div class="fade-up" style="text-align:center">
+      <div class="section-label">Testimonials</div>
+      <h2 class="section-title">Trusted by gym owners across Pakistan</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="card testimonial-card fade-up">
+        <blockquote>"We used to lose at least 15-20 members every month who were training with expired plans. GymFlow stopped that on day one. Our revenue went up 22% in the first month."</blockquote>
+        <div class="testimonial-author"><div class="testimonial-avatar">A</div><div><div class="testimonial-name">Ahmed Raza Khan</div><div class="testimonial-role">Owner, Iron Forge Gym — Karachi</div></div></div>
+      </div>
+      <div class="card testimonial-card fade-up">
+        <blockquote>"My receptionist used to spend 20 minutes every morning checking the register. Now she just scans QR codes. The whole check-in process takes 2 seconds. I wish I had this 5 years ago."</blockquote>
+        <div class="testimonial-author"><div class="testimonial-avatar">S</div><div><div class="testimonial-name">Sadia Malik</div><div class="testimonial-role">Manager, FitZone — Lahore</div></div></div>
+      </div>
+      <div class="card testimonial-card fade-up">
+        <blockquote>"The POS module alone saved us. We were tracking supplement sales in a notebook. Now everything is digital, and I can see exactly how much product revenue we make each week."</blockquote>
+        <div class="testimonial-author"><div class="testimonial-avatar">H</div><div><div class="testimonial-name">Hamza Sheikh</div><div class="testimonial-role">Owner, Titan Strength — Islamabad</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FINAL CTA ── -->
+<section class="section">
+  <div class="container">
+    <div class="cta-box fade-up">
+      <h2>Ready to take control of your gym?</h2>
+      <p>Join hundreds of gym owners who switched to GymFlow and never looked back.</p>
+      <div class="cta-actions">
+        <a href="/signup" class="btn btn-primary btn-lg">Start your free trial →</a>
+        <a href="https://wa.me/923149784156" class="btn btn-ghost btn-lg">Talk to us on WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">⚡ GYM<span style="color:#c6ff00">FLOW</span></div>
+        <p>The all-in-one gym management platform. Built for gym owners who want to grow their business, not their paperwork.</p>
+      </div>
+      <div class="footer-col"><h4>Product</h4><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#how-it-works">How it works</a><a href="#">Changelog</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Contact</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Refund Policy</a></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 GymFlow. All rights reserved.</span>
+      <span>Made in Pakistan 🇵🇰</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Simple fade-up on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

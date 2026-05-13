@@ -6,7 +6,7 @@ import { useMemo, useState } from "react"
 import { formatCurrency } from "@/lib/utils/file-utils"
 import { ChartSkeleton, ChartCardSkeleton } from "@/components/ui/skeleton-components"
 import { DateRange } from "react-day-picker"
-import { isWithinInterval, startOfDay, endOfDay, eachDayOfInterval, format } from "date-fns"
+import { isWithinInterval, startOfDay, endOfDay, eachDayOfInterval, format, subDays, differenceInDays } from "date-fns"
 import { cn } from "@/lib/utils"
 
 export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, dateRange?: DateRange }) {
@@ -17,7 +17,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
 
   const data = useMemo<{ name: string; value: number; date?: Date }[]>(() => {
     if (dateRange?.from && dateRange?.to) {
-      // Pre-group payments by date for O(1) lookup
+
       const paymentsByDate = new Map<string, number>()
       store.payments.forEach(p => {
         const dateStr = format(new Date(p.date), "yyyy-MM-dd")
@@ -25,7 +25,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
       })
 
       const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to })
-        .filter(day => day.getDay() !== 0) // Remove Sundays
+        .filter(day => day.getDay() !== 0)
 
       return days.map(day => {
         const dateStr = format(day, "yyyy-MM-dd")
@@ -94,8 +94,8 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
             }
 
             return (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="flex-1 flex flex-col items-center h-full justify-end group relative px-1 cursor-pointer"
                 onClick={() => setActiveIndex(activeIndex === i ? null : i)}
               >
@@ -385,15 +385,20 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
       })
     }
 
-    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    const days = []
     const counts = new Array(7).fill(0)
-    const now = new Date()
+    const now = startOfDay(new Date())
+
+    // Generate labels for last 7 days
+    for (let i = 6; i >= 0; i--) {
+      days.push(format(subDays(now, i), "EEE"))
+    }
+
     store.attendance.forEach(att => {
-      const date = new Date(att.date)
-      const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+      const date = startOfDay(new Date(att.date))
+      const diff = differenceInDays(now, date)
       if (diff >= 0 && diff < 7) {
-        const dayIndex = (6 - diff)
-        if (dayIndex >= 0) counts[dayIndex] += 1
+        counts[6 - diff] += 1
       }
     })
 
@@ -443,8 +448,8 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
             }
 
             return (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="flex-1 flex flex-col items-center h-full justify-end group relative px-1 cursor-pointer"
                 onClick={() => setActiveIndex(activeIndex === i ? null : i)}
               >

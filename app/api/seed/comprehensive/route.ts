@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import bcrypt from "bcryptjs";
-import fs from "fs";
 import Gym from "@/models/Gym";
 import User from "@/models/User";
 import Member from "@/models/Member";
@@ -25,6 +24,13 @@ import SubscriptionPlan from "@/models/SubscriptionPlan";
 import Attendance from "@/models/Attendance";
 import AuditLog from "@/models/AuditLog";
 import PlatformPayment from "@/models/PlatformPayment";
+import Product from "@/models/Product";
+import ProductCategory from "@/models/ProductCategory";
+import ProductBrand from "@/models/ProductBrand";
+import InventoryLog from "@/models/InventoryLog";
+import ApiKey from "@/models/ApiKey";
+import Asset from "@/models/Asset";
+import AssetFolder from "@/models/AssetFolder";
 import { ROLE_PERMISSIONS, ALL_PERMISSIONS } from "@/lib/permissions";
 
 function getRandomDate(monthsBack = 5, monthsForward = 3): Date {
@@ -67,10 +73,12 @@ export async function POST(req: Request) {
 
         console.log("Cleaning database...");
         const models = [
-            Gym, User, Member, Plan, Subscription, TrainerAvailability, TrainerSlot, 
-            TrainerBooking, TrainerSessionLog, Payment, Exercise, WorkoutPlan, 
-            AssignedWorkoutPlan, WorkoutLog, WorkoutTemplate, Role, GymSettings, 
-            PlatformSettings, PlatformPlan, SubscriptionPlan, Attendance, AuditLog, PlatformPayment
+            Gym, User, Member, Plan, Subscription, TrainerAvailability, TrainerSlot,
+            TrainerBooking, TrainerSessionLog, Payment, Exercise, WorkoutPlan,
+            AssignedWorkoutPlan, WorkoutLog, WorkoutTemplate, Role, GymSettings,
+            PlatformSettings, PlatformPlan, SubscriptionPlan, Attendance, AuditLog,
+            PlatformPayment, Product, ProductCategory, ProductBrand, InventoryLog,
+            ApiKey, Asset, AssetFolder
         ];
         await Promise.all(models.map(m => m.deleteMany({})));
 
@@ -89,14 +97,19 @@ export async function POST(req: Request) {
             const gymName = gymNames[i];
             const gym = await Gym.create({
                 name: gymName,
-                address: `Karachi, Pakistan - Area ${i+1}`,
+                address: `Karachi, Pakistan - Area ${i + 1}`,
                 phone: getRandomPhone(),
                 isActive: true,
-                branches: [{ name: "Main", address: `Karachi, Pakistan - Area ${i+1}`, phone: getRandomPhone(), email: `main@${gymName.toLowerCase().replace(/\s/g, "")}.com`, isDefault: true }]
+                branches: [{ name: "Main", address: `Karachi, Pakistan - Area ${i + 1}`, phone: getRandomPhone(), email: `main@${gymName.toLowerCase().replace(/\s/g, "")}.com`, isDefault: true }]
             });
 
             await GymSettings.create({ gymId: gym._id, general: { name: gymName, address: gym.address } });
-            await SubscriptionPlan.create({ gymId: gym._id, tierName: "Professional", active: true, enabledFeatures: ["members", "manualAttendance", "qrAttendance", "workout_plans"] });
+            await SubscriptionPlan.create({
+                gymId: gym._id,
+                tierName: "Enterprise",
+                active: true,
+                enabledFeatures: ["members", "manualAttendance", "qrAttendance", "workout_plans", "selling", "commerce", "analytics", "auditLogs"]
+            });
 
             const rolesMap: Record<string, any> = {};
             const rolesToCreate = [
@@ -132,29 +145,114 @@ export async function POST(req: Request) {
             });
 
             const plans = await Plan.insertMany([
-                { id: "monthly-30", gymId: gym._id, name: "Monthly", price: 3000, duration: 30 }
+                { id: `monthly-${gym._id.toString().slice(-4)}`, gymId: gym._id, name: "Monthly Standard", price: 3000, duration: 30 },
+                { id: `quarterly-${gym._id.toString().slice(-4)}`, gymId: gym._id, name: "Quarterly Pro", price: 8000, duration: 90 },
+                { id: `yearly-${gym._id.toString().slice(-4)}`, gymId: gym._id, name: "Yearly Elite", price: 25000, duration: 365 }
             ]);
 
-            const createdMembers = await Member.insertMany([
-                { firstName: "Ali", lastName: "Khan", email: `ali@${gymName.toLowerCase().replace(/\s/g, "")}.com`, phone: getRandomPhone(), gymId: gym._id, joinDate: getRandomDate().toISOString(), trainerId: createdTrainers[0]._id, planId: plans[0].id, status: "active" }
+            const memberData = [];
+            for (let m = 0; m < 50; m++) {
+                const name = getRandomName();
+                const joinDate = getRandomDate(6, 0);
+                memberData.push({
+                    firstName: name.first,
+                    lastName: name.last,
+                    email: `${name.first.toLowerCase()}.${name.last.toLowerCase()}.${m}@${gymName.toLowerCase().replace(/\s/g, "")}.com`,
+                    phone: getRandomPhone(),
+                    gymId: gym._id,
+                    joinDate: joinDate.toISOString(),
+                    trainerId: createdTrainers[m % 2]._id,
+                    planId: plans[m % 3].id,
+                    status: Math.random() > 0.1 ? "active" : "expired"
+                });
+            }
+            const createdMembers = await Member.insertMany(memberData);
+
+            // Seed Commerce Data
+            const categories = await ProductCategory.insertMany([
+                { gymId: gym._id, name: "Supplements", slug: "supplements", description: "High-quality protein and vitamins" },
+                { gymId: gym._id, name: "Gear", slug: "gear", description: "Gym belts, straps, and gloves" },
+                { gymId: gym._id, name: "Apparel", slug: "apparel", description: "Comfortable workout clothing" }
             ]);
+
+            const brands = await ProductBrand.insertMany([
+                { gymId: gym._id, name: "Optimum Nutrition", slug: "optimum-nutrition" },
+                { gymId: gym._id, name: "MyProtein", slug: "myprotein" },
+                { gymId: gym._id, name: "Nike", slug: "nike" }
+            ]);
+
+            const productsData = [
+                { name: "Whey Protein 1kg", categoryId: categories[0]._id, brandId: brands[0]._id, price: 8500, costPrice: 6000, stockQuantity: 15, slug: "whey-protein-1kg" },
+                { name: "Pre-Workout 300g", categoryId: categories[0]._id, brandId: brands[1]._id, price: 4500, costPrice: 3000, stockQuantity: 20, slug: "pre-workout-300g" },
+                { name: "Gym Belt Pro", categoryId: categories[1]._id, brandId: brands[2]._id, price: 3500, costPrice: 1500, stockQuantity: 8, slug: "gym-belt-pro" },
+                { name: "Training T-Shirt", categoryId: categories[2]._id, brandId: brands[2]._id, price: 2000, costPrice: 800, stockQuantity: 25, slug: "training-tshirt" }
+            ];
+
+            const createdProducts = [];
+            for (const p of productsData) {
+                const product = await Product.create({
+                    ...p,
+                    gymId: gym._id,
+                    status: "active",
+                    visibility: "public",
+                    trackInventory: true,
+                    images: [{ url: `https://placehold.co/400x400?text=${p.name}`, publicId: `seed-${p.slug}`, alt: p.name }]
+                });
+                createdProducts.push(product);
+
+                await InventoryLog.create({
+                    gymId: gym._id,
+                    productId: product._id,
+                    type: "in",
+                    quantity: p.stockQuantity,
+                    reason: "Initial Stocking",
+                    performedBy: owner._id
+                });
+            }
 
             for (const member of createdMembers) {
-                const subDate = getRandomDate();
-                await Subscription.create({ 
-                    memberId: member._id.toString(), planId: member.planId, 
-                    startDate: subDate.toISOString(), endDate: new Date(subDate.getTime() + 30*24*60*60*1000).toISOString(), 
-                    status: "active", gymId: gym._id 
+                const subDate = new Date(member.joinDate);
+                const plan = plans.find(p => p.id === member.planId);
+                const subPrice = plan?.price || 3000;
+                const subDuration = plan?.duration || 30;
+
+                await Subscription.create({
+                    memberId: member._id.toString(), planId: member.planId,
+                    startDate: subDate.toISOString(), endDate: new Date(subDate.getTime() + subDuration * 24 * 60 * 60 * 1000).toISOString(),
+                    status: member.status === "active" ? "active" : "expired", gymId: gym._id
                 });
-                await Payment.create({ memberId: member._id, amount: 3000, date: getRandomDate(), method: "cash", gymId: gym._id, collectedBy: owner._id });
-                
-                for (let a = 0; a < 5; a++) {
-                    const attDate = getRandomDate();
+
+                // Multiple payments for some members
+                const numPayments = Math.floor(Math.random() * 3) + 1;
+                for (let p = 0; p < numPayments; p++) {
+                    const payDate = new Date(subDate);
+                    payDate.setMonth(subDate.getMonth() - p);
+                    await Payment.create({
+                        memberId: member._id,
+                        amount: subPrice,
+                        date: payDate,
+                        method: Math.random() > 0.3 ? "cash" : "bank_transfer",
+                        gymId: gym._id,
+                        collectedBy: owner._id
+                    });
+                }
+
+                // Attendance density
+                const numAttendance = Math.floor(Math.random() * 15) + 5;
+                for (let a = 0; a < numAttendance; a++) {
+                    const attDate = getRandomDate(3, 0);
                     await Attendance.create({ gymId: gym._id, memberId: member._id, date: attDate, checkInTime: attDate, status: "present" });
                 }
 
-                const assignedPlan = await AssignedWorkoutPlan.create({ gymId: gym._id, memberId: member._id, trainerId: createdTrainers[0]._id, templateId: template._id, startDate: getRandomDate(), status: "active" });
-                await WorkoutLog.create({ gymId: gym._id, memberId: member._id, trainerId: createdTrainers[0]._id, planId: assignedPlan._id, date: getRandomDate(), exercises: [{ exerciseId: exercises[0]._id, setsCompleted: 3, repsCompleted: "10", weightUsed: 40 }] });
+                // Assigned workouts for 30% of members
+                if (Math.random() > 0.7) {
+                    const assignedPlan = await AssignedWorkoutPlan.create({ gymId: gym._id, memberId: member._id, trainerId: createdTrainers[0]._id, templateId: template._id, startDate: getRandomDate(), status: "active" });
+                    await WorkoutLog.create({ gymId: gym._id, memberId: member._id, trainerId: createdTrainers[0]._id, planId: assignedPlan._id, date: getRandomDate(), exercises: [{ exerciseId: exercises[0]._id, setsCompleted: 3, repsCompleted: "10", weightUsed: 40 }] });
+                }
+
+                if (gymCreds.members.length < 3) {
+                    gymCreds.members.push({ email: member.email, password: defaultPassword });
+                }
             }
 
             globalCredentials.push(gymCreds);

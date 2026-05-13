@@ -1,47 +1,94 @@
-import { ArrowRight, Database, Zap, Lock } from "lucide-react"
-import Image from "next/image"
+"use client"
+
+import { Check, ShoppingBag } from "lucide-react"
+import { useState } from "react"
+
+const posItems = [
+  { emoji: "🥤", name: "Whey Protein Shake", qty: 2, price: 600 },
+  { emoji: "💧", name: "Water Bottle", qty: 1, price: 50 },
+  { emoji: "👕", name: "Gym T-Shirt (L)", qty: 1, price: 1200 },
+]
+
+const checks = [
+  "Add products with photos, prices, and stock levels",
+  "Ring up sales in seconds from the front desk",
+  "Track product revenue separately from memberships",
+  "Low-stock alerts so you never run out",
+]
 
 export function ProductShowcase() {
-  return (
-    <section id="product" className="py-32 px-6 relative overflow-hidden">
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] pointer-events-none -ml-[400px]"></div>
+  const [charged, setCharged] = useState(false)
+  const total = posItems.reduce((sum, i) => sum + i.price * i.qty, 0)
 
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-20 relative z-10">
-        <div className="flex-1 w-full order-2 lg:order-1">
-          {/* Dashboard Image Mockup */}
-          <div className="relative w-full lg:w-[125%] xl:w-[135%] lg:-ml-[12%] xl:-ml-[25%] mx-auto lg:my-auto z-20">
-            {/* The main dashboard image with rotation and glow */}
-            <div className="relative">
-              <Image src="/assets/dashboard.png" alt="GymFlow Dashboard Mockup" className="w-full h-auto block object-cover relative z-10" width={1000} height={1000} />
-            </div>
-          </div>
+  return (
+    <section id="product" className="py-32 px-6 border-t border-white/[0.06]">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        {/* Left: text */}
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">Point of Sale</div>
+          <h2 className="text-3xl md:text-[44px] font-bold tracking-[-0.03em] text-white leading-[1.1] mb-5">
+            Sell from the front desk in two taps
+          </h2>
+          <p className="text-[15px] text-white/40 leading-relaxed mb-8">
+            Your receptionist can ring up a protein shake or a gym T-shirt without leaving the dashboard. Every sale is tracked separately from membership revenue so your books always add up.
+          </p>
+          <ul className="flex flex-col gap-3">
+            {checks.map((c, i) => (
+              <li key={i} className="flex items-center gap-3 text-[14px] text-white/60">
+                <div className="w-5 h-5 rounded-full border border-[#c6ff00]/30 bg-[#c6ff00]/[0.08] flex items-center justify-center shrink-0">
+                  <Check className="w-3 h-3 text-[#c6ff00]" strokeWidth={2.5} />
+                </div>
+                {c}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div className="flex-1 order-1 lg:order-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
-            ENTERPRISE SCALE
+        {/* Right: POS mockup */}
+        <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.06]">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4 text-white/40" />
+              <span className="text-[14px] font-semibold text-white">Quick Sale</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#c6ff00] animate-pulse" />
+              <span className="text-[11px] text-[#c6ff00] font-semibold uppercase tracking-wide">Live</span>
+            </div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
-            Engineered for <br /> peak performance.
-          </h2>
-          <p className="text-lg text-slate-400 leading-relaxed mb-8">
-            Behind the sleek interface is a relentless data processing engine. We ensure that
-            your financial records, member data, and critical operations are processed
-            instantly and securely.
-          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="p-5 border border-white/5 bg-white/5 rounded-xl">
-              <Zap className="w-6 h-6 text-primary mb-3" />
-              <div className="text-white font-semibold text-lg mb-1">Zero Latency</div>
-              <div className="text-slate-400 text-sm">Real-time sync across all your devices and branches.</div>
-            </div>
-            <div className="p-5 border border-white/5 bg-white/5 rounded-xl">
-              <Database className="w-6 h-6 text-blue-400 mb-3" />
-              <div className="text-white font-semibold text-lg mb-1">Infinite Scale</div>
-              <div className="text-slate-400 text-sm">Handles millions of attendance logs without breaking a sweat.</div>
-            </div>
+          {/* Items */}
+          <div className="flex flex-col gap-2 mb-4">
+            {posItems.map((item, i) => (
+              <div key={i} className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-base">{item.emoji}</span>
+                  <span className="text-[13px] text-white/70">{item.name}</span>
+                  <span className="text-[11px] text-white/30 bg-white/[0.04] border border-white/[0.06] rounded px-1.5 py-0.5">×{item.qty}</span>
+                </div>
+                <span className="text-[13px] text-white/60">Rs {(item.price * item.qty).toLocaleString()}</span>
+              </div>
+            ))}
           </div>
+
+          {/* Total */}
+          <div className="flex items-center justify-between py-3 border-t border-white/[0.06] mb-4">
+            <span className="text-[13px] text-white/40">Total</span>
+            <span className="text-[16px] font-bold text-[#c6ff00]">Rs {total.toLocaleString()}</span>
+          </div>
+
+          {/* Charge button */}
+          <button
+            onClick={() => { setCharged(true); setTimeout(() => setCharged(false), 2000) }}
+            className="w-full h-11 rounded-lg bg-[#c6ff00] text-black text-[14px] font-semibold hover:bg-[#d4ff33] transition-colors flex items-center justify-center gap-2"
+          >
+            {charged ? (
+              <><Check className="w-4 h-4" strokeWidth={2.5} /> Payment recorded</>
+            ) : (
+              <>Charge Rs {total.toLocaleString()} →</>
+            )}
+          </button>
         </div>
       </div>
     </section>

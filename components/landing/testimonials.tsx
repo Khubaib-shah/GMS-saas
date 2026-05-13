@@ -1,76 +1,61 @@
 "use client"
 
-import { Star, ChevronLeft, ChevronRight } from "lucide-react"
+import { Star } from "lucide-react"
 import useEmblaCarousel from "embla-carousel-react"
 import Autoplay from "embla-carousel-autoplay"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 const testimonials = [
   {
-    quote: "GymFlow completely transformed how we run our fitness studio. We went from chasing payments manually to having everything automated. Our revenue increased by 30% in just 3 months.",
-    name: "Ahmed Khan",
-    role: "Owner, Iron Body Fitness",
-    rating: 5,
-    highlight: "Revenue increased by 30%",
-    image: "/assets/testimonial/person1.jpg"
+    quote: "We used to lose 15–20 members every month who were training with expired plans. GymFlow stopped that on day one. Revenue went up 22% in the first month.",
+    name: "Ahmed Raza Khan",
+    role: "Owner, Iron Forge Gym — Karachi",
+    highlight: "+22% revenue in month one",
+    initial: "A",
   },
   {
-    quote: "The attendance tracking alone saved us hours every week. Our trainers love the mobile experience, and our members appreciate the self-service portal. It's a win-win.",
-    name: "Fatima Riaz",
-    role: "Manager, FitZone Studios",
-    rating: 5,
+    quote: "My receptionist used to spend 20 minutes every morning checking the register. Now she just scans QR codes. The whole check-in takes 2 seconds.",
+    name: "Sadia Malik",
+    role: "Manager, FitZone Studios — Lahore",
     highlight: "Hours saved every week",
-    image: "/assets/testimonial/person2.jpg"
+    initial: "S",
   },
   {
-    quote: "We manage 4 branches across the city, and GymFlow is the only tool that lets us see everything in one place. The multi-branch analytics are incredibly powerful.",
+    quote: "The POS module alone saved us. We were tracking supplement sales in a notebook. Now everything is digital and I can see exactly how much product revenue we make.",
+    name: "Hamza Sheikh",
+    role: "Owner, Titan Strength — Islamabad",
+    highlight: "Full product revenue visibility",
+    initial: "H",
+  },
+  {
+    quote: "We manage 3 branches and GymFlow is the only tool that lets us see everything in one place. The multi-branch reports are incredibly useful.",
     name: "Hassan Ali",
-    role: "CEO, PowerFit Chain",
-    rating: 5,
-    highlight: "4 branches, one dashboard",
-    image: "/assets/testimonial/person3.jpg"
+    role: "CEO, PowerFit Chain — Rawalpindi",
+    highlight: "3 branches, one dashboard",
+    initial: "H",
   },
   {
-    quote: "Switching from spreadsheets to GymFlow was the best decision we made. Member retention went up because we can now proactively reach out before subscriptions expire.",
+    quote: "Switching from spreadsheets to GymFlow was the best decision we made. Member retention improved because we now reach out before subscriptions expire.",
     name: "Sara Mahmood",
-    role: "Operations Lead, Zenith Gym",
-    rating: 5,
-    highlight: "Member retention improved",
-    image: "/assets/testimonial/person4.jpg"
+    role: "Operations Lead, Zenith Gym — Faisalabad",
+    highlight: "Better member retention",
+    initial: "S",
   },
   {
-    quote: "The role-based access is perfect. My receptionist only sees what she needs, trainers manage their clients, and I get the full financial picture. No more permission headaches.",
+    quote: "The role-based access is perfect. My receptionist only sees what she needs, trainers manage clients, and I get the full financial picture.",
     name: "Usman Tariq",
-    role: "Founder, Elite Training Center",
-    rating: 5,
-    highlight: "Perfect role management",
-    image: "/assets/testimonial/person5.jpg"
-  },
-  {
-    quote: "I was skeptical about SaaS tools, but the onboarding was seamless. The demo call answered all my questions, and we were fully running within a week.",
-    name: "Ayesha Nawaz",
-    role: "Owner, SheFit Studio",
-    rating: 5,
-    highlight: "Up and running in a week",
-    image: "/assets/testimonial/person6.jpg"
+    role: "Founder, Elite Training Center — Peshawar",
+    highlight: "Perfect permissions control",
+    initial: "U",
   },
 ]
 
 export function Testimonials() {
-  const autoplayPlugin = useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })
-  )
-
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: "start", slidesToScroll: 1 },
-    [autoplayPlugin.current]
-  )
-
+  const autoplay = useRef(Autoplay({ delay: 3500, stopOnInteraction: false, stopOnMouseEnter: true }))
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" }, [autoplay.current as any])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
-
-  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi])
-  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi])
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return
@@ -86,60 +71,50 @@ export function Testimonials() {
   }, [emblaApi, onSelect])
 
   return (
-    <section id="testimonials" className="py-28 px-6 bg-slate-950 relative overflow-hidden">
-      {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
-
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6 tracking-widest uppercase">
-            Testimonials
-          </div>
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-6">
-            Loved by gym owners <br className="hidden md:block" /> everywhere.
+    <section id="testimonials" className="py-32 px-6 border-t border-white/[0.06]">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="max-w-xl mb-16">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">Testimonials</div>
+          <h2 className="text-3xl md:text-[44px] font-bold tracking-[-0.03em] text-white leading-[1.1] mb-4">
+            Trusted by gym owners across Pakistan
           </h2>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Don&apos;t just take our word for it. Here&apos;s what our customers have to say about GymFlow.
+          <p className="text-[15px] text-white/40 leading-relaxed">
+            Real quotes from gym owners who switched to GymFlow.
           </p>
         </div>
 
         {/* Carousel */}
-        <div className="overflow-hidden px-1" ref={emblaRef}>
-          <div className="flex gap-8 -ml-1 py-6">
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex gap-4 py-2">
             {testimonials.map((t, i) => (
-
-              <div
-                key={i}
-                className={`${i === testimonials.length - 1 ? "mr-8" : ""} flex-[0_0_100%] min-w-0 sm:flex-[0_0_calc(50%-16px)] lg:flex-[0_0_calc(33.333%-22px)] pl-0`}
-              >
-                <div className="bg-slate-900/60 border border-white/5 rounded-2xl p-6 h-full flex flex-col hover:-translate-y-1 transition-transform duration-500">
+              <div key={i} className="flex-[0_0_100%] sm:flex-[0_0_calc(50%-8px)] lg:flex-[0_0_calc(33.333%-11px)] min-w-0">
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 flex flex-col gap-5 h-full hover:border-white/[0.10] transition-colors">
                   {/* Stars */}
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(t.rating)].map((_, j) => (
-                      <Star key={j} className="w-4 h-4 text-primary fill-primary" />
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} className="w-3.5 h-3.5 text-[#c6ff00] fill-[#c6ff00]" />
                     ))}
                   </div>
 
-                  {/* Highlight Badge */}
-                  <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-bold mb-4 tracking-wider uppercase w-fit">
+                  {/* Highlight */}
+                  <div className="inline-block text-[10px] font-semibold uppercase tracking-widest text-[#c6ff00] border border-[#c6ff00]/20 bg-[#c6ff00]/[0.06] rounded-full px-2.5 py-1 w-fit">
                     {t.highlight}
                   </div>
 
                   {/* Quote */}
-                  <p className="text-slate-300 text-sm leading-relaxed mb-6 flex-1">
+                  <p className="text-[13px] text-white/50 leading-relaxed flex-1">
                     &ldquo;{t.quote}&rdquo;
                   </p>
 
                   {/* Author */}
-                  <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-                    <img
-                      src={t.image}
-                      alt={t.name}
-                      className="w-10 h-10 rounded-full object-cover border border-white/10 shrink-0"
-                    />
+                  <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+                    <div className="w-8 h-8 rounded-full bg-[#c6ff00]/[0.08] border border-[#c6ff00]/[0.15] flex items-center justify-center text-[12px] font-bold text-[#c6ff00] shrink-0">
+                      {t.initial}
+                    </div>
                     <div>
-                      <div className="text-white font-semibold text-sm">{t.name}</div>
-                      <div className="text-slate-500 text-xs">{t.role}</div>
+                      <div className="text-[13px] font-semibold text-white">{t.name}</div>
+                      <div className="text-[11px] text-white/30">{t.role}</div>
                     </div>
                   </div>
                 </div>
@@ -148,37 +123,15 @@ export function Testimonials() {
           </div>
         </div>
 
-        {/* Navigation: Arrows + Dots */}
-        <div className="flex items-center justify-center gap-6 mt-10">
-          <button
-            onClick={scrollPrev}
-            className="w-10 h-10 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-slate-300 hover:bg-primary hover:text-black hover:border-primary transition-all duration-300"
-            aria-label="Previous testimonial"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          <div className="flex gap-2">
-            {scrollSnaps.map((_, i) => (
-              <button
-                key={i}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${i === selectedIndex
-                  ? "bg-primary w-6"
-                  : "bg-white/20 hover:bg-white/40"
-                  }`}
-                onClick={() => emblaApi && emblaApi.scrollTo(i)}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={scrollNext}
-            className="w-10 h-10 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-slate-300 hover:bg-primary hover:text-black hover:border-primary transition-all duration-300"
-            aria-label="Next testimonial"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+        {/* Dots */}
+        <div className="flex items-center justify-center gap-1.5 mt-8">
+          {scrollSnaps.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => emblaApi?.scrollTo(i)}
+              className={`h-1 rounded-full transition-all duration-300 ${i === selectedIndex ? "w-6 bg-[#c6ff00]" : "w-1.5 bg-white/20"}`}
+            />
+          ))}
         </div>
       </div>
     </section>

@@ -25,6 +25,7 @@ const GymSettingsSchema = new mongoose.Schema(
         modules: {
             trainersEnabled: { type: Boolean, default: true },
             attendanceEnabled: { type: Boolean, default: true },
+            sellingEnabled: { type: Boolean, default: false },
         },
         email: {
             host: { type: String, default: "smtp.gmail.com" },

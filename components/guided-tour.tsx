@@ -20,7 +20,7 @@ const dashboardSteps = [
                     <h3 className="font-black text-lg tracking-tight">Welcome to GymFlow!</h3>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                    This is your <strong>command center</strong> for managing everything about your gym. Let's take a quick tour to get you started!
+                    This is your <strong>dashboard</strong> for managing everything about your gym. Let's take a quick tour to get you started!
                 </p>
             </div>
         ),
