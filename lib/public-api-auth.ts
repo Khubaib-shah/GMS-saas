@@ -13,6 +13,8 @@ import { verifyApiKey } from "@/lib/api-key-utils";
  * Verifies X-Key-ID, X-API-Key, and X-API-Secret headers.
  */
 export async function validatePublicApiKey(req: Request) {
+    Gym.init();
+
     const keyId = req.headers.get("X-Key-ID");
     const providedKey = req.headers.get("X-API-Key");
     const providedSecret = req.headers.get("X-API-Secret");
@@ -65,8 +67,13 @@ export async function validatePublicApiKey(req: Request) {
 
         return { gymId: keyDoc.gymId, permissions: keyDoc.permissions };
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Public API Auth Error:", error);
-        return { error: NextResponse.json({ error: "Authentication failed" }, { status: 401 }) };
+        return { 
+            error: NextResponse.json({ 
+                error: "Authentication failed", 
+                details: error?.message || String(error) 
+            }, { status: 401 }) 
+        };
     }
 }

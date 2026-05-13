@@ -12,6 +12,12 @@ import User from "@/models/User";
  * Public headless API for external websites to fetch gym products.
  */
 export async function GET(req: Request) {
+    // Ensure models are registered in Mongoose and prevent Webpack tree-shaking
+    ProductCategory.init();
+    ProductBrand.init();
+    Gym.init();
+    User.init();
+
     // Authenticate external request
     const auth = await validatePublicApiKey(req);
     if ("error" in auth) return auth.error;
@@ -64,6 +70,10 @@ export async function GET(req: Request) {
         });
     } catch (error: any) {
         console.error("Store API Error:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ 
+            error: "Internal Server Error", 
+            details: error?.message || String(error),
+            stack: process.env.NODE_ENV === "development" ? error?.stack : undefined
+        }, { status: 500 });
     }
 }
