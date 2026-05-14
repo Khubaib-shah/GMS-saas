@@ -21,7 +21,6 @@ import {
 import { LogOut, User, Settings as SettingsIcon, ShieldCheck } from "lucide-react"
 
 export function Navbar() {
-  const { theme, setTheme } = useTheme()
   const router = useRouter()
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const { data: session } = useSession()

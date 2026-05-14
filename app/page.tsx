@@ -26,7 +26,7 @@ export default function LandingPage() {
   return (
     <div className="relative flex flex-col min-h-screen bg-transparent text-white selection:bg-primary selection:text-black font-sans overflow-clip">
       <PreLoader />
-      <GlobalAntigravity />
+      {/* <GlobalAntigravity /> */}
       <SmoothScroller />
       <Navbar />
       <main className="flex-1">

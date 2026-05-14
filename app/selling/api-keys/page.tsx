@@ -19,6 +19,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DashboardHeader } from "@/components/dashboard-header";
@@ -207,18 +214,20 @@ export default function ApiKeysManagement() {
                 )}
             </div>
 
-            {/* Secret Key Modal (Persistent Overlay) */}
-            {showKeyModal && newKeyData && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-                    <Card className="max-w-2xl w-full bg-slate-900 border-primary/30 p-6 md:p-8 space-y-6 md:space-y-8 animate-in zoom-in-95 duration-300 rounded-[24px] md:rounded-3xl">
+            {/* Secret Key Modal (Persistent Overlay via Portal) */}
+            <Dialog open={showKeyModal} onOpenChange={setShowKeyModal}>
+                <DialogContent className="max-w-2xl w-full glass-premium bg-card border-primary/30 p-6 md:p-8 space-y-6 md:space-y-8 rounded-[24px] md:rounded-3xl shadow-2xl">
+                    <DialogHeader>
                         <div className="flex items-center gap-3 md:gap-4 text-primary">
                             <ShieldCheck className="w-8 h-8 md:w-10 md:h-10 shrink-0" />
-                            <div>
-                                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tighter">Secure API Credentials</h2>
-                                <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Save these credentials now. They will not be shown again.</p>
+                            <div className="text-left">
+                                <DialogTitle className="text-xl md:text-2xl font-black uppercase tracking-tighter text-white">Secure API Credentials</DialogTitle>
+                                <DialogDescription className="text-[8px] md:text-[10px] tracking-widest text-white/90 mt-1">Save these credentials now. They will not be shown again.</DialogDescription>
                             </div>
                         </div>
+                    </DialogHeader>
 
+                    {newKeyData && (
                         <div className="space-y-4 md:space-y-6">
                             {[
                                 { label: "Key ID (Public)", value: newKeyData.keyId, type: "Key ID" },
@@ -228,41 +237,41 @@ export default function ApiKeysManagement() {
                                 <div key={item.type} className="space-y-2">
                                     <label className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.label}</label>
                                     <div className="flex gap-2">
-                                        <Input readOnly value={item.value} className="bg-black/40 border-white/10 font-mono text-[10px] md:text-sm h-10 md:h-12" />
-                                        <Button onClick={() => copyToClipboard(item.value, item.type)} variant="outline" className="h-10 w-10 md:h-12 md:w-12 border-white/10 shrink-0">
-                                            {copying === item.type ? <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> : <Copy className="w-3.5 h-3.5 md:w-4 md:h-4" />}
+                                        <Input readOnly value={item.value} className="bg-black/40 border-white/10 font-mono text-[10px] md:text-sm h-10 md:h-12 text-slate-200" />
+                                        <Button onClick={() => copyToClipboard(item.value, item.type)} variant="outline" className="h-10 w-10 md:h-12 md:w-12 border-white/10 shrink-0 hover:bg-white/10">
+                                            {copying === item.type ? <Check className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /> : <Copy className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400" />}
                                         </Button>
                                     </div>
                                 </div>
                             ))}
                         </div>
+                    )}
 
-                        <div className="bg-rose-500/10 border border-rose-500/20 p-3 md:p-4 rounded-xl flex gap-3">
-                            <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-rose-500 shrink-0" />
-                            <p className="text-[8px] md:text-[10px] font-black text-rose-500 uppercase tracking-widest leading-relaxed">
-                                If you lose these keys, you will have to generate a new pair. GMS-SaaS does not store raw secrets for security.
-                            </p>
-                        </div>
+                    <div className="bg-rose-500/10 border border-rose-500/20 p-3 md:p-4 rounded-xl flex gap-3">
+                        <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-rose-500 shrink-0" />
+                        <p className="text-[8px] md:text-[10px] font-black text-rose-500 uppercase tracking-widest leading-relaxed">
+                            If you lose these keys, you will have to generate a new pair. GMS-SaaS does not store raw secrets for security.
+                        </p>
+                    </div>
 
-                        <Button
-                            onClick={() => setShowKeyModal(false)}
-                            className="w-full h-12 md:h-14 rounded-xl md:rounded-2xl bg-white text-black font-black uppercase tracking-widest hover:bg-primary transition-all text-[10px] md:text-sm"
-                        >
-                            I Have Saved the Keys
-                        </Button>
-                    </Card>
-                </div>
-            )}
+                    <Button
+                        onClick={() => setShowKeyModal(false)}
+                        className="w-full h-12 md:h-14 rounded-xl md:rounded-2xl bg-white text-black font-black uppercase tracking-widest hover:bg-primary transition-all text-[10px] md:text-sm shadow-2xl active:scale-95"
+                    >
+                        I Have Saved the Keys
+                    </Button>
+                </DialogContent>
+            </Dialog>
 
             <ConfirmModal
                 open={deleteModalOpen}
                 onOpenChange={setDeleteModalOpen}
-                title="Revoke"
+                title="Delete"
                 highlight="API Key"
-                description="Are you sure you want to revoke this API Key? Any external applications using this key will immediately lose access to your catalog."
+                description="Are you sure you want to delete this API Key? Any website or app using this key will no longer be able to show your store items."
                 onConfirm={confirmDelete}
                 loading={deleting}
-                confirmText="Revoke Access"
+                confirmText="Delete Key"
                 variant="destructive"
             />
         </div>

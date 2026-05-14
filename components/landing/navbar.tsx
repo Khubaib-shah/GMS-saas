@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { Zap, Menu, X } from "lucide-react"
+import Image from "next/image"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 
@@ -24,22 +25,29 @@ export function Navbar() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-black/90 backdrop-blur-md border-b border-white/[0.06]" : "bg-transparent"}`}>
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-md bg-[#c6ff00] flex items-center justify-center">
-            <Zap className="w-4 h-4 text-black" strokeWidth={2.5} />
-          </div>
-          <span className="font-bold text-[15px] tracking-tight text-white">
-            Gym<span className="text-[#c6ff00]">Flow</span>
-          </span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/assets/logo/left&right.png"
+            alt="GymFlow Logo"
+            width={200}
+            height={50}
+            className="h-20 w-auto object-contain"
+            priority
+          />
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((l) => (
-            <Link key={l.href} href={l.href} className="text-[13px] text-white/50 hover:text-white transition-colors duration-200">
-              {l.label}
+            <Link key={l.href} href={l.href} className="nav-link-reveal text-[13px] md:text-[18px]">
+              <div className="nav-text">
+                {l.label.split(" ").map((w, i) => <span key={i}>{w}</span>)}
+              </div>
+              <div className="nav-clone">
+                {l.label.split(" ").map((w, i) => <span key={i}>{w}</span>)}
+              </div>
             </Link>
           ))}
         </nav>
@@ -47,14 +55,24 @@ export function Navbar() {
         {/* Desktop actions */}
         <div className="hidden md:flex items-center gap-3">
           <Link href="/login">
-            <Button variant="ghost" className="h-8 px-4 text-[13px] text-white/60 hover:text-white hover:bg-white/[0.06] rounded-md">
-              Sign in
-            </Button>
+            <button className="btn-text-reveal">
+              <div className="btn-text">
+                <span>Sign</span>
+                <span>in</span>
+              </div>
+              <div className="btn-clone">
+                <span>Sign</span>
+                <span>in</span>
+              </div>
+              <svg strokeWidth={2} stroke="currentColor" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinejoin="round" strokeLinecap="round" />
+              </svg>
+            </button>
           </Link>
           <Link href="/signup">
-            <Button className="h-8 px-4 text-[13px] font-semibold bg-[#c6ff00] text-black hover:bg-[#d4ff33] rounded-md transition-colors">
-              Get started
-            </Button>
+            <button className="btn-nav-secondary">
+              <span>Get started</span>
+            </button>
           </Link>
         </div>
 
@@ -77,7 +95,9 @@ export function Navbar() {
               <Button variant="outline" className="w-full border-white/10 text-white hover:bg-white/[0.06]">Sign in</Button>
             </Link>
             <Link href="/signup" onClick={() => setIsOpen(false)}>
-              <Button className="w-full bg-[#c6ff00] text-black hover:bg-[#d4ff33] font-semibold">Get started</Button>
+              <button className="btn-nav-secondary w-full">
+                <span>Get started</span>
+              </button>
             </Link>
           </div>
         </div>

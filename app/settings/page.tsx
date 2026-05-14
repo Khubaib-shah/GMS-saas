@@ -219,7 +219,7 @@ export default function SettingsPage() {
     { id: "business_settings", label: "Business", icon: <DollarSign className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("settings:view" as any))) },
     { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("settings:view" as any))) },
     { id: "config", label: "Configuration", icon: <Settings2 className="w-4 h-4" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("settings:view" as any))) },
-    { id: "modules", label: "Features", icon: <LayoutGrid className="w-4 h-4" />, show: session && (isAdmin || (session?.user as any)?.role === 'owner') },
+   
     { id: "roles", label: "Roles", icon: <Shield className="w-3.5 h-3.5" />, show: session && (isAdmin || (!isAdmin && !isTrainer && can("roles:view" as any))) },
   ].filter((t) => t.show)
 

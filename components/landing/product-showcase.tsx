@@ -81,13 +81,15 @@ export function ProductShowcase() {
           {/* Charge button */}
           <button
             onClick={() => { setCharged(true); setTimeout(() => setCharged(false), 2000) }}
-            className="w-full h-11 rounded-lg bg-[#c6ff00] text-black text-[14px] font-semibold hover:bg-[#d4ff33] transition-colors flex items-center justify-center gap-2"
+            className="btn-nav-secondary w-full h-11"
           >
-            {charged ? (
-              <><Check className="w-4 h-4" strokeWidth={2.5} /> Payment recorded</>
-            ) : (
-              <>Charge Rs {total.toLocaleString()} →</>
-            )}
+            <span className="flex items-center justify-center gap-2">
+              {charged ? (
+                <><Check className="w-4 h-4" strokeWidth={2.5} /> Payment recorded</>
+              ) : (
+                <>Charge Rs {total.toLocaleString()} →</>
+              )}
+            </span>
           </button>
         </div>
       </div>

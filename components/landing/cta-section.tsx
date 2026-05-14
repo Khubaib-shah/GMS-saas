@@ -27,16 +27,23 @@ export function CTASection() {
             Join hundreds of gym owners who switched to GymFlow and never looked back.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup">
-              <button className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#c6ff00] text-black text-[14px] font-semibold hover:bg-[#d4ff33] transition-colors">
-                Start your free trial
-                <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
+              <button className="btn-nav-secondary h-12 px-8">
+                <span className="flex items-center gap-2 text-[15px] font-bold">
+                  Start your free trial
+                  <ArrowRight className="size-4" strokeWidth={2.5} />
+                </span>
               </button>
             </Link>
             <a href="https://wa.me/923149784156" target="_blank" rel="noopener noreferrer">
-              <button className="inline-flex items-center gap-2 h-11 px-6 rounded-lg border border-white/10 text-white/60 text-[14px] hover:bg-white/[0.06] hover:text-white transition-colors">
-                Talk to us on WhatsApp
+              <button className="btn-hero-reveal h-12 px-8">
+                <div className="hero-text flex items-center gap-2">
+                  {"Talk to us on WhatsApp".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+                </div>
+                <div className="hero-clone flex items-center gap-2">
+                  {"Talk to us on WhatsApp".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+                </div>
               </button>
             </a>
           </div>

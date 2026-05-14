@@ -299,3 +299,294 @@
   .backface-hidden { backface-visibility: hidden; }
 }
 
+/* ── Animated Text-Reveal Button ── */
+.btn-text-reveal {
+  position: relative;
+  width: 82px;
+  height: 40px;
+  overflow: hidden;
+  border: none;
+  color: #fff;
+  background: none;
+  cursor: pointer;
+  display: block;
+}
+
+.btn-text-reveal > div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(100% - 20px);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-text-reveal svg {
+  position: absolute;
+  width: 18px;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(-50deg);
+  transition: 0.2s ease-out;
+}
+
+.btn-text-reveal::before {
+  content: "";
+  position: absolute;
+  height: 2px;
+  bottom: 4px;
+  left: 0;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  background: currentColor;
+  transition: transform 0.25s ease-out;
+}
+
+.btn-text-reveal:hover::before {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+.btn-text-reveal .btn-clone > *,
+.btn-text-reveal .btn-text > * {
+  opacity: 1;
+  font-size: 1.05rem;
+  transition: 0.2s;
+}
+
+.btn-text-reveal .btn-clone > * {
+  transform: translateY(60px);
+}
+
+.btn-text-reveal:hover .btn-clone > * {
+  opacity: 1;
+  transform: translateY(0px);
+  transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+}
+
+.btn-text-reveal:hover .btn-text > * {
+  opacity: 1;
+  transform: translateY(-60px);
+  transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+}
+
+.btn-text-reveal:hover .btn-clone > :nth-child(1) {
+  transition-delay: 0.15s;
+}
+
+.btn-text-reveal:hover .btn-clone > :nth-child(2) {
+  transition-delay: 0.2s;
+}
+
+.btn-text-reveal:hover svg {
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+/* ── Animated Text-Reveal Nav Link (No SVG) ── */
+.nav-link-reveal {
+  position: relative;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-link-reveal:hover {
+  color: #fff;
+}
+
+.nav-link-reveal .nav-text {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-link-reveal .nav-clone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.nav-link-reveal::before {
+  content: "";
+  position: absolute;
+  height: 2px;
+  bottom: 4px;
+  left: 0;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  background: currentColor;
+  transition: transform 0.25s ease-out;
+}
+
+.nav-link-reveal:hover::before {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+.nav-link-reveal .nav-clone > *,
+.nav-link-reveal .nav-text > * {
+  opacity: 1;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.nav-link-reveal .nav-clone > * {
+  transform: translateY(60px);
+}
+
+.nav-link-reveal:hover .nav-clone > * {
+  transform: translateY(0px);
+  transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+}
+
+.nav-link-reveal:hover .nav-text > * {
+  transform: translateY(-60px);
+  transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+}
+
+.nav-link-reveal:hover .nav-clone > :nth-child(1) {
+  transition-delay: 0.1s;
+}
+.nav-link-reveal:hover .nav-clone > :nth-child(2) {
+  transition-delay: 0.15s;
+}
+.nav-link-reveal:hover .nav-clone > :nth-child(3) {
+  transition-delay: 0.2s;
+}
+
+/* ── Animated Fill Button (Navbar Get Started) ── */
+.btn-nav-secondary {
+  padding: 0 24px;
+  height: 42px;
+  border: unset;
+  border-radius: 12px;
+  color: #212121;
+  background: #85FF40;
+  position: relative;
+  font-weight: 900;
+  font-size: 16px;
+  box-shadow: 4px 8px 19px -3px rgba(133, 255, 64, 0.3);
+  transition: all 250ms;
+  overflow: hidden;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  transform: translateZ(0); /* Hardware clipping for pristine rounded corners */
+}
+
+.btn-nav-secondary span {
+  position: relative;
+  z-index: 2;
+  transition: color 250ms;
+}
+
+.btn-nav-secondary::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  height: calc(100% + 2px);
+  width: 0;
+  border-radius: 0;
+  background-color: #212121;
+  z-index: 1;
+  transition: all 250ms;
+}
+
+.btn-nav-secondary:hover span {
+  color: #85FF40;
+}
+
+.btn-nav-secondary:hover::before {
+  width: calc(100% + 2px);
+}
+
+/* ── Animated Hero Outlined Reveal Button ── */
+.btn-hero-reveal {
+  position: relative;
+  height: 42px;
+  padding: 0 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
+}
+
+.btn-hero-reveal:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-hero-reveal .hero-text {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-hero-reveal .hero-clone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-hero-reveal .hero-clone > *,
+.btn-hero-reveal .hero-text > * {
+  opacity: 1;
+  font-size: 15px;
+  font-weight: 500;
+  transition: 0.2s;
+  display: inline-block;
+}
+
+.btn-hero-reveal .hero-clone > * {
+  transform: translateY(60px);
+}
+
+.btn-hero-reveal:hover .hero-clone > * {
+  transform: translateY(0px);
+  transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+}
+
+.btn-hero-reveal:hover .hero-text > * {
+  transform: translateY(-60px);
+  transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+}
+
+.btn-hero-reveal:hover .hero-clone > :nth-child(1) { transition-delay: 0.08s; }
+.btn-hero-reveal:hover .hero-clone > :nth-child(2) { transition-delay: 0.12s; }
+.btn-hero-reveal:hover .hero-clone > :nth-child(3) { transition-delay: 0.16s; }
+.btn-hero-reveal:hover .hero-clone > :nth-child(4) { transition-delay: 0.20s; }
+.btn-hero-reveal:hover .hero-clone > :nth-child(5) { transition-delay: 0.24s; }

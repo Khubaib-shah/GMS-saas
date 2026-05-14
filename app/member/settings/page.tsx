@@ -10,15 +10,12 @@ import {
     Zap,
     User,
     Lock,
-    Phone,
     ArrowLeft,
     Save,
     Eye,
     EyeOff,
-    CheckCircle2,
     ShieldCheck
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function MemberSettingsPage() {
     const router = useRouter();

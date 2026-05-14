@@ -137,13 +137,21 @@ export function PricingSection() {
                     ))}
                   </ul>
 
-                  <Link href={`/signup?plan=${encodeURIComponent(plan.slug)}`}>
-                    <button className={`w-full h-10 rounded-lg text-[13px] font-semibold transition-colors ${plan.isPopular
-                      ? "bg-[#c6ff00] text-black hover:bg-[#d4ff33]"
-                      : "border border-white/[0.10] text-white/60 hover:text-white hover:border-white/20 hover:bg-white/[0.04]"
-                      }`}>
-                      Get started
-                    </button>
+                  <Link href={`/signup?plan=${encodeURIComponent(plan.slug)}`} className="w-full">
+                    {plan.isPopular ? (
+                      <button className="btn-nav-secondary w-full">
+                        <span>Get started</span>
+                      </button>
+                    ) : (
+                      <button className="btn-hero-reveal w-full">
+                        <div className="hero-text">
+                          {"Get started".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+                        </div>
+                        <div className="hero-clone">
+                          {"Get started".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+                        </div>
+                      </button>
+                    )}
                   </Link>
                 </div>
               )

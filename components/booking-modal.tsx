@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { InputField } from "@/components/ui/input-field";
-import { Search, UserPlus } from "lucide-react";
+import { Search, UserPlus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -26,18 +26,27 @@ export function BookingModal({ isOpen, onClose, slot, onSuccess }: BookingModalP
   const [searchLoading, setSearchLoading] = useState(false);
 
   useEffect(() => {
-    if (search.length > 1) {
-        const timer = setTimeout(searchMembers, 500);
-        return () => clearTimeout(timer);
+    if (isOpen) {
+        searchMembers();
     } else {
         setMembers([]);
+        setSearch("");
+        setSelectedMember(null);
     }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const timer = setTimeout(() => {
+        searchMembers();
+    }, 500);
+    return () => clearTimeout(timer);
   }, [search]);
 
   const searchMembers = async () => {
     setSearchLoading(true);
     try {
-        const res = await fetch(`/api/members?search=${search}`);
+        const res = await fetch(`/api/members?search=${encodeURIComponent(search.trim())}`);
         if (res.ok) {
             const data = await res.json();
             setMembers(data);
@@ -91,23 +100,28 @@ export function BookingModal({ isOpen, onClose, slot, onSuccess }: BookingModalP
             <InputField
               hideLabel
               validateType="text"
-              placeholder="Name or email..."
+              placeholder="Search assigned members..."
               value={search}
               onChange={(val) => setSearch(val)}
               leadingIcon={<Search className="w-4 h-4" />}
             />
-            {members.length > 0 && !selectedMember && (
+            {searchLoading ? (
+                <div className="p-4 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" /> Loading assigned members...
+                </div>
+            ) : members.length > 0 && !selectedMember && (
                 <div className="border rounded-lg max-h-40 overflow-auto bg-muted/20">
                     {members.map(m => (
                         <button
                             key={m.id || m._id}
-                            className="w-full p-2 text-left hover:bg-primary/5 text-sm transition-colors border-b last:border-0"
+                            className="w-full p-2.5 text-left hover:bg-primary/5 text-sm transition-colors border-b last:border-0 flex items-center justify-between gap-2"
                             onClick={() => {
                                 setSelectedMember(m);
                                 setSearch(`${m.firstName} ${m.lastName}`);
                             }}
                         >
-                            {m.firstName} {m.lastName}
+                            <span className="font-medium">{m.firstName} {m.lastName}</span>
+                            {m.email && <span className="text-xs text-muted-foreground truncate max-w-[180px]">{m.email}</span>}
                         </button>
                     ))}
                 </div>
@@ -119,7 +133,7 @@ export function BookingModal({ isOpen, onClose, slot, onSuccess }: BookingModalP
                   <span className="font-medium text-sm text-primary">
                     {selectedMember.firstName} {selectedMember.lastName}
                   </span>
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedMember(null)} className="h-7 text-xs">Clear</Button>
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedMember(null)} className="h-7 text-xs hover:bg-primary/20">Clear</Button>
               </div>
           )}
 
@@ -136,6 +150,7 @@ export function BookingModal({ isOpen, onClose, slot, onSuccess }: BookingModalP
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={handleBook} disabled={!selectedMember || loading}>
+            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
             Confirm Booking
           </Button>
         </DialogFooter>

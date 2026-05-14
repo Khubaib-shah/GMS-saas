@@ -237,7 +237,7 @@ export default function AuditlogsClient() {
         open={!!selectedLog}
         onOpenChange={(open) => !open && setSelectedLog(null)}
       >
-        <DialogContent className="max-w-2xl max-h-[95vh] flex flex-col p-0 gap-0 overflow-hidden glass-premium border-white/10 bg-slate-950/95 shadow-2xl focus:ring-0 outline-none">
+        <DialogContent className="max-w-2xl max-h-[95vh] flex flex-col p-0 gap-0 overflow-hidden glass-premium border-white/10 bg-card  shadow-2xl focus:ring-0 outline-none">
           <div className="flex-none p-6 border-b border-white/10 bg-white/[0.02]">
             <DialogHeader>
               <div className="flex items-center justify-between">

@@ -15,7 +15,7 @@ export function GlobalAntigravity() {
         waveAmplitude={1}
         particleSize={1.5}
         lerpSpeed={0.05}
-        color="#9DE918"
+        color="##eeffefff"
         autoAnimate
         particleVariance={1}
         rotationSpeed={0}

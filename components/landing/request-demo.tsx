@@ -210,24 +210,26 @@ export const RequestDemo = () => {
                                         <p className="text-red-400 text-sm text-center">{errorMsg}</p>
                                     )}
 
-                                    <Button
+                                    <button
                                         type="button"
                                         onClick={submitForm}
                                         disabled={status === 'loading'}
-                                        className="w-full h-[38px] bg-primary text-black hover:bg-white transition-all text-base font-semibold group flex items-center justify-center gap-2 mt-4 disabled:opacity-60"
+                                        className="btn-nav-secondary w-full h-12 mt-4 disabled:opacity-60"
                                     >
-                                        {status === 'loading' ? (
-                                            <>
-                                                <Loader2 className="w-5 h-5 animate-spin" />
-                                                Sending...
-                                            </>
-                                        ) : (
-                                            <>
-                                                Request Demo
-                                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                            </>
-                                        )}
-                                    </Button>
+                                        <span className="flex items-center justify-center gap-2 text-base font-semibold">
+                                            {status === 'loading' ? (
+                                                <>
+                                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                                    Sending...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Request Demo
+                                                    <ArrowRight className="w-5 h-5 transition-transform" />
+                                                </>
+                                            )}
+                                        </span>
+                                    </button>
 
                                     <p className="text-center text-xs text-slate-500 pt-2">
                                         By submitting this form, you agree to our Terms of Service and Privacy Policy.

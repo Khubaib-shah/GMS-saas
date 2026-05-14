@@ -7,12 +7,12 @@ import { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 
 const AntigravityInner = ({
-  count = 300,
+  count = 100,
   magnetRadius = 10,
   ringRadius = 10,
   waveSpeed = 0.4,
   waveAmplitude = 1,
-  particleSize = 2,
+  particleSize = 4,
   lerpSpeed = 0.1,
   color = '#FF9FFC',
   autoAnimate = false,

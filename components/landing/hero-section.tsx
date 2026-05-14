@@ -18,36 +18,38 @@ export function HeroSection() {
       {/* Subtle top radial */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#c6ff00]/8 blur-[120px] rounded-full -z-10 pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto text-center">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/[0.04] text-white/60 text-[11px] font-medium tracking-widest uppercase mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#c6ff00] animate-pulse" />
-          Now live for gyms in Pakistan
-        </div>
-
+      <div className="max-w-7xl mx-auto text-center">
         {/* Headline */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-[-0.04em] text-white leading-[1.05] mb-6">
           Stop losing money.<br />
-          <span className="text-[#c6ff00]">Run your gym</span> smarter.
+          <span className="text-[#85FF3F]">Run your gym</span> smarter.
         </h1>
 
         {/* Sub */}
-        <p className="text-[15px] sm:text-[17px] text-white/50 max-w-xl mx-auto leading-relaxed mb-10">
-          Memberships, QR attendance, billing, point-of-sale, and workout tracking — all in one platform. Built for gym owners in Pakistan.
+        <p className="text-[15px] sm:text-[17px] text-white/80 max-w-xl mx-auto leading-relaxed mb-8">
+          Memberships, automated QR attendance, smart billing, a complete selling &amp; POS system, workout tracking, and automated reminders — everything your gym needs to run on autopilot.
         </p>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
           <Link href="/signup">
-            <button className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#c6ff00] text-black text-[14px] font-semibold hover:bg-[#d4ff33] transition-colors">
-              Start free trial
-              <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
+            <button className="btn-nav-secondary h-12 px-8">
+              <span className="flex items-center gap-2 text-[15px] font-bold">
+                Start free trial
+                <ArrowRight className="size-4" strokeWidth={2.5} />
+              </span>
             </button>
           </Link>
           <Link href="#how-it-works">
-            <button className="inline-flex items-center gap-2 h-11 px-6 rounded-lg border border-white/10 text-white/70 text-[14px] hover:bg-white/[0.06] hover:text-white transition-colors">
-              <Play className="w-3.5 h-3.5 fill-current" />
-              See how it works
+            <button className="btn-hero-reveal h-12 px-8">
+              <div className="hero-text flex items-center gap-2.5">
+                <Play className="size-3.5 fill-current" />
+                {"See how it works".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+              </div>
+              <div className="hero-clone flex items-center gap-2.5">
+                <Play className="size-3.5 fill-current" />
+                {"See how it works".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+              </div>
             </button>
           </Link>
         </div>
@@ -70,7 +72,7 @@ export function HeroSection() {
           {/* Screenshot */}
           <div className="border border-white/[0.08] border-t-0 rounded-b-xl overflow-hidden">
             <Image
-              src="/assets/dashboard.png"
+              src="/assets/image.png"
               alt="GymFlow Dashboard"
               width={1200}
               height={720}
