@@ -587,7 +587,7 @@
   align-items: center;
   justify-content: center;
   isolation: isolate;
-  transform: translateZ(0); /* Hardware clipping for pristine rounded corners */
+  transform: translateZ(0); 
 }
 
 .btn-nav-secondary span {
@@ -689,3 +689,57 @@
 .btn-hero-reveal:hover .hero-clone > :nth-child(3) { transition-delay: 0.16s; }
 .btn-hero-reveal:hover .hero-clone > :nth-child(4) { transition-delay: 0.20s; }
 .btn-hero-reveal:hover .hero-clone > :nth-child(5) { transition-delay: 0.24s; }
+
+/* ── Star Background Pattern (Dynamic) ── */
+#stars {
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  animation: animStar 50s linear infinite;
+}
+#stars:after {
+  content: " ";
+  position: absolute;
+  top: 2000px;
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  box-shadow: inherit;
+}
+
+#stars2 {
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  animation: animStar 100s linear infinite;
+}
+#stars2:after {
+  content: " ";
+  position: absolute;
+  top: 2000px;
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  box-shadow: inherit;
+}
+
+#stars3 {
+  width: 3px;
+  height: 3px;
+  background: transparent;
+  animation: animStar 150s linear infinite;
+}
+#stars3:after {
+  content: " ";
+  position: absolute;
+  top: 2000px;
+  width: 3px;
+  height: 3px;
+  background: transparent;
+  box-shadow: inherit;
+}
+
+@keyframes animStar {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-2000px); }
+}

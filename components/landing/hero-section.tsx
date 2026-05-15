@@ -135,7 +135,7 @@ export function HeroSection() {
           {/* Screenshot */}
           <div className="border border-white/[0.08] border-t-0 rounded-b-xl overflow-hidden">
             <Image
-              src="/assets/image.png"
+              src="/assets/dashboard/owner-dashboard.png"
               alt="GymFlow Dashboard"
               width={1200}
               height={720}

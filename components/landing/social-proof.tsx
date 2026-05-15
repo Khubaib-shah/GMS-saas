@@ -58,7 +58,7 @@ function StatItem({ value, label }: { value: string; label: string }) {
   return (
     <div ref={ref} className="premium-stat-outer">
       <div className="stat-dot" />
-      <div className="glass-premium premium-stat-card px-8 py-8">
+      <div className="glass-premium premium-stat-card px-4 md:px-8 py-4 md:py-8">
         <div className="stat-ray" />
         <div className="stat-line stat-topl" />
         <div className="stat-line stat-leftl" />
@@ -66,8 +66,8 @@ function StatItem({ value, label }: { value: string; label: string }) {
         <div className="stat-line stat-rightl" />
         
         <div className="relative z-20">
-          <div className="text-3xl font-bold tracking-tight stat-value">{displayValue}</div>
-          <div className="text-[12px] text-white/40 uppercase tracking-widest mt-1">{label}</div>
+          <div className="text-xl md:text-3xl font-bold tracking-tight stat-value">{displayValue}</div>
+          <div className="text-[10px] md:text-[12px] text-white/40 uppercase tracking-widest mt-1">{label}</div>
         </div>
       </div>
     </div>
@@ -76,9 +76,9 @@ function StatItem({ value, label }: { value: string; label: string }) {
 
 export function SocialProof() {
   return (
-    <section className="py-16 px-6 mt-20">
-      <div className="max-w-6xl mx-auto ">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 rounded-xl overflow-hidden ">
+    <section className="py-4 md:py-8 px-6 mt-20">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8 rounded-xl overflow-hidden ">
           {stats.map((s, i) => (
             <StatItem key={i} value={s.value} label={s.label} />
           ))}

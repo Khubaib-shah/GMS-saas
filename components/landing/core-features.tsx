@@ -1,5 +1,6 @@
 import { SectionHeading } from "./section-heading"
 import { Users2, CreditCard, QrCode, ShoppingBag, Dumbbell, BarChart2 } from "lucide-react"
+import { StarBackground } from "./star-background"
 
 const features = [
   {
@@ -36,13 +37,16 @@ const features = [
 
 export function CoreFeatures() {
   return (
-    <section id="features" className="py-32 px-6 border-t border-white/[0.06]">
-      <div className="max-w-6xl mx-auto">
+    <section id="features" className="py-32 px-6 relative overflow-hidden">
+      <StarBackground /> 
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
         <div className="max-w-xl mb-16">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Features</div>
           <SectionHeading
-            title="Everything your gym needs. Nothing it doesn't."
+            title="Everything"
+            highlight="your gym needs"
+            subtitle="Nothing it doesn't"
             align="left"
             className="mb-4"
           />
