@@ -8,13 +8,11 @@ export function PreLoader() {
   const [shouldRender, setShouldRender] = useState(true)
 
   useEffect(() => {
-    // Start fading out after a fixed duration (branding/intro phase)
     const timer = setTimeout(() => {
       setLoading(false)
-      // Remove from DOM after the fade-out transition
       const removeTimer = setTimeout(() => setShouldRender(false), 800)
       return () => clearTimeout(removeTimer)
-    }, 1500) // Reduced from 1200 + window.onload delay
+    }, 2500)
 
     return () => clearTimeout(timer)
   }, [])
@@ -24,54 +22,63 @@ export function PreLoader() {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-10000 flex flex-col items-center justify-center bg-[#020617] transition-all duration-700 ease-in-out",
+        "fixed inset-0 z-10000 flex flex-col items-center justify-center text-white bg-card transition-all duration-700 ease-in-out",
         loading ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
       )}
     >
-      <div className="relative flex flex-col items-center gap-12">
+
+      {/* Dot grid background */}
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+        }}
+      />
+      <div className="relative flex flex-col items-center gap-8">
         {/* Animated Background Atmosphere */}
         <div className="absolute inset-0 -z-10 flex items-center justify-center">
-            <div className="w-[300px] h-[300px] bg-primary/5 rounded-full blur-[80px] animate-pulse"></div>
-            <div className="w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px] animate-pulse-glow"></div>
+          <div className="w-[300px] h-[300px] bg-primary/10 rounded-full blur-[80px] animate-pulse"></div>
+          <div className="w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] animate-pulse-glow"></div>
         </div>
 
         {/* Orbiting Elements */}
         <div className="absolute inset-0 -z-10 flex items-center justify-center">
-            <div className="w-64 h-64 rounded-full border border-primary/10 animate-orbit-1"></div>
-            <div className="w-80 h-80 rounded-full border border-blue-500/5 animate-orbit-2"></div>
+          <div className="w-64 h-64 rounded-full border border-primary/10 animate-orbit-1"></div>
+          <div className="w-80 h-80 rounded-full border border-primary/5 animate-orbit-2"></div>
         </div>
 
         {/* Logo / Brand */}
         <div className="flex flex-col items-center gap-6">
-            <div className="relative group">
-                <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white flex items-center gap-1 select-none">
-                    GYM<span className="text-primary drop-shadow-[0_0_20px_rgba(190,255,0,0.6)]">FLOW</span>
-                </h1>
-                {/* Underline Glow */}
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-linear-to-r from-transparent via-primary/50 to-transparent"></div>
-            </div>
+          <div className="relative group">
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white flex items-center gap-1 select-none">
+              GYM<span className="text-primary drop-shadow-[0_0_20px_rgba(190,255,0,0.6)]">FLOW</span>
+            </h1>
+            {/* Underline Glow */}
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-linear-to-r from-transparent via-primary/50 to-transparent"></div>
+          </div>
 
-            {/* Premium Loading Bar */}
-            <div className="w-64 h-[2px] bg-white/5 rounded-full overflow-hidden relative">
-                <div className="absolute inset-0 bg-primary/10"></div>
-                <div className="absolute inset-y-0 left-0 bg-primary w-2/3 animate-light-sweep shadow-[0_0_15px_rgba(190,255,0,0.8)]"></div>
-            </div>
+          {/* Premium Loading Bar */}
+          <div className="w-64 h-[2px] bg-white/5 rounded-full overflow-hidden relative">
+            <div className="absolute inset-0 bg-primary/10"></div>
+            <div className="absolute inset-y-0 left-0 bg-primary w-2/3 animate-light-sweep shadow-[0_0_15px_rgba(190,255,0,0.8)]"></div>
+          </div>
         </div>
 
         {/* Status indicator */}
         <div className="flex flex-col items-center gap-3">
-            <div className="text-slate-500 text-[10px] font-bold tracking-[0.4em] uppercase">
-                Synchronizing Workspace
-            </div>
-            <div className="flex gap-1.5">
-                {[0, 1, 2].map((i) => (
-                    <div 
-                        key={i} 
-                        className="w-1 h-1 rounded-full bg-primary/50 animate-bounce" 
-                        style={{ animationDelay: `${i * 0.15}s` }}
-                    />
-                ))}
-            </div>
+          <div className="text-slate-500 text-[10px] font-bold tracking-[0.4em] uppercase">
+            Fitness made simple
+          </div>
+          <div className="flex gap-1.5">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="size-2 rounded-full bg-primary/50 animate-bounce"
+                style={{ animationDelay: `${i * 0.35}s` }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

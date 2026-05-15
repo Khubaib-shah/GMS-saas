@@ -1,0 +1,29 @@
+{
+  "name": "GymFlow - Advanced Gym Management SaaS",
+  "short_name": "GymFlow",
+  "description": "The complete toolkit for modern gym owners. Manage members, attendance, and billing effortlessly.",
+  "icons": [
+    {
+      "src": "/assets/favicon/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/favicon/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/favicon/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#c6ff00",
+  "background_color": "#020617",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/"
+}

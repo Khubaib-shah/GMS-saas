@@ -24,8 +24,8 @@ export function Navbar() {
   }, [])
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-black/90 backdrop-blur-md border-b border-white/[0.06]" : "bg-transparent"}`}>
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "" : "bg-transparent"}`}>
+      <div className="max-w-7xl mx-auto px-6 h-12 md:h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
@@ -33,7 +33,7 @@ export function Navbar() {
             alt="GymFlow Logo"
             width={200}
             height={50}
-            className="h-20 w-auto object-contain"
+            className="h-10 md:h-20 w-auto object-contain"
             priority
           />
         </Link>

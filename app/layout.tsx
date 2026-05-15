@@ -19,21 +19,36 @@ export const viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gymflow-management.vercel.app/"),
-  title: "GymFlow - Advanced Gym Management SaaS",
-  description: "Streamline your gym operations with GymFlow. Manage members, trainers, attendance, and subscriptions in one platform.",
-  keywords: ["gym management", "fitness software", "SaaS", "member tracking", "trainer scheduling"],
+  title: {
+    default: "GymFlow - Advanced Gym Management SaaS",
+    template: "%s | GymFlow"
+  },
+  description: "The complete toolkit for modern gym owners. Streamline operations, automate QR attendance, manage billing, and track performance with GymFlow SaaS.",
+  keywords: [
+    "gym management software", 
+    "fitness management system", 
+    "gym automation", 
+    "QR attendance tracker", 
+    "gym billing software", 
+    "member management SaaS",
+    "fitness business growth",
+    "gym POS system",
+    "workout tracker app"
+  ],
   authors: [{ name: "Khubaib Shah" }],
+  creator: "Khubaib Shah",
+  publisher: "GymFlow",
   openGraph: {
-    title: "GymFlow - Modern Gym Management",
-    description: "The complete toolkit for modern gym owners. Start managing your fitness business effectively today.",
+    title: "GymFlow - Modern Gym Management Software",
+    description: "Stop losing money. Run your gym smarter with automated QR attendance, smart billing, and a complete POS system.",
     url: "https://gymflow-management.vercel.app/",
-    siteName: "GymFlow",
+    siteName: "GymFlow SaaS",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "GymFlow Dashboard Preview",
+        alt: "GymFlow Dashboard - Advanced Management Toolkit",
       },
     ],
     locale: "en_US",
@@ -41,19 +56,33 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GymFlow | Gym Management SaaS",
-    description: "Streamline your fitness business with our comprehensive management system.",
+    title: "GymFlow | The Smartest way to run your Gym",
+    description: "Automated attendance, billing, and member management. Everything your gym needs to run on autopilot.",
     images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   icons: {
     icon: [
       { url: "/assets/favicon/favicon.ico" },
       { url: "/assets/favicon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/assets/favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/assets/favicon/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
     ],
-    apple: "/assets/favicon/apple-touch-icon.png",
+    apple: [
+      { url: "/assets/favicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
-  manifest: "/assets/favicon/site.webmanifest",
+  manifest: "/site.webmanifest",
 };
 
 import { ThemeProvider } from "@/components/theme-provider";

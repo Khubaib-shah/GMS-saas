@@ -100,11 +100,11 @@ export function PricingSection() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {plans.map((plan) => {
+            {plans.map((plan, idx) => {
               const features = getFeatures(plan)
               return (
                 <div
-                  key={plan.id}
+                  key={`${plan.id}-${idx}`}
                   className={`relative rounded-xl p-8 flex flex-col gap-8 ${plan.isPopular
                     ? "border border-[#c6ff00]/40 bg-[#c6ff00]/[0.03]"
                     : "border border-white/[0.06] bg-white/[0.02]"
@@ -145,10 +145,10 @@ export function PricingSection() {
                     ) : (
                       <button className="btn-hero-reveal w-full">
                         <div className="hero-text">
-                          {"Get started".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+                          {"Get started".split(" ").map((w, i) => <span key={`text-${i}`}>{w}</span>)}
                         </div>
                         <div className="hero-clone">
-                          {"Get started".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+                          {"Get started".split(" ").map((w, i) => <span key={`clone-${i}`}>{w}</span>)}
                         </div>
                       </button>
                     )}

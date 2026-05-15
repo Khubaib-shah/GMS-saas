@@ -3,8 +3,86 @@
 import { ArrowRight, Play } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useEffect, useRef } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+const splitText = (text: string) => {
+  return text.split("").map((char, index) => {
+    if (char === " ") return " "
+    return (
+      <span key={index} className="inline-block headline-char opacity-0 translate-y-[20px]">
+        {char}
+      </span>
+    )
+  })
+}
 
 export function HeroSection() {
+  const mockupRef = useRef<HTMLDivElement>(null)
+  const headlineRef = useRef<HTMLHeadingElement>(null)
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger)
+
+    const mockup = mockupRef.current
+    if (!mockup) return
+
+    // Headline letter stagger animation
+    const headlineChars = headlineRef.current?.querySelectorAll('.headline-char')
+    if (headlineChars && headlineChars.length > 0) {
+      gsap.to(headlineChars, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 2.6,
+        stagger: 0.03,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: headlineRef.current,
+          start: "top 95%", // triggers when visible
+        }
+      })
+    }
+
+    // Initial state
+    gsap.set(mockup, {
+      rotationX: 60,
+      scale: 0.7,
+      transformPerspective: 1000,
+      transformOrigin: "top center",
+    })
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: mockup,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      }
+    })
+
+    // Phase 1: Straighten out and scale to 1 (takes first 50% of the scroll)
+    tl.to(mockup, {
+      rotationX: 0,
+      scale: 1,
+      duration: 1,
+      ease: "power1.out"
+    })
+      // Phase 2: Keep scaling and fade out (takes remaining 50% of scroll)
+      .to(mockup, {
+        rotationX: -20,
+        scale: 1.25,
+        opacity: 0,
+        duration: 1,
+        ease: "power1.in"
+      })
+
+    return () => {
+      tl.kill()
+    }
+  }, [])
+
   return (
     <section className="relative pt-40 pb-0 px-6 overflow-hidden">
       {/* Dot grid background */}
@@ -20,26 +98,19 @@ export function HeroSection() {
 
       <div className="max-w-7xl mx-auto text-center">
         {/* Headline */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-[-0.04em] text-white leading-[1.05] mb-6">
-          Stop losing money.<br />
-          <span className="text-[#85FF3F]">Run your gym</span> smarter.
+        <h1 ref={headlineRef} className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-[-0.04em] text-white leading-[1.05] mb-4 md:mb-6">
+          {splitText("Stop losing money.")}<br />
+          <span className="text-[#85FF3F]">{splitText("Run your gym")}</span> {splitText("smarter.")}
         </h1>
 
         {/* Sub */}
-        <p className="text-[15px] sm:text-[17px] text-white/80 max-w-xl mx-auto leading-relaxed mb-8">
+        <p className="text-[15px] md:text-[17px] text-white/80 max-w-xl mx-auto leading-relaxed mb-6 md:mb-8">
           Memberships, automated QR attendance, smart billing, a complete selling &amp; POS system, workout tracking, and automated reminders — everything your gym needs to run on autopilot.
         </p>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-          <Link href="/signup">
-            <button className="btn-nav-secondary h-12 px-8">
-              <span className="flex items-center gap-2 text-[15px] font-bold">
-                Start free trial
-                <ArrowRight className="size-4" strokeWidth={2.5} />
-              </span>
-            </button>
-          </Link>
+        <div className="flex flex-row items-center justify-center gap-4  mb-6 md:mb-10">
+
           <Link href="#how-it-works">
             <button className="btn-hero-reveal h-12 px-8">
               <div className="hero-text flex items-center gap-2.5">
@@ -52,10 +123,18 @@ export function HeroSection() {
               </div>
             </button>
           </Link>
+          <Link href="/signup">
+            <button className="btn-nav-secondary h-12 md:h-12 px-4 md:px-8">
+              <span className="flex items-center gap-2 text-[13px] md:text-[15px] font-bold">
+                Start free trial
+                <ArrowRight className="size-4" strokeWidth={2.5} />
+              </span>
+            </button>
+          </Link>
         </div>
 
         {/* Browser mockup */}
-        <div className="relative mx-auto max-w-5xl">
+        <div ref={mockupRef} className="relative mx-auto max-w-5xl">
           {/* Browser chrome */}
           <div className="rounded-t-xl border border-white/[0.08] border-b-0 bg-white/[0.04] px-4 py-3 flex items-center gap-2">
             <div className="flex gap-1.5">
