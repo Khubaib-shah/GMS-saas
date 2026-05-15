@@ -1,3 +1,4 @@
+import { SectionHeading } from "./section-heading"
 import { Users2, CreditCard, QrCode, ShoppingBag, Dumbbell, BarChart2 } from "lucide-react"
 
 const features = [
@@ -40,9 +41,11 @@ export function CoreFeatures() {
         {/* Header */}
         <div className="max-w-xl mb-16">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">Features</div>
-          <h2 className="text-3xl md:text-[44px] font-bold tracking-[-0.03em] text-white leading-[1.1] mb-4">
-            Everything your gym needs. Nothing it doesn't.
-          </h2>
+          <SectionHeading
+            title="Everything your gym needs. Nothing it doesn't."
+            align="left"
+            className="mb-4"
+          />
           <p className="text-[15px] text-white/40 leading-relaxed">
             Six powerful modules working together so you can focus on your members, not your paperwork.
           </p>

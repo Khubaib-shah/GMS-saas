@@ -1,5 +1,6 @@
 "use client"
 
+import { SectionHeading } from "./section-heading"
 import { useEffect, useState } from "react"
 import { Check, Loader2 } from "lucide-react"
 import Link from "next/link"
@@ -86,9 +87,11 @@ export function PricingSection() {
         {/* Header */}
         <div className="max-w-xl mb-16">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">Pricing</div>
-          <h2 className="text-3xl md:text-[44px] font-bold tracking-[-0.03em] text-white leading-[1.1] mb-4">
-            Simple pricing. No hidden fees.
-          </h2>
+          <SectionHeading
+            title="Simple pricing. No hidden fees."
+            align="left"
+            className="mb-4"
+          />
           <p className="text-[15px] text-white/40 leading-relaxed">
             Start small. Upgrade when you grow. Cancel anytime.
           </p>

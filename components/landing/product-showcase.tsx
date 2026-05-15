@@ -1,5 +1,6 @@
 "use client"
 
+import { SectionHeading } from "./section-heading"
 import { Check, ShoppingBag } from "lucide-react"
 import { useState } from "react"
 
@@ -26,9 +27,11 @@ export function ProductShowcase() {
         {/* Left: text */}
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">Point of Sale</div>
-          <h2 className="text-3xl md:text-[44px] font-bold tracking-[-0.03em] text-white leading-[1.1] mb-5">
-            Sell from the front desk in two taps
-          </h2>
+          <SectionHeading
+            title="Sell from the front desk in two taps"
+            align="left"
+            className="mb-5"
+          />
           <p className="text-[15px] text-white/40 leading-relaxed mb-8">
             Your receptionist can ring up a protein shake or a gym T-shirt without leaving the dashboard. Every sale is tracked separately from membership revenue so your books always add up.
           </p>

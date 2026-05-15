@@ -1,3 +1,4 @@
+import { SectionHeading } from "./section-heading"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 
@@ -20,9 +21,10 @@ export function CTASection() {
             }}
           />
 
-          <h2 className="text-3xl md:text-[52px] font-bold tracking-[-0.03em] text-white leading-[1.05] mb-4">
-            Ready to take control<br />of your gym?
-          </h2>
+          <SectionHeading
+            title="Ready to take control\nof your gym?"
+            className="mb-4"
+          />
           <p className="text-[15px] text-white/40 max-w-md mx-auto mb-10 leading-relaxed">
             Join hundreds of gym owners who switched to GymFlow and never looked back.
           </p>

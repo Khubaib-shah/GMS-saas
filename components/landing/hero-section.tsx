@@ -7,43 +7,16 @@ import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
-const splitText = (text: string) => {
-  return text.split("").map((char, index) => {
-    if (char === " ") return " "
-    return (
-      <span key={index} className="inline-block headline-char opacity-0 translate-y-[20px]">
-        {char}
-      </span>
-    )
-  })
-}
+import { SectionHeading } from "./section-heading"
 
 export function HeroSection() {
   const mockupRef = useRef<HTMLDivElement>(null)
-  const headlineRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
     const mockup = mockupRef.current
     if (!mockup) return
-
-    // Headline letter stagger animation
-    const headlineChars = headlineRef.current?.querySelectorAll('.headline-char')
-    if (headlineChars && headlineChars.length > 0) {
-      gsap.to(headlineChars, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        delay: 2.6,
-        stagger: 0.03,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: headlineRef.current,
-          start: "top 95%", // triggers when visible
-        }
-      })
-    }
 
     // Initial state
     gsap.set(mockup, {
@@ -98,10 +71,14 @@ export function HeroSection() {
 
       <div className="max-w-7xl mx-auto text-center">
         {/* Headline */}
-        <h1 ref={headlineRef} className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-[-0.04em] text-white leading-[1.05] mb-4 md:mb-6">
-          {splitText("Stop losing money.")}<br />
-          <span className="text-[#85FF3F]">{splitText("Run your gym")}</span> {splitText("smarter.")}
-        </h1>
+        <SectionHeading
+          as="h1"
+          size="hero"
+          title="Stop losing money."
+          highlight="Run your gym"
+          subtitle="smarter."
+          delay={2.6}
+        />
 
         {/* Sub */}
         <p className="text-[15px] md:text-[17px] text-white/80 max-w-xl mx-auto leading-relaxed mb-6 md:mb-8">

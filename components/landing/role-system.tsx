@@ -1,3 +1,4 @@
+import { SectionHeading } from "./section-heading"
 import { Crown, ClipboardList, Monitor, Dumbbell, User } from "lucide-react"
 
 const roles = [
@@ -35,9 +36,11 @@ export function RoleSystem() {
         {/* Header */}
         <div className="max-w-xl mb-16">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">Built for every role</div>
-          <h2 className="text-3xl md:text-[44px] font-bold tracking-[-0.03em] text-white leading-[1.1] mb-4">
-            One platform. Five different experiences.
-          </h2>
+          <SectionHeading
+            title="One platform. Five different experiences."
+            align="left"
+            className="mb-4"
+          />
           <p className="text-[15px] text-white/40 leading-relaxed">
             Every person in your gym sees exactly what they need. Nothing more, nothing less.
           </p>

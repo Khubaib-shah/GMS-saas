@@ -1,3 +1,4 @@
+import { SectionHeading } from "./section-heading"
 import { Check } from "lucide-react"
 
 const checks = [
@@ -30,9 +31,11 @@ export function SolutionSection() {
         {/* Left: text */}
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">The solution</div>
-          <h2 className="text-3xl md:text-[44px] font-bold tracking-[-0.03em] text-white leading-[1.1] mb-5">
-            Know exactly who walks in — instantly
-          </h2>
+          <SectionHeading
+            title="Know exactly who walks in — instantly"
+            align="left"
+            className="mb-5"
+          />
           <p className="text-[15px] text-white/40 leading-relaxed mb-8">
             Every member gets a unique QR code. Your receptionist scans it. The system instantly checks their subscription and logs attendance. No guessing. No arguments.
           </p>

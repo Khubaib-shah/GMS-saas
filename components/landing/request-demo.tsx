@@ -1,5 +1,6 @@
 "use client"
 
+import { SectionHeading } from './section-heading'
 import { useState } from 'react'
 import { CheckCircle2, ArrowRight, Loader2 } from 'lucide-react'
 import { InputField } from '@/components/ui/input-field'
@@ -87,9 +88,13 @@ export const RequestDemo = () => {
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6 tracking-widest">
                         BOOK A FREE DEMO
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
-                        See GymFlow <br /> in action.
-                    </h1>
+                    <SectionHeading
+                        as="h1"
+                        size="hero"
+                        title="See GymFlow \nin action."
+                        align="left"
+                        className="mb-6"
+                    />
                     <p className="text-lg text-slate-400 mb-10 max-w-lg leading-relaxed">
                         Join the hundreds of modern gym owners who use GymFlow to automate their business. Get a personalized walkthrough of the platform.
                     </p>
