@@ -40,13 +40,13 @@ export function CoreFeatures() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="max-w-xl mb-16">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">Features</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Features</div>
           <SectionHeading
             title="Everything your gym needs. Nothing it doesn't."
             align="left"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/40 leading-relaxed">
+          <p className="text-[15px] text-white/80 leading-relaxed">
             Six powerful modules working together so you can focus on your members, not your paperwork.
           </p>
         </div>
@@ -59,11 +59,11 @@ export function CoreFeatures() {
               className="bg-black p-8 flex flex-col gap-4 hover:bg-white/[0.02] transition-colors duration-200 group"
             >
               <div className="w-9 h-9 rounded-lg bg-[#c6ff00]/[0.08] border border-[#c6ff00]/[0.15] flex items-center justify-center">
-                <f.icon className="w-4 h-4 text-[#c6ff00]" />
+                <f.icon className="w-4 h-4 text-primary" />
               </div>
               <div>
                 <h3 className="text-[15px] font-semibold text-white mb-1.5 tracking-tight">{f.title}</h3>
-                <p className="text-[13px] text-white/40 leading-relaxed">{f.description}</p>
+                <p className="text-[13px] text-white/80 leading-relaxed">{f.description}</p>
               </div>
             </div>
           ))}

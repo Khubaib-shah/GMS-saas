@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, ReactNode } from "react"
+import { useEffect, useRef, ReactNode, Fragment } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { cn } from "@/lib/utils"
@@ -76,20 +76,35 @@ export function SectionHeading({
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
-    const chars = headingRef.current?.querySelectorAll(".headline-char")
-    if (chars && chars.length > 0) {
-      gsap.to(chars, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        delay: delay,
-        stagger: 0.03,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: headingRef.current,
-          start: "top 95%",
-        },
-      })
+    const initAnimation = () => {
+      const chars = headingRef.current?.querySelectorAll(".headline-char")
+      if (chars && chars.length > 0) {
+        gsap.to(chars, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: delay,
+          stagger: 0.03,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: headingRef.current,
+            start: "top 95%",
+          },
+        })
+      }
+    }
+
+    // Check if page is still loading (PreLoader is active)
+    const isLoaderActive = document.documentElement.classList.contains('loading')
+
+    if (isLoaderActive) {
+      window.addEventListener('pageLoaded', initAnimation)
+    } else {
+      initAnimation()
+    }
+
+    return () => {
+      window.removeEventListener('pageLoaded', initAnimation)
     }
   }, [delay])
 
@@ -104,12 +119,20 @@ export function SectionHeading({
     section: "text-3xl md:text-[44px] tracking-[-0.03em] leading-[1.1]",
   }[size]
 
-  const renderTitle = (t: string) => {
-    return t.split('\n').map((line, i, arr) => (
-      <span key={i}>
-        {splitText(line)}
-        {i < arr.length - 1 && <br />}
-      </span>
+  const renderText = (t: string) => {
+    // Handle both literal newlines and the string sequence "\n"
+    const normalizedText = t.replace(/\\n/g, "\n")
+    const lines = normalizedText.split("\n")
+    
+    return lines.map((line, i) => (
+      <Fragment key={i}>
+        {line && (
+          <span className="inline-block whitespace-nowrap">
+            {splitText(line)}
+          </span>
+        )}
+        {i < lines.length - 1 && <br />}
+      </Fragment>
     ))
   }
 
@@ -125,17 +148,17 @@ export function SectionHeading({
     >
       {children ? children : (
         <>
-          {title && renderTitle(title)}
+          {title && renderText(title)}
           {highlight && (
             <>
               {" "}
-              <span className="text-[#85FF3F]">{splitText(highlight)}</span>
+              <span className="text-[#85FF3F]">{renderText(highlight)}</span>
             </>
           )}
           {subtitle && (
             <>
               {" "}
-              {splitText(subtitle)}
+              {renderText(subtitle)}
             </>
           )}
         </>

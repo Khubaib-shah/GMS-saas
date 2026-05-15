@@ -42,7 +42,7 @@ export function Footer() {
                 <Zap className="w-3.5 h-3.5 text-black" strokeWidth={2.5} />
               </div>
               <span className="font-bold text-[15px] text-white tracking-tight">
-                Gym<span className="text-[#c6ff00]">Flow</span>
+                Gym<span className="text-primary">Flow</span>
               </span>
             </Link>
             <p className="text-[13px] text-white/30 leading-relaxed max-w-[220px]">

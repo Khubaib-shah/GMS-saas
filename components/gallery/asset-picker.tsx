@@ -379,7 +379,7 @@ export function AssetPicker({ onSelect, trigger, allowedTypes, multiple = false 
                                                     {asset.isUploading && (
                                                         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
                                                             <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                                                            <span className="text-[8px] font-black uppercase text-white/50 tracking-widest">Uploading</span>
+                                                            <span className="text-[8px] font-black uppercase text-white/80 tracking-widest">Uploading</span>
                                                         </div>
                                                     )}
                                                 </div>

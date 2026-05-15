@@ -205,7 +205,7 @@ export function AttendanceScanner() {
           </div>
 
           <div className="absolute inset-0 pointer-events-none border-2 border-primary/50 m-12 rounded-lg flex items-center justify-center">
-            <p className="text-white/50 text-sm mt-32">Place QR code in frame</p>
+            <p className="text-white/80 text-sm mt-32">Place QR code in frame</p>
           </div>
 
           {(!isVideoReady || loading) && (

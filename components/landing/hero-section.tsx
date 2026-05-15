@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { ArrowRight, Play } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import { useEffect, useRef } from "react"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { ArrowRight, Play } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import { SectionHeading } from "./section-heading"
+import { SectionHeading } from "./section-heading";
 
 export function HeroSection() {
-  const mockupRef = useRef<HTMLDivElement>(null)
+  const mockupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger)
+    gsap.registerPlugin(ScrollTrigger);
 
-    const mockup = mockupRef.current
-    if (!mockup) return
+    const mockup = mockupRef.current;
+    if (!mockup) return;
 
     // Initial state
     gsap.set(mockup, {
@@ -24,7 +24,7 @@ export function HeroSection() {
       scale: 0.7,
       transformPerspective: 1000,
       transformOrigin: "top center",
-    })
+    });
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -32,15 +32,15 @@ export function HeroSection() {
         start: "top bottom",
         end: "bottom top",
         scrub: 1,
-      }
-    })
+      },
+    });
 
     // Phase 1: Straighten out and scale to 1 (takes first 50% of the scroll)
     tl.to(mockup, {
       rotationX: 0,
       scale: 1,
       duration: 1,
-      ease: "power1.out"
+      ease: "power1.out",
     })
       // Phase 2: Keep scaling and fade out (takes remaining 50% of scroll)
       .to(mockup, {
@@ -48,13 +48,13 @@ export function HeroSection() {
         scale: 1.25,
         opacity: 0,
         duration: 1,
-        ease: "power1.in"
-      })
+        ease: "power1.in",
+      });
 
     return () => {
-      tl.kill()
-    }
-  }, [])
+      tl.kill();
+    };
+  }, []);
 
   return (
     <section className="relative pt-40 pb-0 px-6 overflow-hidden">
@@ -62,7 +62,8 @@ export function HeroSection() {
       <div
         className="absolute inset-0 -z-10"
         style={{
-          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
           backgroundSize: "24px 24px",
         }}
       />
@@ -70,33 +71,37 @@ export function HeroSection() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#c6ff00]/8 blur-[120px] rounded-full -z-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto text-center">
-        {/* Headline */}
         <SectionHeading
           as="h1"
           size="hero"
-          title="Stop losing money."
+          title="Stop losing money.\n"
           highlight="Run your gym"
           subtitle="smarter."
-          delay={2.6}
+          delay={.4}
         />
 
         {/* Sub */}
+        
         <p className="text-[15px] md:text-[17px] text-white/80 max-w-xl mx-auto leading-relaxed mb-6 md:mb-8">
-          Memberships, automated QR attendance, smart billing, a complete selling &amp; POS system, workout tracking, and automated reminders — everything your gym needs to run on autopilot.
+          Memberships, smart billing, automated QR attendance, automated reminders,
+          workout tracking, POS system, and much more — everything your gym needs to run on autopilot.
         </p>
 
         {/* CTAs */}
         <div className="flex flex-row items-center justify-center gap-4  mb-6 md:mb-10">
-
           <Link href="#how-it-works">
             <button className="btn-hero-reveal h-12 px-8">
               <div className="hero-text flex items-center gap-2.5">
                 <Play className="size-3.5 fill-current" />
-                {"See how it works".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+                {"See how it works".split(" ").map((w, i) => (
+                  <span key={i}>{w}</span>
+                ))}
               </div>
               <div className="hero-clone flex items-center gap-2.5">
                 <Play className="size-3.5 fill-current" />
-                {"See how it works".split(" ").map((w, i) => <span key={i}>{w}</span>)}
+                {"See how it works".split(" ").map((w, i) => (
+                  <span key={i}>{w}</span>
+                ))}
               </div>
             </button>
           </Link>
@@ -121,7 +126,9 @@ export function HeroSection() {
             </div>
             <div className="flex-1 mx-4">
               <div className="h-5 rounded bg-white/[0.06] max-w-[200px] mx-auto flex items-center justify-center">
-                <span className="text-[10px] text-white/30">app.gymflow.pk/dashboard</span>
+                <span className="text-[10px] text-white/30">
+                  app.gymflow.pk/dashboard
+                </span>
               </div>
             </div>
           </div>
@@ -141,5 +148,5 @@ export function HeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

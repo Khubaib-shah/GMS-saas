@@ -86,20 +86,20 @@ export function PricingSection() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="max-w-xl mb-16">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">Pricing</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Pricing</div>
           <SectionHeading
             title="Simple pricing. No hidden fees."
             align="left"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/40 leading-relaxed">
+          <p className="text-[15px] text-white/80 leading-relaxed">
             Start small. Upgrade when you grow. Cancel anytime.
           </p>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <Loader2 className="w-6 h-6 text-[#c6ff00] animate-spin" />
+            <Loader2 className="w-6 h-6 text-primary animate-spin" />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -134,7 +134,7 @@ export function PricingSection() {
                   <ul className="flex flex-col gap-3 flex-1">
                     {features.map((f, j) => (
                       <li key={j} className="flex items-center gap-2.5 text-[13px] text-white/50">
-                        <Check className={`w-3.5 h-3.5 shrink-0 ${plan.isPopular ? "text-[#c6ff00]" : "text-white/30"}`} strokeWidth={2.5} />
+                        <Check className={`w-3.5 h-3.5 shrink-0 ${plan.isPopular ? "text-primary" : "text-white/30"}`} strokeWidth={2.5} />
                         {f}
                       </li>
                     ))}

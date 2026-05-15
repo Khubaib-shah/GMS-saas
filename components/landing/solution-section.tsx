@@ -30,20 +30,22 @@ export function SolutionSection() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* Left: text */}
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">The solution</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">The solution</div>
           <SectionHeading
-            title="Know exactly who walks in — instantly"
+            title="Know exactly who \n"
+            highlight="walks in"
+            subtitle="— instantly"
             align="left"
             className="mb-5"
           />
-          <p className="text-[15px] text-white/40 leading-relaxed mb-8">
+          <p className="text-[15px] text-white/80 leading-relaxed mb-8">
             Every member gets a unique QR code. Your receptionist scans it. The system instantly checks their subscription and logs attendance. No guessing. No arguments.
           </p>
           <ul className="flex flex-col gap-3">
             {checks.map((c, i) => (
               <li key={i} className="flex items-center gap-3 text-[14px] text-white/60">
                 <div className="w-5 h-5 rounded-full border border-[#c6ff00]/30 bg-[#c6ff00]/[0.08] flex items-center justify-center shrink-0">
-                  <Check className="w-3 h-3 text-[#c6ff00]" strokeWidth={2.5} />
+                  <Check className="w-3 h-3 text-primary" strokeWidth={2.5} />
                 </div>
                 {c}
               </li>
@@ -90,7 +92,7 @@ export function SolutionSection() {
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-[#c6ff00] animate-pulse" />
-              <span className="text-[11px] text-[#c6ff00] font-semibold">VERIFIED</span>
+              <span className="text-[11px] text-primary font-semibold">VERIFIED</span>
             </div>
           </div>
         </div>

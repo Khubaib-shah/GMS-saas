@@ -73,7 +73,7 @@ function LoginForm() {
             <Zap className="w-4 h-4 text-black" strokeWidth={2.5} />
           </div>
           <span className="font-bold text-[15px] tracking-tight text-white">
-            Gym<span className="text-[#c6ff00]">Flow</span>
+            Gym<span className="text-primary">Flow</span>
           </span>
         </div>
 
@@ -102,7 +102,7 @@ function LoginForm() {
             <span className="text-[12px] font-medium text-white/50">Password</span>
             <a
               href="#"
-              className="text-[12px] text-[#c6ff00] hover:text-white transition-colors"
+              className="text-[12px] text-primary hover:text-white transition-colors"
             >
               Forgot password?
             </a>
@@ -144,7 +144,7 @@ function LoginForm() {
       <div className="mt-8 pt-6 border-t border-white/[0.06] flex flex-col gap-3">
         <p className="text-center text-[13px] text-white/30">
           Are you a gym member?{" "}
-          <Link href="/member/login" className="text-[#c6ff00] hover:text-white transition-colors font-medium">
+          <Link href="/member/login" className="text-primary hover:text-white transition-colors font-medium">
             Go to Member Portal
           </Link>
         </p>
@@ -154,7 +154,7 @@ function LoginForm() {
             href="https://wa.me/923149784156"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#c6ff00] hover:text-white transition-colors font-medium"
+            className="text-primary hover:text-white transition-colors font-medium"
           >
             Contact support
           </a>
@@ -272,17 +272,17 @@ export default function LoginPage() {
               <Zap className="w-4.5 h-4.5 text-black" strokeWidth={2.5} />
             </div>
             <span className="font-bold text-[17px] tracking-tight text-white">
-              Gym<span className="text-[#c6ff00]">Flow</span>
+              Gym<span className="text-primary">Flow</span>
             </span>
           </div>
 
           {/* Headline */}
           <h2 className="text-5xl font-bold tracking-[-0.04em] text-white leading-[1.05] mb-6">
             Stop losing money.<br />
-            <span className="text-[#c6ff00]">Run your gym</span> smarter.
+            <span className="text-primary">Run your gym</span> smarter.
           </h2>
 
-          <p className="text-[15px] text-white/40 leading-relaxed mb-12">
+          <p className="text-[15px] text-white/80 leading-relaxed mb-12">
             Memberships, QR attendance, billing, point-of-sale, and workout tracking. All in one place.
           </p>
 
@@ -290,7 +290,7 @@ export default function LoginPage() {
           <div className="flex flex-col gap-4">
             {brandPoints.map((p, i) => (
               <div key={i} className="flex items-center gap-3">
-                <p.icon className="w-4 h-4 text-[#c6ff00] shrink-0" strokeWidth={2} />
+                <p.icon className="w-4 h-4 text-primary shrink-0" strokeWidth={2} />
                 <span className="text-[14px] text-white/60">{p.text}</span>
               </div>
             ))}
@@ -302,7 +302,7 @@ export default function LoginPage() {
       <div className="w-full lg:w-2/5 flex items-center justify-center px-8 py-16 relative z-10">
         <Suspense
           fallback={
-            <div className="text-[#c6ff00] text-[13px] animate-pulse tracking-widest">
+            <div className="text-primary text-[13px] animate-pulse tracking-widest">
               Loading...
             </div>
           }

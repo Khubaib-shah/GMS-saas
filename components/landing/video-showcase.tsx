@@ -7,7 +7,10 @@ import { useState } from "react";
 export function VideoShowcase() {
   const [isPlaying, setIsPlaying] = useState(false);
   return (
-    <section className="py-24 px-6 bg-slate-950 relative overflow-hidden">
+    <section 
+      className="py-24 px-6 relative overflow-hidden"
+      style={{ background: 'linear-gradient(to right, #000000, #0d1318)' }}
+    >
       {/* Ambient Background */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -20,7 +23,7 @@ export function VideoShowcase() {
             title="See GymFlow in Action."
             className="mb-6"
           />
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg max-w-2xl mx-auto text-white/80">
             Watch how easy it is to manage your entire fitness business,
             automate payments, and track attendance from one centralized
             dashboard.
@@ -28,12 +31,12 @@ export function VideoShowcase() {
         </div>
 
         {/* Video Container */}
-        <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 bg-slate-900 shadow-[0_0_50px_rgba(190,255,0,0.1)] group hover:shadow-[0_0_80px_rgba(190,255,0,0.2)] transition-shadow duration-700">
+        <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 bg-slate-900 shadow-[0_0_50px_rgba(190,255,0,0.1)] group hover:shadow-[0_0_80px_rgba(190,255,0,0.05)] transition-shadow duration-700">
           {!isPlaying ? (
             <>
               {/* Thumbnail / Placeholder */}
               <div className="absolute inset-0 bg-gradient-to-tr from-slate-950/35 to-slate-800/35">
-                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20"></div>
+                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5"></div>
                 {/* We keep the iframe but without autoplay and pointer events so it acts as a thumbnail */}
                 <iframe
                   width="100%"
@@ -44,7 +47,7 @@ export function VideoShowcase() {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen
-                  className="w-full h-full object-cover opacity-50 mix-blend-overlay group-hover:scale-105 transition-transform duration-1000 ease-out pointer-events-none"
+                  className="w-full h-full object-cover opacity-90 transition-transform duration-1000 ease-out pointer-events-none"
                 ></iframe>
               </div>
 

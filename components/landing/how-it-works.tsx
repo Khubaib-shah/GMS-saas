@@ -29,13 +29,13 @@ export function HowItWorks() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="max-w-xl mb-20">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">How it works</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">How it works</div>
           <SectionHeading
             title="Up and running in under 10 minutes"
             align="left"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/40 leading-relaxed">
+          <p className="text-[15px] text-white/80 leading-relaxed">
             No installation. No training needed. Just sign up and start managing.
           </p>
         </div>
@@ -49,12 +49,12 @@ export function HowItWorks() {
             <div key={i} className="flex flex-col gap-5">
               {/* Number */}
               <div className="relative w-10 h-10 rounded-full border border-white/[0.12] bg-white/[0.03] flex items-center justify-center z-10">
-                <span className="text-[12px] font-bold text-[#c6ff00]">{s.n}</span>
+                <span className="text-[12px] font-bold text-primary">{s.n}</span>
               </div>
 
               <div>
                 <h3 className="text-[15px] font-semibold text-white mb-2 tracking-tight">{s.title}</h3>
-                <p className="text-[13px] text-white/40 leading-relaxed">{s.description}</p>
+                <p className="text-[13px] text-white/80 leading-relaxed">{s.description}</p>
               </div>
             </div>
           ))}

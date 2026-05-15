@@ -76,13 +76,13 @@ export function Testimonials() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="max-w-xl mb-16">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#c6ff00] mb-4">Testimonials</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Testimonials</div>
           <SectionHeading
             title="Trusted by gym owners across Pakistan"
             align="left"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/40 leading-relaxed">
+          <p className="text-[15px] text-white/80 leading-relaxed">
             Real quotes from gym owners who switched to GymFlow.
           </p>
         </div>
@@ -96,23 +96,23 @@ export function Testimonials() {
                   {/* Stars */}
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="w-3.5 h-3.5 text-[#c6ff00] fill-[#c6ff00]" />
+                      <Star key={j} className="w-3.5 h-3.5 text-primary fill-[#c6ff00]" />
                     ))}
                   </div>
 
                   {/* Highlight */}
-                  <div className="inline-block text-[10px] font-semibold uppercase tracking-widest text-[#c6ff00] border border-[#c6ff00]/20 bg-[#c6ff00]/[0.06] rounded-full px-2.5 py-1 w-fit">
+                  <div className="inline-block text-[10px] font-semibold uppercase tracking-widest text-primary border border-[#c6ff00]/20 bg-[#c6ff00]/[0.06] rounded-full px-2.5 py-1 w-fit">
                     {t.highlight}
                   </div>
 
                   {/* Quote */}
-                  <p className="text-[13px] text-white/50 leading-relaxed flex-1">
+                  <p className="text-[13px] text-white/80 leading-relaxed flex-1">
                     &ldquo;{t.quote}&rdquo;
                   </p>
 
                   {/* Author */}
                   <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
-                    <div className="w-8 h-8 rounded-full bg-[#c6ff00]/[0.08] border border-[#c6ff00]/[0.15] flex items-center justify-center text-[12px] font-bold text-[#c6ff00] shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[#c6ff00]/[0.08] border border-[#c6ff00]/[0.15] flex items-center justify-center text-[12px] font-bold text-primary shrink-0">
                       {t.initial}
                     </div>
                     <div>

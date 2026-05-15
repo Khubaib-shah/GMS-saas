@@ -8,13 +8,19 @@ export function PreLoader() {
   const [shouldRender, setShouldRender] = useState(true)
 
   useEffect(() => {
+    document.documentElement.classList.add('loading')
     const timer = setTimeout(() => {
       setLoading(false)
+      document.documentElement.classList.remove('loading')
+      window.dispatchEvent(new CustomEvent('pageLoaded'))
       const removeTimer = setTimeout(() => setShouldRender(false), 800)
       return () => clearTimeout(removeTimer)
     }, 2500)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      document.documentElement.classList.remove('loading')
+    }
   }, [])
 
   if (!shouldRender) return null
