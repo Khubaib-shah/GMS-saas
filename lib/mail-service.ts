@@ -43,7 +43,14 @@ export function getBaseTemplate(title: string, content: string): string {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="color-scheme" content="light dark">
+        <meta name="supported-color-schemes" content="light dark">
         <style>
+          :root {
+            color-scheme: light dark;
+            supported-color-schemes: light dark;
+          }
+
           /* Global resets & client overrides */
           body, html {
             margin: 0 !important;
@@ -133,9 +140,112 @@ export function getBaseTemplate(title: string, content: string): string {
             color: ${primaryColor} !important;
             text-decoration: none;
           }
-          @media only screen and (max-width: 600px) {
-            .receipt-box { padding: 15px !important; }
-            .content { padding: 30px 15px; }
+
+          /* Force Dark Mode colors inside prefers-color-scheme query to prevent iOS automatic background inversion */
+          @media (prefers-color-scheme: dark) {
+            body, html, .email-body-wrapper {
+              background-color: ${bgColor} !important;
+              color: #f8fafc !important;
+            }
+            .container { 
+              background-color: ${cardBg} !important; 
+              border-color: ${borderColor} !important; 
+            }
+            .header { 
+              background-color: #090d12 !important;
+              border-color: ${borderColor} !important;
+            }
+            .content { 
+              background-color: ${cardBg} !important;
+              color: #cbd5e1 !important;
+            }
+            .footer { 
+              color: #64748b !important; 
+              background-color: #06090d !important;
+              border-color: ${borderColor} !important;
+            }
+            .receipt-box {
+              background-color: #11161d !important;
+              border-color: #1e293b !important;
+            }
+            .privacy-box {
+              background-color: #06090d !important;
+              border-color: #1e293b !important;
+            }
+            a {
+              color: ${primaryColor} !important;
+            }
+          }
+
+          /* Mobile responsive layout */
+          @media only screen and (max-width: 480px) {
+            .container {
+              border-radius: 16px !important;
+            }
+            .content { 
+              padding: 24px 16px !important; 
+            }
+            .header {
+              padding: 30px 16px !important;
+            }
+            .footer {
+              padding: 24px 16px !important;
+            }
+            .receipt-box { 
+              padding: 16px !important; 
+              margin: 20px 0 !important; 
+              border-radius: 12px !important;
+            }
+            .privacy-box {
+              padding: 12px !important;
+              margin-top: 24px !important;
+              border-radius: 10px !important;
+            }
+            /* Stack table columns for seamless responsiveness on mobile */
+            .receipt-box table, 
+            .receipt-box tbody, 
+            .receipt-box tr, 
+            .receipt-box td {
+              display: block !important;
+              width: 100% !important;
+              box-sizing: border-box !important;
+            }
+            .receipt-box tr {
+              margin-bottom: 12px !important;
+              border-bottom: 1px solid rgba(30, 41, 59, 0.4) !important;
+              padding-bottom: 12px !important;
+            }
+            .receipt-box tr:last-child {
+              margin-bottom: 0 !important;
+              border-bottom: none !important;
+              padding-bottom: 0 !important;
+              border-top: 1px solid #1e293b !important;
+              padding-top: 12px !important;
+            }
+            .receipt-box td {
+              text-align: left !important;
+              padding-bottom: 4px !important;
+              font-size: 12px !important;
+              word-break: break-word !important;
+            }
+            .receipt-box td:first-child {
+              color: #64748b !important;
+              font-size: 11px !important;
+              font-weight: bold !important;
+              text-transform: uppercase !important;
+              letter-spacing: 1px !important;
+            }
+            .receipt-box td:last-child {
+              padding-bottom: 0 !important;
+              font-size: 13px !important;
+            }
+            .btn {
+              display: block !important;
+              text-align: center !important;
+              padding: 14px 16px !important;
+              font-size: 12px !important;
+              box-sizing: border-box !important;
+            }
           }
         </style>
       </head>

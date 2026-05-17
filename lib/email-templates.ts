@@ -125,7 +125,7 @@ export const EmailTemplates = {
         <a href="${data.loginUrl}" class="btn" style="background-color: #ccff00 !important; color: #000000 !important; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: 900; text-transform: uppercase; font-size: 12px; display: inline-block;">Access Admin Dashboard</a>
       </p>
 
-      <div style="background-color: #06090d !important; border-radius: 12px; padding: 15px; margin-top: 30px; border: 1px solid #1e293b !important; font-size: 11px; color: #64748b; line-height: 1.4;">
+      <div class="privacy-box" style="background-color: #06090d !important; border-radius: 12px; padding: 15px; margin-top: 30px; border: 1px solid #1e293b !important; font-size: 11px; color: #64748b; line-height: 1.4;">
         <strong>🔒 Privacy & Data Protection Notice:</strong><br>
         This email contains confidential information related to your enterprise account at GymFlow. We process your data in accordance with our Privacy Policy and applicable data protection regulations. We never share your personal or payment details with third parties. Under relevant privacy laws, you have the right to access, rectify, or request erasure of your data at any time. For privacy inquiries or to manage your communication preferences, contact our Data Protection Officer at <a href="mailto:gymflow@gmail.com" style="color: #ccff00 !important; text-decoration: none;">gymflow@gmail.com</a>.
       </div>
@@ -180,7 +180,7 @@ export const EmailTemplates = {
         <a href="${data.portalUrl}" class="btn" style="background-color: #ccff00 !important; color: #000000 !important; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: 900; text-transform: uppercase; font-size: 12px; display: inline-block;">Login to Member Portal</a>
       </p>
 
-      <div style="background-color: #06090d !important; border-radius: 12px; padding: 15px; margin-top: 30px; border: 1px solid #1e293b !important; font-size: 11px; color: #64748b; line-height: 1.4;">
+      <div class="privacy-box" style="background-color: #06090d !important; border-radius: 12px; padding: 15px; margin-top: 30px; border: 1px solid #1e293b !important; font-size: 11px; color: #64748b; line-height: 1.4;">
         <strong>🔒 Privacy & GDPR Notice:</strong><br>
         Your privacy is extremely important to us. Your membership data is securely stored on behalf of <strong>${data.gymName}</strong> via GymFlow. We process your contact information and workout history solely to facilitate membership access. We do not sell your personal health records or contact info. You have full rights to request a copy of your records, restrict processing, or request account deletion. For any privacy requests or to modify your communication preferences, contact the gym management or email <a href="mailto:privacy@gymflow.pk" style="color: #ccff00 !important; text-decoration: none;">privacy@gymflow.pk</a>.
       </div>
