@@ -119,7 +119,7 @@ async function runBackup() {
         // Cleanup old local backups
         await cleanOldBackups();
 
-        console.log("\n✅ Backup completed successfully.");
+        console.log("\n Backup completed successfully.");
         process.exit(0);
     } catch (error) {
         console.error("[FATAL] Backup failed:", error);

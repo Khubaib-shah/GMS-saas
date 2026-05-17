@@ -117,7 +117,7 @@ export const CreateMemberSchema = z.object({
     notes: z.string().max(500).optional(),
     trainerId: z.string().optional().or(z.literal("")),
     branchId: z.string().optional().or(z.literal("")),
-    photoBase64: z.string().optional(),
+    photoBase64: z.string().nullable().optional(),
 });
 
 export const UpdateMemberSchema = z.object({
@@ -131,7 +131,7 @@ export const UpdateMemberSchema = z.object({
     notes: z.string().max(500).optional(),
     trainerId: z.string().optional().or(z.literal("")).or(z.literal("__none__")),
     branchId: z.string().optional().or(z.literal("")),
-    photoBase64: z.string().optional().or(z.literal("")),
+    photoBase64: z.string().nullable().optional().or(z.literal("")),
 });
 
 // ─────────────────────────────────────────────────

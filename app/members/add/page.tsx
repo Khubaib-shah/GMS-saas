@@ -49,6 +49,8 @@ export default function AddMemberPage() {
     trainerId: "",
   });
   const [trainers, setTrainers] = useState<any[]>([]);
+  const [previewId, setPreviewId] = useState("");
+  const [currentTime, setCurrentTime] = useState("");
 
   const progress = useMemo(() => {
     const fields = [
@@ -67,6 +69,13 @@ export default function AddMemberPage() {
   useEffect(() => {
     store.loadPlans();
     fetchTrainers();
+    setPreviewId(Math.random().toString(36).substr(2, 6).toUpperCase());
+    setCurrentTime(new Date().toLocaleTimeString());
+
+    const interval = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   // Auto-set planId to first available plan when plans load
@@ -457,11 +466,10 @@ export default function AddMemberPage() {
                   </h3>
                   <div className="flex items-center gap-2 text-[8px] font-bold text-slate-500 uppercase tracking-widest">
                     <span>
-                      ID: GF-
-                      {Math.random().toString(36).substr(2, 6).toUpperCase()}
+                      ID: GF-{previewId || "------"}
                     </span>
                     <span className="w-1 h-1 bg-slate-800 rounded-full"></span>
-                    <span>{new Date().toLocaleTimeString()}</span>
+                    <span>{currentTime || "--:--:--"}</span>
                   </div>
                 </div>
               </div>

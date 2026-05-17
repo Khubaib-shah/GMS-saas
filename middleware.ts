@@ -102,8 +102,8 @@ export const config = {
          * - _next/static
          * - _next/image
          * - favicon.ico
-         * - public assets (png, svg, jpg, etc.)
+         * - public assets (png, svg, jpg, etc., and webmanifest)
          */
-        "/((?!api/seed|api/register|api/auth|api/v1/store|api/request-demo|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)",
+        "/((?!api/seed|api/register|api/auth|api/v1/store|api/request-demo|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|webmanifest)).*)",
     ],
 };

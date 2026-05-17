@@ -2,8 +2,11 @@ import { NextResponse } from "next/server";
 import { stripeService } from "@/lib/services/stripe";
 import connectDB from "@/lib/db";
 import Gym from "@/models/Gym";
+import User from "@/models/User";
 import PlatformPayment from "@/models/PlatformPayment";
 import { logAudit } from "@/lib/audit";
+import { sendEmail } from "@/lib/mail-service";
+import { EmailTemplates } from "@/lib/email-templates";
 
 export async function POST(req: Request) {
     const payload = await req.text();
@@ -82,6 +85,29 @@ export async function POST(req: Request) {
                         newExpiry: newExpiry
                     }
                 });
+
+                // ── Send Gym Owner Welcome Onboarding Email ──
+                try {
+                    const owner = await User.findOne({ gymId, role: "owner" });
+                    if (owner && owner.email) {
+                        console.log(`[Stripe Webhook] Sending welcome onboarding email to owner: ${owner.email}`);
+                        await sendEmail({
+                            to: owner.email,
+                            subject: "Welcome to GymFlow — Your subscription is active!",
+                            html: EmailTemplates.ownerWelcome({
+                                ownerName: owner.fullName,
+                                gymName: gym.name,
+                                planName: planName || "Professional",
+                                expiryDate: newExpiry.toISOString(),
+                                loginUrl: `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/login`,
+                            }),
+                        });
+                    } else {
+                        console.warn(`[Stripe Webhook] Gym Owner user not found for gym: ${gymId}. Skipping welcome email.`);
+                    }
+                } catch (emailErr: any) {
+                    console.error(`[Stripe Webhook] Welcome email delivery failed:`, emailErr);
+                }
             }
         }
 

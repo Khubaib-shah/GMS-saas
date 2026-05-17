@@ -1,5 +1,6 @@
 import connectDB from "@/lib/db";
 import Member from "@/models/Member";
+import Gym from "@/models/Gym";
 import { NextResponse } from "next/server";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import Subscription from "@/models/Subscription";
@@ -9,6 +10,8 @@ import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 import GymSettings from "@/models/GymSettings";
 import { CreateMemberSchema } from "@/lib/validations";
+import { sendEmail } from "@/lib/mail-service";
+import { EmailTemplates } from "@/lib/email-templates";
 
 export async function GET(req: Request) {
     const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW);
@@ -188,6 +191,39 @@ export async function POST(req: Request) {
 
         // Invalidate all member list caches for this gym on addition of new member
         await invalidatePattern(`members:list:gym:${session.user.gymId}:*`);
+
+        // ── Send Gym Member Welcome Email ──
+        if (createdMember.email) {
+            try {
+                // Fetch gym details for branding name
+                const gym = await Gym.findById(targetGymId).lean();
+                const gymName = gym ? gym.name : "Your Gym";
+
+                // Fetch subscription plan details if provided
+                let planName = "General Membership";
+                if (data.planId) {
+                    const Plan = (await import("@/models/Plan")).default;
+                    const plan = await Plan.findOne({ id: data.planId, gymId: targetGymId }).lean();
+                    if (plan) planName = plan.name;
+                }
+
+                console.log(`[Members Route] Sending welcome email to member: ${createdMember.email} (Gym: ${gymName})`);
+                await sendEmail({
+                    to: createdMember.email,
+                    subject: `Welcome to ${gymName}!`,
+                    gymId: targetGymId, 
+                    html: EmailTemplates.memberWelcome({
+                        memberName: `${createdMember.firstName || ""} ${createdMember.lastName || ""}`.trim(),
+                        gymName,
+                        planName,
+                        email: createdMember.email,
+                        portalUrl: `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/members/login`,
+                    }),
+                });
+            } catch (emailErr: any) {
+                console.error(`[Members Route] Member welcome email delivery failed:`, emailErr);
+            }
+        }
 
         return NextResponse.json(createdMember, { status: 201 });
     } catch (error: any) {

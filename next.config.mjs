@@ -38,7 +38,7 @@ const nextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://va.vercel-scripts.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://res.cloudinary.com",
+              "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com",
               "connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com",
               "frame-src 'self' https://js.stripe.com",
             ].join("; "),
