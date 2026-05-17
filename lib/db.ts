@@ -1,4 +1,11 @@
 import mongoose from "mongoose";
+import { mongooseTenantPlugin } from "./mongoose-tenant-plugin";
+
+// Register the tenant isolation plugin globally for all Mongoose models.
+// This auto-injects gymId scoping into find/update/delete queries when
+// a tenant context is active via AsyncLocalStorage.
+mongoose.plugin(mongooseTenantPlugin);
+
 
 const MONGODB_URL = process.env.MONGODB_URL;
 

@@ -86,3 +86,33 @@ The project follows the standard Next.js App Router structure:
 - **Attendance**: Daily log of member visits (`checkInTime`, `checkOutTime`).
 
 This document provides a complete high-level understanding of the GMS SaaS application structure and functionality.
+
+## 7. Security & Compliance Architecture
+
+The system implements strict enterprise-grade security and compliance protocols to ensure tenant isolation and protect sensitive member data:
+
+### 7.1 Multi-Tenant Isolation
+Multi-tenancy is enforced globally via a custom Mongoose plugin (`lib/mongoose-tenant-plugin.ts`) combined with Node's `AsyncLocalStorage`.
+- **Global Scoping**: When an API request begins, the active `gymId` is bound to the AsyncLocalStorage context.
+- **Automatic Scoping**: The Mongoose plugin automatically intercepts all query types (`find`, `findOne`, `updateOne`, `deleteMany`, etc.) and injects `gymId` scoping automatically.
+- **Leak Protection**: Attempts to execute a query containing a mismatched `gymId` compared to the active tenant context are automatically blocked with a runtime error, preventing IDOR/BOLA data leaks.
+
+### 7.2 Input Validation & Mass Assignment Guard
+All critical write endpoints (POST/PUT) are protected against Mass Assignment attacks.
+- **Zod Schemas**: Strict schemas defined in `lib/validations.ts` parse and whitelist incoming parameters for Members, Subscriptions, Payments, Staff, and Signup requests.
+- **Constraint Enforcement**: Enforces strong validation, format compliance (emails, URIs), and optional field sanitization before data touches database schemas.
+
+### 7.3 Rate Limiting & Brute-Force Protection
+- **Sliding-Window Throttling**: A Redis-backed sliding-window rate limiter (`lib/rate-limiter.ts`) restricts public write operations (Signup capped at 5/hour per IP, Member Portal Login at 10/15-minutes per IP).
+- **Brute-Force Lockout**: Staff and member logins track failed attempts. 5 consecutive failures trigger a 15-minute account lockout, updating persistent counters in MongoDB.
+
+### 7.4 Transport Security & HTTP Headers
+Strict production headers are appended to all requests inside `next.config.mjs`:
+- **HSTS (Strict-Transport-Security)**: Enforces TLS/HTTPS usage over a 2-year window including subdomains.
+- **CSP (Content-Security-Policy)**: Restricts allowed source connections to a strict whitelist (Stripe, Cloudinary, Google Fonts).
+- **Redirection**: HTTP connections are automatically redirected to HTTPS via middleware (`middleware.ts`).
+- **Additional guards**: `X-Frame-Options: DENY` (Anti-Clickjacking), `X-Content-Type-Options: nosniff` (Anti-MIME-sniffing), and secure Referrer-Policies.
+
+### 7.5 Database Backups
+- **Automated Archives**: `scripts/db-backup.ts` handles gzipped mongodumps with local retention (7 days) and direct secure upload capability to AWS S3.
+

@@ -90,6 +90,106 @@ export const UserPreferencesSchema = z.object({
 });
 
 // ─────────────────────────────────────────────────
+// Password Policy
+// ─────────────────────────────────────────────────
+
+export const PasswordSchema = z
+    .string()
+    .min(8, "Password must be at least 8 characters long")
+    .max(128, "Password must not exceed 128 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
+
+// ─────────────────────────────────────────────────
+// Member Schemas (Mass Assignment Protection)
+// ─────────────────────────────────────────────────
+
+export const CreateMemberSchema = z.object({
+    firstName: z.string().min(1, "First name is required").max(50),
+    lastName: z.string().max(50).optional(),
+    email: z.string().email("Invalid email format").optional().or(z.literal("")),
+    phone: z.string().max(20).optional().or(z.literal("")),
+    gender: z.enum(["male", "female", "other"]).optional(),
+    joinDate: z.string().min(1, "Join date is required"),
+    planId: z.string().optional(),
+    notes: z.string().max(500).optional(),
+    trainerId: z.string().optional().or(z.literal("")),
+    branchId: z.string().optional().or(z.literal("")),
+    photoBase64: z.string().optional(),
+});
+
+export const UpdateMemberSchema = z.object({
+    firstName: z.string().min(1).max(50).optional(),
+    lastName: z.string().max(50).optional(),
+    email: z.string().email("Invalid email format").optional().or(z.literal("")),
+    phone: z.string().max(20).optional().or(z.literal("")),
+    gender: z.enum(["male", "female", "other"]).optional(),
+    joinDate: z.string().optional(),
+    planId: z.string().optional(),
+    notes: z.string().max(500).optional(),
+    trainerId: z.string().optional().or(z.literal("")).or(z.literal("__none__")),
+    branchId: z.string().optional().or(z.literal("")),
+    photoBase64: z.string().optional().or(z.literal("")),
+});
+
+// ─────────────────────────────────────────────────
+// Payment Schemas
+// ─────────────────────────────────────────────────
+
+export const CreatePaymentSchema = z.object({
+    memberId: z.string().min(1, "Member ID is required"),
+    amount: z.number().min(0, "Amount must be positive"),
+    date: z.string().min(1, "Payment date is required"),
+    method: z.enum(["cash", "online", "bank_transfer", "card", "other"]),
+    description: z.string().max(500).optional(),
+    receiptUrl: z.string().url().optional().or(z.literal("")),
+    receiptNumber: z.string().max(50).optional(),
+    collectedBy: z.string().optional(),
+    notes: z.string().max(500).optional(),
+    branchId: z.string().optional(),
+});
+
+// ─────────────────────────────────────────────────
+// Subscription Schemas
+// ─────────────────────────────────────────────────
+
+export const CreateSubscriptionSchema = z.object({
+    memberId: z.string().min(1, "Member ID is required"),
+    planId: z.string().min(1, "Plan ID is required"),
+    startDate: z.string().min(1, "Start date is required"),
+    endDate: z.string().min(1, "End date is required"),
+    originalEndDate: z.string().optional(),
+    status: z.enum(["active", "expired", "paused"]).optional(),
+    paymentId: z.string().optional(),
+    branchId: z.string().optional(),
+});
+
+// ─────────────────────────────────────────────────
+// Staff Schemas
+// ─────────────────────────────────────────────────
+
+export const CreateStaffSchema = z.object({
+    fullName: z.string().min(1, "Full name is required").max(100),
+    email: z.string().email("Invalid email format"),
+    password: PasswordSchema,
+    role: z.enum(["manager", "receptionist", "trainer", "accountant"]),
+});
+
+// ─────────────────────────────────────────────────
+// Signup Schema
+// ─────────────────────────────────────────────────
+
+export const SignupSchema = z.object({
+    fullName: z.string().min(1, "Full name is required").max(100),
+    email: z.string().email("Invalid email format"),
+    password: PasswordSchema,
+    gymName: z.string().min(1, "Gym name is required").max(100),
+    planName: z.string().optional(),
+});
+
+// ─────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────
 

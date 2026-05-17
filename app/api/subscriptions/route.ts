@@ -1,4 +1,5 @@
 import connectDB from "@/lib/db";
+import { CreateSubscriptionSchema } from "@/lib/validations";
 import Subscription from "@/models/Subscription";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
@@ -44,11 +45,29 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
+
+        // ── Zod Validation (Mass Assignment Protection) ──
+        const parsed = CreateSubscriptionSchema.safeParse(body);
+        if (!parsed.success) {
+            return NextResponse.json(
+                { message: "Validation failed", errors: parsed.error.flatten().fieldErrors },
+                { status: 400 }
+            );
+        }
+
+        const data = parsed.data;
         await connectDB();
+
         const sub = await new Subscription({
-            ...body,
+            memberId: data.memberId,
+            planId: data.planId,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            originalEndDate: data.originalEndDate || data.endDate,
+            status: data.status || "active",
+            paymentId: data.paymentId,
             gymId: session.user.gymId,
-            branchId: body.branchId || session.user.branchId
+            branchId: data.branchId || session.user.branchId,
         }).save();
 
         // Audit Log

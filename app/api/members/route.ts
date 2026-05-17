@@ -8,6 +8,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 import GymSettings from "@/models/GymSettings";
+import { CreateMemberSchema } from "@/lib/validations";
 
 export async function GET(req: Request) {
     const authResult = await requirePermission(PERMISSIONS.MEMBERS_VIEW);
@@ -124,43 +125,51 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
+
+        // ── Zod Validation (Mass Assignment Protection) ──
+        const parsed = CreateMemberSchema.safeParse(body);
+        if (!parsed.success) {
+            return NextResponse.json(
+                { message: "Validation failed", errors: parsed.error.flatten().fieldErrors },
+                { status: 400 }
+            );
+        }
+
+        const data = parsed.data;
         await connectDB();
 
-        // Sanitize: remove empty/invalid values that would cause MongoDB CastError
-        const sanitizedBody = { ...body };
-        // trainerId must be a valid ObjectId or undefined
-        if (!sanitizedBody.trainerId || sanitizedBody.trainerId === "__none__" || sanitizedBody.trainerId === "") {
-            delete sanitizedBody.trainerId;
-        }
-        // Remove empty email to avoid duplicate key errors on sparse unique index
-        if (!sanitizedBody.email || sanitizedBody.email.trim() === "") {
-            delete sanitizedBody.email;
-        }
-        // Remove empty phone
-        if (!sanitizedBody.phone || sanitizedBody.phone.trim() === "") {
-            delete sanitizedBody.phone;
-        }
-
-        console.log("[POST /api/members] Sanitized payload:", { ...sanitizedBody, photoBase64: sanitizedBody.photoBase64 ? "[BASE64]" : undefined });
-
-        // Auto-inject gymId and optional branchId
+        // Auto-inject gymId from session (never trust client)
         const gymId = session.user.gymId;
 
         if (!gymId && session.user.role !== 'super_admin') {
             return NextResponse.json({ message: "Gym ID is required to create a member" }, { status: 400 });
         }
 
-        // If super_admin, we might expect gymId in the body or they just can't create members this way
-        const targetGymId = gymId || sanitizedBody.gymId;
+        const targetGymId = gymId || body.gymId;
         if (!targetGymId) {
             return NextResponse.json({ message: "Contextual Gym ID missing. Super-admins must provide a gymId." }, { status: 400 });
         }
 
-        const memberData = {
-            ...sanitizedBody,
+        // Build safe member data — only validated fields
+        const memberData: Record<string, any> = {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            gender: data.gender,
+            joinDate: data.joinDate,
+            planId: data.planId,
+            notes: data.notes,
             gymId: targetGymId,
-            branchId: sanitizedBody.branchId || session.user.branchId || undefined,
+            branchId: data.branchId || session.user.branchId || undefined,
         };
+
+        // Sanitize optional fields
+        if (data.email && data.email.trim() !== "") memberData.email = data.email;
+        if (data.phone && data.phone.trim() !== "") memberData.phone = data.phone;
+        if (data.trainerId && data.trainerId !== "" && data.trainerId !== "__none__") {
+            memberData.trainerId = data.trainerId;
+        }
+        if (data.photoBase64) memberData.photoBase64 = data.photoBase64;
+
         const member = await Member.create(memberData);
         const createdMember = Array.isArray(member) ? member[0] : member;
 
@@ -171,8 +180,8 @@ export async function POST(req: Request) {
                 "create",
                 "member",
                 createdMember._id.toString(),
-                `${body.firstName || ""} ${body.lastName || ""}`.trim(),
-                { member: body },
+                `${data.firstName || ""} ${data.lastName || ""}`.trim(),
+                { member: data },
                 req.headers
             )
         );

@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
+import { rateLimit, getClientIp } from "@/lib/rate-limiter";
 
 const MEMBER_JWT_SECRET = process.env.NEXTAUTH_SECRET || "member-portal-secret";
 const TOKEN_EXPIRY = "7d";
@@ -14,6 +15,23 @@ const TOKEN_EXPIRY = "7d";
  */
 export async function POST(req: Request) {
     try {
+        // ── Rate Limiting (10 login attempts per 15 minutes per IP) ──
+        const ip = getClientIp(req);
+        const limiter = await rateLimit(`member-login:${ip}`, 10, 900);
+        if (!limiter.success) {
+            return NextResponse.json(
+                { message: "Too many login attempts. Please try again later." },
+                {
+                    status: 429,
+                    headers: {
+                        "Retry-After": String(limiter.reset - Math.floor(Date.now() / 1000)),
+                        "X-RateLimit-Limit": String(limiter.limit),
+                        "X-RateLimit-Remaining": String(limiter.remaining),
+                    },
+                }
+            );
+        }
+
         const body = await req.json();
         const { email, password, pin, qrCode, gymId } = body;
 

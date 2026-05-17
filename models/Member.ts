@@ -36,6 +36,10 @@ const MemberSchema = new mongoose.Schema(
         attendanceStreak: { type: Number, default: 0 },
         lastCheckIn: { type: Date },
         totalCheckIns: { type: Number, default: 0 },
+
+        // Brute-force protection for portal login
+        failedLoginAttempts: { type: Number, default: 0 },
+        lastFailedLoginAt: { type: Date },
     },
     { timestamps: true }
 );

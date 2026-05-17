@@ -6,6 +6,7 @@ import User from "@/models/User";
 import Member from "@/models/Member";
 import Gym from "@/models/Gym";
 import { subscriptionService } from "@/lib/services/subscription";
+import { logAudit } from "@/lib/audit";
 
 // Rate limiting constants
 const MAX_FAILED_ATTEMPTS = 5;
@@ -64,7 +65,7 @@ export const authOptions: NextAuthOptions = {
                     throw new Error("Account is disabled. Contact your administrator.");
                 }
 
-                // Rate limiting check
+                // Rate limiting check (applies to both Staff and Members)
                 if (account.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
                     const lockoutEnd = new Date(account.lastFailedLoginAt?.getTime() + LOCKOUT_DURATION_MS);
                     if (new Date() < lockoutEnd) {
@@ -72,7 +73,8 @@ export const authOptions: NextAuthOptions = {
                         throw new Error(`Too many failed attempts. Try again in ${minutesLeft} minutes.`);
                     }
                     // Lockout expired, reset counter
-                    await User.updateOne(
+                    const Model = isMember ? Member : User;
+                    await Model.updateOne(
                         { _id: account._id },
                         { $set: { failedLoginAttempts: 0 } }
                     );
@@ -81,16 +83,15 @@ export const authOptions: NextAuthOptions = {
                 const isMatch = await bcrypt.compare(credentials.password, account.password);
 
                 if (!isMatch) {
-                    // Increment failed attempts only for Staff/Admin users
-                    if (!isMember) {
-                        await User.updateOne(
-                            { _id: account._id },
-                            {
-                                $inc: { failedLoginAttempts: 1 },
-                                $set: { lastFailedLoginAt: new Date() }
-                            }
-                        );
-                    }
+                    // Increment failed attempts for both Staff and Members
+                    const Model = isMember ? Member : User;
+                    await Model.updateOne(
+                        { _id: account._id },
+                        {
+                            $inc: { failedLoginAttempts: 1 },
+                            $set: { lastFailedLoginAt: new Date() }
+                        }
+                    );
                     throw new Error("Invalid credentials");
                 }
 
@@ -108,8 +109,29 @@ export const authOptions: NextAuthOptions = {
                 } else {
                     await Member.updateOne(
                         { _id: account._id },
-                        { $set: { lastPortalLogin: new Date() } }
+                        {
+                            $set: {
+                                failedLoginAttempts: 0,
+                                lastPortalLogin: new Date()
+                            }
+                        }
                     );
+                }
+
+                // Audit log: successful login
+                try {
+                    await logAudit({
+                        gymId: account.gymId ? account.gymId.toString() : "PLATFORM",
+                        userId: account._id.toString(),
+                        userName: account.fullName || account.email || identifier,
+                        userRole: account.role,
+                        action: "login",
+                        resource: "user",
+                        resourceId: account._id.toString(),
+                        details: { status: "success", isMember },
+                    });
+                } catch (_auditErr) {
+                    // Never block login flow due to audit failure
                 }
 
                 let isPremium = false;

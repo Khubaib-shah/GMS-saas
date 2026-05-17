@@ -3,6 +3,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export default async function proxy(req: NextRequest) {
+    // ── HTTPS Enforcement (Production Only) ──────────────
+    if (
+        process.env.NODE_ENV === "production" &&
+        req.headers.get("x-forwarded-proto") !== "https"
+    ) {
+        return NextResponse.redirect(
+            `https://${req.nextUrl.hostname}${req.nextUrl.pathname}${req.nextUrl.search}`,
+            301
+        );
+    }
+
+
     const cookies = req.cookies.getAll();
     const sessionCookie = cookies.find(c => c.name.includes('session-token'));
 

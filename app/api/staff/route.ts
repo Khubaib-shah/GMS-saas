@@ -6,6 +6,7 @@ import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
+import { CreateStaffSchema } from "@/lib/validations";
 
 // GET /api/staff - List all staff for the gym
 export async function GET() {
@@ -61,7 +62,17 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { fullName, email, password, role: newRole } = body;
+
+        // ── Zod Validation (includes PasswordSchema complexity check) ──
+        const parsed = CreateStaffSchema.safeParse(body);
+        if (!parsed.success) {
+            return NextResponse.json(
+                { message: "Validation failed", errors: parsed.error.flatten().fieldErrors },
+                { status: 400 }
+            );
+        }
+
+        const { fullName, email, password, role: newRole } = parsed.data;
         await connectDB();
 
         if (session.user.role === "super_admin" && !gymId) {
@@ -72,16 +83,6 @@ export async function POST(req: Request) {
 
         if (!gymId) {
             return NextResponse.json({ error: "No gym context found" }, { status: 404 });
-        }
-
-        if (!fullName || !email || !password || !newRole) {
-            return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-        }
-
-        // Validate role to assign
-        const allowedNewRoles = ["manager", "receptionist", "trainer", "accountant"];
-        if (!allowedNewRoles.includes(newRole)) {
-            return NextResponse.json({ error: "Invalid role selected" }, { status: 400 });
         }
 
         if (session.user.role === 'manager' && newRole === 'manager') {

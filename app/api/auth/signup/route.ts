@@ -5,15 +5,40 @@ import Gym from "@/models/Gym";
 import PlatformPlan from "@/models/PlatformPlan";
 import bcrypt from "bcryptjs";
 import { stripeService } from "@/lib/services/stripe";
+import { SignupSchema } from "@/lib/validations";
+import { rateLimit, getClientIp } from "@/lib/rate-limiter";
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        const { fullName, email, password, gymName, planName } = body;
-
-        if (!fullName || !email || !password || !gymName) {
-            return NextResponse.json({ message: "All fields are required" }, { status: 400 });
+        // ── Rate Limiting (5 signups per hour per IP) ──
+        const ip = getClientIp(req);
+        const limiter = await rateLimit(`signup:${ip}`, 5, 3600);
+        if (!limiter.success) {
+            return NextResponse.json(
+                { message: "Too many signup attempts. Please try again later." },
+                {
+                    status: 429,
+                    headers: {
+                        "Retry-After": String(limiter.reset - Math.floor(Date.now() / 1000)),
+                        "X-RateLimit-Limit": String(limiter.limit),
+                        "X-RateLimit-Remaining": String(limiter.remaining),
+                    },
+                }
+            );
         }
+
+        const body = await req.json();
+
+        // ── Zod Validation (includes PasswordSchema complexity) ──
+        const parsed = SignupSchema.safeParse(body);
+        if (!parsed.success) {
+            return NextResponse.json(
+                { message: "Validation failed", errors: parsed.error.flatten().fieldErrors },
+                { status: 400 }
+            );
+        }
+
+        const { fullName, email, password, gymName, planName } = parsed.data;
 
         await connectDB();
 
@@ -49,7 +74,7 @@ export async function POST(req: Request) {
             fullName,
             email: email.toLowerCase(),
             password: hashedPassword,
-            role: 'owner', // Correct role as per user request
+            role: 'owner',
             gymId: gym._id,
             status: 'active',
         });

@@ -1,8 +1,7 @@
 import connectDB from "@/lib/db";
+import { CreatePaymentSchema } from "@/lib/validations";
 import Payment from "@/models/Payment";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 import { requirePermission, buildGymQuery } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -48,11 +47,31 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
+
+        // ── Zod Validation (Mass Assignment Protection) ──
+        const parsed = CreatePaymentSchema.safeParse(body);
+        if (!parsed.success) {
+            return NextResponse.json(
+                { message: "Validation failed", errors: parsed.error.flatten().fieldErrors },
+                { status: 400 }
+            );
+        }
+
+        const data = parsed.data;
         await connectDB();
+
         const payment = await new Payment({
-            ...body,
+            memberId: data.memberId,
+            amount: data.amount,
+            date: data.date,
+            method: data.method,
+            description: data.description,
+            receiptUrl: data.receiptUrl || undefined,
+            receiptNumber: data.receiptNumber,
+            collectedBy: data.collectedBy,
+            notes: data.notes,
             gymId: session.user.gymId,
-            branchId: body.branchId || session.user.branchId
+            branchId: data.branchId || session.user.branchId,
         }).save();
 
         // Audit Log
