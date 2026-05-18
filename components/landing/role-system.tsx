@@ -41,14 +41,14 @@ export function RoleSystem() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
   return (
-    <section className="py-32 px-6 border-t border-white/[0.06]">
+    <section className="py-6 md:py-32 px-2 md:px-6 border-t border-white/[0.06]">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="max-w-xl mb-16">
+        <div className="max-w-xl mb-6 md:mb-16">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Built for every role</div>
           <SectionHeading
-            title="One platform. Five different"
-            highlight="experiences"
+            title="Built For "
+            highlight="Every Role"
             align="left"
             className="mb-4"
           />
@@ -88,7 +88,7 @@ export function RoleSystem() {
                   <div className="stat-line stat-bottoml" />
                   <div className="stat-line stat-rightl" />
                   
-                  <div className="relative z-20 h-full flex flex-col p-6">
+                  <div className="relative z-20 h-full flex flex-col p-2 md:p-6">
                     {/* Header */}
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -103,7 +103,7 @@ export function RoleSystem() {
                     </div>
 
                     <div className={cn(
-                      "flex h-full gap-4",
+                      "flex h-full gap-2 md:gap-4",
                       i === 0 ? "flex-col lg:flex-row" : "flex-col sm:flex-row"
                     )}>
                       {/* Description */}

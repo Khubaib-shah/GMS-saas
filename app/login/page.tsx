@@ -80,7 +80,7 @@ function LoginForm() {
         <h1 className="text-3xl font-bold tracking-[-0.03em] text-white mb-2">
           Welcome back
         </h1>
-        <p className="text-[14px] text-white/40">
+        <p className="text-[14px] text-white/80">
           Sign in to access your dashboard.
         </p>
       </div>

@@ -55,7 +55,6 @@ export function HeroSection() {
       tl.kill();
     };
   }, []);
-
   return (
     <section className="relative pt-40 pb-0 px-6 overflow-hidden">
       {/* Dot grid background */}
@@ -88,26 +87,26 @@ export function HeroSection() {
         </p>
 
         {/* CTAs */}
-        <div className="flex flex-row items-center justify-center gap-4  mb-6 md:mb-10">
+        <div className="flex flex-row items-center justify-center gap-2 sm:gap-4 mb-6 md:mb-10">
           <Link href="#how-it-works">
-            <button className="btn-hero-reveal h-12 px-8">
-              <div className="hero-text flex items-center gap-2.5">
+            <button className="btn-hero-reveal h-12 px-4 sm:px-8">
+              <div className="hero-text flex items-center gap-1.5 sm:gap-2.5">
                 <Play className="size-3.5 fill-current" />
                 {"See how it works".split(" ").map((w, i) => (
-                  <span key={i}>{w}</span>
+                  <span key={i} className={i === 0 ? "!hidden md:!inline-block" : ""}>{w}</span>
                 ))}
               </div>
-              <div className="hero-clone flex items-center gap-2.5">
+              <div className="hero-clone flex items-center gap-1.5 sm:gap-2.5">
                 <Play className="size-3.5 fill-current" />
                 {"See how it works".split(" ").map((w, i) => (
-                  <span key={i}>{w}</span>
+                  <span key={i} className={i === 0 ? "!hidden md:!inline-block" : ""}>{w}</span>
                 ))}
               </div>
             </button>
           </Link>
           <Link href="/signup">
-            <button className="btn-nav-secondary h-12 md:h-12 px-4 md:px-8">
-              <span className="flex items-center gap-2 text-[13px] md:text-[15px] font-bold">
+            <button className="btn-nav-secondary h-12 md:h-12 px-4 sm:px-8">
+              <span className="flex items-center gap-1.5 sm:gap-2 text-[13px] md:text-[15px] font-bold whitespace-nowrap">
                 Start free trial
                 <ArrowRight className="size-4" strokeWidth={2.5} />
               </span>

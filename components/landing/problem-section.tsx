@@ -30,7 +30,7 @@ const problems = [
 
 export function ProblemSection() {
   return (
-    <section className="py-32 px-6 relative">
+    <section className="py-6 md:py-32 px-2 md:px-6 relative">
       {/* Dot grid background */}
       <div
         className="absolute inset-0 -z-10"
@@ -42,7 +42,7 @@ export function ProblemSection() {
       />
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="max-w-xl mb-16">
+        <div className="max-w-xl mb-6 md:mb-16">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">
             The problem
           </div>
@@ -64,7 +64,7 @@ export function ProblemSection() {
           {problems.map((p, i) => (
             <div key={i} className="premium-stat-outer">
               <div className="stat-dot" />
-              <div className="premium-stat-card p-8">
+              <div className="premium-stat-card p-4 md:p-8">
                 <div className="stat-ray !right-0" />
                 <div className="stat-line stat-topl" />
                 <div className="stat-line stat-leftl" />

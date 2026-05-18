@@ -17,7 +17,7 @@ const dataModules = [
 
 export function SolutionSection() {
   return (
-    <section id="solution" className="py-32 px-6 border-t border-white/[0.06]">
+    <section id="solution" className="py-6 md:py-32 px-2 md:px-6 border-t border-white/[0.06]">
       {/*
         Keyframe defined in a plain <style> tag — no styled-jsx,
         no "use client" required. This is valid in Server Components.
@@ -27,7 +27,7 @@ export function SolutionSection() {
         .qr-scan-line { animation: qr-scan 2.5s ease-in-out infinite; }
       `}</style>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-16 items-center">
         {/* Left: text */}
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">The solution</div>
@@ -88,7 +88,7 @@ export function SolutionSection() {
           <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between bg-black/60 border border-white/[0.08] rounded-lg px-4 py-3 backdrop-blur-sm">
             <div>
               <div className="text-[12px] font-semibold text-white">Ahmed Raza Khan</div>
-              <div className="text-[11px] text-white/40">Premium Yearly · Active</div>
+              <div className="text-[11px] text-white/80">Premium Yearly · Active</div>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-[#c6ff00] animate-pulse" />

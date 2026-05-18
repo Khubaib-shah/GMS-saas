@@ -22,18 +22,19 @@ export function ProductShowcase() {
   const total = posItems.reduce((sum, i) => sum + i.price * i.qty, 0)
 
   return (
-    <section id="product" className="py-32 px-6 border-t border-white/[0.06]">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+    <section id="product" className="py-6 md:py-32 px-2 md:px-6 border-t border-white/[0.06]">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-16 items-center">
         {/* Left: text */}
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Point of Sale</div>
           <SectionHeading
-            title="Sell from the front desk in two taps"
+            title="Sell From The Front Desk"
+            highlight="In Two Taps"
             align="left"
             className="mb-5"
           />
           <p className="text-[15px] text-white/80 leading-relaxed mb-8">
-            Your receptionist can ring up a protein shake or a gym T-shirt without leaving the dashboard. Every sale is tracked separately from membership revenue so your books always add up.
+            Sell supplements, water bottles, or merchandise directly from the dashboard. Every transaction is automatically tracked and added to your daily revenue reports.
           </p>
           <ul className="flex flex-col gap-3">
             {checks.map((c, i) => (
@@ -52,7 +53,7 @@ export function ProductShowcase() {
           {/* Header */}
           <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.06]">
             <div className="flex items-center gap-2">
-              <ShoppingBag className="w-4 h-4 text-white/40" />
+              <ShoppingBag className="w-4 h-4 text-white/80" />
               <span className="text-[14px] font-semibold text-white">Quick Sale</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -77,7 +78,7 @@ export function ProductShowcase() {
 
           {/* Total */}
           <div className="flex items-center justify-between py-3 border-t border-white/[0.06] mb-4">
-            <span className="text-[13px] text-white/40">Total</span>
+            <span className="text-[13px] text-white/80">Total</span>
             <span className="text-[16px] font-bold text-primary">Rs {total.toLocaleString()}</span>
           </div>
 

@@ -2,20 +2,49 @@
 
 import { SectionHeading } from "./section-heading";
 import { Play } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function VideoShowcase() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    
+    const el = videoRef.current;
+    if (!el) return;
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: "top bottom",
+        end: "center center",
+        scrub: 1,
+      }
+    });
+
+    tl.fromTo(el, 
+      { scale: 0.4, opacity: 0.5 },
+      { scale: 1, opacity: 1, duration: 1, ease: "power2.out" }
+    );
+
+    return () => {
+      tl.kill();
+    };
+  }, []);
+
   return (
     <section 
-      className="py-24 px-6 relative overflow-hidden"
+      className="py-6 md:py-32 px-2 md:px-6 relative overflow-hidden"
       style={{ background: 'linear-gradient(to right, #000000, #0d1318)' }}
     >
       {/* Ambient Background */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
-        <div className="text-center mb-16">
+      <div className="max-w-6xl mx-auto relative z-10 flex flex-col items-center w-full">
+        <div className="text-center mb-6 md:mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6 tracking-widest uppercase">
             Product Walkthrough
           </div>
@@ -31,7 +60,7 @@ export function VideoShowcase() {
         </div>
 
         {/* Video Container */}
-        <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 bg-slate-900 shadow-[0_0_50px_rgba(190,255,0,0.1)] group hover:shadow-[0_0_80px_rgba(190,255,0,0.05)] transition-shadow duration-700">
+        <div ref={videoRef} className="relative aspect-video w-full rounded-3xl overflow-hidden border border-white/10 bg-slate-900 shadow-[0_0_50px_rgba(190,255,0,0.1)] group hover:shadow-[0_0_80px_rgba(190,255,0,0.05)] transition-shadow duration-700">
           {!isPlaying ? (
             <>
               {/* Thumbnail / Placeholder */}
@@ -41,7 +70,7 @@ export function VideoShowcase() {
                 <iframe
                   width="100%"
                   height="100%"
-                  src="https://www.youtube.com/embed/YNIIwl_qHPM?si=gPqLpmDXdJgbq9J8&controls=0"
+                  src="https://www.youtube.com/embed/YNIIwl_qHPM?si=mUcPHqbcLJBe_e_V&controls=0"
                   title="YouTube video player"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -68,7 +97,7 @@ export function VideoShowcase() {
             <iframe
               width="100%"
               height="100%"
-              src="https://www.youtube.com/embed/yo6-_FYRHhc?si=LlNHlBRrACcmxo5P&autoplay=1"
+              src="https://www.youtube.com/embed/YNIIwl_qHPM?si=mUcPHqbcLJBe_e_V&autoplay=1"
               title="YouTube video player"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

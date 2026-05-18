@@ -82,18 +82,19 @@ export function PricingSection() {
   }, [])
 
   return (
-    <section id="pricing" className="py-32 px-6 border-t border-white/[0.06]">
+    <section id="pricing" className="py-6 md:py-32 px-2 md:px-6 border-t border-white/[0.06]">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="max-w-xl mb-16">
+        <div className="max-w-xl mb-6 md:mb-16">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Pricing</div>
           <SectionHeading
-            title="Simple pricing. No hidden fees."
+            title="Simple Pricing"
+            highlight="No Hidden Fees"
             align="left"
             className="mb-4"
           />
           <p className="text-[15px] text-white/80 leading-relaxed">
-            Start small. Upgrade when you grow. Cancel anytime.
+            Transparent pricing. No hidden fees. Upgrade when you grow. Cancel anytime.
           </p>
         </div>
 

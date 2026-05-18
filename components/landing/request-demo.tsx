@@ -76,7 +76,7 @@ export const RequestDemo = () => {
     }
 
     return (
-        <section id='request-demo' className="flex-1 flex flex-col items-center justify-center py-20 px-6 relative overflow-hidden">
+        <section id='request-demo' className="flex-1 flex flex-col items-center justify-center py-6 md:py-20 px-2 md:px-6 relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -91,12 +91,13 @@ export const RequestDemo = () => {
                     <SectionHeading
                         as="h1"
                         size="hero"
-                        title="See GymFlow \nin action."
+                        title="See GymFlow "
+                        highlight="In Action"
                         align="left"
                         className="mb-6"
                     />
                     <p className="text-lg text-slate-400 mb-10 max-w-lg leading-relaxed">
-                        Join the hundreds of modern gym owners who use GymFlow to automate their business. Get a personalized walkthrough of the platform.
+                        Join thousands of gym owners who use GymFlow to automate their business. Get a personalized walkthrough of the platform.
                     </p>
 
                     <div className="space-y-6">
@@ -118,7 +119,7 @@ export const RequestDemo = () => {
 
                 {/* Right Side: Form */}
                 <div className="order-2 lg:order-2">
-                    <div className="bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl relative">
+                    <div className="backdrop-blur-xl md:border md:border-white/10 md:rounded-3xl md:p-8 shadow-2xl relative">
                         <div className="absolute -top-px left-1/2 -translate-x-1/2 w-32 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent"></div>
 
                         {status === 'success' ? (

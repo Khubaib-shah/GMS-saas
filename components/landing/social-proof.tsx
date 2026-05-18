@@ -67,7 +67,7 @@ function StatItem({ value, label }: { value: string; label: string }) {
         
         <div className="relative z-20">
           <div className="text-xl md:text-3xl font-bold tracking-tight stat-value">{displayValue}</div>
-          <div className="text-[10px] md:text-[12px] text-white/40 uppercase tracking-widest mt-1">{label}</div>
+          <div className="text-[10px] md:text-[12px] text-white/80 uppercase tracking-widest mt-1 !font-normal">{label}</div>
         </div>
       </div>
     </div>
@@ -76,7 +76,7 @@ function StatItem({ value, label }: { value: string; label: string }) {
 
 export function SocialProof() {
   return (
-    <section className="py-4 md:py-8 px-6 mt-20">
+    <section className="py-6 md:py-8 px-2 md:px-6 md:mt-20">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8 rounded-xl overflow-hidden ">
           {stats.map((s, i) => (

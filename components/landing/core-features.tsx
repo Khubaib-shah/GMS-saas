@@ -37,11 +37,11 @@ const features = [
 
 export function CoreFeatures() {
   return (
-    <section id="features" className="py-32 px-6 relative overflow-hidden">
+    <section id="features" className="py-6 md:py-32 px-2 md:px-6 relative overflow-hidden">
       <StarBackground /> 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="max-w-xl mb-16">
+        <div className="max-w-xl mb-6 md:mb-16">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Features</div>
           <SectionHeading
             title="Everything"

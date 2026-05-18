@@ -72,18 +72,19 @@ export function Testimonials() {
   }, [emblaApi, onSelect])
 
   return (
-    <section id="testimonials" className="py-32 px-6 border-t border-white/[0.06]">
+    <section id="testimonials" className="py-6 md:py-32 px-2 md:px-6 border-t border-white/[0.06]">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="max-w-xl mb-16">
+        <div className="max-w-xl mb-6 md:mb-16">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Testimonials</div>
           <SectionHeading
-            title="Trusted by gym owners across Pakistan"
+            title="Trusted By Gym Owners"
+            highlight="Across Pakistan"
             align="left"
             className="mb-4"
           />
           <p className="text-[15px] text-white/80 leading-relaxed">
-            Real quotes from gym owners who switched to GymFlow.
+            Real success stories from gym owners who switched to GymFlow.
           </p>
         </div>
 

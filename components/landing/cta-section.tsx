@@ -4,10 +4,10 @@ import Link from "next/link"
 
 export function CTASection() {
   return (
-    <section className="py-32 px-6 border-t border-white/[0.06]">
+    <section className="md:py-32 md:px-6 border-t border-white/[0.06]">
       <div className="max-w-6xl mx-auto">
         <div
-          className="relative rounded-2xl border border-white/[0.08] overflow-hidden px-8 py-20 text-center"
+          className="relative md:rounded-2xl md:border md:border-white/[0.08] overflow-hidden md:px-8 md:py-20 py-6 text-center"
           style={{
             background: "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(198,255,0,0.07) 0%, transparent 70%), rgba(255,255,255,0.01)",
           }}
@@ -22,18 +22,20 @@ export function CTASection() {
           />
 
           <SectionHeading
-            title="Ready to take control\nof your gym?"
-            className="mb-4"
+            title="Ready To Take "
+            highlight="Control Of Your Gym?"
+            align="center"
+            className="md:mb-4"
           />
-          <p className="text-[15px] text-white/40 max-w-md mx-auto mb-10 leading-relaxed">
-            Join hundreds of gym owners who switched to GymFlow and never looked back.
+          <p className="text-[15px] text-white/80 max-w-md mx-auto mb-4 md:mb-10 leading-relaxed">
+            Join thousands of gym owners who switched to GymFlow and never looked back.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-4">
             <Link href="/signup">
               <button className="btn-nav-secondary h-12 px-8">
                 <span className="flex items-center gap-2 text-[15px] font-bold">
-                  Start your free trial
+                  Start Your Free Trial
                   <ArrowRight className="size-4" strokeWidth={2.5} />
                 </span>
               </button>
