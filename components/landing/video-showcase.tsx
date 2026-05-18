@@ -16,22 +16,51 @@ export function VideoShowcase() {
     const el = videoRef.current;
     if (!el) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: el,
-        start: "top bottom",
-        end: "center center",
-        scrub: 1,
-      }
+    let mm = gsap.matchMedia();
+
+    // Desktop/Tablet: Scale up from 0.4 to 1 on scroll scrub
+    mm.add("(min-width: 768px)", () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: el,
+          start: "top bottom",
+          end: "center center",
+          scrub: 1,
+        }
+      });
+
+      tl.fromTo(el, 
+        { scale: 0.4, opacity: 0.5 },
+        { scale: 1, opacity: 1, duration: 1, ease: "power2.out" }
+      );
+
+      return () => {
+        tl.kill();
+      };
     });
 
-    tl.fromTo(el, 
-      { scale: 0.4, opacity: 0.5 },
-      { scale: 1, opacity: 1, duration: 1, ease: "power2.out" }
-    );
+    // Mobile (iPhone 12, etc.): Disable extreme scale-scrubbing and use clean, smooth entrance
+    mm.add("(max-width: 767px)", () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: el,
+          start: "top 90%",
+          toggleActions: "play none none reverse",
+        }
+      });
+
+      tl.fromTo(el, 
+        { scale: 0.95, opacity: 0.8 },
+        { scale: 1, opacity: 1, duration: 0.6, ease: "power2.out" }
+      );
+
+      return () => {
+        tl.kill();
+      };
+    });
 
     return () => {
-      tl.kill();
+      mm.revert();
     };
   }, []);
 

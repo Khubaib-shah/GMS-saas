@@ -42,8 +42,14 @@ export function HowItWorks() {
     const dot = dotRef.current
     const container = containerRef.current
     
-    if (path && dot && container) {
-      // Dynamic path height
+    if (!container) return;
+
+    let mm = gsap.matchMedia();
+
+    // Large screens (Desktop/Tablet): Run vertical timeline SVG path tracking and dot scrubbing
+    mm.add("(min-width: 1024px)", () => {
+      if (!path || !dot) return;
+
       const updatePath = () => {
         const height = container.offsetHeight
         path.setAttribute('d', `M 1 0 L 1 ${height}`)
@@ -76,14 +82,31 @@ export function HowItWorks() {
         ease: "none"
       }, 0)
 
-      // Individual cards entrance
+      return () => {
+        window.removeEventListener('resize', updatePath)
+        tl.kill()
+      }
+    });
+
+    // Handle card entrance animations cleanly across different breakpoints
+    mm.add({
+      isDesktop: "(min-width: 1024px)",
+      isMobile: "(max-width: 1023px)"
+    }, (context) => {
+      const { isDesktop } = context.conditions as { isDesktop: boolean };
       const cards = container.querySelectorAll(".how-it-works-card")
+      const activeTriggers: ScrollTrigger[] = [];
+
       cards?.forEach((card, i) => {
-        gsap.fromTo(card, 
-          { opacity: 0, x: i % 2 === 0 ? 50 : -50 },
+        const startX = isDesktop ? (i % 2 === 0 ? 50 : -50) : 0;
+        const startY = isDesktop ? 0 : 30; // Slide upwards on mobile instead of side-to-side
+
+        const anim = gsap.fromTo(card, 
+          { opacity: 0, x: startX, y: startY },
           {
             opacity: 1,
             x: 0,
+            y: 0,
             duration: 0.8,
             scrollTrigger: {
               trigger: card,
@@ -92,12 +115,19 @@ export function HowItWorks() {
             }
           }
         )
+        if (anim.scrollTrigger) {
+          activeTriggers.push(anim.scrollTrigger);
+        }
       })
 
       return () => {
-        window.removeEventListener('resize', updatePath)
-      }
-    }
+        activeTriggers.forEach(st => st.kill());
+      };
+    });
+
+    return () => {
+      mm.revert();
+    };
   }, [])
 
   return (

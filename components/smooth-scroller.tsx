@@ -5,6 +5,10 @@ import Lenis from "lenis";
 
 export default function SmoothScroller() {
     useEffect(() => {
+        // Disable Lenis on touch devices (mobiles, tablets) to leverage native momentum scrolling
+        const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+        if (isTouchDevice) return;
+
         const lenis = new Lenis({
             duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

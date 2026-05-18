@@ -18,32 +18,33 @@ export function HeroSection() {
     const mockup = mockupRef.current;
     if (!mockup) return;
 
-    // Initial state
-    gsap.set(mockup, {
-      rotationX: 60,
-      scale: 0.7,
-      transformPerspective: 1000,
-      transformOrigin: "top center",
-    });
+    let mm = gsap.matchMedia();
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: mockup,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: 1,
-      },
-    });
+    // Desktop/Tablet: Keep premium 3D rotate and scale animation
+    mm.add("(min-width: 768px)", () => {
+      gsap.set(mockup, {
+        rotationX: 60,
+        scale: 0.7,
+        transformPerspective: 1000,
+        transformOrigin: "top center",
+        opacity: 1,
+      });
 
-    // Phase 1: Straighten out and scale to 1 (takes first 50% of the scroll)
-    tl.to(mockup, {
-      rotationX: 0,
-      scale: 1,
-      duration: 1,
-      ease: "power1.out",
-    })
-      // Phase 2: Keep scaling and fade out (takes remaining 50% of scroll)
-      .to(mockup, {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: mockup,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+
+      tl.to(mockup, {
+        rotationX: 0,
+        scale: 1,
+        duration: 1,
+        ease: "power1.out",
+      }).to(mockup, {
         rotationX: -20,
         scale: 1.25,
         opacity: 0,
@@ -51,8 +52,41 @@ export function HeroSection() {
         ease: "power1.in",
       });
 
+      return () => {
+        tl.kill();
+      };
+    });
+
+    // Mobile (iPhone 12, etc.): Disable 3D transforms and complex scrubbing to avoid lag/freezing
+    mm.add("(max-width: 767px)", () => {
+      gsap.set(mockup, {
+        rotationX: 0,
+        scale: 1,
+        transformPerspective: 0,
+        opacity: 1,
+      });
+
+      // Simple, performant fade-in and slight scale up instead of raw scroll-scrubbing
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: mockup,
+          start: "top 90%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      tl.fromTo(mockup,
+        { opacity: 0.8, scale: 0.95 },
+        { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }
+      );
+
+      return () => {
+        tl.kill();
+      };
+    });
+
     return () => {
-      tl.kill();
+      mm.revert();
     };
   }, []);
   return (

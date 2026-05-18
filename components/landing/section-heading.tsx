@@ -127,7 +127,7 @@ export function SectionHeading({
     return lines.map((line, i) => (
       <Fragment key={i}>
         {line && (
-          <span className="inline-block whitespace-nowrap">
+          <span className="inline-block whitespace-normal md:whitespace-nowrap">
             {splitText(line)}
           </span>
         )}
