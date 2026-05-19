@@ -18,10 +18,14 @@ export function HeroSection() {
     const mockup = mockupRef.current;
     if (!mockup) return;
 
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const initialRotationX = isMobile ? 20 : 60;
+    const initialScale = isMobile ? 0.85 : 0.7;
+
     // Initial state
     gsap.set(mockup, {
-      rotationX: 60,
-      scale: 0.7,
+      rotationX: initialRotationX,
+      scale: initialScale,
       transformPerspective: 1000,
       transformOrigin: "top center",
     });
@@ -44,8 +48,8 @@ export function HeroSection() {
     })
       // Phase 2: Keep scaling and fade out (takes remaining 50% of scroll)
       .to(mockup, {
-        rotationX: -20,
-        scale: 1.25,
+        rotationX: isMobile ? -10 : -20,
+        scale: isMobile ? 1.05 : 1.25,
         opacity: 0,
         duration: 1,
         ease: "power1.in",
@@ -57,7 +61,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative pt-40 pb-0 px-6 overflow-hidden">
+    <section className="relative pt-32 md:pt-40 pb-0 px-4 md:px-6 overflow-hidden">
       {/* Dot grid background */}
       <div
         className="absolute inset-0 -z-10"

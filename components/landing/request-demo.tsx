@@ -76,17 +76,17 @@ export const RequestDemo = () => {
     }
 
     return (
-        <section id='request-demo' className="flex-1 flex flex-col items-center justify-center py-20 px-6 relative overflow-hidden">
+        <section id='request-demo' className="flex-1 flex flex-col items-center justify-center py-16 md:py-32 px-4 md:px-6 relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-            <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+            <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center relative z-10">
 
                 {/* Left Side: Value Proposition */}
                 <div className="order-1 lg:order-1">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6 tracking-widest">
-                        BOOK A FREE DEMO
+                    <div className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-4">
+                        Book a free demo
                     </div>
                     <SectionHeading
                         as="h1"
@@ -95,7 +95,7 @@ export const RequestDemo = () => {
                         align="left"
                         className="mb-6"
                     />
-                    <p className="text-lg text-slate-400 mb-10 max-w-lg leading-relaxed">
+                    <p className="text-[15px] md:text-[17px] text-white/70 mb-10 max-w-lg leading-relaxed">
                         Join the hundreds of modern gym owners who use GymFlow to automate their business. Get a personalized walkthrough of the platform.
                     </p>
 
@@ -110,7 +110,7 @@ export const RequestDemo = () => {
                                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
                                     <CheckCircle2 className="w-4 h-4 text-primary" />
                                 </div>
-                                <span className="text-slate-300 font-medium">{benefit}</span>
+                                <span className="text-white/80 font-medium text-[14px]">{benefit}</span>
                             </div>
                         ))}
                     </div>

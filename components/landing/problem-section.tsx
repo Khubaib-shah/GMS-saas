@@ -30,7 +30,7 @@ const problems = [
 
 export function ProblemSection() {
   return (
-    <section className="py-32 px-6 relative">
+    <section className="py-16 md:py-32 px-4 md:px-6 relative">
       {/* Dot grid background */}
       <div
         className="absolute inset-0 -z-10"
@@ -42,8 +42,8 @@ export function ProblemSection() {
       />
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="max-w-xl mb-16">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">
+        <div className="max-w-xl mb-10 md:mb-16">
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-4">
             The problem
           </div>
           <SectionHeading
@@ -53,7 +53,7 @@ export function ProblemSection() {
             align="left"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/80 leading-relaxed">
+          <p className="text-[15px] md:text-[17px] text-white/70 leading-relaxed max-w-xl">
             Most gym owners still use spreadsheets and WhatsApp groups. It costs
             them money every single day.
           </p>
@@ -64,7 +64,7 @@ export function ProblemSection() {
           {problems.map((p, i) => (
             <div key={i} className="premium-stat-outer">
               <div className="stat-dot" />
-              <div className="premium-stat-card p-8">
+              <div className="premium-stat-card p-6 md:p-8">
                 <div className="stat-ray !right-0" />
                 <div className="stat-line stat-topl" />
                 <div className="stat-line stat-leftl" />
@@ -85,10 +85,10 @@ export function ProblemSection() {
                     <p.icon className="w-4 h-4 text-red-400" />
                   </div>
                 </div>
-                <h3 className="text-[16px] font-semibold text-white mb-2 tracking-tight">
+                <h3 className="text-base font-bold text-white mb-2 tracking-tight">
                   {p.title}
                 </h3>
-                <p className="text-[13px] text-white/80 leading-relaxed">
+                <p className="text-[13px] text-white/60 leading-relaxed">
                   {p.description}
                 </p>
               </div>

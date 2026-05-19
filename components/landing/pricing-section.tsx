@@ -82,17 +82,17 @@ export function PricingSection() {
   }, [])
 
   return (
-    <section id="pricing" className="py-32 px-6 border-t border-white/[0.06]">
+    <section id="pricing" className="py-16 md:py-32 px-4 md:px-6 border-t border-white/[0.06]">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="max-w-xl mb-16">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Pricing</div>
+        <div className="max-w-xl mb-10 md:mb-16">
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-4">Pricing</div>
           <SectionHeading
             title="Simple pricing. No hidden fees."
             align="left"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/80 leading-relaxed">
+          <p className="text-[15px] md:text-[17px] text-white/70 leading-relaxed max-w-xl">
             Start small. Upgrade when you grow. Cancel anytime.
           </p>
         </div>
@@ -108,21 +108,21 @@ export function PricingSection() {
               return (
                 <div
                   key={`${plan.id}-${idx}`}
-                  className={`relative rounded-xl p-8 flex flex-col gap-8 ${plan.isPopular
-                    ? "border border-[#c6ff00]/40 bg-[#c6ff00]/[0.03]"
+                  className={`relative rounded-xl p-6 md:p-8 flex flex-col gap-8 ${plan.isPopular
+                    ? "border border-primary/40 bg-primary/[0.03]"
                     : "border border-white/[0.06] bg-white/[0.02]"
                     }`}
                 >
                   {/* Popular badge */}
                   {plan.isPopular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c6ff00] text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
                       Most popular
                     </div>
                   )}
 
                   <div>
-                    <div className="text-[13px] font-semibold text-white mb-1">{plan.name}</div>
-                    <div className="text-[12px] text-white/30 mb-6">{plan.description}</div>
+                    <div className="text-base font-bold text-white mb-1 tracking-tight">{plan.name}</div>
+                    <div className="text-[12px] text-white/40 mb-6">{plan.description}</div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-bold tracking-tight text-white">
                         Rs {plan.monthlyPricePKR.toLocaleString()}
@@ -133,7 +133,7 @@ export function PricingSection() {
 
                   <ul className="flex flex-col gap-3 flex-1">
                     {features.map((f, j) => (
-                      <li key={j} className="flex items-center gap-2.5 text-[13px] text-white/50">
+                      <li key={j} className="flex items-center gap-2.5 text-[13px] text-white/60">
                         <Check className={`w-3.5 h-3.5 shrink-0 ${plan.isPopular ? "text-primary" : "text-white/30"}`} strokeWidth={2.5} />
                         {f}
                       </li>

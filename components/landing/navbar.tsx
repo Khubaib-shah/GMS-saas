@@ -24,7 +24,7 @@ export function Navbar() {
   }, [])
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "" : "bg-transparent"}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-slate-950/80 backdrop-blur-md border-b border-white/[0.06] shadow-lg shadow-black/20" : "bg-transparent"}`}>
       <div className="max-w-7xl mx-auto px-6 h-12 md:h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center">
@@ -77,25 +77,27 @@ export function Navbar() {
         </div>
 
         {/* Mobile toggle */}
-        <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-white/60 hover:text-white">
+        <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-white/60 hover:text-white transition-colors">
           {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden border-t border-white/[0.06] bg-black/95 backdrop-blur-md px-6 py-6 flex flex-col gap-5">
-          {navLinks.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setIsOpen(false)} className="text-[15px] text-white/60 hover:text-white transition-colors">
-              {l.label}
-            </Link>
-          ))}
-          <div className="flex flex-col gap-3 pt-4 border-t border-white/[0.06]">
+        <div className="md:hidden border-t border-white/[0.06] bg-slate-950/95 backdrop-blur-lg px-6 py-8 flex flex-col gap-6 shadow-2xl animate-in slide-in-from-top-4 duration-200">
+          <div className="flex flex-col gap-4">
+            {navLinks.map((l) => (
+              <Link key={l.href} href={l.href} onClick={() => setIsOpen(false)} className="text-[16px] font-medium text-white/70 hover:text-white transition-colors py-1">
+                {l.label}
+              </Link>
+            ))}
+          </div>
+          <div className="flex flex-col gap-3 pt-6 border-t border-white/[0.06]">
             <Link href="/login" onClick={() => setIsOpen(false)}>
-              <Button variant="outline" className="w-full border-white/10 text-white hover:bg-white/[0.06]">Sign in</Button>
+              <Button variant="outline" className="w-full h-11 border-white/10 text-white bg-white/5 hover:bg-white/[0.08] hover:text-white rounded-xl">Sign in</Button>
             </Link>
             <Link href="/signup" onClick={() => setIsOpen(false)}>
-              <button className="btn-nav-secondary w-full">
+              <button className="btn-nav-secondary w-full h-11">
                 <span>Get started</span>
               </button>
             </Link>

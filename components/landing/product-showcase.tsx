@@ -22,22 +22,22 @@ export function ProductShowcase() {
   const total = posItems.reduce((sum, i) => sum + i.price * i.qty, 0)
 
   return (
-    <section id="product" className="py-32 px-6 border-t border-white/[0.06]">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+    <section id="product" className="py-16 md:py-32 px-4 md:px-6 border-t border-white/[0.06]">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
         {/* Left: text */}
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Point of Sale</div>
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-4">Point of Sale</div>
           <SectionHeading
             title="Sell from the front desk in two taps"
             align="left"
             className="mb-5"
           />
-          <p className="text-[15px] text-white/80 leading-relaxed mb-8">
+          <p className="text-[15px] md:text-[17px] text-white/70 leading-relaxed max-w-xl mb-8">
             Your receptionist can ring up a protein shake or a gym T-shirt without leaving the dashboard. Every sale is tracked separately from membership revenue so your books always add up.
           </p>
           <ul className="flex flex-col gap-3">
             {checks.map((c, i) => (
-              <li key={i} className="flex items-center gap-3 text-[14px] text-white/60">
+              <li key={i} className="flex items-center gap-3 text-[13px] md:text-[14px] text-white/70">
                 <div className="w-5 h-5 rounded-full border border-[#c6ff00]/30 bg-[#c6ff00]/[0.08] flex items-center justify-center shrink-0">
                   <Check className="w-3 h-3 text-primary" strokeWidth={2.5} />
                 </div>

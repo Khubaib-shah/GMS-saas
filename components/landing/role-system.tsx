@@ -41,18 +41,18 @@ export function RoleSystem() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
   return (
-    <section className="py-32 px-6 border-t border-white/[0.06]">
+    <section className="py-16 md:py-32 px-4 md:px-6 border-t border-white/[0.06]">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="max-w-xl mb-16">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Built for every role</div>
+        <div className="max-w-xl mb-10 md:mb-16">
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-4">Built for every role</div>
           <SectionHeading
             title="One platform. Five different"
             highlight="experiences"
             align="left"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/80 leading-relaxed">
+          <p className="text-[15px] md:text-[17px] text-white/70 leading-relaxed max-w-xl">
             Tailored dashboards for every role. From business analytics for owners to workout logging for members, everyone gets the tools they actually need.
           </p>
         </div>
@@ -96,7 +96,7 @@ export function RoleSystem() {
                       </div>
                       <h3 className={cn(
                         "font-bold text-white tracking-tight",
-                        i === 0 ? "text-3xl" : "text-xl"
+                        i === 0 ? "text-2xl md:text-3xl" : "text-base md:text-lg"
                       )}>
                         {r.title}
                       </h3>
@@ -112,8 +112,8 @@ export function RoleSystem() {
                         i === 0 ? "lg:w-[22%] mb-4 lg:mb-0" : (hasImage ? "sm:w-[35%] mb-2 sm:mb-0" : "w-full")
                       )}>
                         <p className={cn(
-                          "text-white/80 leading-relaxed",
-                          i === 0 ? "text-[16px]" : "text-[13px]"
+                          "text-white/60 leading-relaxed",
+                          i === 0 ? "text-[14px] md:text-[15px]" : "text-[13px]"
                         )}>
                           {i === 0 ? (
                             <>
@@ -130,8 +130,8 @@ export function RoleSystem() {
                           className={cn(
                             "relative mt-auto sm:mt-0 overflow-hidden rounded-lg p-1 border border-white/10 bg-slate-900/50 shadow-2xl cursor-pointer group/mockup",
                             i === 0 
-                              ? "lg:flex-1 aspect-video lg:translate-x-12 lg:translate-y-10 group-hover:translate-x-8 group-hover:translate-y-6 transition-transform duration-500" 
-                              : "flex-1 aspect-video sm:translate-x-10 sm:translate-y-8 group-hover:translate-x-6 group-hover:translate-y-6 transition-transform duration-500"
+                              ? "lg:flex-1 aspect-video lg:translate-x-12 lg:translate-y-10 group-hover:lg:translate-x-8 group-hover:lg:translate-y-6 translate-x-0 translate-y-0 transition-transform duration-500" 
+                              : "flex-1 aspect-video lg:translate-x-10 lg:translate-y-8 group-hover:lg:translate-x-6 group-hover:lg:translate-y-6 translate-x-0 translate-y-0 transition-transform duration-500"
                           )}
                         >
                           <Image 

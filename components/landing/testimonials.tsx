@@ -72,17 +72,17 @@ export function Testimonials() {
   }, [emblaApi, onSelect])
 
   return (
-    <section id="testimonials" className="py-32 px-6 border-t border-white/[0.06]">
+    <section id="testimonials" className="py-16 md:py-32 px-4 md:px-6 border-t border-white/[0.06]">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="max-w-xl mb-16">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Testimonials</div>
+        <div className="max-w-xl mb-10 md:mb-16">
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-4">Testimonials</div>
           <SectionHeading
             title="Trusted by gym owners across Pakistan"
             align="left"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/80 leading-relaxed">
+          <p className="text-[15px] md:text-[17px] text-white/70 leading-relaxed max-w-xl">
             Real quotes from gym owners who switched to GymFlow.
           </p>
         </div>
@@ -92,27 +92,27 @@ export function Testimonials() {
           <div className="flex gap-4 py-2">
             {testimonials.map((t, i) => (
               <div key={i} className="flex-[0_0_100%] sm:flex-[0_0_calc(50%-8px)] lg:flex-[0_0_calc(33.333%-11px)] min-w-0">
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 flex flex-col gap-5 h-full hover:border-white/[0.10] transition-colors">
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 md:p-6 flex flex-col gap-5 h-full hover:border-white/[0.10] transition-colors">
                   {/* Stars */}
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="w-3.5 h-3.5 text-primary fill-[#c6ff00]" />
+                      <Star key={j} className="w-3.5 h-3.5 text-primary fill-primary" />
                     ))}
                   </div>
 
                   {/* Highlight */}
-                  <div className="inline-block text-[10px] font-semibold uppercase tracking-widest text-primary border border-[#c6ff00]/20 bg-[#c6ff00]/[0.06] rounded-full px-2.5 py-1 w-fit">
+                  <div className="inline-block text-[10px] font-semibold uppercase tracking-widest text-primary border border-primary/20 bg-primary/[0.06] rounded-full px-2.5 py-1 w-fit">
                     {t.highlight}
                   </div>
 
                   {/* Quote */}
-                  <p className="text-[13px] text-white/80 leading-relaxed flex-1">
+                  <p className="text-[13px] text-white/60 leading-relaxed flex-1">
                     &ldquo;{t.quote}&rdquo;
                   </p>
 
                   {/* Author */}
                   <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
-                    <div className="w-8 h-8 rounded-full bg-[#c6ff00]/[0.08] border border-[#c6ff00]/[0.15] flex items-center justify-center text-[12px] font-bold text-primary shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-primary/[0.08] border border-primary/[0.15] flex items-center justify-center text-[12px] font-bold text-primary shrink-0">
                       {t.initial}
                     </div>
                     <div>
@@ -132,7 +132,7 @@ export function Testimonials() {
             <button
               key={i}
               onClick={() => emblaApi?.scrollTo(i)}
-              className={`h-1 rounded-full transition-all duration-300 ${i === selectedIndex ? "w-6 bg-[#c6ff00]" : "w-1.5 bg-white/20"}`}
+              className={`h-1 rounded-full transition-all duration-300 ${i === selectedIndex ? "w-6 bg-primary" : "w-1.5 bg-white/20"}`}
             />
           ))}
         </div>
