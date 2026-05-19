@@ -24,6 +24,6 @@ const ApiKeySchema = new mongoose.Schema({
 }, { timestamps: true });
 
 ApiKeySchema.index({ gymId: 1, isActive: 1 });
-ApiKeySchema.index({ key: 1 });
 
 export default mongoose.models.ApiKey || mongoose.model("ApiKey", ApiKeySchema);
+
