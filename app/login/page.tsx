@@ -14,7 +14,6 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showSuspendedModal, setShowSuspendedModal] = useState(false);
   const [suspensionReason, setSuspensionReason] = useState("");
@@ -109,7 +108,7 @@ function LoginForm() {
           </div>
           <div className="relative">
             <InputField
-              type={showPassword ? "text" : "password"}
+              type="password"
               validateType="password"
               placeholder="••••••••"
               value={password}
@@ -117,25 +116,18 @@ function LoginForm() {
               hideLabel
               required
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-12 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors z-20"
-            >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
           </div>
         </div>
 
         <Button
           type="submit"
           disabled={loading}
-          className="w-full h-11 bg-[#c6ff00] text-black hover:bg-[#d4ff33] font-semibold text-[14px] rounded-lg transition-colors mt-1"
+          className="btn-nav-secondary w-full"
         >
           {loading ? (
-            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Signing in...</>
+            <span className="flex items-center"><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Signing in...</span>
           ) : (
-            <>Sign in <ArrowRight className="ml-2 w-4 h-4" strokeWidth={2.5} /></>
+            <span className="flex items-center">Sign in <ArrowRight className="ml-2 w-4 h-4" strokeWidth={2.5} /></span>
           )}
         </Button>
       </form>
