@@ -21,6 +21,14 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const { data: session } = useSession()
   const pathname = usePathname()
   const isAdmin = (session?.user as any)?.role === "super_admin"
+  const isLandingPage = pathname === "/"
+  const isLoginPage = pathname === "/login"
+  const isMemberPortal = pathname?.match(/^\/member($|\/)/)
+  const isSuperAdmin = pathname?.startsWith("/super-admin")
+  const isLegacyAdmin = pathname?.startsWith("/admin")
+  const isSignupPage = pathname?.startsWith("/signup")
+  const isPublicPage = isLandingPage || isLoginPage || isMemberPortal || isSuperAdmin || isSignupPage || isLegacyAdmin || isAdmin
+
   const loadMembers = useAppStore((state) => state.loadMembers)
   const loadPlans = useAppStore((state) => state.loadPlans)
   const loadSubscriptions = useAppStore((state) => state.loadSubscriptions)
@@ -38,23 +46,15 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   }, [gymName, pathname])
 
   useEffect(() => {
-    // Only load core data if authenticated and not on login/public pages
-    if (session?.user && pathname !== "/login" && !pathname?.startsWith("/member")) {
+    // Only load core data if authenticated and not on public/landing/auth pages
+    if (session?.user && !isPublicPage) {
       loadGymProfile()
       loadMembers()
       loadPlans()
       loadSubscriptions()
       loadPayments()
     }
-  }, [session?.user?.id, pathname, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
-
-  const isLandingPage = pathname === "/"
-  const isLoginPage = pathname === "/login"
-  const isMemberPortal = pathname?.match(/^\/member($|\/)/)
-  const isSuperAdmin = pathname?.startsWith("/super-admin")
-  const isLegacyAdmin = pathname?.startsWith("/admin")
-  const isSignupPage = pathname?.startsWith("/signup")
-  const isPublicPage = isLandingPage || isLoginPage || isMemberPortal || isSuperAdmin || isSignupPage || isLegacyAdmin || isAdmin
+  }, [session?.user?.id, isPublicPage, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
 
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
 
