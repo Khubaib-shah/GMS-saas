@@ -1,26 +1,47 @@
 "use client";
 
 import type React from "react";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
-import { Zap, Shield, ArrowRight, CheckCircle, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
+type LoginMode = "LOGIN" | "FORGOT_EMAIL" | "FORGOT_OTP" | "FORGOT_NEW_PASSWORD";
+
 function LoginForm() {
+  const [mode, setMode] = useState<LoginMode>("LOGIN");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(""); // Also used for PIN
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [resetToken, setResetToken] = useState("");
+
   const [showSuspendedModal, setShowSuspendedModal] = useState(false);
   const [suspensionReason, setSuspensionReason] = useState("");
   const [showExpiredModal, setShowExpiredModal] = useState(false);
   const [expiredReason, setExpiredReason] = useState("");
+
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Timer effect for OTP
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,10 +69,12 @@ function LoginForm() {
         const res = await fetch("/api/auth/session");
         const session = await res.json();
         toast.success("You are signed in.");
-        if (callbackUrl && callbackUrl !== "/dashboard") {
-          router.push(callbackUrl);
-        } else if (session?.user?.role === "super_admin") {
+
+        const role = session?.user?.role;
+        if (role === "super_admin") {
           router.push("/super-admin");
+        } else if (role === "member") {
+          router.push("/member/dashboard");
         } else {
           router.push("/dashboard");
         }
@@ -63,95 +86,316 @@ function LoginForm() {
     }
   };
 
+  const handleRequestOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!email) {
+      toast.error("Please enter your email.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to send OTP");
+
+      toast.success("OTP sent to your email.");
+      setMode("FORGOT_OTP");
+      setCountdown(60);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to request password reset.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp || otp.length !== 6) {
+      toast.error("Please enter a valid 6-digit OTP.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Invalid OTP");
+
+      setResetToken(data.token);
+      setMode("FORGOT_NEW_PASSWORD");
+      toast.success("OTP verified. You can now reset your password.");
+    } catch (err: any) {
+      toast.error(err.message || "OTP verification failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, token: resetToken, newPassword })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to reset password.");
+
+      toast.success("Password reset successful! Logging you in...");
+
+      // Auto login after reset
+      const result = await signIn("credentials", {
+        email,
+        password: newPassword,
+        redirect: false,
+      });
+
+      if (!result?.error) {
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+        const role = session?.user?.role;
+        if (role === "super_admin") {
+          router.push("/super-admin");
+        } else if (role === "member") {
+          router.push("/member/dashboard");
+        } else {
+          router.push("/dashboard");
+        }
+      } else {
+        setMode("LOGIN");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to reset password.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-md">
       {/* Header */}
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-8">
-          <div className="w-7 h-7 rounded-md bg-[#c6ff00] flex items-center justify-center">
-            <Zap className="w-4 h-4 text-black" strokeWidth={2.5} />
+          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center p-1">
+            <img src="/assets/logo/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           <span className="font-bold text-[15px] tracking-tight text-white">
             Gym<span className="text-primary">Flow</span>
           </span>
         </div>
 
-        <h1 className="text-3xl font-bold tracking-[-0.03em] text-white mb-2">
-          Welcome back
-        </h1>
-        <p className="text-[14px] text-white/40">
-          Sign in to access your dashboard.
-        </p>
+        {mode === "LOGIN" && (
+          <>
+            <h1 className="text-3xl font-bold tracking-[-0.03em] text-white mb-2">
+              Welcome back
+            </h1>
+            <p className="text-[14px] text-white/40">
+              Sign in to access your dashboard.
+            </p>
+          </>
+        )}
+        {mode !== "LOGIN" && (
+          <>
+            <h1 className="text-3xl font-bold tracking-[-0.03em] text-white mb-2">
+              Reset Password
+            </h1>
+            <p className="text-[14px] text-white/40">
+              {mode === "FORGOT_EMAIL" && "Enter your email to receive a recovery code."}
+              {mode === "FORGOT_OTP" && "Enter the 6-digit code sent to your email."}
+              {mode === "FORGOT_NEW_PASSWORD" && "Create a new strong password."}
+            </p>
+          </>
+        )}
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleLogin} className="flex flex-col gap-5">
-        <InputField
-          label="Email or Phone"
-          className="gap-1.5"
-          validateType="text"
-          placeholder="Email or phone number"
-          value={email}
-          onChange={(val) => setEmail(val)}
-          required
-        />
+      {/* Forms */}
+      {mode === "LOGIN" && (
+        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+          <InputField
+            label="Email or Phone"
+            className="gap-1.5"
+            validateType="text"
+            placeholder="Email or phone number"
+            value={email}
+            onChange={(val) => setEmail(val)}
+            required
+          />
 
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-medium text-white/50">Password</span>
-            <a
-              href="#"
-              className="text-[12px] text-primary hover:text-white transition-colors"
-            >
-              Forgot password?
-            </a>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] font-medium text-white/50">Password or PIN</span>
+              <button
+                type="button"
+                onClick={() => setMode("FORGOT_EMAIL")}
+                className="text-[12px] text-primary hover:text-white transition-colors"
+              >
+                Forgot password?
+              </button>
+            </div>
+            <div className="relative">
+              <InputField
+                type={showPassword ? "text" : "password"}
+                validateType="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(val) => setPassword(val)}
+                hideLabel
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="btn-nav-secondary w-full"
+          >
+            {loading ? (
+              <span className="flex items-center"><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Signing in...</span>
+            ) : (
+              <span className="flex items-center">Sign in <ArrowRight className="ml-2 w-4 h-4" strokeWidth={2.5} /></span>
+            )}
+          </Button>
+        </form>
+      )}
+
+      {mode === "FORGOT_EMAIL" && (
+        <form onSubmit={handleRequestOtp} className="flex flex-col gap-5">
+          <InputField
+            label="Email Address"
+            className="gap-1.5"
+            validateType="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(val) => setEmail(val)}
+            required
+          />
+          <Button type="submit" disabled={loading} className="btn-nav-secondary w-full">
+            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <span>Get a Recovery Code</span>}
+          </Button>
+          <button type="button" onClick={() => setMode("LOGIN")} className="text-xs text-white/40 hover:text-white mt-2">
+            Back to login
+          </button>
+        </form>
+      )}
+
+      {mode === "FORGOT_OTP" && (
+        <form onSubmit={handleVerifyOtp} className="flex flex-col gap-5">
+          <InputField
+            label="6-Digit OTP"
+            className="gap-1.5 tracking-[0.5em] text-center font-bold"
+            validateType="number"
+            placeholder="••••••"
+            maxLength={6}
+            value={otp}
+            onChange={(val) => setOtp(val.replace(/\D/g, ""))}
+            required
+          />
+          <Button type="submit" disabled={loading} className="btn-nav-secondary w-full">
+            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <span>Verify Code</span>}
+          </Button>
+          <div className="flex flex-col items-center gap-2 mt-2">
+            {countdown > 0 ? (
+              <p className="text-xs text-white/40">Code expires in <span className="text-primary font-bold">{countdown}s</span></p>
+            ) : (
+              <button type="button" onClick={() => handleRequestOtp()} disabled={loading} className="text-xs text-primary hover:text-white transition-colors">
+                Resend Code
+              </button>
+            )}
+            <button type="button" onClick={() => setMode("LOGIN")} className="text-xs text-white/40 hover:text-white mt-2">
+              Back to login
+            </button>
+          </div>
+        </form>
+      )}
+
+      {mode === "FORGOT_NEW_PASSWORD" && (
+        <form onSubmit={handleResetPassword} className="flex flex-col gap-5">
           <div className="relative">
             <InputField
-              type="password"
+              label="New Password"
+              className="gap-1.5"
+              type={showPassword ? "text" : "password"}
               validateType="password"
               placeholder="••••••••"
-              value={password}
-              onChange={(val) => setPassword(val)}
-              hideLabel
+              value={newPassword}
+              onChange={(val) => setNewPassword(val)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-[38px] text-slate-500 hover:text-white transition-colors"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+
+          <div className="relative">
+            <InputField
+              label="Confirm Password"
+              className="gap-1.5"
+              type={showPassword ? "text" : "password"}
+              validateType="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(val) => setConfirmPassword(val)}
               required
             />
           </div>
-        </div>
 
-        <Button
-          type="submit"
-          disabled={loading}
-          className="btn-nav-secondary w-full"
-        >
-          {loading ? (
-            <span className="flex items-center"><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Signing in...</span>
-          ) : (
-            <span className="flex items-center">Sign in <ArrowRight className="ml-2 w-4 h-4" strokeWidth={2.5} /></span>
-          )}
-        </Button>
-      </form>
+          <Button type="submit" disabled={loading} className="btn-nav-secondary w-full">
+            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : "Update Password"}
+          </Button>
+        </form>
+      )}
 
       {/* Footer links */}
-      <div className="mt-8 pt-6 border-t border-white/[0.06] flex flex-col gap-3">
-        <p className="text-center text-[13px] text-white/30">
-          Are you a gym member?{" "}
-          <Link href="/member/login" className="text-primary hover:text-white transition-colors font-medium">
-            Go to Member Portal
-          </Link>
-        </p>
-        <p className="text-center text-[13px] text-white/30">
-          Need help?{" "}
-          <a
-            href="https://wa.me/923149784156"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:text-white transition-colors font-medium"
-          >
-            Contact support
-          </a>
-        </p>
-      </div>
+      {mode === "LOGIN" && (
+        <div className="mt-8 pt-6 border-t border-white/[0.06] flex flex-col gap-3">
+          <p className="text-center text-[13px] text-white/30">
+            Need help?{" "}
+            <a
+              href="https://wa.me/923149784156"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-white transition-colors font-medium"
+            >
+              Contact support
+            </a>
+          </p>
+        </div>
+      )}
 
       {/* Suspended modal */}
       <ConfirmModal
@@ -260,8 +504,8 @@ export default function LoginPage() {
         <div className="relative z-10 max-w-lg">
           {/* Logo */}
           <div className="flex items-center gap-2 mb-16">
-            <div className="w-8 h-8 rounded-lg bg-[#c6ff00] flex items-center justify-center">
-              <Zap className="w-4.5 h-4.5 text-black" strokeWidth={2.5} />
+            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center p-1.5">
+              <img src="/assets/logo/logo.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <span className="font-bold text-[17px] tracking-tight text-white">
               Gym<span className="text-primary">Flow</span>

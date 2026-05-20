@@ -227,24 +227,24 @@ export default function EditMemberPage({
               />
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="group relative border-2 border-dashed border-white/5 rounded-2xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer overflow-hidden"
+                className="group relative border-2 border-dashed border-white/5 rounded-2xl h-48 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer overflow-hidden"
               >
                 {photoPreview ? (
-                  <div className="space-y-4">
-                    <div className="relative w-24 h-24 mx-auto">
-                      <img
-                        src={photoPreview || "/placeholder.svg"}
-                        alt="Preview"
-                        className="w-full h-full rounded-2xl object-cover grayscale group-hover:grayscale-0 transition-all border border-white/10"
-                      />
-                      <div className="absolute inset-0 border-2 border-primary/20 rounded-2xl pointer-events-none group-hover:border-primary/50 transition-all"></div>
+                  <>
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300 flex flex-col items-center justify-center gap-2">
+                      <Upload className="w-6 h-6 text-white/80 group-hover:text-primary group-hover:scale-110 transition-all duration-300" />
+                      <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] group-hover:text-primary transition-colors duration-300">
+                        Click to change image
+                      </span>
                     </div>
-                    <p className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">
-                      Update Photo
-                    </p>
-                  </div>
+                  </>
                 ) : (
-                  <div className="space-y-4 py-4">
+                  <div className="space-y-4 py-4 text-center">
                     <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                       <Upload className="w-6 h-6 text-slate-500 group-hover:text-primary transition-colors" />
                     </div>

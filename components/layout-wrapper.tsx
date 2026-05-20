@@ -27,7 +27,10 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const isSuperAdmin = pathname?.startsWith("/super-admin")
   const isLegacyAdmin = pathname?.startsWith("/admin")
   const isSignupPage = pathname?.startsWith("/signup")
-  const isPublicPage = isLandingPage || isLoginPage || isMemberPortal || isSuperAdmin || isSignupPage || isLegacyAdmin || isAdmin
+  // Only public auth pages and landing page bypass the layout wrapper
+  const isPublicPage = isLandingPage || isLoginPage || isSignupPage
+
+  const userRole = (session?.user as any)?.role
 
   const loadMembers = useAppStore((state) => state.loadMembers)
   const loadPlans = useAppStore((state) => state.loadPlans)
@@ -46,15 +49,28 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   }, [gymName, pathname])
 
   useEffect(() => {
-    // Only load core data if authenticated and not on public/landing/auth pages
+    // Role-based boundary enforcement
     if (session?.user && !isPublicPage) {
+      if (userRole === "member" && !pathname.match(/^\/member($|\/)/)) {
+        window.location.href = "/member/dashboard";
+      } else if (userRole === "super_admin" && !pathname.startsWith("/super-admin")) {
+        window.location.href = "/super-admin";
+      } else if (userRole !== "member" && userRole !== "super_admin" && (pathname.match(/^\/member($|\/)/) || pathname.startsWith("/super-admin"))) {
+        window.location.href = "/dashboard";
+      }
+    }
+  }, [session?.user, pathname, isPublicPage, userRole])
+
+  useEffect(() => {
+    // Only load core data if authenticated and not on public/landing/auth pages, and not super admin
+    if (session?.user && !isPublicPage && userRole !== "super_admin") {
       loadGymProfile()
       loadMembers()
       loadPlans()
       loadSubscriptions()
       loadPayments()
     }
-  }, [session?.user?.id, isPublicPage, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
+  }, [session?.user?.id, isPublicPage, userRole, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
 
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
 

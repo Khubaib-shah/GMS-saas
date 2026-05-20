@@ -80,7 +80,21 @@ export const authOptions: NextAuthOptions = {
                     );
                 }
 
-                const isMatch = await bcrypt.compare(credentials.password, account.password);
+                let isMatch = false;
+
+                // For Members, we might be comparing against a PIN instead of a password
+                if (isMember) {
+                    // Try password first
+                    if (account.password) {
+                        isMatch = await bcrypt.compare(credentials.password, account.password);
+                    }
+                    // If no match, try PIN
+                    if (!isMatch && account.portalPin) {
+                        isMatch = await bcrypt.compare(credentials.password, account.portalPin);
+                    }
+                } else {
+                    isMatch = await bcrypt.compare(credentials.password, account.password);
+                }
 
                 if (!isMatch) {
                     // Increment failed attempts for both Staff and Members

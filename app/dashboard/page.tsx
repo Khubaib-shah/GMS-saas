@@ -14,11 +14,11 @@ import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { getPreviousPeriod, calculateTrend, isDateInRange } from "@/lib/analytics-utils";
-import { 
-  StatsCardSkeleton, 
-  ChartCardSkeleton, 
-  TableSkeleton, 
-  PageHeaderSkeleton 
+import {
+  StatsCardSkeleton,
+  ChartCardSkeleton,
+  TableSkeleton,
+  PageHeaderSkeleton
 } from "@/components/ui/skeleton-components";
 
 export default function DashboardPage() {
@@ -27,7 +27,6 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
-  // Set default date range on mount to avoid hydration mismatch
   useEffect(() => {
     if (!dateRange) {
       setDateRange({
@@ -134,8 +133,8 @@ export default function DashboardPage() {
     return (
       <div className="space-y-4 md:space-y-10 animate-pulse">
         <PageHeaderSkeleton showButton={false} />
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-6">
           <StatsCardSkeleton />
           <StatsCardSkeleton />
           <StatsCardSkeleton />
@@ -144,16 +143,16 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4 md:mt-10">
           <div className="h-[300px]">
-             <ChartCardSkeleton type="bar" />
+            <ChartCardSkeleton type="bar" />
           </div>
           <div className="h-[300px]">
-             <ChartCardSkeleton type="bar" />
+            <ChartCardSkeleton type="bar" />
           </div>
           <div className="h-[300px]">
-             <ChartCardSkeleton type="pie" />
+            <ChartCardSkeleton type="pie" />
           </div>
           <div className="h-[300px]">
-             <ChartCardSkeleton type="pie" />
+            <ChartCardSkeleton type="pie" />
           </div>
         </div>
 

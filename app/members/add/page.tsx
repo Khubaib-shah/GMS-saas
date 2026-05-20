@@ -29,6 +29,7 @@ export default function AddMemberPage() {
   const [loading, setLoading] = useState(false);
   const [photoBase64, setPhotoBase64] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<{
     firstName: string;
     lastName: string;
@@ -102,29 +103,15 @@ export default function AddMemberPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const loadingToast = toast.loading("Processing photo...");
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", "profiles/members");
-      formData.append("resourceType", "image");
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData
-      });
-      const data = await res.json();
-      
-      if (data.url) {
-        setPhotoBase64(data.url);
-        setPhotoPreview(data.url);
-        toast.success("Photo processed", { id: loadingToast });
-      } else {
-        throw new Error(data.error);
-      }
-    } catch (error) {
-      toast.error("Photo upload failed", { id: loadingToast });
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Invalid format. Please select a JPG, PNG, or WebP image.");
+      return;
     }
+
+    setSelectedFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+    setPhotoBase64(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,9 +125,35 @@ export default function AddMemberPage() {
     }
 
     try {
+      let finalPhotoUrl = photoBase64;
+
+      if (selectedFile) {
+        const loadingToast = toast.loading("Uploading photo...");
+        const uploadData = new FormData();
+        uploadData.append("file", selectedFile);
+        uploadData.append("folder", "profiles/members");
+        uploadData.append("resourceType", "image");
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: uploadData
+        });
+        const data = await res.json();
+
+        if (data.url) {
+          finalPhotoUrl = data.url;
+          setPhotoBase64(data.url);
+          setSelectedFile(null);
+          toast.success("Photo uploaded", { id: loadingToast });
+        } else {
+          toast.error("Photo upload failed", { id: loadingToast });
+          throw new Error(data.error || "Failed to upload photo");
+        }
+      }
+
       const payload: Omit<Member, "id"> = {
         ...formData,
-        photoBase64: photoBase64,
+        photoBase64: finalPhotoUrl,
         joinDate: new Date().toISOString(),
       };
       // Clean up empty optional fields to prevent API errors
@@ -227,7 +240,7 @@ export default function AddMemberPage() {
                 ref={fileInputRef}
                 type="file"
                 validateType="text"
-                accept="image/*"
+                accept="image/jpeg, image/png, image/webp"
                 hideLabel={true}
                 onChange={(_, e) =>
                   e &&
@@ -237,24 +250,24 @@ export default function AddMemberPage() {
               />
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="group relative border-2 border-dashed border-white/5 rounded-2xl p-8 text-center hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer overflow-hidden"
+                className="group relative border-2 border-dashed border-white/5 rounded-2xl h-48 flex items-center justify-center hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer overflow-hidden"
               >
                 {photoPreview ? (
-                  <div className="space-y-4">
-                    <div className="relative w-24 h-24 mx-auto">
-                      <img
-                        src={photoPreview || "/placeholder.svg"}
-                        alt="Preview"
-                        className="w-full h-full rounded-2xl object-cover grayscale group-hover:grayscale-0 transition-all border border-white/10"
-                      />
-                      <div className="absolute inset-0 border-2 border-primary/20 rounded-2xl pointer-events-none group-hover:border-primary/50 transition-all"></div>
+                  <>
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300 flex flex-col items-center justify-center gap-2">
+                      <Upload className="w-6 h-6 text-white/80 group-hover:text-primary group-hover:scale-110 transition-all duration-300" />
+                      <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] group-hover:text-primary transition-colors duration-300">
+                        Click to change image
+                      </span>
                     </div>
-                    <p className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">
-                      Update Photo
-                    </p>
-                  </div>
+                  </>
                 ) : (
-                  <div className="space-y-4 py-4">
+                  <div className="space-y-4 py-4 text-center">
                     <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                       <Upload className="w-6 h-6 text-slate-500 group-hover:text-primary transition-colors" />
                     </div>
