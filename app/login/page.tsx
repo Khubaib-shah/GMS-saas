@@ -74,6 +74,9 @@ function LoginForm() {
         if (role === "super_admin") {
           router.push("/super-admin");
         } else if (role === "member") {
+          if (session?.user?.memberToken) {
+            localStorage.setItem("memberToken", session.user.memberToken);
+          }
           router.push("/member/dashboard");
         } else {
           router.push("/dashboard");
@@ -180,6 +183,9 @@ function LoginForm() {
         if (role === "super_admin") {
           router.push("/super-admin");
         } else if (role === "member") {
+          if (session?.user?.memberToken) {
+            localStorage.setItem("memberToken", session.user.memberToken);
+          }
           router.push("/member/dashboard");
         } else {
           router.push("/dashboard");
@@ -258,7 +264,7 @@ function LoginForm() {
             <div className="relative">
               <InputField
                 type={showPassword ? "text" : "password"}
-                validateType="password"
+                validateType="text"
                 placeholder="••••••••"
                 value={password}
                 onChange={(val) => setPassword(val)}

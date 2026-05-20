@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/ui/input-field";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,6 +20,7 @@ import {
 
 export default function MemberSettingsPage() {
     const router = useRouter();
+    const { data: session, status } = useSession();
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -38,11 +40,23 @@ export default function MemberSettingsPage() {
     });
 
     const fetchProfile = useCallback(async () => {
-        setIsLoading(true);
-        const token = localStorage.getItem("memberToken");
-        if (!token) {
-            router.push("/member/login");
+        // Wait for session to load first if we don't have token in localStorage
+        if (status === "loading" && !localStorage.getItem("memberToken")) {
             return;
+        }
+
+        setIsLoading(true);
+        let token = localStorage.getItem("memberToken");
+
+        if (!token) {
+            // Attempt to restore memberToken from NextAuth session
+            if (status === "authenticated" && (session?.user as any)?.memberToken) {
+                token = (session.user as any).memberToken;
+                localStorage.setItem("memberToken", token!);
+            } else {
+                router.push("/login");
+                return;
+            }
         }
 
         try {
@@ -53,7 +67,7 @@ export default function MemberSettingsPage() {
             if (!res.ok) {
                 if (res.status === 401) {
                     localStorage.removeItem("memberToken");
-                    router.push("/member/login");
+                    router.push("/login");
                     return;
                 }
                 throw new Error("Failed to load profile");
@@ -71,7 +85,7 @@ export default function MemberSettingsPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [router]);
+    }, [router, session, status]);
 
     useEffect(() => {
         fetchProfile();

@@ -59,7 +59,6 @@ export default function AddMemberPage() {
       formData.lastName,
       formData.email,
       formData.phone,
-      formData.planId,
       formData.trainerId,
       photoBase64,
     ];
@@ -79,12 +78,12 @@ export default function AddMemberPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-set planId to first available plan when plans load
-  useEffect(() => {
-    if (store.plans.length > 0 && !formData.planId) {
-      setFormData((prev) => ({ ...prev, planId: store.plans[0].id }));
-    }
-  }, [store.plans]);
+  // Do NOT auto-select a plan - let user explicitly choose
+  // useEffect(() => {
+  //   if (store.plans.length > 0 && !formData.planId) {
+  //     setFormData((prev) => ({ ...prev, planId: store.plans[0].id }));
+  //   }
+  // }, [store.plans]);
 
   const fetchTrainers = async () => {
     try {
@@ -161,6 +160,7 @@ export default function AddMemberPage() {
       if (!payload.email) delete payload.email;
       if (!payload.phone) delete payload.phone;
       if (!payload.notes) delete payload.notes;
+      if (!payload.planId) delete payload.planId; // planId is now optional
       console.log("[AddMember] Submitting payload:", {
         ...payload,
         photoBase64: payload.photoBase64 ? "[BASE64_IMAGE]" : null,
@@ -175,14 +175,18 @@ export default function AddMemberPage() {
 
       console.log("[AddMember] Member created with ID:", newMember.id);
 
-      // Create a subscription for the member
-      const plan = store.plans.find((p) => p.id === formData.planId);
-      if (plan) {
-        await store.renewSubscription(
-          newMember.id,
-          formData.planId,
-          plan.duration,
-        );
+      // Only create a subscription if a plan was explicitly selected
+      if (formData.planId) {
+        const plan = store.plans.find((p) => p.id === formData.planId);
+        if (plan) {
+          await store.renewSubscription(
+            newMember.id,
+            formData.planId,
+            plan.duration,
+          );
+        }
+      } else {
+        console.log("[AddMember] No plan selected - member created without subscription");
       }
 
       toast.success("Member added successfully!");
@@ -361,18 +365,24 @@ export default function AddMemberPage() {
 
               <Field>
                 <FieldLabel className="mb-1 text-slate-500 ml-2">
-                  Membership Plan <span className="text-primary">*</span>
+                  Membership Plan <span className="text-slate-400 text-xs">(Optional)</span>
                 </FieldLabel>
                 <Select
-                  value={formData.planId}
+                  value={formData.planId || "__none__"}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, planId: value })
+                    setFormData({ ...formData, planId: value === "__none__" ? "" : value })
                   }
                 >
                   <SelectTrigger className="w-full !h-12 px-6 rounded-md border-transparent bg-black/5 dark:bg-white/5 text-foreground font-black text-[10px] uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
-                    <SelectValue placeholder="Select plan" />
+                    <SelectValue placeholder="No plan selected" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-white/10">
+                    <SelectItem
+                      value="__none__"
+                      className="text-[10px] font-bold uppercase tracking-widest text-slate-400"
+                    >
+                      NO PLAN (Add Later)
+                    </SelectItem>
                     {store.plans.map((plan) => (
                       <SelectItem
                         key={plan.id}

@@ -31,6 +31,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const isPublicPage = isLandingPage || isLoginPage || isSignupPage
 
   const userRole = (session?.user as any)?.role
+  const isMember = userRole === "member"
 
   const loadMembers = useAppStore((state) => state.loadMembers)
   const loadPlans = useAppStore((state) => state.loadPlans)
@@ -77,6 +78,9 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   return (
     <GymProvider>
       {isPublicPage ? (
+        children
+      ) : isMember && isMemberPortal ? (
+        // Member portal - no sidebar/navbar, just render children
         children
       ) : (
         <GuidedTourProvider>

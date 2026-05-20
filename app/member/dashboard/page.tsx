@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { useSession, signOut } from "next-auth/react";
 import {
     Zap,
     User,
@@ -107,16 +108,29 @@ interface DashboardData {
 
 export default function MemberDashboardPage() {
     const router = useRouter();
+    const { data: session, status } = useSession();
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState<DashboardData | null>(null);
     const qrRef = useRef<HTMLDivElement>(null);
 
     const fetchDashboard = useCallback(async () => {
-        setIsLoading(true);
-        const token = localStorage.getItem("memberToken");
-        if (!token) {
-            router.push("/member/login");
+        // Wait for session to load first if we don't have token in localStorage
+        if (status === "loading" && !localStorage.getItem("memberToken")) {
             return;
+        }
+
+        setIsLoading(true);
+        let token = localStorage.getItem("memberToken");
+
+        if (!token) {
+            // Attempt to restore memberToken from NextAuth session
+            if (status === "authenticated" && (session?.user as any)?.memberToken) {
+                token = (session.user as any).memberToken;
+                localStorage.setItem("memberToken", token!);
+            } else {
+                router.push("/login");
+                return;
+            }
         }
 
         try {
@@ -128,7 +142,7 @@ export default function MemberDashboardPage() {
                 if (res.status === 401 || res.status === 404) {
                     localStorage.removeItem("memberToken");
                     localStorage.removeItem("memberData");
-                    router.push("/member/login");
+                    router.push("/login");
                     return;
                 }
                 throw new Error("Failed to load dashboard");
@@ -141,16 +155,16 @@ export default function MemberDashboardPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [router]);
+    }, [router, session, status]);
 
     useEffect(() => {
         fetchDashboard();
     }, [fetchDashboard]);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         localStorage.removeItem("memberToken");
         localStorage.removeItem("memberData");
-        router.push("/member/login");
+        await signOut({ callbackUrl: "/login" });
     };
 
     if (isLoading) {
@@ -181,10 +195,10 @@ export default function MemberDashboardPage() {
                         RETRY
                     </Button>
                     <Button
-                        onClick={() => {
+                        onClick={async () => {
                             localStorage.removeItem("memberToken");
                             localStorage.removeItem("memberData");
-                            router.push("/member/login");
+                            await signOut({ callbackUrl: "/login" });
                         }}
                         className="bg-primary text-black hover:bg-white font-black uppercase tracking-widest rounded-xl"
                     >

@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db";
 import Member from "@/models/Member";
 import Subscription from "@/models/Subscription";
+import Gym from "@/models/Gym";
+import User from "@/models/User";
 import { rateLimit, getClientIp } from "@/lib/rate-limiter";
 
 const MEMBER_JWT_SECRET = process.env.NEXTAUTH_SECRET || "member-portal-secret";
@@ -44,32 +46,56 @@ export async function POST(req: Request) {
 
         let member;
 
+        // Helper: fetch contact info for gym (owner phone preferred)
+        async function getGymContact(gymIdToFetch: any) {
+            try {
+                const gym = await Gym.findById(gymIdToFetch).lean();
+                const owner = await User.findOne({ gymId: gymIdToFetch, role: { $in: ["gym_owner", "owner", "manager"] } }).select("fullName email phone").lean();
+                const phone = (owner && owner.phone) || (gym && gym.phone) || (gym && gym.branches && gym.branches[0] && gym.branches[0].phone) || null;
+                let whatsappUrl = null;
+                if (phone) {
+                    // sanitize phone for wa.me (remove non digits and leading +)
+                    const digits = phone.replace(/[^0-9]/g, "");
+                    whatsappUrl = `https://wa.me/${digits}`;
+                }
+                return { phone, whatsappUrl, owner };
+            } catch (e) {
+                return { phone: null, whatsappUrl: null, owner: null };
+            }
+        }
+
         // QR Code login
         if (qrCode) {
             member = await Member.findOne({
                 qrCode,
                 gymId,
                 deletedAt: null,
-                portalEnabled: true,
-            });
+            }).select("+portalPassword +portalPin +portalEnabled");
+
+            if (!member) {
+                return NextResponse.json({ message: "Member not found" }, { status: 404 });
+            }
+
+            if (!member.portalEnabled) {
+                const contact = await getGymContact(member.gymId);
+                return NextResponse.json({ message: "Member portal is disabled for this account", code: "PORTAL_DISABLED", contact }, { status: 403 });
+            }
         }
         // Email + Password/PIN login
         else if (email) {
-            // Find member by email
-            // Note: email is globally unique in our schema
-            if (gymId && gymId !== "null" && gymId !== "undefined") {
-                // We keep the query but we don't strictly enforce it if not found, 
-                // but actually since email is unique, we should just find by email.
-            }
-
+            // Find member by email (do not filter by portalEnabled yet)
             member = await Member.findOne({
                 email,
                 deletedAt: null,
-                portalEnabled: true
-            }).select("+portalPassword +portalPin");
+            }).select("+portalPassword +portalPin +portalEnabled gymId");
 
             if (!member) {
-                return NextResponse.json({ message: "Invalid credentials or portal not enabled" }, { status: 401 });
+                return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
+            }
+
+            if (!member.portalEnabled) {
+                const contact = await getGymContact(member.gymId);
+                return NextResponse.json({ message: "Member portal is disabled for this account", code: "PORTAL_DISABLED", contact }, { status: 403 });
             }
 
             // Verify password or PIN

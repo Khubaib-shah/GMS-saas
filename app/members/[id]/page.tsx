@@ -387,7 +387,7 @@ export default function MemberDetailPage({
 
   const handleDisablePortal = async () => {
     if (!confirm("Are you sure you want to disable portal access? This will remove the member's login credentials.")) return;
-    
+
     setIsPortalProcessing(true);
     try {
       const res = await fetch(`/api/member-portal/setup?memberId=${memberId}`, {
@@ -556,7 +556,7 @@ export default function MemberDetailPage({
               )}
             </div>
           </Card>
- 
+
           {/* Member Portal Access */}
           <Card className="glass-premium p-6 border-border dark:bg-slate-950/40 space-y-6">
             <div className="flex flex-col gap-2">
@@ -598,8 +598,8 @@ export default function MemberDetailPage({
                 </div>
               )}
 
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full h-11 border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-widest hover:text-primary hover:border-primary/50 transition-all"
                 onClick={() => setIsPortalModalOpen(true)}
               >
@@ -802,28 +802,28 @@ export default function MemberDetailPage({
           {/* Active Status Banner - Visible to all roles */}
           <Card className={cn(
             "glass-premium gap-1 p-6 border-y-border border-r-border border-l-4 flex items-center justify-between shadow-2xl transition-all",
-            isLoading ? "border-l-border" : (activeSub ? (new Date(activeSub.endDate) < new Date() ? "border-l-orange-500 bg-orange-500/5" : "border-l-emerald-500 bg-emerald-500/5") : "border-l-destructive bg-destructive/5")
+            isLoading ? "border-l-border" : (activeSub ? (new Date(activeSub.endDate) < new Date() ? "border-l-orange-500 bg-orange-500/5" : "border-l-emerald-500 bg-emerald-500/5") : "border-l-slate-500 bg-slate-500/5")
           )}>
             <div className="flex items-center gap-4">
               <div className={cn(
                 "w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner",
-                isLoading ? "bg-muted text-muted-foreground" : (activeSub ? "bg-emerald-100 text-emerald-600" : "bg-destructive/10 text-destructive")
+                isLoading ? "bg-muted text-muted-foreground" : (activeSub ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-600")
               )}>
                 {isLoading ? <Skeleton className="w-6 h-6 rounded-full" /> : (activeSub ? <CreditCard className="w-6 h-6" /> : <Clock className="w-6 h-6" />)}
               </div>
               <div>
                 <div className="font-bold text-foreground">
-                  {isLoading ? <Skeleton className="w-32 h-5" /> : (activeSub ? (new Date(activeSub.endDate) < new Date() ? "Grace Period" : "Membership Active") : "Membership Expired")}
+                  {isLoading ? <Skeleton className="w-32 h-5" /> : (activeSub ? (new Date(activeSub.endDate) < new Date() ? "Grace Period" : "Membership Active") : "No Active Subscription")}
                 </div>
                 <div className={cn("text-sm leading-none mt-1", activeSub && new Date(activeSub.endDate) < new Date() ? "text-orange-500" : "text-emerald-500")}>
                   {isLoading ? <Skeleton className="w-48 h-4 mt-1" /> : (activeSub
                     ? (new Date(activeSub.endDate) < new Date() ? `Expired on ${formatDate(activeSub.endDate)}` : `Expiring on ${formatDate(activeSub.endDate)}`)
-                    : `Last active on ${memberSubs[0] ? formatDate(memberSubs[0].endDate) : 'never'}`)}
+                    : `${memberSubs.length > 0 ? `Last active on ${formatDate(memberSubs[0].endDate)}` : 'Never subscribed'}`)}
                 </div>
               </div>
             </div>
             {!isLoading && !activeSub && (
-              <span className="animate-pulse flex items-center gap-1 text-xs font-bold text-destructive uppercase tracking-widest bg-destructive/10 px-3 py-1 rounded-full">
+              <span className="animate-pulse flex items-center gap-1 text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-500/10 px-3 py-1 rounded-full">
                 Renewal Needed
               </span>
             )}
@@ -1080,8 +1080,8 @@ export default function MemberDetailPage({
         title={member?.deletedAt ? "Permanently Purge" : "Delete"}
         highlight="Member Profile?"
         description={member?.deletedAt
-            ? "This is a final action. This member's entire history, billing, and attendance will be purged from the system forever."
-            : "The member will be moved to the trash and hidden from active lists."
+          ? "This is a final action. This member's entire history, billing, and attendance will be purged from the system forever."
+          : "The member will be moved to the trash and hidden from active lists."
         }
         onConfirm={handleDelete}
         loading={isProcessingDelete}
@@ -1096,7 +1096,7 @@ export default function MemberDetailPage({
         title="Delete"
         highlight="Subscription Record?"
         description={
-            <>This will remove this specific membership period and its <strong>associated payment record</strong>. This may affect the member's current status.</>
+          <>This will remove this specific membership period and its <strong>associated payment record</strong>. This may affect the member's current status.</>
         }
         onConfirm={handleDeleteSubscription}
         loading={isProcessingDeleteSub}
@@ -1111,7 +1111,7 @@ export default function MemberDetailPage({
         title="Delete"
         highlight="Payment Record?"
         description={
-            <>Are you sure you want to delete this payment record? This will <strong>NOT</strong> affect the member's subscription status, but it will be removed from all financial totals.</>
+          <>Are you sure you want to delete this payment record? This will <strong>NOT</strong> affect the member's subscription status, but it will be removed from all financial totals.</>
         }
         onConfirm={handleDeletePayment}
         loading={isProcessingDeletePayment}
@@ -1280,8 +1280,8 @@ export default function MemberDetailPage({
               Portal <span className="text-primary">Management</span>
             </DialogTitle>
             <DialogDescription className="text-slate-400 text-xs font-bold uppercase tracking-wider">
-              {member?.portalEnabled 
-                ? `Update credentials for ${member?.firstName}` 
+              {member?.portalEnabled
+                ? `Update credentials for ${member?.firstName}`
                 : `Enable self-service portal for ${member?.firstName}`}
             </DialogDescription>
           </DialogHeader>
@@ -1320,9 +1320,9 @@ export default function MemberDetailPage({
 
             <DialogFooter className="flex flex-col sm:flex-row gap-3">
               {member?.portalEnabled && (
-                <Button 
-                  type="button" 
-                  variant="destructive" 
+                <Button
+                  type="button"
+                  variant="destructive"
                   className="sm:mr-auto h-11 px-6 rounded-xl font-black text-xs uppercase tracking-widest"
                   onClick={handleDisablePortal}
                   disabled={isPortalProcessing}
@@ -1332,16 +1332,16 @@ export default function MemberDetailPage({
                   ) : "Disable Access"}
                 </Button>
               )}
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 type="button"
                 onClick={() => setIsPortalModalOpen(false)}
                 className="h-11 px-6 rounded-xl font-black text-xs uppercase tracking-widest border-white/5 bg-white/5"
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="h-11 px-6 rounded-xl font-black text-xs uppercase tracking-widest bg-primary text-black hover:bg-white shadow-lg shadow-primary/20"
                 disabled={isPortalProcessing}
               >
