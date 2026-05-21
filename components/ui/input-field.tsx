@@ -73,7 +73,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
     return (
       <Field className={cn("w-full relative", containerClassName)}>
         {label && !hideLabel && (
-          <FieldLabel className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
+          <FieldLabel className="ml-2 text-[10px] font-medium text-white/80 uppercase tracking-widest mb-1">
             {label} {required && <span className="text-primary">*</span>}
           </FieldLabel>
         )}

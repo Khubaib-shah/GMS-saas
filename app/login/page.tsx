@@ -203,25 +203,15 @@ function LoginForm() {
   return (
     <div className="w-full max-w-md">
       {/* Header */}
-      <div className="mb-10">
-        <div className="flex items-center gap-2 mb-8">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center p-1">
-            <img src="/assets/logo/logo.png" alt="Logo" className="w-full h-full object-contain" />
+      <div className="mb-10 text-center">
+        <div className="flex justify-center">
+          <div className="w-3/4">
+            <img src="/assets/logo/left&right.png" alt="Logo" className="w-full h-full object-contain translate-x-[-10%]" />
           </div>
-          <span className="font-bold text-[15px] tracking-tight text-white">
-            Gym<span className="text-primary">Flow</span>
-          </span>
         </div>
 
         {mode === "LOGIN" && (
-          <>
-            <h1 className="text-3xl font-bold tracking-[-0.03em] text-white mb-2">
-              Welcome back
-            </h1>
-            <p className="text-[14px] text-white/40">
-              Sign in to access your dashboard.
-            </p>
-          </>
+          <></>
         )}
         {mode !== "LOGIN" && (
           <>
@@ -252,7 +242,7 @@ function LoginForm() {
 
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[12px] font-medium text-white/50">Password or PIN</span>
+              <span className="text-[12px] font-medium text-white/80 ml-2">Password or PIN</span>
               <button
                 type="button"
                 onClick={() => setMode("FORGOT_EMAIL")}
@@ -509,13 +499,10 @@ export default function LoginPage() {
 
         <div className="relative z-10 max-w-lg">
           {/* Logo */}
-          <div className="flex items-center gap-2 mb-16">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center p-1.5">
-              <img src="/assets/logo/logo.png" alt="Logo" className="w-full h-full object-contain" />
+          <div className="flex items-center">
+            <div className="w-3/4">
+              <img src="/assets/logo/left&right.png" alt="Logo" className="w-full h-full object-contain translate-x-[-10%]" />
             </div>
-            <span className="font-bold text-[17px] tracking-tight text-white">
-              Gym<span className="text-primary">Flow</span>
-            </span>
           </div>
 
           {/* Headline */}

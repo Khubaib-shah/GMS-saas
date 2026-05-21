@@ -74,14 +74,12 @@ export function Sidebar() {
         <div data-tour="sidebar-logo" className={cn("h-16 flex items-center border-b border-sidebar-border", sidebarCollapsed ? "lg:justify-center px-0" : "px-6", "justify-start px-6")}>
           <div className="flex items-center gap-2 overflow-hidden">
             <Link href={isSuperAdmin ? "/super-admin" : "/dashboard"} className="flex items-center gap-2 group cursor-pointer" onClick={() => setMobileMenuOpen(false)}>
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg transition-all group-hover:scale-105">
-                <img src="/assets/logo/logo.png" alt="GymFlow Logo" className="w-8 h-8 object-contain" />
+              <div className="flex-shrink-0 w-3/4 flex items-center justify-center shadow-lg transition-all group-hover:scale-105">
+                <img src="/assets/logo/left&right.png" alt="GymFlow Logo" className="w-full h-full object-contain" />
               </div>
-              {(!sidebarCollapsed || mobileMenuOpen) && (
-                <span className="font-black text-xl tracking-tighter text-white animate-in fade-in slide-in-from-left-2 duration-300">
-                  GYM<span className="text-primary">FLOW</span>
-                </span>
-              )}
+              {/* {(!sidebarCollapsed || mobileMenuOpen) && ( */}
+              {/* <img src="/assets/logo/logo3.png" alt="GymFlow Logo" className="w-full h-full object-contain" /> */}
+              {/* )} */}
             </Link>
           </div>
         </div>
