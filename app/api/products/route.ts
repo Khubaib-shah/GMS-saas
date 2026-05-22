@@ -3,6 +3,8 @@ import { requirePermission, checkFeature } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
+import ProductCategory from "@/models/ProductCategory";
+import ProductBrand from "@/models/ProductBrand";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { getCache, setCache, invalidatePattern } from "@/lib/redis";
 
@@ -13,6 +15,10 @@ export async function GET(req: Request) {
     const authResult = await requirePermission(PERMISSIONS.PRODUCTS_VIEW);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
+
+    // Prevent tree-shaking of models used in populate
+    ProductCategory.init();
+    ProductBrand.init();
 
     try {
         const gymId = session.user.gymId;

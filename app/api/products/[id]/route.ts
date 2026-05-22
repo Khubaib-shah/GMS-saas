@@ -3,6 +3,8 @@ import { requirePermission } from "@/lib/api-middleware";
 import { PERMISSIONS } from "@/lib/permissions";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
+import ProductCategory from "@/models/ProductCategory";
+import ProductBrand from "@/models/ProductBrand";
 import { logAudit, createCrudAuditEntry } from "@/lib/audit";
 import { getCache, setCache, invalidatePattern, deleteCache } from "@/lib/redis";
 
@@ -17,6 +19,9 @@ export async function GET(
     const authResult = await requirePermission(PERMISSIONS.PRODUCTS_VIEW);
     if ("error" in authResult) return authResult.error;
     const { session } = authResult;
+
+    ProductCategory.init();
+    ProductBrand.init();
 
     try {
         const cacheKey = `product:id:${id}:gym:${session.user.gymId}`;

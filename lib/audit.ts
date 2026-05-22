@@ -45,8 +45,8 @@ export type AuditResource =
     | 'product_category'
     | 'product_brand'
     | 'inventory_log'
-    | 'api_key'
     | 'webhook'
+    | 'order'
     | 'member';
 
 export interface AuditLogEntry {

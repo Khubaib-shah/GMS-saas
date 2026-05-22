@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Bell, Search, ChevronDown, CreditCard, UserPlus, AlertTriangle, Menu, X, Moon, Sun, Activity } from "lucide-react"
 import { InputField } from "@/components/ui/input-field"
@@ -23,7 +23,22 @@ import { LogOut, User, Settings as SettingsIcon, ShieldCheck } from "lucide-reac
 export function Navbar() {
   const router = useRouter()
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [dbNotifications, setDbNotifications] = useState<any[]>([])
   const { data: session } = useSession()
+
+  useEffect(() => {
+    // Only fetch if session exists
+    if (session?.user) {
+      fetch("/api/notifications")
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setDbNotifications(data)
+          }
+        })
+        .catch(console.error)
+    }
+  }, [session])
   const store = useAppStore()
   const gymName = store.gymProfile.name
   const isAdmin = (session?.user as any)?.role === "super_admin"
@@ -122,14 +137,42 @@ export function Navbar() {
     })
   }
 
-  const hasNotifications = notifications.length > 0
+  const hasNotifications = notifications.length > 0 || dbNotifications.length > 0
   const activeNotifications = notifications.filter(n => !store.dismissedNotifications.includes(n.id))
-  const finalHasNotifications = activeNotifications.length > 0
+  
+  // Combine local active notifications and DB unread notifications
+  const allActiveNotifications = [...activeNotifications, ...dbNotifications.filter(n => !n.isRead)]
+  const finalHasNotifications = allActiveNotifications.length > 0
 
   const sidebarCollapsed = store.sidebarCollapsed
   const setSidebarCollapsed = store.setSidebarCollapsed
   const mobileMenuOpen = store.mobileMenuOpen
   const setMobileMenuOpen = store.setMobileMenuOpen
+
+  // Mark all DB notifications as read
+  const handleClearAll = async () => {
+    store.clearNotifications(activeNotifications.map(n => n.id))
+    try {
+      await fetch("/api/notifications/read-all", { method: "POST" })
+      setDbNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  // Mark single DB notification as read
+  const handleReadDbNotification = async (note: any) => {
+    if (note.link) {
+      router.push(note.link)
+    }
+    try {
+      await fetch(`/api/notifications/${note._id}/read`, { method: "POST" })
+      setDbNotifications(prev => prev.map(n => n._id === note._id ? { ...n, isRead: true } : n))
+      setNotificationsOpen(false)
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   return (
     <header className={cn(
@@ -211,7 +254,7 @@ export function Navbar() {
                   </div>
                   {finalHasNotifications && (
                     <button
-                      onClick={() => store.clearNotifications(activeNotifications.map(n => n.id))}
+                      onClick={handleClearAll}
                       className="text-[10px] font-black text-primary hover:text-white transition-colors uppercase tracking-widest"
                     >
                       Clear All
@@ -222,16 +265,18 @@ export function Navbar() {
                   className="max-h-[400px] overflow-y-auto p-3 space-y-2 custom-scrollbar overscroll-contain"
                   data-lenis-prevent
                 >
-                  {activeNotifications.length > 0 ? (
-                    activeNotifications.map(note => (
+                  {allActiveNotifications.length > 0 ? (
+                    allActiveNotifications.map(note => (
                       <div
-                        key={note.id}
+                        key={note.id || note._id}
                         className={cn(
                           "group/note relative p-3 hover:bg-black/5 dark:hover:bg-white/10 rounded-xl cursor-pointer transition-all border border-black/5 dark:border-white/5",
                           "bg-black/5 dark:bg-white/5"
                         )}
                         onClick={() => {
-                          if (note.memberId) {
+                          if (note._id) {
+                            handleReadDbNotification(note)
+                          } else if (note.memberId) {
                             router.push(`/members/${note.memberId}`)
                             setNotificationsOpen(false)
                           }
@@ -240,7 +285,11 @@ export function Navbar() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
-                            store.dismissNotification(note.id)
+                            if (note._id) {
+                              handleReadDbNotification(note)
+                            } else {
+                              store.dismissNotification(note.id)
+                            }
                           }}
                           className="absolute right-2 top-2 p-1 rounded-lg opacity-0 group-hover/note:opacity-100 hover:bg-white/10 transition-all"
                         >
@@ -248,7 +297,7 @@ export function Navbar() {
                         </button>
                         <div className="flex items-center gap-2 mb-2 pr-6">
                           <div className="p-1.5 rounded-lg bg-secondary border border-border text-primary group-hover/note:neon-glow transition-all">
-                            {note.icon}
+                            {note.icon || <Bell className="w-4 h-4 text-primary" />}
                           </div>
                           <p className="text-xs font-black text-foreground leading-none tracking-tight uppercase italic">{note.title}</p>
                         </div>
