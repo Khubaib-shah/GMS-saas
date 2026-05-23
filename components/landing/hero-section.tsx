@@ -61,14 +61,6 @@ export function HeroSection() {
       .to(mockup, {
         rotationX: isMobile ? -10 : -20,
         scale: isMobile ? 1.05 : 1.25,
-      tl.to(mockup, {
-        rotationX: 0,
-        scale: 1,
-        duration: 1,
-        ease: "power1.out",
-      }).to(mockup, {
-        rotationX: -20,
-        scale: 1.25,
         opacity: 0,
         duration: 1,
         ease: "power1.in",

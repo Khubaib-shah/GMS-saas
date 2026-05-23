@@ -39,9 +39,8 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com",
-              "connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com",
-
-              "frame-src 'self' https://js.stripe.com https://www.youtube.com https://youtube.com",
+              "connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com ws: wss:",
+              "frame-src 'self' https://js.stripe.com https://www.youtube.com",
             ].join("; "),
           },
         ],
