@@ -16,12 +16,12 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const data = useMemo<{ name: string; value: number; date?: Date }[]>(() => {
+    const rawData = store.dashboardStats?.charts?.revenueChartData || []
+    
     if (dateRange?.from && dateRange?.to) {
-
       const paymentsByDate = new Map<string, number>()
-      store.payments.forEach(p => {
-        const dateStr = format(new Date(p.date), "yyyy-MM-dd")
-        paymentsByDate.set(dateStr, (paymentsByDate.get(dateStr) || 0) + p.amount)
+      rawData.forEach((p: any) => {
+        paymentsByDate.set(p._id, p.value)
       })
 
       const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to })
@@ -38,13 +38,12 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
     }
 
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    const currentYear = new Date().getFullYear()
     const monthlyTotals = new Array(12).fill(0)
 
-    store.payments.forEach(payment => {
-      const date = new Date(payment.date)
-      if (date.getFullYear() === currentYear) {
-        monthlyTotals[date.getMonth()] += payment.amount
+    rawData.forEach((d: any) => {
+      const monthIndex = parseInt(d._id) - 1
+      if (monthIndex >= 0 && monthIndex < 12) {
+        monthlyTotals[monthIndex] = d.value
       }
     })
 
@@ -53,7 +52,7 @@ export function RevenueChart({ isLoading, dateRange }: { isLoading?: boolean, da
       value: monthlyTotals[index],
       date: undefined
     }))
-  }, [store.payments, dateRange])
+  }, [store.dashboardStats, dateRange])
 
   const maxValue = Math.max(...data.map(d => d.value), 1)
 
@@ -160,30 +159,8 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
 
   const store = useAppStore()
 
-  const stats = useMemo(() => {
-    const planCounts: Record<string, number> = {}
-
-    // Group by memberId to only count the LATEST subscription per member
-    const latestSubsPerMember = new Map<string, any>()
-    store.subscriptions.forEach(sub => {
-      const current = latestSubsPerMember.get(sub.memberId)
-      if (!current || new Date(sub.endDate) > new Date(current.endDate)) {
-        latestSubsPerMember.set(sub.memberId, sub)
-      }
-    })
-
-    latestSubsPerMember.forEach(sub => {
-      if (dateRange?.from && dateRange?.to) {
-        const subDate = new Date(sub.createdAt || Date.now())
-        if (!isWithinInterval(subDate, { start: startOfDay(dateRange.from), end: endOfDay(dateRange.to) })) {
-          return
-        }
-      }
-      const plan = store.plans.find(p => p.id === sub.planId)
-      const name = plan ? plan.name : "Unknown Plan"
-      planCounts[name] = (planCounts[name] || 0) + 1
-    })
-
+  const stats = useMemo<{name: string, value: number, color: string}[]>(() => {
+    const rawData = store.dashboardStats?.charts?.subscriptionChartData || []
     const colors = [
       "bg-primary",
       "bg-blue-500",
@@ -193,12 +170,12 @@ export function SubscriptionChart({ isLoading, dateRange }: { isLoading?: boolea
       "bg-purple-500",
     ]
 
-    return Object.entries(planCounts).map(([name, value], i) => ({
-      name,
-      value,
+    return rawData.map((d: any, i: number) => ({
+      name: d.name,
+      value: d.value,
       color: colors[i % colors.length]
     }))
-  }, [store.subscriptions, store.plans, dateRange])
+  }, [store.dashboardStats])
 
   const total = stats.reduce((acc, curr) => acc + curr.value, 0)
 
@@ -268,38 +245,13 @@ export function MembershipStatusChart({ isLoading }: { isLoading?: boolean }) {
 
   const store = useAppStore()
 
-  const stats = useMemo(() => {
-    const today = new Date()
-
-    const latestSubsPerMember = new Map<string, any>()
-    store.subscriptions.forEach(sub => {
-      const current = latestSubsPerMember.get(sub.memberId)
-      if (!current || new Date(sub.endDate) > new Date(current.endDate)) {
-        latestSubsPerMember.set(sub.memberId, sub)
-      }
-    })
-
-    let active = 0
-    let expiring = 0
-    let expired = 0
-
-    latestSubsPerMember.forEach(s => {
-      const days = Math.floor((new Date(s.endDate).getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-      if (s.status === "active" && days > 7) {
-        active++
-      } else if (s.status === "active" && days > 0 && days <= 7) {
-        expiring++
-      } else {
-        expired++
-      }
-    })
-
-    return [
-      { name: "Active", value: active, color: "bg-emerald-500" },
-      { name: "Expiring Soon", value: expiring, color: "bg-amber-500" },
-      { name: "Expired", value: expired, color: "bg-rose-500" },
+  const stats = useMemo<{name: string, value: number, color: string}[]>(() => {
+    return store.dashboardStats?.charts?.membershipStatusData || [
+      { name: "Active", value: 0, color: "bg-emerald-500" },
+      { name: "Expiring Soon", value: 0, color: "bg-amber-500" },
+      { name: "Expired", value: 0, color: "bg-rose-500" },
     ]
-  }, [store.subscriptions])
+  }, [store.dashboardStats])
 
   const total = stats.reduce((acc, curr) => acc + curr.value, 0)
 
@@ -364,12 +316,13 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const data = useMemo<{ name: string; value: number; date?: Date }[]>(() => {
+    const rawData = store.dashboardStats?.charts?.attendanceChartData || []
+    
     if (dateRange?.from && dateRange?.to) {
       // Pre-group attendance by date for O(1) lookup
       const attendanceByDate = new Map<string, number>()
-      store.attendance.forEach(att => {
-        const dateStr = format(new Date(att.date), "yyyy-MM-dd")
-        attendanceByDate.set(dateStr, (attendanceByDate.get(dateStr) || 0) + 1)
+      rawData.forEach((att: any) => {
+        attendanceByDate.set(att._id, att.count)
       })
 
       const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to })
@@ -394,11 +347,12 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
       days.push(format(subDays(now, i), "EEE"))
     }
 
-    store.attendance.forEach(att => {
-      const date = startOfDay(new Date(att.date))
+    rawData.forEach((att: any) => {
+      const [year, month, day] = att._id.split('-')
+      const date = startOfDay(new Date(parseInt(year), parseInt(month) - 1, parseInt(day)))
       const diff = differenceInDays(now, date)
       if (diff >= 0 && diff < 7) {
-        counts[6 - diff] += 1
+        counts[6 - diff] += att.count
       }
     })
 
@@ -407,7 +361,7 @@ export function AttendanceChart({ isLoading, dateRange }: { isLoading?: boolean,
       value: counts[i],
       date: undefined
     }))
-  }, [store.attendance, dateRange])
+  }, [store.dashboardStats, dateRange])
 
   const maxValue = Math.max(...data.map(d => d.value), 1)
 

@@ -33,10 +33,6 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const userRole = (session?.user as any)?.role
   const isMember = userRole === "member"
 
-  const loadMembers = useAppStore((state) => state.loadMembers)
-  const loadPlans = useAppStore((state) => state.loadPlans)
-  const loadSubscriptions = useAppStore((state) => state.loadSubscriptions)
-  const loadPayments = useAppStore((state) => state.loadPayments)
   const loadGymProfile = useAppStore((state) => state.loadGymProfile)
   const gymName = useAppStore((state) => state.gymProfile.name)
 
@@ -63,15 +59,13 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   }, [session?.user, pathname, isPublicPage, userRole])
 
   useEffect(() => {
-    // Only load core data if authenticated and not on public/landing/auth pages, and not super admin
+    // Only load gym profile if authenticated and not on public/landing/auth pages, and not super admin
     if (session?.user && !isPublicPage && userRole !== "super_admin") {
       loadGymProfile()
-      loadMembers()
-      loadPlans()
-      loadSubscriptions()
-      loadPayments()
+      // Note: Data collections (members, plans, etc.) are now lazy-loaded by individual pages
+      // to improve initial app rendering and dashboard speed.
     }
-  }, [session?.user?.id, isPublicPage, userRole, loadGymProfile, loadMembers, loadPlans, loadSubscriptions, loadPayments])
+  }, [session?.user?.id, isPublicPage, userRole, loadGymProfile])
 
   const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed)
 

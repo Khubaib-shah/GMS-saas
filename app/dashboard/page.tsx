@@ -1,48 +1,40 @@
 "use client"
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Users, AlertCircle, DollarSign, CheckCircle, UserPlus, Zap, Dumbbell, Plus, Send } from "lucide-react";
+import { Users, AlertCircle, DollarSign, CheckCircle, Dumbbell, Plus, Send } from "lucide-react";
 import { StatsCard } from "@/components/stats-card";
 import { RevenueChart, SubscriptionChart, AttendanceChart, MembershipStatusChart } from "@/components/dashboard-charts";
 import { MembersTable } from "@/components/members-table";
 import { useAppStore } from "@/lib/store";
-import { daysUntilExpiry, formatCurrency } from "@/lib/utils/file-utils";
-import { useState, useEffect, useMemo } from "react";
+import { formatCurrency } from "@/lib/utils/file-utils";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { getPreviousPeriod, calculateTrend, isDateInRange } from "@/lib/analytics-utils";
-import {
-  StatsCardSkeleton,
-  ChartCardSkeleton,
-  TableSkeleton,
-  PageHeaderSkeleton
-} from "@/components/ui/skeleton-components";
+import { getPreviousPeriod } from "@/lib/analytics-utils";
 
 export default function DashboardPage() {
   const store = useAppStore();
   const { data: session } = useSession();
-  const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
-
-  useEffect(() => {
-    if (!dateRange) {
-      setDateRange({
-        from: subDays(new Date(), 30),
-        to: new Date()
-      });
-    }
-  }, []);
+  // Only show skeletons if we have no data yet — mirrors gallery cache behaviour
+  // On revisit: store already has data → false → renders instantly, no flash
+  const [statsLoading, setStatsLoading] = useState(!store.dashboardStats);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 30),
+    to: new Date()
+  });
 
   const router = useRouter();
+  const role = (session?.user as any)?.role;
+  const isTrainer = role === 'trainer';
 
   useEffect(() => {
     const loadData = async () => {
       if (!store.gymProfile._id) return;
 
-      setLoading(true);
+      setStatsLoading(true);
 
       let fetchFrom = dateRange?.from;
       if (dateRange?.from && dateRange?.to) {
@@ -50,126 +42,43 @@ export default function DashboardPage() {
         fetchFrom = prev.from;
       }
 
-      await Promise.all([
-        store.loadMembers(),
-        store.loadPlans(),
-        store.loadSubscriptions(),
-        store.loadPayments(),
-        store.loadAttendance({
-          from: fetchFrom?.toISOString(),
-          to: dateRange?.to?.toISOString() || new Date().toISOString()
-        })
-      ]);
-      setLoading(false);
+      // Returns false if served from client TTL cache (data already in store)
+      const didFetch = await store.loadDashboardStats({
+        from: fetchFrom?.toISOString(),
+        to: dateRange?.to?.toISOString() || new Date().toISOString()
+      });
+      // Only hide skeletons after a real fetch — if cached, skeletons were never shown
+      if (didFetch) setStatsLoading(false);
+
     };
+
     if (store.gymProfile._id) {
       loadData();
     }
   }, [dateRange, store.gymProfile._id]);
 
-  const role = (session?.user as any)?.role;
-  const userId = (session?.user as any)?.id;
-  const isTrainer = role === 'trainer';
+  const {
+    totalMembers = 0,
+    currentNewMembers = 0,
+    membersTrend,
+    currentCheckins = 0,
+    checkinsTrend,
+    currentRevenue = 0,
+    revenueTrend,
+    expiringSoon = 0
+  } = store.dashboardStats?.stats || {};
+  
+  const tables = store.dashboardStats?.tables || {};
 
-  const { totalMembers, currentNewMembers, membersTrend, currentCheckins, checkinsTrend, currentRevenue, revenueTrend, expiringSoon } = useMemo(() => {
-    const members = Array.isArray(store.members) ? store.members : [];
-    const subscriptions = Array.isArray(store.subscriptions) ? store.subscriptions : [];
-    const payments = Array.isArray(store.payments) ? store.payments : [];
-    const attendance = Array.isArray(store.attendance) ? store.attendance : [];
-
-    const myMembers = isTrainer
-      ? members.filter(m => (m as any).trainerId === userId || (m as any).trainerId?._id === userId)
-      : members;
-
-    const totalMembers = myMembers.length;
-    const prevRange = dateRange?.from && dateRange?.to ? getPreviousPeriod({ from: dateRange.from, to: dateRange.to }) : null;
-
-    // 1. Members Trend
-    const currentNewMembers = dateRange?.from && dateRange?.to
-      ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, { from: dateRange.from!, to: dateRange.to! })).length
-      : totalMembers;
-    const prevNewMembers = prevRange
-      ? myMembers.filter(m => m.joinDate && isDateInRange(m.joinDate, prevRange)).length
-      : 0;
-    const membersTrend = prevRange ? calculateTrend(currentNewMembers, prevNewMembers) : undefined;
-
-    // 2. Check-ins Trend
-    const currentCheckins = dateRange?.from && dateRange?.to
-      ? attendance.filter(a => isDateInRange(a.date, { from: dateRange.from!, to: dateRange.to! })).length
-      : attendance.length;
-    const prevCheckins = prevRange
-      ? attendance.filter(a => isDateInRange(a.date, prevRange)).length
-      : 0;
-    const checkinsTrend = prevRange ? calculateTrend(currentCheckins, prevCheckins) : undefined;
-
-    // 3. Revenue Trend
-    const currentRevenue = dateRange?.from && dateRange?.to
-      ? payments.filter(p => isDateInRange(p.date, { from: dateRange.from!, to: dateRange.to! })).reduce((sum, p) => sum + p.amount, 0)
-      : payments.reduce((sum, p) => sum + p.amount, 0);
-    const prevRevenue = prevRange
-      ? payments.filter(p => isDateInRange(p.date, prevRange)).reduce((sum, p) => sum + p.amount, 0)
-      : 0;
-    const revenueTrend = prevRange ? calculateTrend(currentRevenue, prevRevenue) : undefined;
-
-    const expiringSoon = isTrainer
-      ? myMembers.filter(m => {
-        const active = (m as any).activeSubscription;
-        if (!active || active.status === "paused") return false;
-        const daysLeft = daysUntilExpiry(active.endDate);
-        return daysLeft > 0 && daysLeft <= 7;
-      }).length
-      : subscriptions.filter((s) => {
-        if (s.status === "paused") return false;
-        const daysLeft = daysUntilExpiry(s.endDate);
-        return daysLeft > 0 && daysLeft <= 7;
-      }).length;
-
-    return { totalMembers, currentNewMembers, membersTrend, currentCheckins, checkinsTrend, currentRevenue, revenueTrend, expiringSoon };
-  }, [store.members, store.subscriptions, store.payments, store.attendance, isTrainer, userId, dateRange]);
-
-
-
-  if (loading) {
-    return (
-      <div className="space-y-4 md:space-y-10 animate-pulse">
-        <PageHeaderSkeleton showButton={false} />
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-6">
-          <StatsCardSkeleton />
-          <StatsCardSkeleton />
-          <StatsCardSkeleton />
-          <StatsCardSkeleton />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4 md:mt-10">
-          <div className="h-[300px]">
-            <ChartCardSkeleton type="bar" />
-          </div>
-          <div className="h-[300px]">
-            <ChartCardSkeleton type="bar" />
-          </div>
-          <div className="h-[300px]">
-            <ChartCardSkeleton type="pie" />
-          </div>
-          <div className="h-[300px]">
-            <ChartCardSkeleton type="pie" />
-          </div>
-        </div>
-
-        <div className="mt-4 md:mt-10">
-          <TableSkeleton columns={5} rows={5} />
-        </div>
-      </div>
-    );
-  }
-
+  // ── Static shell renders immediately. Only values are skeleton'd ──────────
   return (
     <div className="space-y-4 md:space-y-10 animate-fade-up">
+      {/* Header — always visible immediately */}
       <DashboardHeader
         title={isTrainer ? "Trainer" : "Admin"}
         highlight="Dashboard"
         subtitle={isTrainer ? "Track your performance" : "Overview of your gym"}
-        description={isTrainer ? `Managing ${totalMembers} members.` : 'See how your gym is doing today.'}
+        description={isTrainer ? `Managing your members.` : 'See how your gym is doing today.'}
         descriptionIconColor={isTrainer ? "emerald" : "primary"}
       >
         <div className="flex flex-wrap items-center gap-3">
@@ -210,28 +119,27 @@ export default function DashboardPage() {
         </div>
       </DashboardHeader>
 
-      {/* Stats Grid */}
+      {/* Stats Grid — card shell is instant, only the numbers skeleton */}
       <div data-tour="dashboard-stats" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <StatsCard
           title={dateRange?.from ? "New Members" : "Total Members"}
-          // value={totalMembers.toString()}
           value={currentNewMembers.toString()}
           icon={<Users className="w-5 h-5" />}
           trend={membersTrend}
-          isLoading={loading}
+          isLoading={statsLoading}
         />
         <StatsCard
           title={dateRange?.from ? "Period Check-ins" : "Total Check-ins"}
           value={currentCheckins.toString()}
           icon={<CheckCircle className="w-5 h-5" />}
           trend={checkinsTrend}
-          isLoading={loading}
+          isLoading={statsLoading}
         />
         <StatsCard
           title="Expiring Plans"
           value={expiringSoon.toString()}
           icon={<AlertCircle className="w-5 h-5" />}
-          isLoading={loading}
+          isLoading={statsLoading}
         />
         {!isTrainer && (
           <StatsCard
@@ -239,35 +147,35 @@ export default function DashboardPage() {
             value={formatCurrency(currentRevenue)}
             icon={<DollarSign className="w-5 h-5" />}
             trend={revenueTrend}
-            isLoading={loading}
+            isLoading={statsLoading}
           />
         )}
       </div>
 
-      {/* Charts Section - Only for Managers/Owners */}
+      {/* Charts Section — card shell is instant, inner chart is skeleton'd */}
       {!isTrainer && (
         <div className="space-y-4 md:space-y-8">
           <div data-tour="dashboard-charts" className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8 items-stretch">
             <div className="lg:col-span-2">
-              <RevenueChart isLoading={loading} dateRange={dateRange} />
+              <RevenueChart isLoading={statsLoading} dateRange={dateRange} />
             </div>
             <div className="h-full">
-              <SubscriptionChart isLoading={loading} dateRange={dateRange} />
+              <SubscriptionChart isLoading={statsLoading} dateRange={dateRange} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 items-stretch">
             <div className="h-full">
-              <MembershipStatusChart isLoading={loading} />
+              <MembershipStatusChart isLoading={statsLoading} />
             </div>
             <div className="h-full md:col-span-2">
-              <AttendanceChart isLoading={loading} dateRange={dateRange} />
+              <AttendanceChart isLoading={statsLoading} dateRange={dateRange} />
             </div>
           </div>
         </div>
       )}
 
-      {/* Members Table */}
+      {/* Members Table — shell renders immediately, rows populate as data loads */}
       <div data-tour="dashboard-members" className="relative">
         <div className="flex items-center gap-4 mb-4 md:mb-8">
           <h2 className="text-xl md:text-2xl font-black tracking-tighter text-foreground uppercase">
@@ -281,7 +189,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
-          <MembersTable trainerOnly={isTrainer} />
+          <MembersTable trainerOnly={isTrainer} data={tables.recentMembers} isLoading={statsLoading} disableFetch={true} />
         </div>
       </div>
 
@@ -289,14 +197,14 @@ export default function DashboardPage() {
         <div className="relative">
           <div className="flex flex-col md:flex-row items-start md:items-center md:gap-4 mb-4 md:mb-8">
             <h2 className="text-xl md:text-2xl font-black tracking-tighter text-red-500 uppercase">
-              Expiring & Expired
+              Expiring &amp; Expired
             </h2>
             <div className="hidden md:block h-px flex-1 bg-black/5 dark:bg-white/5"></div>
             <p className="text-[10px] font-medium md:font-black text-slate-500 uppercase tracking-widest -mt-1 md:mt-0">Memberships needing immediate renewal</p>
           </div>
 
           <div className="glass-premium p-0 overflow-hidden border-border bg-card dark:bg-slate-950/40">
-            <MembersTable mode="expiring" />
+            <MembersTable mode="expiring" data={tables.expiringMembers} isLoading={statsLoading} disableFetch={true} />
           </div>
         </div>
       )}

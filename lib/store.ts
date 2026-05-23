@@ -68,6 +68,10 @@ export type AppState = {
   attendance: any[]
   loadAttendance: (params?: { date?: string, month?: string, from?: string, to?: string, force?: boolean }) => Promise<void>
 
+  // Dashboard Stats
+  dashboardStats: any
+  loadDashboardStats: (params?: { from?: string, to?: string, force?: boolean }) => Promise<boolean>
+
   // Exercises
   exercises: any[]
   loadExercises: (options?: { force?: boolean }) => Promise<void>
@@ -101,6 +105,40 @@ export const useAppStore = create<AppState>()(
       // STATUS
       // -------------------------
       lastLoaded: {},
+
+      // -------------------------
+      // DASHBOARD STATS
+      // -------------------------
+      dashboardStats: null,
+      loadDashboardStats: async (params) => {
+        const state = get();
+        const now = Date.now();
+        const queryParams = new URLSearchParams();
+        if (params?.from) queryParams.append("from", params.from);
+        if (params?.to) queryParams.append("to", params.to);
+        const url = `/api/dashboard/stats?${queryParams.toString()}`;
+
+        const cacheKey = `dashboardStats_${url}`;
+        // If data is fresh (< 60s old) and we already have data, skip fetch
+        if (!params?.force && now - (state.lastLoaded?.[cacheKey] || 0) < 60000 && state.dashboardStats) {
+          return false; // served from client cache — no loading spinner needed
+        }
+
+        set((state) => ({
+          lastLoaded: { ...state.lastLoaded, [cacheKey]: Date.now() }
+        }));
+
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const data = await res.json();
+            set({ dashboardStats: data });
+          }
+        } catch (error) {
+          console.error("Failed to load dashboard stats", error);
+        }
+        return true; // fetched from network
+      },
 
       // -------------------------
       // GYM PROFILE

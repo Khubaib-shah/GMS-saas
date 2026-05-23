@@ -26,19 +26,28 @@ import { LucideEye } from "lucide-react";
 
 export function MembersTable({ 
   trainerOnly = false, 
-  mode = "recent" 
+  mode = "recent",
+  data,
+  isLoading = false,
+  disableFetch = false
 }: { 
   trainerOnly?: boolean,
-  mode?: "recent" | "expiring"
+  mode?: "recent" | "expiring",
+  data?: any[],
+  isLoading?: boolean,
+  disableFetch?: boolean
 }) {
   const store = useAppStore();
   const { data: session } = useSession();
   const userId = (session?.user as any)?.id;
 
   useEffect(() => {
-    store.loadMembers();
-    store.loadSubscriptions();
-  }, []);
+    // Only fetch globally if we are allowed to, and weren't given direct data
+    if (!disableFetch && !data) {
+      store.loadMembers();
+      store.loadSubscriptions();
+    }
+  }, [data, disableFetch]);
 
   const relevantMembers = useMemo(() => {
     let list = store.members;
@@ -100,6 +109,18 @@ export function MembersTable({
     return filtered.slice(0, 10);
   }, [relevantMembers, store.subscriptions, store.searchQuery, mode]);
 
+  // Use provided data if available, otherwise compute it
+  const finalMembers = data || displayMembers;
+
+  if (isLoading) {
+    return (
+      <div className="glass-premium bg-card rounded-2xl border border-white/5 overflow-hidden p-8 flex flex-col items-center justify-center gap-4">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Loading members...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="glass-premium bg-card rounded-2xl border border-white/5 overflow-hidden relative after:absolute after:top-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-primary/10 after:to-transparent">
       <Table className="!text-xs md:text-sm">
@@ -123,8 +144,8 @@ export function MembersTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {displayMembers.length > 0 ? (
-            displayMembers.map((item) => (
+          {finalMembers.length > 0 ? (
+            finalMembers.map((item) => (
               <TableRow
                 key={item.member.id}
                 className="[&_td]:py-2 [&_td]:md:py-6 [&_td]:px-3 [&_td]:md:px-6 border-white/5 hover:bg-white/[0.02] transition-colors group/row"
