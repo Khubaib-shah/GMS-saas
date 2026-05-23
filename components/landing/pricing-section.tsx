@@ -1,92 +1,139 @@
-"use client"
+"use client";
 
-import { SectionHeading } from "./section-heading"
-import { useEffect, useState } from "react"
-import { Check, Loader2 } from "lucide-react"
-import Link from "next/link"
+import { SectionHeading } from "./section-heading";
+import { useEffect, useState } from "react";
+import { Check, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 interface PlatformPlan {
-  id: string
-  name: string
-  slug: string
-  description: string
-  monthlyPricePKR: number
-  branchLimit: number
-  maxStaffAccounts: number
-  featureFlags: string[]
-  isPopular?: boolean
-  sortOrder?: number
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  monthlyPricePKR: number;
+  branchLimit: number;
+  maxStaffAccounts: number;
+  featureFlags: string[];
+  isPopular?: boolean;
+  sortOrder?: number;
 }
 
 const FALLBACK_PLANS = [
   {
-    id: "starter", slug: "starter", name: "Starter", monthlyPricePKR: 3000, isPopular: false, sortOrder: 0,
+    id: "starter",
+    slug: "starter",
+    name: "Starter",
+    monthlyPricePKR: 3000,
+    isPopular: false,
+    sortOrder: 0,
     description: "For small gyms just getting started.",
-    branchLimit: 1, maxStaffAccounts: 3,
+    branchLimit: 1,
+    maxStaffAccounts: 3,
     featureFlags: ["members", "manualAttendance", "payments"],
   },
   {
-    id: "professional", slug: "professional", name: "Professional", monthlyPricePKR: 6000, isPopular: true, sortOrder: 1,
+    id: "professional",
+    slug: "professional",
+    name: "Professional",
+    monthlyPricePKR: 6000,
+    isPopular: true,
+    sortOrder: 1,
     description: "For growing gyms that need more power.",
-    branchLimit: 3, maxStaffAccounts: 10,
-    featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics"],
+    branchLimit: 3,
+    maxStaffAccounts: 10,
+    featureFlags: [
+      "members",
+      "manualAttendance",
+      "qrAttendance",
+      "payments",
+      "subscriptions",
+      "trainersModule",
+      "analytics",
+    ],
   },
   {
-    id: "enterprise", slug: "enterprise", name: "Enterprise", monthlyPricePKR: 10000, isPopular: false, sortOrder: 2,
+    id: "enterprise",
+    slug: "enterprise",
+    name: "Enterprise",
+    monthlyPricePKR: 10000,
+    isPopular: false,
+    sortOrder: 2,
     description: "For multi-branch chains and franchises.",
-    branchLimit: 10, maxStaffAccounts: 50,
-    featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics", "workoutPlanner", "auditLogs"],
+    branchLimit: 10,
+    maxStaffAccounts: 50,
+    featureFlags: [
+      "members",
+      "manualAttendance",
+      "qrAttendance",
+      "payments",
+      "subscriptions",
+      "trainersModule",
+      "analytics",
+      "workoutPlanner",
+      "auditLogs",
+    ],
   },
-]
+];
 
 function getFeatures(plan: PlatformPlan): string[] {
-  const f: string[] = []
-  if (plan.branchLimit === 1) f.push("1 branch")
-  else if (plan.branchLimit >= 10) f.push("Unlimited branches")
-  else f.push(`Up to ${plan.branchLimit} branches`)
+  const f: string[] = [];
+  if (plan.branchLimit === 1) f.push("1 branch");
+  else if (plan.branchLimit >= 10) f.push("Unlimited branches");
+  else f.push(`Up to ${plan.branchLimit} branches`);
 
-  if (plan.maxStaffAccounts <= 3) f.push("Up to 3 staff accounts")
-  else if (plan.maxStaffAccounts >= 50) f.push("Unlimited staff accounts")
-  else f.push(`Up to ${plan.maxStaffAccounts} staff accounts`)
+  if (plan.maxStaffAccounts <= 3) f.push("Up to 3 staff accounts");
+  else if (plan.maxStaffAccounts >= 50) f.push("Unlimited staff accounts");
+  else f.push(`Up to ${plan.maxStaffAccounts} staff accounts`);
 
-  if (plan.featureFlags.includes("members")) f.push("Member management")
-  if (plan.featureFlags.includes("manualAttendance")) f.push("Manual attendance")
-  if (plan.featureFlags.includes("qrAttendance")) f.push("QR code attendance")
-  if (plan.featureFlags.includes("payments")) f.push("Billing & payments")
-  if (plan.featureFlags.includes("trainersModule")) f.push("Trainer management")
-  if (plan.featureFlags.includes("analytics")) f.push("Advanced analytics")
-  if (plan.featureFlags.includes("workoutPlanner")) f.push("Workout planner")
-  if (plan.featureFlags.includes("auditLogs")) f.push("Security audit logs")
-  return f
+  if (plan.featureFlags.includes("members")) f.push("Member management");
+  if (plan.featureFlags.includes("manualAttendance"))
+    f.push("Manual attendance");
+  if (plan.featureFlags.includes("qrAttendance")) f.push("QR code attendance");
+  if (plan.featureFlags.includes("payments")) f.push("Billing & payments");
+  if (plan.featureFlags.includes("trainersModule"))
+    f.push("Trainer management");
+  if (plan.featureFlags.includes("analytics")) f.push("Advanced analytics");
+  if (plan.featureFlags.includes("workoutPlanner")) f.push("Workout planner");
+  if (plan.featureFlags.includes("auditLogs")) f.push("Security audit logs");
+  return f;
 }
 
 export function PricingSection() {
-  const [plans, setPlans] = useState<PlatformPlan[]>(FALLBACK_PLANS)
-  const [loading, setLoading] = useState(true)
+  const [plans, setPlans] = useState<PlatformPlan[]>(FALLBACK_PLANS);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchPlans() {
       try {
-        const res = await fetch("/api/platform/plans")
-        const data = await res.json()
+        const res = await fetch("/api/platform/plans");
+        const data = await res.json();
         if (data.plans && data.plans.length > 0) {
-          setPlans([...data.plans].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)))
+          setPlans(
+            [...data.plans].sort(
+              (a, b) => (a.sortOrder || 0) - (b.sortOrder || 0),
+            ),
+          );
         }
       } catch {
         // fallback already set
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    fetchPlans()
-  }, [])
+    fetchPlans();
+  }, []);
 
   return (
-    <section id="pricing" className="py-6 md:py-32 px-2 md:px-6 border-t border-white/[0.06]">
+    <section
+      id="pricing"
+      className="py-6 md:py-32 px-2 md:px-6 border-t border-white/[0.06]"
+    >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="max-w-xl mb-6 md:mb-16">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">Pricing</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">
+            Pricing
+          </div>
           <SectionHeading
             title="Simple Pricing"
             highlight="No Hidden Fees"
@@ -94,7 +141,8 @@ export function PricingSection() {
             className="mb-4"
           />
           <p className="text-[15px] text-white/80 leading-relaxed">
-            Transparent pricing. No hidden fees. Upgrade when you grow. Cancel anytime.
+            Transparent pricing. No hidden fees. Upgrade when you grow. Cancel
+            anytime.
           </p>
         </div>
 
@@ -105,25 +153,30 @@ export function PricingSection() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {plans.map((plan, idx) => {
-              const features = getFeatures(plan)
+              const features = getFeatures(plan);
               return (
                 <div
                   key={`${plan.id}-${idx}`}
-                  className={`relative rounded-xl p-8 flex flex-col gap-8 ${plan.isPopular
-                    ? "border border-[#c6ff00]/40 bg-[#c6ff00]/[0.03]"
-                    : "border border-white/[0.06] bg-white/[0.02]"
-                    }`}
+                  className={`relative rounded-xl p-8 flex flex-col gap-8 ${
+                    plan.isPopular
+                      ? "border border-[#c6ff00]/40 bg-[#c6ff00]/[0.03]"
+                      : "border border-white/[0.06] bg-white/[0.02]"
+                  }`}
                 >
                   {/* Popular badge */}
                   {plan.isPopular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#c6ff00] text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
                       Most popular
                     </div>
                   )}
 
                   <div>
-                    <div className="text-[13px] font-semibold text-white mb-1">{plan.name}</div>
-                    <div className="text-[12px] text-white/30 mb-6">{plan.description}</div>
+                    <div className="text-[13px] font-semibold text-white mb-1">
+                      {plan.name}
+                    </div>
+                    <div className="text-[12px] text-white/30 mb-6">
+                      {plan.description}
+                    </div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-bold tracking-tight text-white">
                         Rs {plan.monthlyPricePKR.toLocaleString()}
@@ -134,14 +187,23 @@ export function PricingSection() {
 
                   <ul className="flex flex-col gap-3 flex-1">
                     {features.map((f, j) => (
-                      <li key={j} className="flex items-center gap-2.5 text-[13px] text-white/50">
-                        <Check className={`w-3.5 h-3.5 shrink-0 ${plan.isPopular ? "text-primary" : "text-white/30"}`} strokeWidth={2.5} />
+                      <li
+                        key={j}
+                        className="flex items-center gap-2.5 text-[13px] text-white/50"
+                      >
+                        <Check
+                          className={`w-3.5 h-3.5 shrink-0 ${plan.isPopular ? "text-primary" : "text-white/30"}`}
+                          strokeWidth={2.5}
+                        />
                         {f}
                       </li>
                     ))}
                   </ul>
 
-                  <Link href={`/signup?plan=${encodeURIComponent(plan.slug)}`} className="w-full">
+                  <Link
+                    href={`/signup?plan=${encodeURIComponent(plan.slug)}`}
+                    className="w-full"
+                  >
                     {plan.isPopular ? (
                       <button className="btn-nav-secondary w-full">
                         <span>Get started</span>
@@ -149,20 +211,24 @@ export function PricingSection() {
                     ) : (
                       <button className="btn-hero-reveal w-full">
                         <div className="hero-text">
-                          {"Get started".split(" ").map((w, i) => <span key={`text-${i}`}>{w}</span>)}
+                          {"Get started".split(" ").map((w, i) => (
+                            <span key={`text-${i}`}>{w}</span>
+                          ))}
                         </div>
                         <div className="hero-clone">
-                          {"Get started".split(" ").map((w, i) => <span key={`clone-${i}`}>{w}</span>)}
+                          {"Get started".split(" ").map((w, i) => (
+                            <span key={`clone-${i}`}>{w}</span>
+                          ))}
                         </div>
                       </button>
                     )}
                   </Link>
                 </div>
-              )
+              );
             })}
           </div>
         )}
       </div>
     </section>
-  )
+  );
 }

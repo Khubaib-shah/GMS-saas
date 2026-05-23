@@ -18,6 +18,17 @@ export function HeroSection() {
     const mockup = mockupRef.current;
     if (!mockup) return;
 
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const initialRotationX = isMobile ? 20 : 60;
+    const initialScale = isMobile ? 0.85 : 0.7;
+
+    // Initial state
+    gsap.set(mockup, {
+      rotationX: initialRotationX,
+      scale: initialScale,
+      transformPerspective: 1000,
+      transformOrigin: "top center",
+    });
     let mm = gsap.matchMedia();
 
     // Desktop/Tablet: Keep premium 3D rotate and scale animation
@@ -39,6 +50,17 @@ export function HeroSection() {
         },
       });
 
+    // Phase 1: Straighten out and scale to 1 (takes first 50% of the scroll)
+    tl.to(mockup, {
+      rotationX: 0,
+      scale: 1,
+      duration: 1,
+      ease: "power1.out",
+    })
+      // Phase 2: Keep scaling and fade out (takes remaining 50% of scroll)
+      .to(mockup, {
+        rotationX: isMobile ? -10 : -20,
+        scale: isMobile ? 1.05 : 1.25,
       tl.to(mockup, {
         rotationX: 0,
         scale: 1,
@@ -90,7 +112,7 @@ export function HeroSection() {
     };
   }, []);
   return (
-    <section className="relative pt-40 pb-0 px-6 overflow-hidden">
+    <section className="relative pt-32 md:pt-40 pb-0 px-4 md:px-6 overflow-hidden">
       {/* Dot grid background */}
       <div
         className="absolute inset-0 -z-10"

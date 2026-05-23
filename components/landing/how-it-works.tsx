@@ -131,18 +131,18 @@ export function HowItWorks() {
   }, [])
 
   return (
-    <section id="how-it-works" className="py-10 md:py-32 px-2 md:px-6 border-t border-white/[0.06] overflow-hidden" ref={containerRef}>
+    <section id="how-it-works" className="py-16 md:py-32 px-4 md:px-6 border-t border-white/[0.06] overflow-hidden" ref={containerRef}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-10 md:mb-24">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-4">How it works</div>
+        <div className="text-center mb-10 md:mb-16">
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-4">How it works</div>
           <SectionHeading
             title="Up and running in"
             highlight="under 10 minutes"
             align="center"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/80 leading-relaxed max-w-xl mx-auto">
+          <p className="text-[15px] md:text-[17px] text-white/70 leading-relaxed max-w-xl mx-auto">
             Zero setup. Zero training. Just sign up and automate your entire gym from day one.
           </p>
         </div>
@@ -181,12 +181,12 @@ export function HowItWorks() {
                   {/* Content Side */}
                   <div className="flex-1 w-full lg:w-1/2">
                     <div className={cn(
-                      "how-it-works-card",
-                      i % 2 === 0 ? "lg:pr-24 text-center lg:text-right" : "lg:pl-24 text-center lg:text-left"
+                       "how-it-works-card",
+                       i % 2 === 0 ? "lg:pr-24 text-center lg:text-right" : "lg:pl-24 text-center lg:text-left"
                     )}>
                       <div className="premium-stat-outer inline-block w-full max-w-md">
                         <div className="stat-dot" />
-                        <div className="premium-stat-card p-4 md:p-8 text-left">
+                        <div className="premium-stat-card p-6 md:p-8 text-left">
                           <div className="stat-ray" />
                           <div className="stat-line stat-topl" />
                           <div className="stat-line stat-leftl" />
@@ -198,8 +198,8 @@ export function HowItWorks() {
                               {s.n}
                             </div>
                             <div>
-                              <h3 className="text-xl font-bold text-white mb-2">{s.title}</h3>
-                              <p className="text-sm text-white/70 leading-relaxed">{s.description}</p>
+                              <h3 className="text-base font-bold text-white mb-2 tracking-tight">{s.title}</h3>
+                              <p className="text-[13px] text-white/60 leading-relaxed">{s.description}</p>
                             </div>
                           </div>
                         </div>

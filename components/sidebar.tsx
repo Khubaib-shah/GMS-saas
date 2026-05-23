@@ -24,8 +24,19 @@ export function Sidebar() {
   const enabledFeatures = useAppStore((state) => state.gymProfile.enabledFeatures) || []
   const isSellingEnabled = enabledFeatures.includes("selling") || enabledFeatures.includes("commerce")
 
-  const navItems: NavItem[] = [
-    ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : [{ label: "My Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }]),
+  const isSuperAdmin = role === 'super_admin'
+  const isTrainer = role === 'trainer'
+
+  const superAdminNavItems: NavItem[] = [
+    { label: "Dashboard", href: "/super-admin", icon: <LayoutDashboard className="w-5 h-5" /> },
+    { label: "Gyms", href: "/super-admin/gyms", icon: <Building2 className="w-5 h-5" /> },
+    { label: "Plans", href: "/super-admin/plans", icon: <CreditCard className="w-5 h-5" /> },
+    { label: "Billing", href: "/super-admin/billing", icon: <CreditCard className="w-5 h-5" /> },
+    { label: "Settings", href: "/super-admin/settings", icon: <Settings className="w-5 h-5" /> },
+  ]
+
+  const navItems: NavItem[] = isSuperAdmin ? superAdminNavItems : [
+    ...(!isTrainer ? [{ label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }] : [{ label: "My Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> }]),
     { label: "Members", href: "/members", icon: <Users className="w-5 h-5" /> },
     ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Attendance", href: "/attendance", icon: <UserCheck className="w-5 h-5" /> }] : []),
     ...((session?.user as any)?.role !== 'trainer' ? [{ label: "Subscriptions", href: "/subscriptions", icon: <CreditCard className="w-5 h-5" /> }] : []),
@@ -62,15 +73,13 @@ export function Sidebar() {
         {/* Logo Section */}
         <div data-tour="sidebar-logo" className={cn("h-16 flex items-center border-b border-sidebar-border", sidebarCollapsed ? "lg:justify-center px-0" : "px-6", "justify-start px-6")}>
           <div className="flex items-center gap-2 overflow-hidden">
-            <Link href="/dashboard" className="flex items-center gap-2 group cursor-pointer" onClick={() => setMobileMenuOpen(false)}>
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg transition-all group-hover:scale-105">
-                <Building2 className="w-6 h-6 text-black" />
+            <Link href={isSuperAdmin ? "/super-admin" : "/dashboard"} className="flex items-center gap-2 group cursor-pointer" onClick={() => setMobileMenuOpen(false)}>
+              <div className="flex-shrink-0 w-3/4 flex items-center justify-center shadow-lg transition-all group-hover:scale-105">
+                <img src="/assets/logo/left&right.png" alt="GymFlow Logo" className="w-full h-full object-contain" />
               </div>
-              {(!sidebarCollapsed || mobileMenuOpen) && (
-                <span className="font-black text-xl tracking-tighter text-white animate-in fade-in slide-in-from-left-2 duration-300">
-                  GYM<span className="text-primary">FLOW</span>
-                </span>
-              )}
+              {/* {(!sidebarCollapsed || mobileMenuOpen) && ( */}
+              {/* <img src="/assets/logo/logo3.png" alt="GymFlow Logo" className="w-full h-full object-contain" /> */}
+              {/* )} */}
             </Link>
           </div>
         </div>

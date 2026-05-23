@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 // ─────────────────────────────────────────────────
 // Types
@@ -70,10 +71,20 @@ const GymContext = createContext<GymContextValue>({
 
 export function GymProvider({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
+    const pathname = usePathname();
     const [settings, setSettings] = useState<GymSettingsData | null>(null);
     const [subscription, setSubscription] = useState<SubscriptionPlanData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const isAdmin = (session?.user as any)?.role === "super_admin";
+    const isLandingPage = pathname === "/";
+    const isLoginPage = pathname === "/login";
+    const isMemberPortal = pathname?.match(/^\/member($|\/)/);
+    const isSuperAdmin = pathname?.startsWith("/super-admin");
+    const isLegacyAdmin = pathname?.startsWith("/admin");
+    const isSignupPage = pathname?.startsWith("/signup");
+    const isPublicPage = isLandingPage || isLoginPage || isMemberPortal || isSuperAdmin || isSignupPage || isLegacyAdmin || isAdmin;
 
     const fetchSettings = useCallback(async () => {
         if (status !== "authenticated") return;
@@ -110,12 +121,12 @@ export function GymProvider({ children }: { children: React.ReactNode }) {
     }, [status]);
 
     useEffect(() => {
-        if (status === "authenticated") {
+        if (status === "authenticated" && !isPublicPage) {
             fetchSettings();
-        } else if (status === "unauthenticated") {
+        } else if (status === "unauthenticated" || isPublicPage) {
             setLoading(false);
         }
-    }, [status, fetchSettings]);
+    }, [status, isPublicPage, fetchSettings]);
 
     /**
      * Check if a feature is enabled on the gym's subscription plan.

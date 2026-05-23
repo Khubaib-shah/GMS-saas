@@ -53,7 +53,7 @@ export function ProblemSection() {
             align="left"
             className="mb-4"
           />
-          <p className="text-[15px] text-white/80 leading-relaxed">
+          <p className="text-[15px] md:text-[17px] text-white/70 leading-relaxed max-w-xl">
             Most gym owners still use spreadsheets and WhatsApp groups. It costs
             them money every single day.
           </p>
@@ -85,10 +85,10 @@ export function ProblemSection() {
                     <p.icon className="w-4 h-4 text-red-400" />
                   </div>
                 </div>
-                <h3 className="text-[16px] font-semibold text-white mb-2 tracking-tight">
+                <h3 className="text-base font-bold text-white mb-2 tracking-tight">
                   {p.title}
                 </h3>
-                <p className="text-[13px] text-white/80 leading-relaxed">
+                <p className="text-[13px] text-white/60 leading-relaxed">
                   {p.description}
                 </p>
               </div>

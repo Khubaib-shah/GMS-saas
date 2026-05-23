@@ -9,6 +9,7 @@ import Attendance from "@/models/Attendance";
 import Plan from "@/models/Plan";
 import WorkoutPlan from "@/models/WorkoutPlan";
 import Exercise from "@/models/Exercise";
+import Order from "@/models/Order";
 
 const MEMBER_JWT_SECRET = process.env.NEXTAUTH_SECRET || "member-portal-secret";
 
@@ -124,6 +125,16 @@ export async function GET(req: Request) {
                 .lean();
         }
 
+        // Get recent orders (last 10)
+        const orders = await Order.find({
+            memberId: tokenData.memberId,
+            gymId: tokenData.gymId,
+            source: "member_portal"
+        })
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .lean();
+
         // Calculate stats
         const daysUntilExpiry = subscription
             ? Math.ceil((new Date(subscription.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
@@ -205,6 +216,18 @@ export async function GET(req: Request) {
                     }))
                 }))
             } : null,
+            orders: orders.map((o: any) => ({
+                id: o._id.toString(),
+                receiptNumber: o.receiptNumber,
+                finalAmount: o.finalAmount,
+                status: o.status,
+                createdAt: o.createdAt,
+                items: o.items.map((i: any) => ({
+                    name: i.name,
+                    quantity: i.quantity,
+                    subtotal: i.subtotal,
+                })),
+            })),
         });
     } catch (error) {
         console.error("Member dashboard error:", error);

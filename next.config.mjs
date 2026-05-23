@@ -40,6 +40,7 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com",
               "connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com",
+
               "frame-src 'self' https://js.stripe.com https://www.youtube.com https://youtube.com",
             ].join("; "),
           },

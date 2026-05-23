@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import Member from "@/models/Member";
@@ -38,18 +39,25 @@ export const authOptions: NextAuthOptions = {
 
                 // 2. If not found, try finding in Member model
                 if (!account) {
+                    // Normalize phone number query to match both formats (e.g. 0300... and +92300...)
+                    const phoneAlternatives = [identifier];
+                    if (/^03\d{9}$/.test(identifier)) {
+                        phoneAlternatives.push("+92" + identifier.substring(1));
+                    } else if (/^\+923\d{9}$/.test(identifier)) {
+                        phoneAlternatives.push("0" + identifier.substring(3));
+                    }
+
                     account = await Member.findOne({
                         $or: [
                             { email: identifier },
-                            { phone: identifier }
+                            { phone: { $in: phoneAlternatives } }
                         ],
                         deletedAt: null,
                         portalEnabled: true
-                    }).select("+portalPassword");
-                    
+                    }).select("+portalPassword +portalPin");
+                    console.log(account);
                     if (account) {
                         isMember = true;
-                        // Map portalPassword to password for compatibility with existing logic
                         account.password = account.portalPassword;
                         account.role = "member";
                         account.fullName = `${account.firstName} ${account.lastName || ""}`.trim();
@@ -80,7 +88,21 @@ export const authOptions: NextAuthOptions = {
                     );
                 }
 
-                const isMatch = await bcrypt.compare(credentials.password, account.password);
+                let isMatch = false;
+
+                // For Members, we might be comparing against a PIN instead of a password
+                if (isMember) {
+                    // Try password first
+                    if (account.password) {
+                        isMatch = await bcrypt.compare(credentials.password, account.password);
+                    }
+                    // If no match, try PIN
+                    if (!isMatch && account.portalPin) {
+                        isMatch = await bcrypt.compare(credentials.password, account.portalPin);
+                    }
+                } else {
+                    isMatch = await bcrypt.compare(credentials.password, account.password);
+                }
 
                 if (!isMatch) {
                     // Increment failed attempts for both Staff and Members
@@ -153,7 +175,7 @@ export const authOptions: NextAuthOptions = {
                     }
                 }
 
-                return {
+                const returnVal: any = {
                     id: account._id.toString(),
                     name: account.fullName,
                     email: account.email || account.phone, // Use phone if email is missing
@@ -163,6 +185,22 @@ export const authOptions: NextAuthOptions = {
                     customPermissions: account.customPermissions || [],
                     isPremium
                 };
+
+                if (isMember) {
+                    const MEMBER_JWT_SECRET = process.env.NEXTAUTH_SECRET || "member-portal-secret";
+                    returnVal.memberToken = jwt.sign(
+                        {
+                            memberId: account._id.toString(),
+                            gymId: account.gymId ? account.gymId.toString() : "",
+                            email: account.email || "",
+                            type: "member",
+                        },
+                        MEMBER_JWT_SECRET,
+                        { expiresIn: "7d" }
+                    );
+                }
+
+                return returnVal;
             },
         }),
     ],
@@ -175,6 +213,9 @@ export const authOptions: NextAuthOptions = {
                 token.branchId = (user as any).branchId;
                 token.customPermissions = (user as any).customPermissions;
                 token.isPremium = (user as any).isPremium;
+                if ((user as any).memberToken) {
+                    token.memberToken = (user as any).memberToken;
+                }
             }
             return token;
         },
@@ -186,6 +227,9 @@ export const authOptions: NextAuthOptions = {
                 (session.user as any).branchId = token.branchId;
                 (session.user as any).customPermissions = token.customPermissions;
                 (session.user as any).isPremium = token.isPremium;
+                if (token.memberToken) {
+                    (session.user as any).memberToken = token.memberToken;
+                }
             }
             return session;
         },
