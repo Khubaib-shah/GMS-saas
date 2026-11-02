@@ -66,7 +66,7 @@ export function HowItWorks() {
           trigger: container,
           start: "top center",
           end: "bottom center",
-          scrub: 1.5,
+          scrub: 0.8,
         },
       })
 
@@ -98,8 +98,8 @@ export function HowItWorks() {
       const activeTriggers: ScrollTrigger[] = [];
 
       cards?.forEach((card, i) => {
-        const startX = isDesktop ? (i % 2 === 0 ? 50 : -50) : 0;
-        const startY = isDesktop ? 0 : 30; // Slide upwards on mobile instead of side-to-side
+        const startX = isDesktop ? (i % 2 === 0 ? 40 : -40) : 0;
+        const startY = isDesktop ? 0 : 25; // Slide upwards on mobile instead of side-to-side
 
         const anim = gsap.fromTo(card, 
           { opacity: 0, x: startX, y: startY },
@@ -107,7 +107,7 @@ export function HowItWorks() {
             opacity: 1,
             x: 0,
             y: 0,
-            duration: 0.8,
+            duration: 0.7,
             scrollTrigger: {
               trigger: card,
               start: "top 85%",
@@ -165,7 +165,7 @@ export function HowItWorks() {
             {/* The Dot */}
             <div 
               ref={dotRef}
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary shadow-[0_0_20px_rgba(133,255,0,0.8)] z-50 pointer-events-none"
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary shadow-[0_0_20px_rgba(133,255,0,0.8)] z-50 pointer-events-none will-change-transform"
             />
           </div>
 

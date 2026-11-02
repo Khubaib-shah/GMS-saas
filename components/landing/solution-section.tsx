@@ -31,12 +31,18 @@ export function SolutionSection() {
       className="py-6 md:py-32 px-2 md:px-6 border-t border-white/[0.06]"
     >
       {/*
-        Keyframe defined in a plain <style> tag — no styled-jsx,
-        no "use client" required. This is valid in Server Components.
+        GPU-accelerated composite animation using translateY instead of top
       */}
       <style>{`
-        @keyframes qr-scan { 0%,100%{top:20%} 50%{top:78%} }
-        .qr-scan-line { animation: qr-scan 2.5s ease-in-out infinite; }
+        @keyframes qr-scan {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(180px); }
+        }
+        .qr-scan-line {
+          top: 20%;
+          animation: qr-scan 2.5s ease-in-out infinite;
+          will-change: transform;
+        }
       `}</style>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-16 items-center">

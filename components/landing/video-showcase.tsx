@@ -2,6 +2,7 @@
 
 import { SectionHeading } from "./section-heading";
 import { Play } from "lucide-react";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -18,19 +19,19 @@ export function VideoShowcase() {
 
     let mm = gsap.matchMedia();
 
-    // Desktop/Tablet: Scale up from 0.4 to 1 on scroll scrub
+    // Desktop/Tablet: Scale up from 0.7 to 1 on scroll scrub (avoiding extreme scale factor jumps)
     mm.add("(min-width: 768px)", () => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: el,
-          start: "top bottom",
+          start: "top 85%",
           end: "center center",
-          scrub: 1,
+          scrub: 0.8,
         }
       });
 
       tl.fromTo(el, 
-        { scale: 0.4, opacity: 0.5 },
+        { scale: 0.85, opacity: 0.7 },
         { scale: 1, opacity: 1, duration: 1, ease: "power2.out" }
       );
 
@@ -39,7 +40,7 @@ export function VideoShowcase() {
       };
     });
 
-    // Mobile (iPhone 12, etc.): Disable extreme scale-scrubbing and use clean, smooth entrance
+    // Mobile: Clean, non-scrubbing fade/scale entrance
     mm.add("(max-width: 767px)", () => {
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -92,35 +93,26 @@ export function VideoShowcase() {
         <div ref={videoRef} className="relative aspect-video w-full rounded-3xl overflow-hidden border border-white/10 bg-slate-900 shadow-[0_0_50px_rgba(190,255,0,0.1)] group hover:shadow-[0_0_80px_rgba(190,255,0,0.05)] transition-shadow duration-700">
           {!isPlaying ? (
             <>
-              {/* Thumbnail / Placeholder */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-slate-950/35 to-slate-800/35">
-                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5"></div>
-                {/* We keep the iframe but without autoplay and pointer events so it acts as a thumbnail */}
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src="https://www.youtube.com/embed/YNIIwl_qHPM?si=mUcPHqbcLJBe_e_V&controls=0"
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                  className="w-full h-full object-cover opacity-90 transition-transform duration-1000 ease-out pointer-events-none"
-                ></iframe>
-              </div>
-
-              {/* Play Button Overlay */}
-              <div
-                className="absolute inset-0 flex items-center justify-center cursor-pointer pointer-events-auto z-10"
+              {/* Lightweight Image Poster (avoids heavy unclicked YouTube iframe scripts) */}
+              <div 
+                className="absolute inset-0 bg-slate-950 flex items-center justify-center cursor-pointer group"
                 onClick={() => setIsPlaying(true)}
               >
-                <div className="w-24 h-24 rounded-full bg-primary/90 text-black flex items-center justify-center pl-2 group-hover:scale-110 group-hover:bg-primary transition-all duration-300 shadow-[0_0_40px_rgba(190,255,0,0.3)] backdrop-blur-sm">
-                  <Play className="w-10 h-10 fill-black" />
+                <Image
+                  src="https://img.youtube.com/vi/YNIIwl_qHPM/maxresdefault.jpg"
+                  alt="GymFlow Video Walkthrough"
+                  fill
+                  className="object-cover opacity-80 group-hover:opacity-95 transition-opacity duration-300"
+                  sizes="(max-width: 1200px) 100vw, 1200px"
+                  priority={false}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/40 pointer-events-none" />
+
+                {/* Play Button Overlay */}
+                <div className="relative z-10 w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary text-black flex items-center justify-center pl-1 group-hover:scale-110 transition-all duration-300 shadow-[0_0_40px_rgba(190,255,0,0.4)]">
+                  <Play className="w-8 h-8 md:w-10 md:h-10 fill-black" />
                 </div>
               </div>
-
-              {/* Bottom Gradient for depth */}
-              <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-slate-950/80 to-transparent pointer-events-none"></div>
             </>
           ) : (
             <iframe

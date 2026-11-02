@@ -1,6 +1,6 @@
-
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 
@@ -28,6 +28,16 @@ import SubscriptionPlan from "../models/SubscriptionPlan";
 import Attendance from "../models/Attendance";
 import AuditLog from "../models/AuditLog";
 import PlatformPayment from "../models/PlatformPayment";
+import Product from "../models/Product";
+import ProductCategory from "../models/ProductCategory";
+import ProductBrand from "../models/ProductBrand";
+import InventoryLog from "../models/InventoryLog";
+import Order from "../models/Order";
+import Notification from "../models/Notification";
+import ApiKey from "../models/ApiKey";
+import Asset from "../models/Asset";
+import AssetFolder from "../models/AssetFolder";
+import ExerciseCompletion from "../models/ExerciseCompletion";
 
 // Permissions
 import { ROLE_PERMISSIONS, ALL_PERMISSIONS } from "../lib/permissions";
@@ -38,7 +48,6 @@ function loadEnv() {
     for (const file of envFiles) {
         const filePath = path.join(process.cwd(), file);
         if (fs.existsSync(filePath)) {
-            console.log(`Loading environment from ${file}`);
             const content = fs.readFileSync(filePath, "utf8");
             for (const line of content.split("\n")) {
                 if (!line || line.startsWith("#") || !line.includes("=")) continue;
@@ -54,16 +63,26 @@ function loadEnv() {
 
 loadEnv();
 
-const MONGODB_URL = process.env.MONGODB_URL;
+const MONGODB_URL = process.env.MONGODB_URL || process.env.MONGODB_URI;
 if (!MONGODB_URL) {
     console.error("MONGODB_URL not found in environment variables");
     process.exit(1);
 }
 
-// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers & Name Lists
+// ─────────────────────────────────────────────────────────────────────────────
 const hashPassword = async (pwd: string) => await bcrypt.hash(pwd, 10);
 
-const pakistanFirstNamesMale = [
+const pakistanFemaleFirstNames = [
+    "Fatima", "Ayesha", "Zainab", "Maryam", "Sana", "Hira", "Sadia", "Kiran", "Nida", "Amna",
+    "Bakhtawar", "Bushra", "Dur-e-Fishan", "Eshal", "Fiza", "Ghazala", "Humaira", "Iffat", "Javerya", "Komal",
+    "Laila", "Mahnoor", "Nadia", "Pareeshay", "Quratulain", "Rabia", "Saba", "Tayyaba", "Urooj", "Vaneeza",
+    "Warda", "Yumna", "Zoya", "Anum", "Bisma", "Dua", "Eman", "Farah", "Gia", "Hania",
+    "Alizeh", "Mehak", "Laiba", "Zunaira", "Momina", "Natasha", "Ayeza", "Kinza", "Sidra", "Samina"
+];
+
+const pakistanMaleFirstNames = [
     "Ahmed", "Ali", "Bilal", "Danish", "Fahad", "Hamza", "Hassan", "Imran", "Junaid", "Kamran",
     "Mohammad", "Noman", "Omar", "Qasim", "Rizwan", "Saad", "Taimoor", "Usman", "Waqas", "Zain",
     "Arsalan", "Babar", "Faisal", "Ghayur", "Haris", "Irfan", "Jawad", "Kashif", "Luqman", "Mansoor",
@@ -71,26 +90,12 @@ const pakistanFirstNamesMale = [
     "Khubaib", "Shahzaib", "Zeeshan", "Mubashir", "Adeel", "Asad", "Basit", "Daniyal", "Ehsan", "Farhan"
 ];
 
-const pakistanFirstNamesFemale = [
-    "Fatima", "Ayesha", "Zainab", "Maryam", "Sana", "Hira", "Sadia", "Kiran", "Nida", "Amna",
-    "Bakhtawar", "Bushra", "Dur-e-Fishan", "Eshal", "Fiza", "Ghazala", "Humaira", "Iffat", "Javerya", "Komal",
-    "Laila", "Mahnoor", "Nadia", "Pareeshay", "Quratulain", "Rabia", "Saba", "Tayyaba", "Urooj", "Vaneeza",
-    "Warda", "Yumna", "Zoya", "Anum", "Bisma", "Dua", "Eman", "Farah", "Gia", "Hania"
-];
-
 const pakistanLastNames = [
     "Khan", "Ahmed", "Ali", "Hussain", "Shah", "Malik", "Raja", "Butt", "Sheikh", "Chaudhry",
     "Ansari", "Qureshi", "Siddiqui", "Baig", "Mirza", "Abbasi", "Awan", "Lodhi", "Mughal", "Pasha",
-    "Zaid", "Farooqi", "Javed", "Saeed", "Iqbal", "Hashmi", "Naqvi", "Kazmi", "Gillani", "Tirmizi"
+    "Zaid", "Farooqi", "Javed", "Saeed", "Iqbal", "Hashmi", "Naqvi", "Kazmi", "Gillani", "Tirmizi",
+    "Rehman", "Tariq", "Mustafa", "Akram", "Bhatti"
 ];
-
-const getRandomName = (gender?: "male" | "female") => {
-    const isMale = gender ? gender === "male" : Math.random() > 0.4;
-    const firstNames = isMale ? pakistanFirstNamesMale : pakistanFirstNamesFemale;
-    const first = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const last = pakistanLastNames[Math.floor(Math.random() * pakistanLastNames.length)];
-    return { first, last, full: `${first} ${last}`, gender: isMale ? "male" : "female" };
-};
 
 const getRandomPhone = () => {
     const prefixes = ["0300", "0301", "0302", "0303", "0312", "0313", "0314", "0321", "0322", "0333", "0334", "0335", "0345", "0346", "0347"];
@@ -99,125 +104,314 @@ const getRandomPhone = () => {
     return `${prefix}-${number}`;
 };
 
-const cities = [
-    { name: "Karachi", areas: ["DHA Phase 5", "Gulshan-e-Iqbal", "North Nazimabad", "Clifton", "PECHS", "Korangi"] },
-    { name: "Lahore", areas: ["Gulberg III", "DHA Phase 6", "Johar Town", "Model Town", "Bahria Town", "Samanabad"] },
-    { name: "Islamabad", areas: ["F-10 Markaz", "F-6", "G-11", "E-7", "Blue Area", "I-8"] },
-    { name: "Rawalpindi", areas: ["Saddar", "Satellite Town", "Bahria Phase 7", "Westridge"] },
-    { name: "Faisalabad", areas: ["People's Colony", "Canal Road", "Madina Town"] },
-    { name: "Peshawar", areas: ["Hayatabad", "University Road", "Peshawar Cantt"] }
-];
-
-const gymNames = [
-    "The Iron Forge Karachi", "Lahore Power Fitness", "Islamabad Elite Club",
-    "Titan Strength Rawalpindi", "Faisalabad Muscle Mania", "Hayatabad Warriors Gym",
-    "Skyline Health Studio", "Oceanic Fitness Clifton", "Metal Temple Gulberg", "Desert Storm Bahria"
-];
-
-const specialties = [
-    "Weight Training", "Cardio Fitness", "Yoga & Pilates", "CrossFit",
-    "Bodybuilding", "Nutrition Coaching", "Rehabilitation", "HIIT",
-    "Functional Training", "Sports Conditioning", "Powerlifting", "MMA & Boxing"
-];
-
-function getRandomDate(monthsBack = 3, monthsForward = 0): Date {
-    const now = new Date();
-    const start = new Date(now);
-    start.setMonth(now.getMonth() - monthsBack);
-    const end = new Date(now);
-    end.setMonth(now.getMonth() + monthsForward);
-
-    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-}
-
-/**
- * Generates a list of monthly dates starting from joinDate until now
- */
-function getMonthlyDates(startDate: Date): Date[] {
-    const dates = [];
-    const current = new Date(startDate);
-    const now = new Date();
-
-    while (current <= now) {
-        dates.push(new Date(current));
-        current.setMonth(current.getMonth() + 1);
-    }
-    return dates;
-}
-
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN SEED FUNCTION
+// ─────────────────────────────────────────────────────────────────────────────
 async function seed() {
     try {
+        console.log("==========================================================");
+        console.log("  GymFlow SaaS - 6-Month Chronological Database Seeding   ");
+        console.log("==========================================================");
         console.log("Connecting to MongoDB...");
         await mongoose.connect(MONGODB_URL!);
-        console.log("Database connection established");
-        console.log("Cleaning database...");
-        const models = [
+        console.log("✅ Database connection established.");
+
+        // 1. PURGE ALL EXISTING DATA
+        console.log("\nPurging all existing data across 34 models...");
+        const modelsToClean = [
             Gym, User, Member, Plan, Subscription, TrainerAvailability, TrainerSlot,
             TrainerBooking, TrainerSessionLog, Payment, Exercise, WorkoutPlan,
             AssignedWorkoutPlan, WorkoutLog, WorkoutTemplate, Role, GymSettings,
-            PlatformSettings, PlatformPlan, SubscriptionPlan, Attendance, AuditLog, PlatformPayment
+            PlatformSettings, PlatformPlan, SubscriptionPlan, Attendance, AuditLog,
+            PlatformPayment, Product, ProductCategory, ProductBrand, InventoryLog,
+            Order, Notification, ApiKey, Asset, AssetFolder, ExerciseCompletion
         ];
-        await Promise.all((models as any[]).map(m => m.deleteMany({})));
-        console.log("Database cleaned");
+        await Promise.all((modelsToClean as any[]).map(m => m.deleteMany({})));
+        console.log("✅ All collections cleaned.");
 
-        // 1. Platform Settings & Plans
-        console.log("Seeding Platform...");
-        await PlatformSettings.create({});
-        const pPlans = await PlatformPlan.create([
-            { name: "Starter", slug: "starter", monthlyPricePKR: 3000, branchLimit: 1, maxStaffAccounts: 3, featureFlags: ["members", "manualAttendance", "payments"] },
-            { name: "Professional", slug: "professional", monthlyPricePKR: 5000, branchLimit: 3, maxStaffAccounts: 10, featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics"] },
-            { name: "Enterprise", slug: "enterprise", monthlyPricePKR: 10000, branchLimit: 10, maxStaffAccounts: 50, featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics", "workoutPlanner", "auditLogs"] }
-        ]);
-
-        const globalCredentials = [];
         const defaultPassword = "password123";
+        const defaultPin = "1234";
         const hashedPassword = await hashPassword(defaultPassword);
-        const hashedPin = await hashPassword("1234");
+        const hashedPin = await hashPassword(defaultPin);
 
-        // 2. Gyms
-        for (let i = 0; i < 6; i++) {
-            const gymName = gymNames[i % gymNames.length];
-            const cityData = cities[i % cities.length];
-            const area = cityData.areas[Math.floor(Math.random() * cityData.areas.length)];
-            const address = `${area}, ${cityData.name}, Pakistan`;
+        // 2. PLATFORM SETTINGS & PLANS
+        console.log("\nSeeding Platform Settings and Plans...");
+        await PlatformSettings.create({});
 
-            console.log(`Processing Gym ${i + 1}/6: ${gymName}`);
+        const pPlans = await PlatformPlan.create([
+            {
+                name: "Starter",
+                slug: "starter",
+                monthlyPricePKR: 3500,
+                branchLimit: 1,
+                maxStaffAccounts: 3,
+                maxTrainers: 2,
+                featureFlags: ["members", "manualAttendance", "payments"]
+            },
+            {
+                name: "Professional",
+                slug: "professional",
+                monthlyPricePKR: 6500,
+                branchLimit: 3,
+                maxStaffAccounts: 10,
+                maxTrainers: 5,
+                featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics", "selling"]
+            },
+            {
+                name: "Enterprise",
+                slug: "enterprise",
+                monthlyPricePKR: 12000,
+                branchLimit: 10,
+                maxStaffAccounts: 50,
+                maxTrainers: 20,
+                isPopular: true,
+                featureFlags: ["members", "manualAttendance", "qrAttendance", "payments", "subscriptions", "trainersModule", "analytics", "workoutPlanner", "auditLogs", "selling", "inventory", "pos"]
+            }
+        ]);
+        console.log(`✅ Seeded ${pPlans.length} Platform Plans.`);
+
+        // 3. SUPER ADMIN USER
+        console.log("\nSeeding Super Admin...");
+        const superAdmin = await User.create({
+            fullName: "Platform Super Admin",
+            email: "admin@gms.com",
+            password: hashedPassword,
+            role: "super_admin",
+            isActive: true
+        });
+        console.log(`✅ Super Admin created: admin@gms.com / ${defaultPassword}`);
+
+        // Current simulated date reference: late September 2026
+        const NOW = new Date("2026-09-22T08:00:00.000Z");
+        const SIX_MONTHS_AGO = new Date("2026-03-22T08:00:00.000Z");
+
+        // ─────────────────────────────────────────────────────────────────────────
+        // GYM CONFIGURATIONS (With Ladies Health Care as Gym 1)
+        // ─────────────────────────────────────────────────────────────────────────
+        const gymConfigs = [
+            {
+                isFemaleOnly: true,
+                name: "Ladies Health Care",
+                slug: "ladieshealthcare",
+                tagline: "Premier Women's Fitness, Wellness & Rehabilitation Center",
+                city: "Lahore",
+                address: "Plot 42-C, Commercial Zone, DHA Phase 5, Lahore, Pakistan",
+                phone: "042-35789012",
+                planIdx: 2, // Enterprise
+                staff: {
+                    owner: { name: "Dr. Fatima Tariq", email: "owner@ladieshealthcare.pk" },
+                    manager: { name: "Ayesha Khan", email: "manager@ladieshealthcare.pk" },
+                    receptionist: { name: "Zainab Malik", email: "receptionist@ladieshealthcare.pk" },
+                    trainers: [
+                        { name: "Maryam Siddiqui", email: "trainer.maryam@ladieshealthcare.pk", spec: ["HIIT", "Pilates", "Postnatal Fitness"], rate: 2500 },
+                        { name: "Sana Mir", email: "trainer.sana@ladieshealthcare.pk", spec: ["Yoga & Mobility", "Core Conditioning"], rate: 2200 },
+                        { name: "Hira Ahmed", email: "trainer.hira@ladieshealthcare.pk", spec: ["Strength & Tone", "Nutrition Coaching"], rate: 2400 }
+                    ]
+                }
+            },
+            {
+                isFemaleOnly: false,
+                name: "The Iron Forge Karachi",
+                slug: "ironforgekarachi",
+                tagline: "Karachi's Hardcore Strength and Performance Gym",
+                city: "Karachi",
+                address: "Street 7, Khayaban-e-Shamsheer, DHA Phase 5, Karachi, Pakistan",
+                phone: "021-35841234",
+                planIdx: 2, // Enterprise
+                staff: {
+                    owner: { name: "Shahzaib Khan", email: "owner@ironforge.pk" },
+                    manager: { name: "Bilal Hussain", email: "manager@ironforge.pk" },
+                    receptionist: { name: "Haris Qureshi", email: "receptionist@ironforge.pk" },
+                    trainers: [
+                        { name: "Usman Raza", email: "trainer.usman@ironforge.pk", spec: ["Powerlifting", "Bodybuilding"], rate: 2000 },
+                        { name: "Zain Tariq", email: "trainer.zain@ironforge.pk", spec: ["Weight Training", "HIIT"], rate: 1800 },
+                        { name: "Hamza Abbasi", email: "trainer.hamza@ironforge.pk", spec: ["Sports Conditioning", "Functional Training"], rate: 2200 }
+                    ]
+                }
+            },
+            {
+                isFemaleOnly: false,
+                name: "Islamabad Elite Club",
+                slug: "islamabadelite",
+                tagline: "Exclusive Wellness & Fitness Studio in the Capital",
+                city: "Islamabad",
+                address: "Plot 14, Markaz F-10, Islamabad, Pakistan",
+                phone: "051-2210456",
+                planIdx: 1, // Professional
+                staff: {
+                    owner: { name: "Mohammad Fahad", email: "owner@islamabadelite.pk" },
+                    manager: { name: "Omer Farooq", email: "manager@islamabadelite.pk" },
+                    receptionist: { name: "Danish Ali", email: "receptionist@islamabadelite.pk" },
+                    trainers: [
+                        { name: "Arsalan Baig", email: "trainer.arsalan@islamabadelite.pk", spec: ["Functional Fitness", "Cardio Conditioning"], rate: 2500 },
+                        { name: "Kashif Mirza", email: "trainer.kashif@islamabadelite.pk", spec: ["Rehabilitation", "Weight Training"], rate: 2000 },
+                        { name: "Jawad Sheikh", email: "trainer.jawad@islamabadelite.pk", spec: ["CrossFit", "Athletic Prep"], rate: 2200 }
+                    ]
+                }
+            },
+            {
+                isFemaleOnly: false,
+                name: "Titan Strength Rawalpindi",
+                slug: "titanrawalpindi",
+                tagline: "Rawalpindi's Leading Bodybuilding & Hypertrophy Facility",
+                city: "Rawalpindi",
+                address: "Civic Center, Bahria Town Phase 7, Rawalpindi, Pakistan",
+                phone: "051-5401987",
+                planIdx: 1, // Professional
+                staff: {
+                    owner: { name: "Rizwan Ahmed", email: "owner@titanstrength.pk" },
+                    manager: { name: "Saad Malik", email: "manager@titanstrength.pk" },
+                    receptionist: { name: "Waqas Chaudhry", email: "receptionist@titanstrength.pk" },
+                    trainers: [
+                        { name: "Taimoor Shah", email: "trainer.taimoor@titanstrength.pk", spec: ["Bodybuilding", "Nutrition Coaching"], rate: 1700 },
+                        { name: "Noman Ansari", email: "trainer.noman@titanstrength.pk", spec: ["Strength & Hypertrophy"], rate: 1600 },
+                        { name: "Nasir Lodhi", email: "trainer.nasir@titanstrength.pk", spec: ["Weight Training", "HIIT"], rate: 1800 }
+                    ]
+                }
+            },
+            {
+                isFemaleOnly: false,
+                name: "Faisalabad Muscle Mania",
+                slug: "faisalabadmuscle",
+                tagline: "High Performance Fitness for Industrial Titans",
+                city: "Faisalabad",
+                address: "Jaranwala Road, People's Colony No. 1, Faisalabad, Pakistan",
+                phone: "041-8723456",
+                planIdx: 0, // Starter
+                staff: {
+                    owner: { name: "Kamran Siddiqui", email: "owner@musclemania.pk" },
+                    manager: { name: "Faisal Mehmood", email: "manager@musclemania.pk" },
+                    receptionist: { name: "Luqman Butt", email: "receptionist@musclemania.pk" },
+                    trainers: [
+                        { name: "Babar Awan", email: "trainer.babar@musclemania.pk", spec: ["Strength Conditioning", "Powerlifting"], rate: 1500 },
+                        { name: "Irfan Pasha", email: "trainer.irfan@musclemania.pk", spec: ["Weight Training", "Fat Loss"], rate: 1400 },
+                        { name: "Sajid Tirmizi", email: "trainer.sajid@musclemania.pk", spec: ["Calisthenics", "Functional"], rate: 1500 }
+                    ]
+                }
+            },
+            {
+                isFemaleOnly: false,
+                name: "Hayatabad Warriors Gym",
+                slug: "hayatabadwarriors",
+                tagline: "Combat, Conditioning, and Iron Power",
+                city: "Peshawar",
+                address: "Phase 3 Chowk, Hayatabad, Peshawar, Pakistan",
+                phone: "091-5820987",
+                planIdx: 1, // Professional
+                staff: {
+                    owner: { name: "Asadullah Khan", email: "owner@hayatabadwarriors.pk" },
+                    manager: { name: "Daniyal Gillani", email: "manager@hayatabadwarriors.pk" },
+                    receptionist: { name: "Raheel Farooqi", email: "receptionist@hayatabadwarriors.pk" },
+                    trainers: [
+                        { name: "Ehsan Afridi", email: "trainer.ehsan@hayatabadwarriors.pk", spec: ["MMA Conditioning", "Strength"], rate: 1800 },
+                        { name: "Farhan Bangash", email: "trainer.farhan@hayatabadwarriors.pk", spec: ["Boxing & HIIT", "Functional"], rate: 1700 },
+                        { name: "Junaid Shinwari", email: "trainer.junaid@hayatabadwarriors.pk", spec: ["Bodybuilding", "Cardio"], rate: 1600 }
+                    ]
+                }
+            }
+        ];
+
+        const credentialsExport: any = {
+            featuredGym: null,
+            superAdmin: { email: superAdmin.email, password: defaultPassword, role: "super_admin" },
+            gyms: []
+        };
+
+        // ─────────────────────────────────────────────────────────────────────────
+        // ITERATE GYMS
+        // ─────────────────────────────────────────────────────────────────────────
+        for (let gIdx = 0; gIdx < gymConfigs.length; gIdx++) {
+            const cfg = gymConfigs[gIdx];
+            const platformPlan = pPlans[cfg.planIdx];
+            console.log(`\n-----------------------------------------------------------`);
+            console.log(`[${gIdx + 1}/${gymConfigs.length}] Seeding Gym: ${cfg.name} (${cfg.city})`);
+            console.log(`-----------------------------------------------------------`);
+
+            // 1. Create Gym Document (Est. 6 months ago)
+            const gymCreatedAt = new Date(SIX_MONTHS_AGO.getTime() + (gIdx * 7 * 24 * 60 * 60 * 1000));
+            const gymExpiry = new Date(NOW.getTime() + (180 * 24 * 60 * 60 * 1000)); // 6 months in future
 
             const gym = await Gym.create({
-                name: gymName,
-                address: address,
-                city: cityData.name,
-                phone: getRandomPhone(),
+                name: cfg.name,
+                address: cfg.address,
+                city: cfg.city,
+                phone: cfg.phone,
                 isActive: true,
+                platformPlanId: platformPlan._id,
+                subscriptionStatus: "active",
+                expiryDate: gymExpiry,
+                createdAt: gymCreatedAt,
+                updatedAt: NOW,
                 branches: [{
                     name: "Main Branch",
-                    address: address,
-                    phone: getRandomPhone(),
-                    email: `contact@${gymName.toLowerCase().replace(/\s/g, "")}.pk`,
-                    isDefault: true
-                }]
+                    address: cfg.address,
+                    phone: cfg.phone,
+                    email: `contact@${cfg.slug}.pk`,
+                    isDefault: true,
+                    isActive: true,
+                    createdAt: gymCreatedAt
+                }],
+                settings: {
+                    allowMultipleBranches: platformPlan.branchLimit > 1,
+                    attendanceRules: {
+                        preventDuplicateCheckin: true,
+                        dailyLimit: 2,
+                        allowLateCheckout: true
+                    },
+                    sessionTimeoutMinutes: 90
+                }
             });
 
+            // 2. GymSettings
             await GymSettings.create({
                 gymId: gym._id,
-                general: { name: gymName, address: address },
-                attendanceRules: { preventDuplicateCheckin: true, dailyLimit: 2 }
-            } as any);
-
-            await SubscriptionPlan.create({
-                gymId: gym._id,
-                tierName: i % 2 === 0 ? "Professional" : "Enterprise",
-                active: true,
-                enabledFeatures: ["members", "subscriptions", "payments", "attendance", "workout_plans", "trainersModule"]
+                business: { joiningFee: 1000, autoExpireDays: 0, gracePeriodDays: 3 },
+                notifications: { sendExpiryReminder: true, sendInvoiceEmail: true, sendSMS: true },
+                modules: { trainersEnabled: true, attendanceEnabled: true, sellingEnabled: true }
             });
 
-            // 3. Roles
+            // 3. SubscriptionPlan (Tenant monetization tier)
+            await SubscriptionPlan.create({
+                gymId: gym._id,
+                tierName: platformPlan.name,
+                active: true,
+                expiresAt: gymExpiry,
+                enabledFeatures: platformPlan.featureFlags
+            });
+
+            // 4. Platform Payments (Gym -> SaaS Platform for the past 6 months)
+            console.log("  • Seeding 6 months of platform payment history...");
+            for (let m = 5; m >= 0; m--) {
+                const payDate = new Date(NOW);
+                payDate.setMonth(NOW.getMonth() - m);
+                payDate.setDate(1);
+                payDate.setHours(10, 0, 0, 0);
+
+                const expDate = new Date(payDate);
+                expDate.setMonth(expDate.getMonth() + 1);
+
+                await PlatformPayment.create({
+                    gymId: gym._id,
+                    planId: platformPlan._id,
+                    planName: platformPlan.name,
+                    amountPKR: platformPlan.monthlyPricePKR,
+                    paymentMethod: m % 2 === 0 ? "bank_transfer" : "cash",
+                    paymentDate: payDate,
+                    expiryDate: expDate,
+                    notes: `Monthly platform subscription - ${payDate.toLocaleString("en-US", { month: "long", year: "numeric" })}`,
+                    enteredBy: superAdmin._id,
+                    createdAt: payDate
+                });
+            }
+
+            // 5. System Roles
+            console.log("  • Seeding Roles...");
             const rolesMap: Record<string, any> = {};
             const rolesToCreate = [
-                { name: "owner", permissions: ALL_PERMISSIONS },
-                { name: "manager", permissions: ROLE_PERMISSIONS.manager },
-                { name: "trainer", permissions: ROLE_PERMISSIONS.trainer },
-                { name: "receptionist", permissions: ROLE_PERMISSIONS.receptionist }
+                { name: "owner", permissions: ALL_PERMISSIONS, desc: "Full ownership access" },
+                { name: "manager", permissions: ROLE_PERMISSIONS.manager, desc: "Full branch management and staff oversight" },
+                { name: "trainer", permissions: ROLE_PERMISSIONS.trainer, desc: "Client workouts, progress tracking, and schedule" },
+                { name: "receptionist", permissions: ROLE_PERMISSIONS.receptionist, desc: "Front desk, member registrations, and billing" }
             ];
             for (const r of rolesToCreate) {
                 rolesMap[r.name] = await Role.create({
@@ -225,227 +419,735 @@ async function seed() {
                     name: r.name,
                     permissions: r.permissions,
                     isSystemRole: true,
-                    description: `${r.name.charAt(0).toUpperCase() + r.name.slice(1)} access for ${gymName}`
+                    description: `${r.desc} at ${cfg.name}`
                 });
             }
 
-            const gymCreds: any = { gymName, owner: null, manager: null, trainers: [], members: [] };
-
-            // 4. Users (Staff)
-            const ownerName = getRandomName();
+            // 6. Staff Users (Owner, Manager, Receptionist, 3 Trainers)
+            console.log("  • Seeding Staff accounts...");
             const owner = await User.create({
-                fullName: ownerName.full,
-                email: `owner@${gymName.toLowerCase().replace(/\s/g, "")}.pk`,
+                fullName: cfg.staff.owner.name,
+                email: cfg.staff.owner.email,
                 password: hashedPassword,
                 role: "owner",
                 roleId: rolesMap["owner"]._id,
                 gymId: gym._id,
-                isActive: true
+                isActive: true,
+                createdAt: gymCreatedAt
             });
-            gymCreds.owner = { email: owner.email, password: defaultPassword };
 
-            const managerName = getRandomName();
             const manager = await User.create({
-                fullName: managerName.full,
-                email: `manager@${gymName.toLowerCase().replace(/\s/g, "")}.pk`,
+                fullName: cfg.staff.manager.name,
+                email: cfg.staff.manager.email,
                 password: hashedPassword,
                 role: "manager",
                 roleId: rolesMap["manager"]._id,
                 gymId: gym._id,
-                isActive: true
+                isActive: true,
+                createdAt: gymCreatedAt
             });
-            gymCreds.manager = { email: manager.email, password: defaultPassword };
+
+            const receptionist = await User.create({
+                fullName: cfg.staff.receptionist.name,
+                email: cfg.staff.receptionist.email,
+                password: hashedPassword,
+                role: "receptionist",
+                roleId: rolesMap["receptionist"]._id,
+                gymId: gym._id,
+                isActive: true,
+                createdAt: gymCreatedAt
+            });
 
             const trainerDocs = [];
-            for (let t = 0; t < 3; t++) {
-                const tName = getRandomName();
-                const specCount = 2 + Math.floor(Math.random() * 2);
-                const tSpecs = [];
-                for (let s = 0; s < specCount; s++) tSpecs.push(specialties[Math.floor(Math.random() * specialties.length)]);
-
+            for (const tr of cfg.staff.trainers) {
                 trainerDocs.push({
-                    fullName: tName.full,
-                    email: `trainer${t + 1}@${gymName.toLowerCase().replace(/\s/g, "")}.pk`,
+                    fullName: tr.name,
+                    email: tr.email,
                     password: hashedPassword,
                     role: "trainer",
                     roleId: rolesMap["trainer"]._id,
                     gymId: gym._id,
                     isActive: true,
-                    bio: `Professional ${tSpecs[0]} trainer with 5+ years of experience in ${cityData.name}.`,
-                    specialties: [...new Set(tSpecs)],
-                    hourlyRate: 1500 + (Math.floor(Math.random() * 10) * 100),
-                    trainerStatus: "active"
+                    bio: `Certified Fitness Trainer specializing in ${tr.spec.join(", ")}. Dedicated to progressive client results.`,
+                    specialties: tr.spec,
+                    hourlyRate: tr.rate,
+                    trainerStatus: "active",
+                    createdAt: gymCreatedAt
                 });
             }
             const createdTrainers = await User.insertMany(trainerDocs);
-            createdTrainers.forEach(t => gymCreds.trainers.push({ name: t.fullName, email: t.email, password: defaultPassword }));
 
-            // 5. Exercises
-            const exercises = await Exercise.insertMany([
-                { gymId: gym._id, name: "Barbell Bench Press", muscleGroup: "Chest", equipment: "Barbell", difficulty: "Intermediate", createdByTrainerId: createdTrainers[0]._id, tips: [], isPublicWithinGym: true },
-                { gymId: gym._id, name: "Deadlift", muscleGroup: "Back", equipment: "Barbell", difficulty: "Advanced", createdByTrainerId: createdTrainers[0]._id, tips: [], isPublicWithinGym: true },
-                { gymId: gym._id, name: "High Bar Squat", muscleGroup: "Legs", equipment: "Barbell", difficulty: "Intermediate", createdByTrainerId: createdTrainers[0]._id, tips: [], isPublicWithinGym: true },
-                { gymId: gym._id, name: "Overhead Press", muscleGroup: "Shoulders", equipment: "Barbell", difficulty: "Intermediate", createdByTrainerId: createdTrainers[1]._id, tips: [], isPublicWithinGym: true },
-                { gymId: gym._id, name: "Lat Pulldown", muscleGroup: "Back", equipment: "Machine", difficulty: "Beginner", createdByTrainerId: createdTrainers[1]._id, tips: [], isPublicWithinGym: true },
-                { gymId: gym._id, name: "Dumbbell Bicep Curls", muscleGroup: "Arms", equipment: "Dumbbells", difficulty: "Beginner", createdByTrainerId: createdTrainers[2]._id, tips: [], isPublicWithinGym: true }
-            ] as any);
+            // Record Credentials
+            const gymCredRecord: any = {
+                gymName: cfg.name,
+                city: cfg.city,
+                address: cfg.address,
+                phone: cfg.phone,
+                owner: { name: owner.fullName, email: owner.email, password: defaultPassword },
+                manager: { name: manager.fullName, email: manager.email, password: defaultPassword },
+                receptionist: { name: receptionist.fullName, email: receptionist.email, password: defaultPassword },
+                trainers: createdTrainers.map(t => ({ name: t.fullName, email: t.email, password: defaultPassword, specialties: t.specialties })),
+                sampleMembers: []
+            };
 
-            // 6. Workout Templates
-            const template = await WorkoutTemplate.create({
-                gymId: gym._id,
-                createdByTrainerId: createdTrainers[0]._id,
-                name: "Pakistani Power Split",
-                goal: "Strength & Hypertrophy",
-                daysPerWeek: 3,
-                days: [
-                    {
-                        dayNumber: 1, title: "Push (Chest/Shoulders/Triceps)", exercises: [
-                            { exerciseId: exercises[0]._id, sets: 4, reps: "8-12", restSeconds: 90 },
-                            { exerciseId: exercises[3]._id, sets: 3, reps: "10-12", restSeconds: 60 }
-                        ]
-                    },
-                    {
-                        dayNumber: 2, title: "Pull (Back/Biceps)", exercises: [
-                            { exerciseId: exercises[1]._id, sets: 3, reps: "5", restSeconds: 180 },
-                            { exerciseId: exercises[4]._id, sets: 4, reps: "10-15", restSeconds: 60 },
-                            { exerciseId: exercises[5]._id, sets: 3, reps: "12-15", restSeconds: 45 }
-                        ]
-                    },
-                    {
-                        dayNumber: 3, title: "Legs", exercises: [
-                            { exerciseId: exercises[2]._id, sets: 4, reps: "8-10", restSeconds: 120 }
-                        ]
-                    }
-                ]
-            });
+            if (cfg.isFemaleOnly) {
+                credentialsExport.featuredGym = gymCredRecord;
+            } else {
+                credentialsExport.gyms.push(gymCredRecord);
+            }
 
-            // 7. Membership Plans
+            // 7. Exercises (Gym Specific)
+            console.log("  • Seeding Exercise Library...");
+            const exerciseDefinitions = cfg.isFemaleOnly ? [
+                { name: "Barbell Hip Thrust", muscleGroup: "Legs", equipment: "Barbell", difficulty: "Intermediate", desc: "Premier posterior chain movement for glute development." },
+                { name: "Goblet Squats", muscleGroup: "Legs", equipment: "Dumbbells", difficulty: "Beginner", desc: "Full-depth squat focusing on core stability and quad strength." },
+                { name: "Cable Glute Kickbacks", muscleGroup: "Legs", equipment: "Machine", difficulty: "Beginner", desc: "Targeted glute isolation using ankle strap attachment." },
+                { name: "Lat Pulldown (Wide Grip)", muscleGroup: "Back", equipment: "Machine", difficulty: "Beginner", desc: "Builds upper back and improves posture." },
+                { name: "Dumbbell Overhead Shoulder Press", muscleGroup: "Shoulders", equipment: "Dumbbells", difficulty: "Intermediate", desc: "Tones shoulders and upper chest." },
+                { name: "Plank to Push-Up", muscleGroup: "Core", equipment: "Bodyweight", difficulty: "Intermediate", desc: "Dynamic core endurance and upper body stability." },
+                { name: "Dumbbell Romanian Deadlift", muscleGroup: "Legs", equipment: "Dumbbells", difficulty: "Intermediate", desc: "Hamstring and lower back strengthening." },
+                { name: "Incline Treadmill Strides", muscleGroup: "Cardio", equipment: "Machine", difficulty: "Beginner", desc: "High incline fat burning cardio conditioning." }
+            ] : [
+                { name: "Barbell Bench Press", muscleGroup: "Chest", equipment: "Barbell", difficulty: "Intermediate", desc: "Compound horizontal pressing for chest and triceps." },
+                { name: "Conventional Deadlift", muscleGroup: "Back", equipment: "Barbell", difficulty: "Advanced", desc: "Total body strength and spinal erectors power." },
+                { name: "High Bar Back Squat", muscleGroup: "Legs", equipment: "Barbell", difficulty: "Intermediate", desc: "Fundamental quad and glute strength builder." },
+                { name: "Standing Military Press", muscleGroup: "Shoulders", equipment: "Barbell", difficulty: "Intermediate", desc: "Strict overhead pressing for deltoid mass." },
+                { name: "Close Grip Cable Row", muscleGroup: "Back", equipment: "Machine", difficulty: "Beginner", desc: "Mid-back thickness and lats engagement." },
+                { name: "Incline Dumbbell Bicep Curl", muscleGroup: "Arms", equipment: "Dumbbells", difficulty: "Beginner", desc: "Long-head bicep isolation on 60 degree bench." },
+                { name: "Hanging Leg Raises", muscleGroup: "Core", equipment: "Bodyweight", difficulty: "Intermediate", desc: "Lower abdominal strengthening and hip flexor control." },
+                { name: "Assault Bike Intervals", muscleGroup: "Cardio", equipment: "Machine", difficulty: "Advanced", desc: "Tabata style high-intensity anaerobic conditioning." }
+            ];
+
+            const createdExercises = await Exercise.insertMany(
+                exerciseDefinitions.map(e => ({
+                    gymId: gym._id,
+                    name: e.name,
+                    description: e.desc,
+                    muscleGroup: e.muscleGroup,
+                    equipment: e.equipment,
+                    difficulty: e.difficulty,
+                    createdByTrainerId: createdTrainers[0]._id,
+                    tips: [],
+                    isPublicWithinGym: true
+                })) as any
+            );
+
+            // 8. Workout Plans & Templates
+            console.log("  • Seeding Workout Plans...");
+            const workoutPlanData = cfg.isFemaleOnly ? [
+                {
+                    name: "Women's Glute & Tone Split",
+                    desc: "Specialized 3-day split focused on posterior chain, posture, and core tightening.",
+                    trainer: createdTrainers[0],
+                    schedule: [
+                        {
+                            day: "monday", title: "Glutes & Hamstrings",
+                            exercises: [
+                                { exerciseId: createdExercises[0]._id, sets: 4, reps: "10-12", restSeconds: 75, notes: "Pause 2 sec at peak contraction" },
+                                { exerciseId: createdExercises[6]._id, sets: 3, reps: "12", restSeconds: 60, notes: "Focus on hip hinge stretch" }
+                            ]
+                        },
+                        {
+                            day: "wednesday", title: "Upper Body & Posture",
+                            exercises: [
+                                { exerciseId: createdExercises[3]._id, sets: 4, reps: "12-15", restSeconds: 60, notes: "Drive with elbows" },
+                                { exerciseId: createdExercises[4]._id, sets: 3, reps: "10-12", restSeconds: 60, notes: "Control the eccentric descent" }
+                            ]
+                        },
+                        {
+                            day: "friday", title: "Core, Tone & Conditioning",
+                            exercises: [
+                                { exerciseId: createdExercises[1]._id, sets: 3, reps: "15", restSeconds: 45, notes: "Chest up and slow tempo" },
+                                { exerciseId: createdExercises[5]._id, sets: 3, reps: "10 per side", restSeconds: 45, notes: "Maintain neutral pelvis" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "Pilates, Mobility & Flow",
+                    desc: "Low impact flexibility, pelvic floor health, and muscular endurance.",
+                    trainer: createdTrainers[1],
+                    schedule: [
+                        {
+                            day: "tuesday", title: "Full Body Mobility",
+                            exercises: [
+                                { exerciseId: createdExercises[5]._id, sets: 3, reps: "12", restSeconds: 45, notes: "Breath in cadence" },
+                                { exerciseId: createdExercises[2]._id, sets: 3, reps: "15", restSeconds: 45, notes: "Keep tension constant" }
+                            ]
+                        },
+                        {
+                            day: "thursday", title: "Cardio Sculpt",
+                            exercises: [
+                                { exerciseId: createdExercises[7]._id, sets: 4, reps: "5 mins", restSeconds: 60, notes: "12% incline, steady brisk pace" },
+                                { exerciseId: createdExercises[1]._id, sets: 3, reps: "15", restSeconds: 45, notes: "Controlled depth" }
+                            ]
+                        }
+                    ]
+                }
+            ] : [
+                {
+                    name: "Pakistani Power Split",
+                    desc: "Classic Heavy-Duty strength routine for building raw power and lean muscle mass.",
+                    trainer: createdTrainers[0],
+                    schedule: [
+                        {
+                            day: "monday", title: "Push (Chest, Shoulders, Triceps)",
+                            exercises: [
+                                { exerciseId: createdExercises[0]._id, sets: 4, reps: "8-10", restSeconds: 90, notes: "Touch sternum and press explosively" },
+                                { exerciseId: createdExercises[3]._id, sets: 3, reps: "10-12", restSeconds: 60, notes: "Strict form, no leg drive" }
+                            ]
+                        },
+                        {
+                            day: "wednesday", title: "Pull (Back & Biceps)",
+                            exercises: [
+                                { exerciseId: createdExercises[1]._id, sets: 3, reps: "5", restSeconds: 150, notes: "Engage lats and drive heels through floor" },
+                                { exerciseId: createdExercises[4]._id, sets: 4, reps: "10-12", restSeconds: 60, notes: "Squeeze shoulder blades together" },
+                                { exerciseId: createdExercises[5]._id, sets: 3, reps: "12-15", restSeconds: 45, notes: "Slow 3-second negative" }
+                            ]
+                        },
+                        {
+                            day: "friday", title: "Legs & Core",
+                            exercises: [
+                                { exerciseId: createdExercises[2]._id, sets: 4, reps: "8-10", restSeconds: 120, notes: "Break parallel cleanly" },
+                                { exerciseId: createdExercises[6]._id, sets: 3, reps: "15", restSeconds: 60, notes: "Control swing, flex abs" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "Hypertrophy & Conditioning",
+                    desc: "Body composition enhancement with moderate weights and aerobic capacity.",
+                    trainer: createdTrainers[1],
+                    schedule: [
+                        {
+                            day: "tuesday", title: "Upper Body Hypertrophy",
+                            exercises: [
+                                { exerciseId: createdExercises[0]._id, sets: 3, reps: "12", restSeconds: 60, notes: "Moderate load, maximum pump" },
+                                { exerciseId: createdExercises[4]._id, sets: 3, reps: "12", restSeconds: 60, notes: "Full range of motion" }
+                            ]
+                        },
+                        {
+                            day: "thursday", title: "Metabolic HIIT",
+                            exercises: [
+                                { exerciseId: createdExercises[7]._id, sets: 5, reps: "30s sprint", restSeconds: 60, notes: "All-out sprint effort" },
+                                { exerciseId: createdExercises[6]._id, sets: 3, reps: "12", restSeconds: 45, notes: "Abs burn" }
+                            ]
+                        }
+                    ]
+                }
+            ];
+
+            const createdWorkoutPlans: any[] = [];
+            for (const wp of workoutPlanData) {
+                const planDoc = await WorkoutPlan.create({
+                    name: wp.name,
+                    description: wp.desc,
+                    gymId: gym._id,
+                    trainerId: wp.trainer._id,
+                    schedule: wp.schedule,
+                    active: true
+                });
+                createdWorkoutPlans.push(planDoc);
+
+                // Also create WorkoutTemplate for template library view
+                await WorkoutTemplate.create({
+                    gymId: gym._id,
+                    createdByTrainerId: wp.trainer._id,
+                    name: wp.name,
+                    goal: wp.desc,
+                    daysPerWeek: wp.schedule.length,
+                    days: wp.schedule.map((s, idx) => ({
+                        dayNumber: idx + 1,
+                        title: s.title,
+                        exercises: s.exercises.map(e => ({
+                            exerciseId: e.exerciseId,
+                            sets: e.sets,
+                            reps: e.reps,
+                            restSeconds: e.restSeconds
+                        }))
+                    }))
+                });
+            }
+
+            // 9. Membership Plans
+            console.log("  • Seeding Membership Plans...");
             const plans = await Plan.insertMany([
-                { id: "basic-monthly", gymId: gym._id, name: "Basic Monthly", price: 3000, duration: 30, description: "Full gym access" },
-                { id: "standard-quarterly", gymId: gym._id, name: "Standard Quarterly", price: 7500, duration: 90, description: "Save with 3 months access" },
-                { id: "premium-yearly", gymId: gym._id, name: "Premium Yearly", price: 25000, duration: 365, description: "VIP access with locker" },
-                { id: "student-monthly", gymId: gym._id, name: "Student Monthly", price: 2000, duration: 30, description: "Discounted for students" },
-                { id: "family-quarterly", gymId: gym._id, name: "Family Quarterly", price: 18000, duration: 90, description: "Access for up to 3 family members" },
-                { id: "weekend-only", gymId: gym._id, name: "Weekend Warrior", price: 1500, duration: 30, description: "Saturday & Sunday access only" }
+                { id: "basic-monthly", gymId: gym._id, name: "Basic Monthly", price: cfg.isFemaleOnly ? 4000 : 3500, duration: 30, description: "Full gym facility access" },
+                { id: "standard-quarterly", gymId: gym._id, name: "Standard Quarterly", price: cfg.isFemaleOnly ? 10500 : 9000, duration: 90, description: "3 Months commitment with savings" },
+                { id: "vip-halfyearly", gymId: gym._id, name: "VIP Half-Yearly", price: cfg.isFemaleOnly ? 19000 : 16000, duration: 180, description: "6 Months access with locker included" },
+                { id: "elite-yearly", gymId: gym._id, name: "Elite Yearly", price: cfg.isFemaleOnly ? 34000 : 28000, duration: 365, description: "All-inclusive annual membership" },
+                { id: "student-monthly", gymId: gym._id, name: "Student Monthly", price: cfg.isFemaleOnly ? 2800 : 2500, duration: 30, description: "Discounted student rate with valid ID" }
             ] as any);
 
-            // 8. Members
-            const memberCount = 65; // Increased count
-            const mDocs = [];
-            for (let m = 0; m < memberCount; m++) {
-                const mName = getRandomName();
+            // 10. Members (50 for Ladies Health Care, 45 for others)
+            const targetMemberCount = cfg.isFemaleOnly ? 50 : 45;
+            console.log(`  • Seeding ${targetMemberCount} Members with chronological history...`);
+
+            const memberDocs = [];
+            const femaleList = [...pakistanFemaleFirstNames];
+            const maleList = [...pakistanMaleFirstNames];
+
+            for (let m = 0; m < targetMemberCount; m++) {
+                let first: string;
+                let gender: "female" | "male";
+
+                if (cfg.isFemaleOnly) {
+                    first = femaleList[m % femaleList.length];
+                    gender = "female";
+                } else {
+                    gender = Math.random() > 0.4 ? "male" : "female";
+                    first = gender === "female"
+                        ? femaleList[m % femaleList.length]
+                        : maleList[m % maleList.length];
+                }
+                const last = pakistanLastNames[m % pakistanLastNames.length];
+                const fullName = `${first} ${last}`;
+                const email = `${first.toLowerCase()}.${last.toLowerCase()}.${cfg.slug}.${m + 1}@gmail.com`;
+
+                // Stagger join dates over the 6-month simulation (0 to 175 days ago)
+                const daysAgo = Math.floor(Math.random() * 175);
+                const joinDate = new Date(NOW.getTime() - (daysAgo * 24 * 60 * 60 * 1000));
+
                 const plan = plans[m % plans.length];
                 const trainer = createdTrainers[m % createdTrainers.length];
-                const joinDate = getRandomDate(1, 0); // Past 1 month (Latest dates)
+                const workoutPlan = createdWorkoutPlans[m % createdWorkoutPlans.length];
 
-                mDocs.push({
-                    firstName: mName.first,
-                    lastName: mName.last,
-                    email: `${mName.first.toLowerCase()}.${mName.last.toLowerCase()}.${i}-${m + 1}@gmail.com`,
+                memberDocs.push({
+                    firstName: first,
+                    lastName: last,
+                    email: email,
                     phone: getRandomPhone(),
-                    gender: mName.gender,
+                    gender: gender,
                     gymId: gym._id,
                     joinDate: joinDate.toISOString(),
                     trainerId: trainer._id,
+                    workoutPlanId: workoutPlan._id,
                     planId: plan.id,
                     status: "active",
                     portalPassword: hashedPassword,
                     portalPin: hashedPin,
                     portalEnabled: true,
-                    qrCode: `QR-${gym._id.toString().substring(0, 4)}-${m + 100}`
+                    qrCode: `QR-${cfg.slug.toUpperCase().slice(0, 3)}-${1000 + m}`,
+                    attendanceStreak: Math.floor(Math.random() * 5),
+                    totalCheckIns: 0,
+                    lastCheckIn: null as any
                 });
             }
-            const createdMembers = await Member.insertMany(mDocs);
 
-            // 9. Subscriptions, Payments, Attendance
-            for (const member of createdMembers) {
-                const joinDate = new Date(member.joinDate);
-                const paymentDates = getMonthlyDates(joinDate);
-                const plan = plans.find(p => p.id === member.planId);
+            const createdMembers = await Member.insertMany(memberDocs);
 
-                // 9.1 Monthly Payments
-                for (const pDate of paymentDates) {
-                    await Payment.create({
-                        memberId: member._id,
-                        amount: plan?.price || 3000,
-                        date: pDate,
-                        method: Math.random() > 0.3 ? "cash" : "bank_transfer",
-                        gymId: gym._id,
-                        collectedBy: manager._id,
-                        description: `Renewal payment for ${plan?.name}`
-                    });
-                }
-
-                // 9.2 Subscription (Set based on latest payment)
-                const lastPaymentDate = paymentDates[paymentDates.length - 1];
-                const expiryDate = new Date(lastPaymentDate);
-                expiryDate.setDate(expiryDate.getDate() + (plan?.duration || 30));
-
-                await Subscription.create({
-                    memberId: member._id.toString(),
-                    planId: member.planId,
-                    startDate: lastPaymentDate.toISOString(),
-                    endDate: expiryDate.toISOString(),
-                    status: expiryDate > new Date() ? "active" : "expired",
-                    gymId: gym._id
+            // Record a few sample member credentials
+            for (let sm = 0; sm < Math.min(5, createdMembers.length); sm++) {
+                const mem = createdMembers[sm];
+                gymCredRecord.sampleMembers.push({
+                    name: `${mem.firstName} ${mem.lastName}`,
+                    email: mem.email,
+                    password: defaultPassword,
+                    pin: defaultPin
                 });
+            }
 
-                // 9.3 Attendance logs (Higher density since join date)
-                const now = new Date();
-                const diffTime = Math.abs(now.getTime() - joinDate.getTime());
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            // 11. Subscriptions, Payments, Attendance, Workouts & Exercise Completions
+            console.log("  • Generating synchronized payments, attendance & workout logs...");
+            const allPayments: any[] = [];
+            const allSubscriptions: any[] = [];
+            const allAttendance: any[] = [];
+            const allAssignedPlans: any[] = [];
+            const allWorkoutLogs: any[] = [];
+            const allExerciseCompletions: any[] = [];
 
-                // Average 4-5 days a week
-                for (let d = 0; d < diffDays; d++) {
-                    if (Math.random() > 0.4) { // 60% attendance rate
-                        const attDate = new Date(joinDate);
-                        attDate.setDate(joinDate.getDate() + d);
-                        if (attDate <= now) {
-                            const checkIn = new Date(attDate);
-                            checkIn.setHours(8 + Math.floor(Math.random() * 12), Math.floor(Math.random() * 60));
-                            await Attendance.create({
-                                gymId: gym._id,
-                                memberId: member._id,
-                                date: attDate,
-                                checkInTime: checkIn,
-                                status: "present"
-                            });
-                        }
-                    }
-                }
+            let receiptCounter = 1;
 
-                // Assigned Workout Plan
-                const assignedPlan = await AssignedWorkoutPlan.create({
+            for (let mIdx = 0; mIdx < createdMembers.length; mIdx++) {
+                const member = createdMembers[mIdx];
+                const plan = plans.find(p => p.id === member.planId)!;
+                const joinDate = new Date(member.joinDate);
+                const assignedWp = createdWorkoutPlans.find(wp => wp._id.toString() === member.workoutPlanId?.toString()) || createdWorkoutPlans[0];
+
+                allAssignedPlans.push({
                     gymId: gym._id,
                     memberId: member._id,
                     trainerId: member.trainerId,
-                    templateId: template._id,
+                    templateId: assignedWp._id,
                     startDate: joinDate,
                     status: "active"
                 });
 
-                // Recent Workout Log
-                await WorkoutLog.create({
+                const durationDays = plan.duration;
+                let cycleDate = new Date(joinDate);
+                let paymentDates: Date[] = [];
+
+                while (cycleDate <= NOW) {
+                    paymentDates.push(new Date(cycleDate));
+                    cycleDate.setDate(cycleDate.getDate() + durationDays);
+                }
+
+                // If member hasn't renewed (e.g. 10% simulated expired)
+                const isSimulatedExpired = (mIdx % 10 === 0 && paymentDates.length > 1);
+                if (isSimulatedExpired) {
+                    paymentDates.pop();
+                }
+
+                for (let pIdx = 0; pIdx < paymentDates.length; pIdx++) {
+                    const pDate = paymentDates[pIdx];
+                    const receiptNum = `RCP-${cfg.slug.toUpperCase().slice(0, 3)}-26-${String(receiptCounter++).padStart(4, '0')}`;
+                    allPayments.push({
+                        memberId: member._id.toString(),
+                        amount: plan.price,
+                        date: pDate.toISOString(), // Critical ISO format
+                        method: pIdx === 0 ? "cash" : (Math.random() > 0.4 ? "bank_transfer" : "card"),
+                        gymId: gym._id,
+                        receiptNumber: receiptNum,
+                        collectedBy: Math.random() > 0.5 ? receptionist._id : manager._id,
+                        description: pIdx === 0 ? `Initial membership fee - ${plan.name}` : `Renewal membership fee - ${plan.name}`,
+                        createdAt: pDate
+                    });
+                }
+
+                const lastPaymentDate = paymentDates[paymentDates.length - 1];
+                const subExpiryDate = new Date(lastPaymentDate);
+                subExpiryDate.setDate(subExpiryDate.getDate() + durationDays);
+
+                let subStatus: "active" | "expired" = "active";
+                if (subExpiryDate < NOW) {
+                    subStatus = "expired";
+                }
+
+                allSubscriptions.push({
+                    memberId: member._id.toString(),
+                    planId: plan.id,
+                    startDate: lastPaymentDate.toISOString(),
+                    endDate: subExpiryDate.toISOString(),
+                    status: subStatus,
                     gymId: gym._id,
-                    memberId: member._id,
-                    trainerId: member.trainerId,
-                    planId: assignedPlan._id,
-                    date: new Date(),
-                    exercises: [
-                        { exerciseId: exercises[0]._id, setsCompleted: 4, repsCompleted: "10", weightUsed: 40 + Math.floor(Math.random() * 40) },
-                        { exerciseId: exercises[2]._id, setsCompleted: 3, repsCompleted: "12", weightUsed: 60 + Math.floor(Math.random() * 60) }
-                    ]
+                    createdAt: lastPaymentDate
                 });
 
-                gymCreds.members.push({ name: `${member.firstName} ${member.lastName}`, email: member.email, password: defaultPassword });
+                // Attendance
+                const attendanceEndDate = subStatus === "expired" ? subExpiryDate : NOW;
+                const daysBetween = Math.max(1, Math.floor((attendanceEndDate.getTime() - joinDate.getTime()) / (24 * 60 * 60 * 1000)));
+
+                let memberCheckInCount = 0;
+                let lastCheckInDate: Date | null = null;
+
+                for (let dayOffset = 0; dayOffset < daysBetween; dayOffset++) {
+                    if (Math.random() > 0.52) {
+                        const attDate = new Date(joinDate.getTime() + (dayOffset * 24 * 60 * 60 * 1000));
+                        if (attDate <= NOW) {
+                            const isMorning = Math.random() > 0.45;
+                            const checkInTime = new Date(attDate);
+                            checkInTime.setHours(isMorning ? 7 + Math.floor(Math.random() * 3) : 17 + Math.floor(Math.random() * 4));
+                            checkInTime.setMinutes(Math.floor(Math.random() * 60));
+
+                            const checkOutTime = new Date(checkInTime);
+                            checkOutTime.setMinutes(checkInTime.getMinutes() + 55 + Math.floor(Math.random() * 35));
+
+                            allAttendance.push({
+                                gymId: gym._id,
+                                memberId: member._id,
+                                date: attDate,
+                                checkInTime: checkInTime,
+                                checkOutTime: checkOutTime,
+                                status: "present",
+                                checkInMethod: Math.random() > 0.3 ? "qr" : "manual"
+                            });
+
+                            memberCheckInCount++;
+                            lastCheckInDate = checkInTime;
+
+                            // Exercise Completions
+                            const daysFromNow = (NOW.getTime() - attDate.getTime()) / (24 * 60 * 60 * 1000);
+                            if (daysFromNow <= 30 && Math.random() > 0.3) {
+                                const sampleEx1 = createdExercises[0];
+                                const sampleEx2 = createdExercises[1];
+                                const dateStr = attDate.toISOString().split("T")[0];
+
+                                allExerciseCompletions.push({
+                                    gymId: gym._id,
+                                    memberId: member._id,
+                                    exerciseId: sampleEx1._id,
+                                    planId: member.workoutPlanId,
+                                    date: dateStr,
+                                    attemptNumber: 1,
+                                    sets: [
+                                        { setNumber: 1, startedAt: checkInTime, completedAt: new Date(checkInTime.getTime() + 60000), durationSeconds: 60, reps: "12", weight: 30 },
+                                        { setNumber: 2, startedAt: new Date(checkInTime.getTime() + 120000), completedAt: new Date(checkInTime.getTime() + 180000), durationSeconds: 60, reps: "10", weight: 35 },
+                                        { setNumber: 3, startedAt: new Date(checkInTime.getTime() + 240000), completedAt: new Date(checkInTime.getTime() + 300000), durationSeconds: 60, reps: "8", weight: 40 }
+                                    ],
+                                    totalSets: 3,
+                                    totalDuration: 180,
+                                    status: "completed",
+                                    completedAt: new Date(checkInTime.getTime() + 300000)
+                                });
+
+                                allWorkoutLogs.push({
+                                    gymId: gym._id,
+                                    memberId: member._id,
+                                    trainerId: member.trainerId,
+                                    planId: member.workoutPlanId,
+                                    date: attDate,
+                                    exercises: [
+                                        { exerciseId: sampleEx1._id, setsCompleted: 3, repsCompleted: "10", weightUsed: 35 },
+                                        { exerciseId: sampleEx2._id, setsCompleted: 3, repsCompleted: "12", weightUsed: 25 }
+                                    ]
+                                });
+                            }
+                        }
+                    }
+                }
+
+                member.totalCheckIns = memberCheckInCount;
+                if (lastCheckInDate) member.lastCheckIn = lastCheckInDate;
+                await member.save();
             }
 
-            // 10. Trainer Availability & Bookings
-            for (const trainer of createdTrainers) {
-                const availDays = [1, 2, 3, 4, 5]; // Mon-Fri
-                for (const day of availDays) {
+            await Payment.insertMany(allPayments as any);
+            await Subscription.insertMany(allSubscriptions as any);
+            await Attendance.insertMany(allAttendance as any);
+            await AssignedWorkoutPlan.insertMany(allAssignedPlans as any);
+            await WorkoutLog.insertMany(allWorkoutLogs as any);
+            await ExerciseCompletion.insertMany(allExerciseCompletions as any);
+
+            console.log(`    ✓ Seeded ${allPayments.length} Payments`);
+            console.log(`    ✓ Seeded ${allSubscriptions.length} Subscriptions`);
+            console.log(`    ✓ Seeded ${allAttendance.length} Attendance check-ins`);
+            console.log(`    ✓ Seeded ${allExerciseCompletions.length} Exercise Completion logs`);
+
+            // 12. Selling Module
+            console.log("  • Seeding Selling / POS / Store Module...");
+
+            const catSupplements = await ProductCategory.create({
+                gymId: gym._id,
+                name: "Nutrition & Supplements",
+                slug: "supplements",
+                description: "Whey protein, amino acids, multivitamins, and recovery blends",
+                isActive: true
+            });
+
+            const catApparel = await ProductCategory.create({
+                gymId: gym._id,
+                name: cfg.isFemaleOnly ? "Women's Activewear" : "Fitness Apparel & Gear",
+                slug: "apparel",
+                description: cfg.isFemaleOnly ? "High-waist leggings, sports tops, grip socks" : "Gym shirts, shorts, lifting wraps",
+                isActive: true
+            });
+
+            const catAccessories = await ProductCategory.create({
+                gymId: gym._id,
+                name: "Accessories & Equipment",
+                slug: "accessories",
+                description: "Shakers, resistance loops, micro-towels, water flasks",
+                isActive: true
+            });
+
+            const brandON = await ProductBrand.create({
+                gymId: gym._id,
+                name: "Optimum Nutrition",
+                slug: "optimum-nutrition",
+                description: "World recognized sports nutrition standards"
+            });
+
+            const brandGym = await ProductBrand.create({
+                gymId: gym._id,
+                name: cfg.name,
+                slug: cfg.slug,
+                description: `Official branded merchandise from ${cfg.name}`
+            });
+
+            const productCatalog = cfg.isFemaleOnly ? [
+                {
+                    name: "Optimum Nutrition 100% Gold Whey Isolate - Vanilla",
+                    slug: "on-gold-whey-isolate-vanilla",
+                    shortDesc: "Pure fast-absorbing whey protein isolate with minimal carbs.",
+                    price: 19500, discountPrice: 18000,
+                    stock: 35, sku: "LHC-WHEY-ISO-VAN",
+                    cat: catSupplements._id, brand: brandON._id
+                },
+                {
+                    name: "Hydrolyzed Collagen Peptides & Biotin Blend",
+                    slug: "collagen-peptides-biotin",
+                    shortDesc: "Supports joint flexibility, healthy skin, hair, and nail rejuvenation.",
+                    price: 6800, discountPrice: 6200,
+                    stock: 45, sku: "LHC-COLLAGEN-BIO",
+                    cat: catSupplements._id, brand: brandON._id
+                },
+                {
+                    name: "Women's High-Waist Seamless Compression Tights",
+                    slug: "womens-high-waist-compression-tights",
+                    shortDesc: "Squat-proof, breathable 4-way stretch fabric with tummy control.",
+                    price: 3200, discountPrice: 2800,
+                    stock: 60, sku: "LHC-TIGHTS-BLK-M",
+                    cat: catApparel._id, brand: brandGym._id
+                },
+                {
+                    name: "Fabric Resistance Booty Bands (Set of 3 Levels)",
+                    slug: "fabric-resistance-booty-bands-set",
+                    shortDesc: "Non-slip woven fabric bands for glute activation and warmups.",
+                    price: 1800, discountPrice: 1500,
+                    stock: 75, sku: "LHC-BANDS-SET3",
+                    cat: catAccessories._id, brand: brandGym._id
+                },
+                {
+                    name: "Insulated Stainless Steel Gym Flask (750ml)",
+                    slug: "insulated-stainless-gym-flask",
+                    shortDesc: "Keeps water chilled for 24 hours. Leak-proof sports straw lid.",
+                    price: 2200, discountPrice: 1900,
+                    stock: 40, sku: "LHC-FLASK-750",
+                    cat: catAccessories._id, brand: brandGym._id
+                }
+            ] : [
+                {
+                    name: "Optimum Nutrition 100% Whey Gold Standard - 5lbs Chocolate",
+                    slug: "on-gold-standard-whey-5lb-choc",
+                    shortDesc: "The gold standard for muscle recovery with 24g pure protein per scoop.",
+                    price: 18500, discountPrice: 17200,
+                    stock: 30, sku: "GYM-ON-WHEY-5LB",
+                    cat: catSupplements._id, brand: brandON._id
+                },
+                {
+                    name: "Cellucor C4 Original Pre-Workout (30 Servings)",
+                    slug: "cellucor-c4-original-preworkout",
+                    shortDesc: "Explosive energy and endurance formula with Beta-Alanine.",
+                    price: 6500, discountPrice: 5900,
+                    stock: 40, sku: "GYM-C4-PRE-30",
+                    cat: catSupplements._id, brand: brandON._id
+                },
+                {
+                    name: "GymFlow Engineered Performance T-Shirt",
+                    slug: "gymflow-engineered-performance-tshirt",
+                    shortDesc: "Ultra-breathable sweat-wicking training tee with gym logo.",
+                    price: 1800, discountPrice: 1500,
+                    stock: 70, sku: "GYM-TEE-PERF-L",
+                    cat: catApparel._id, brand: brandGym._id
+                },
+                {
+                    name: "Heavy Duty Cotton Lifting Straps",
+                    slug: "heavy-duty-cotton-lifting-straps",
+                    shortDesc: "Neoprene padded wrist support for heavy deadlifts and pulls.",
+                    price: 1200, discountPrice: 950,
+                    stock: 80, sku: "GYM-STRAPS-COTTON",
+                    cat: catAccessories._id, brand: brandGym._id
+                },
+                {
+                    name: "Premium Microfiber Gym Sweat Towel",
+                    slug: "premium-microfiber-gym-sweat-towel",
+                    shortDesc: "Quick-drying, antibacterial workout bench towel with phone pocket.",
+                    price: 850, discountPrice: 750,
+                    stock: 90, sku: "GYM-TOWEL-MICRO",
+                    cat: catAccessories._id, brand: brandGym._id
+                }
+            ];
+
+            const createdProducts: any[] = [];
+            for (const p of productCatalog) {
+                const prod = await Product.create({
+                    gymId: gym._id,
+                    name: p.name,
+                    slug: p.slug,
+                    shortDescription: p.shortDesc,
+                    description: `<p>${p.shortDesc}</p>`,
+                    price: p.price,
+                    discountPrice: p.discountPrice,
+                    categoryId: p.cat,
+                    brandId: p.brand,
+                    status: "active",
+                    trackInventory: true,
+                    stockQuantity: p.stock,
+                    sku: p.sku,
+                    visibility: "public",
+                    images: []
+                });
+                createdProducts.push(prod);
+
+                await InventoryLog.create({
+                    gymId: gym._id,
+                    productId: prod._id,
+                    type: "restock",
+                    quantityChange: p.stock,
+                    previousQuantity: 0,
+                    newQuantity: p.stock,
+                    reason: "Initial Gym Launch Stocking",
+                    performedBy: manager._id,
+                    createdAt: gymCreatedAt
+                });
+            }
+
+            console.log("  • Simulating POS sales and orders...");
+            let orderReceiptCount = 1;
+            for (let ordIdx = 0; ordIdx < 25; ordIdx++) {
+                const ordMember = createdMembers[Math.floor(Math.random() * createdMembers.length)];
+                const ordMemberJoin = new Date(ordMember.joinDate);
+                const orderTime = new Date(ordMemberJoin.getTime() + Math.random() * (NOW.getTime() - ordMemberJoin.getTime()));
+                const prod1 = createdProducts[ordIdx % createdProducts.length];
+                const prod2 = createdProducts[(ordIdx + 2) % createdProducts.length];
+
+                const qty1 = 1;
+                const qty2 = ordIdx % 3 === 0 ? 1 : 0;
+
+                const items = [
+                    {
+                        productId: prod1._id,
+                        name: prod1.name,
+                        quantity: qty1,
+                        unitPrice: prod1.discountPrice || prod1.price,
+                        subtotal: (prod1.discountPrice || prod1.price) * qty1
+                    }
+                ];
+
+                if (qty2 > 0) {
+                    items.push({
+                        productId: prod2._id,
+                        name: prod2.name,
+                        quantity: qty2,
+                        unitPrice: prod2.discountPrice || prod2.price,
+                        subtotal: (prod2.discountPrice || prod2.price) * qty2
+                    });
+                }
+
+                const total = items.reduce((acc, curr) => acc + curr.subtotal, 0);
+                const orderReceipt = `ORD-${cfg.slug.toUpperCase().slice(0, 3)}-26-${String(orderReceiptCount++).padStart(4, '0')}`;
+
+                await Order.create({
+                    gymId: gym._id,
+                    memberId: ordMember._id,
+                    processedBy: receptionist._id,
+                    items: items,
+                    totalAmount: total,
+                    discountAmount: 0,
+                    taxAmount: 0,
+                    finalAmount: total,
+                    paymentMethod: ordIdx % 2 === 0 ? "cash" : "card",
+                    status: "completed",
+                    source: "pos",
+                    receiptNumber: orderReceipt,
+                    createdAt: orderTime
+                });
+
+                if (prod1.stockQuantity > qty1) {
+                    const prev1 = prod1.stockQuantity;
+                    prod1.stockQuantity -= qty1;
+                    await prod1.save();
+                    await InventoryLog.create({
+                        gymId: gym._id,
+                        productId: prod1._id,
+                        type: "sale",
+                        quantityChange: -qty1,
+                        previousQuantity: prev1,
+                        newQuantity: prod1.stockQuantity,
+                        reason: "POS Front Desk Sale",
+                        referenceId: orderReceipt,
+                        performedBy: receptionist._id,
+                        createdAt: orderTime
+                    });
+                }
+            }
+
+            // 13. Trainer Slots & Bookings
+            console.log("  • Seeding Trainer Availability and Bookings...");
+            for (const tr of createdTrainers) {
+                for (let day = 1; day <= 5; day++) {
                     const avail = await TrainerAvailability.create({
-                        trainerId: trainer._id,
+                        trainerId: tr._id,
                         dayOfWeek: day,
                         startTime: "09:00",
                         endTime: "18:00",
@@ -453,104 +1155,142 @@ async function seed() {
                         gymId: gym._id
                     });
 
-                    // Create some slots for next 3 days
-                    const today = new Date();
-                    for (let d = 0; d < 3; d++) {
-                        const slotDate = new Date(today);
-                        slotDate.setDate(today.getDate() + d);
-                        if (slotDate.getDay() === day) {
-                            const startTime = "10:00";
-                            const endTime = "11:00";
+                    const yesterday = new Date(NOW.getTime() - 24 * 60 * 60 * 1000);
+                    const slotYesterday = await TrainerSlot.create({
+                        trainerId: tr._id,
+                        availabilityId: avail._id,
+                        date: yesterday,
+                        startTime: "11:00",
+                        endTime: "12:00",
+                        capacity: 1,
+                        gymId: gym._id,
+                        status: "full"
+                    });
 
-                            const slot = await TrainerSlot.create({
-                                trainerId: trainer._id,
-                                availabilityId: avail._id,
-                                date: slotDate,
-                                startTime,
-                                endTime,
-                                capacity: 1,
-                                gymId: gym._id,
-                                status: "available"
-                            });
+                    const clientMember = createdMembers[Math.floor(Math.random() * createdMembers.length)];
+                    const booking = await TrainerBooking.create({
+                        gymId: gym._id,
+                        memberId: clientMember._id,
+                        trainerId: tr._id,
+                        slotId: slotYesterday._id,
+                        startTime: "11:00",
+                        endTime: "12:00",
+                        bookingDate: yesterday,
+                        status: "completed"
+                    });
 
-                            // Book one slot for variety
-                            if (d === 1) {
-                                const member = createdMembers[Math.floor(Math.random() * createdMembers.length)];
-                                const booking = await TrainerBooking.create({
-                                    gymId: gym._id,
-                                    memberId: member._id,
-                                    trainerId: trainer._id,
-                                    slotId: slot._id,
-                                    startTime: slot.startTime,
-                                    endTime: slot.endTime,
-                                    bookingDate: slot.date,
-                                    status: "booked"
-                                });
-                                booking.status = "booked"; // Should be booked (already is)
-                                slot.status = "full";
-                                await slot.save();
+                    await TrainerSessionLog.create({
+                        bookingId: booking._id,
+                        trainerId: tr._id,
+                        memberId: clientMember._id,
+                        gymId: gym._id,
+                        trainerNotes: `Client had exceptional form and energy. Finished all working sets on time. Recommended 2.5kg load progression next week.`
+                    });
 
-                                // Historical session log
-                                if (slotDate < new Date()) {
-                                    await TrainerSessionLog.create({
-                                        bookingId: booking._id,
-                                        trainerId: trainer._id,
-                                        memberId: member._id,
-                                        gymId: gym._id,
-                                        trainerNotes: "Focused on form today. Improved squat depth."
-                                    });
-                                }
-                            }
-                        }
-                    }
+                    const tomorrow = new Date(NOW.getTime() + 24 * 60 * 60 * 1000);
+                    await TrainerSlot.create({
+                        trainerId: tr._id,
+                        availabilityId: avail._id,
+                        date: tomorrow,
+                        startTime: "15:00",
+                        endTime: "16:00",
+                        capacity: 1,
+                        gymId: gym._id,
+                        status: "available"
+                    });
                 }
             }
 
-            // 11. Platform Payments (Gym to Platform)
-            await PlatformPayment.create({
+            // 14. Notifications
+            console.log("  • Seeding Notifications & Media Assets...");
+            await Notification.create([
+                {
+                    gymId: gym._id,
+                    targetRoles: ["owner", "staff"],
+                    title: "Welcome to GymFlow SaaS",
+                    message: `System setup for ${cfg.name} completed. All modules active.`,
+                    type: "system_alert",
+                    createdAt: gymCreatedAt
+                },
+                {
+                    gymId: gym._id,
+                    targetRoles: ["staff"],
+                    title: "Inventory Alert: High Whey Sales",
+                    message: "Gold Standard Whey is selling rapidly through the POS. Check warehouse reorder levels.",
+                    type: "info",
+                    createdAt: new Date(NOW.getTime() - 48 * 60 * 60 * 1000)
+                }
+            ]);
+
+            // 15. Assets & Folders
+            const assetFolder = await AssetFolder.create({
                 gymId: gym._id,
-                amountPKR: 5000,
-                paymentDate: getRandomDate(0.5, 0),
-                expiryDate: getRandomDate(0, 1),
-                enteredBy: owner._id,
-                planName: "Professional",
-                status: "completed"
+                name: "Store Catalogs",
+                createdBy: manager._id
             });
 
-            // 12. Audit Logs
-            const logActions = ["create_member", "update_settings", "process_payment", "update_plan"];
-            for (let l = 0; l < 10; l++) {
+            await Asset.create({
+                gymId: gym._id,
+                name: `${cfg.slug}-banner.jpg`,
+                type: "image",
+                url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200",
+                publicId: `gyms/${cfg.slug}/banner_01`,
+                folderId: assetFolder._id,
+                size: 245120,
+                createdBy: manager._id
+            });
+
+            // 16. API Key
+            await ApiKey.create({
+                gymId: gym._id,
+                name: "Store Public Webhook & Widget Key",
+                keyId: `gms_${cfg.slug}_live_key`,
+                key: crypto.createHash("sha256").update(`key_${cfg.slug}_123`).digest("hex"),
+                secret: crypto.createHash("sha256").update(`secret_${cfg.slug}_456`).digest("hex"),
+                permissions: ["store:read", "inventory:read", "orders:create"],
+                isActive: true
+            });
+
+            // 17. Audit Logs
+            const logActions = ["member:created", "payment:recorded", "plan:assigned", "order:completed"];
+            for (let l = 0; l < 8; l++) {
                 await AuditLog.create({
                     gymId: gym._id,
-                    userId: manager._id,
-                    userName: manager.fullName,
+                    userId: receptionist._id,
+                    userName: receptionist.fullName,
                     action: logActions[l % logActions.length],
                     resource: "system",
-                    details: { message: `Performed ${logActions[l % logActions.length]} action` },
-                    ipAddress: "182.180.1.1"
+                    details: { message: `Performed ${logActions[l % logActions.length]} in normal workflow` },
+                    ipAddress: "182.180.1.15",
+                    createdAt: new Date(NOW.getTime() - (l * 4 * 24 * 60 * 60 * 1000))
                 });
             }
 
-            globalCredentials.push(gymCreds);
+            console.log(`✅ Completed setup for ${cfg.name}.`);
         }
 
-        // 13. Super Admin
-        console.log("Seeding Super Admin...");
-        const admin = await User.create({
-            fullName: "Super Admin",
-            email: "admin@gms.com",
-            password: hashedPassword,
-            role: "super_admin",
-            isActive: true
-        });
-        globalCredentials.push({ role: "super-admin", email: admin.email, password: defaultPassword });
+        // ─────────────────────────────────────────────────────────────────────────
+        // SAVE CREDENTIALS JSON FILE
+        // ─────────────────────────────────────────────────────────────────────────
+        const credentialsFilePath = path.join(process.cwd(), "seed_pakistani_credentials.json");
+        fs.writeFileSync(credentialsFilePath, JSON.stringify(credentialsExport, null, 2));
 
-        fs.writeFileSync("seed_pakistani_credentials.json", JSON.stringify(globalCredentials, null, 2));
-        console.log("Seeding process completed successfully.");
-        console.log("Credentials saved to 'seed_pakistani_credentials.json'");
+        console.log("\n==========================================================");
+        console.log("🎉 DATABASE SEEDING COMPLETED SUCCESSFULLY!");
+        console.log("==========================================================");
+        console.log(`📁 Credentials exported to: ${credentialsFilePath}`);
+        console.log("\n⭐ FEATURED GYM: LADIES HEALTH CARE");
+        console.log(`  • Owner:        ${credentialsExport.featuredGym.owner.email} (${credentialsExport.featuredGym.owner.name})`);
+        console.log(`  • Manager:      ${credentialsExport.featuredGym.manager.email} (${credentialsExport.featuredGym.manager.name})`);
+        console.log(`  • Receptionist: ${credentialsExport.featuredGym.receptionist.email} (${credentialsExport.featuredGym.receptionist.name})`);
+        console.log(`  • Password:     ${defaultPassword}`);
+        console.log("\n⭐ SUPER ADMIN:");
+        console.log(`  • Email:        ${credentialsExport.superAdmin.email}`);
+        console.log(`  • Password:     ${defaultPassword}`);
+        console.log("==========================================================\n");
 
-    } catch (e) {
-        console.error("Seeding failed:", e);
+    } catch (error) {
+        console.error("❌ Seeding failed with error:", error);
         process.exit(1);
     } finally {
         await mongoose.connection.close();

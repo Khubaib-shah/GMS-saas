@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
@@ -12,8 +12,8 @@ const stats = [
 ]
 
 function StatItem({ value, label }: { value: string; label: string }) {
-  const [displayValue, setDisplayValue] = useState("0")
   const ref = useRef<HTMLDivElement>(null)
+  const valRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -23,7 +23,6 @@ function StatItem({ value, label }: { value: string; label: string }) {
     const target = parseFloat(numericPart)
     
     // Extract prefix and suffix (e.g. "Rs " and "M+")
-    // We look for anything that isn't a digit or dot at the start and end
     const prefix = value.match(/^[^\d.]*/)?.[0] || ""
     const suffix = value.match(/[^\d.]*$/)?.[0] || ""
     const hasDecimals = value.includes('.')
@@ -40,13 +39,14 @@ function StatItem({ value, label }: { value: string; label: string }) {
         toggleActions: "play none none none",
       },
       onUpdate: () => {
+        if (!valRef.current) return
         let formatted = ""
         if (hasDecimals) {
           formatted = obj.val.toFixed(1)
         } else {
           formatted = Math.floor(obj.val).toLocaleString()
         }
-        setDisplayValue(`${prefix}${formatted}${suffix}`)
+        valRef.current.textContent = `${prefix}${formatted}${suffix}`
       }
     })
 
@@ -66,8 +66,12 @@ function StatItem({ value, label }: { value: string; label: string }) {
         <div className="stat-line stat-rightl" />
         
         <div className="relative z-20">
-          <div className="text-xl md:text-3xl font-bold tracking-tight stat-value">{displayValue}</div>
-          <div className="text-[10px] md:text-[12px] text-white/80 uppercase tracking-widest mt-1 !font-normal">{label}</div>
+          <div ref={valRef} className="text-xl md:text-3xl font-bold tracking-tight stat-value">
+            0
+          </div>
+          <div className="text-[10px] md:text-[12px] text-white/80 uppercase tracking-widest mt-1 !font-normal">
+            {label}
+          </div>
         </div>
       </div>
     </div>
@@ -78,7 +82,7 @@ export function SocialProof() {
   return (
     <section className="py-6 md:py-8 px-2 md:px-6 md:mt-20">
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8 rounded-xl overflow-hidden ">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8 rounded-xl overflow-hidden">
           {stats.map((s, i) => (
             <StatItem key={i} value={s.value} label={s.label} />
           ))}

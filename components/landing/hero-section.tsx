@@ -31,7 +31,7 @@ export function HeroSection() {
     });
     let mm = gsap.matchMedia();
 
-    // Desktop/Tablet: Keep premium 3D rotate and scale animation
+    // Desktop/Tablet: Keep 3D rotate and scale animation with smooth scrub
     mm.add("(min-width: 768px)", () => {
       gsap.set(mockup, {
         rotationX: 60,
@@ -46,32 +46,32 @@ export function HeroSection() {
           trigger: mockup,
           start: "top bottom",
           end: "bottom top",
-          scrub: 1,
+          scrub: 0.8,
         },
       });
 
-    // Phase 1: Straighten out and scale to 1 (takes first 50% of the scroll)
-    tl.to(mockup, {
-      rotationX: 0,
-      scale: 1,
-      duration: 1,
-      ease: "power1.out",
-    })
-      // Phase 2: Keep scaling and fade out (takes remaining 50% of scroll)
-      .to(mockup, {
-        rotationX: isMobile ? -10 : -20,
-        scale: isMobile ? 1.05 : 1.25,
-        opacity: 0,
+      // Phase 1: Straighten out and scale to 1 (takes first 50% of the scroll)
+      tl.to(mockup, {
+        rotationX: 0,
+        scale: 1,
         duration: 1,
-        ease: "power1.in",
-      });
+        ease: "power1.out",
+      })
+        // Phase 2: Keep scaling and fade out (takes remaining 50% of scroll)
+        .to(mockup, {
+          rotationX: isMobile ? -10 : -20,
+          scale: isMobile ? 1.05 : 1.25,
+          opacity: 0,
+          duration: 1,
+          ease: "power1.in",
+        });
 
       return () => {
         tl.kill();
       };
     });
 
-    // Mobile (iPhone 12, etc.): Disable 3D transforms and complex scrubbing to avoid lag/freezing
+    // Mobile: Performant fade-in and subtle scale
     mm.add("(max-width: 767px)", () => {
       gsap.set(mockup, {
         rotationX: 0,
@@ -80,7 +80,6 @@ export function HeroSection() {
         opacity: 1,
       });
 
-      // Simple, performant fade-in and slight scale up instead of raw scroll-scrubbing
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: mockup,
@@ -103,6 +102,7 @@ export function HeroSection() {
       mm.revert();
     };
   }, []);
+
   return (
     <section className="relative pt-32 md:pt-40 pb-0 px-4 md:px-6 overflow-hidden">
       {/* Dot grid background */}
@@ -124,11 +124,10 @@ export function HeroSection() {
           title="Stop losing money.\n"
           highlight="Run your gym"
           subtitle="smarter."
-          delay={.4}
+          delay={0.2}
         />
 
         {/* Sub */}
-        
         <p className="text-[15px] md:text-[17px] text-white/80 max-w-xl mx-auto leading-relaxed mb-6 md:mb-8">
           Memberships, smart billing, automated QR attendance, automated reminders,
           workout tracking, POS system, and much more — everything your gym needs to run on autopilot.
@@ -163,7 +162,7 @@ export function HeroSection() {
         </div>
 
         {/* Browser mockup */}
-        <div ref={mockupRef} className="relative mx-auto max-w-5xl">
+        <div ref={mockupRef} className="relative mx-auto max-w-5xl will-change-transform">
           {/* Browser chrome */}
           <div className="rounded-t-xl border border-white/[0.08] border-b-0 bg-white/[0.04] px-4 py-3 flex items-center gap-2">
             <div className="flex gap-1.5">

@@ -13,9 +13,9 @@ export function PreLoader() {
       setLoading(false)
       document.documentElement.classList.remove('loading')
       window.dispatchEvent(new CustomEvent('pageLoaded'))
-      const removeTimer = setTimeout(() => setShouldRender(false), 800)
+      const removeTimer = setTimeout(() => setShouldRender(false), 600)
       return () => clearTimeout(removeTimer)
-    }, 2500)
+    }, 1000)
 
     return () => {
       clearTimeout(timer)
@@ -28,11 +28,10 @@ export function PreLoader() {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-10000 flex flex-col items-center justify-center text-white bg-card transition-all duration-700 ease-in-out",
+        "fixed inset-0 z-[10000] flex flex-col items-center justify-center text-white bg-card transition-all duration-500 ease-in-out",
         loading ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
       )}
     >
-
       {/* Dot grid background */}
       <div
         className="absolute inset-0 -z-10"
@@ -43,15 +42,8 @@ export function PreLoader() {
       />
       <div className="relative flex flex-col items-center gap-8">
         {/* Animated Background Atmosphere */}
-        <div className="absolute inset-0 -z-10 flex items-center justify-center">
-          <div className="w-[300px] h-[300px] bg-primary/10 rounded-full blur-[80px] animate-pulse"></div>
-          <div className="w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] animate-pulse-glow"></div>
-        </div>
-
-        {/* Orbiting Elements */}
-        <div className="absolute inset-0 -z-10 flex items-center justify-center">
-          <div className="w-64 h-64 rounded-full border border-primary/10 animate-orbit-1"></div>
-          <div className="w-80 h-80 rounded-full border border-primary/5 animate-orbit-2"></div>
+        <div className="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none">
+          <div className="w-[300px] h-[300px] bg-primary/10 rounded-full blur-[80px]"></div>
         </div>
 
         {/* Logo / Brand */}
@@ -61,7 +53,7 @@ export function PreLoader() {
               GYM<span className="text-primary drop-shadow-[0_0_20px_rgba(190,255,0,0.6)]">FLOW</span>
             </h1>
             {/* Underline Glow */}
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-linear-to-r from-transparent via-primary/50 to-transparent"></div>
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
           </div>
 
           {/* Premium Loading Bar */}
@@ -81,7 +73,7 @@ export function PreLoader() {
               <div
                 key={i}
                 className="size-2 rounded-full bg-primary/50 animate-bounce"
-                style={{ animationDelay: `${i * 0.35}s` }}
+                style={{ animationDelay: `${i * 0.2}s` }}
               />
             ))}
           </div>
